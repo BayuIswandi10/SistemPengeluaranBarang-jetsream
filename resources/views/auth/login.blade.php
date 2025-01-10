@@ -66,8 +66,8 @@
                         @csrf
 
                         <div class="form-group">
-                            <x-label for="name" value="{{ __('Email') }}" />
-                            <x-input id="name" class="form-control" type="text" name="name" :value="old('name')" required autofocus autocomplete="username" />
+                            <x-label for="email" value="{{ __('Email') }}" />
+                            <x-input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                         </div>
 
                         <div class="form-group mt-4">
@@ -81,7 +81,7 @@
                                 <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                             </label>
                         </div>
-
+                        
                         <div class="text-center mt-4">
                             @if (Route::has('password.request'))
                                 <a class="btn btn-danger" href="{{ route('password.request') }}">
