@@ -10,8 +10,28 @@
             @csrf
 
             <div>
+                <x-label for="nrp_karyawan" value="{{ __('NRP Karyawan') }}" />
+                <x-input id="nrp_karyawan" class="block mt-1 w-full" type="text" name="nrp_karyawan" :value="old('nrp_karyawan')" required autofocus autocomplete="nrp_karyawan" />
+            </div>            
+
+            <div>
                 <x-label for="name" value="{{ __('Name') }}" />
                 <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            </div>
+
+            <div>
+                <x-label for="seksi" value="{{ __('Seksi') }}" />
+                <x-input id="seksi" class="block mt-1 w-full" type="text" name="seksi" :value="old('seksi')" required autofocus autocomplete="seksi" />
+            </div>
+
+            <div>
+                <x-label for="departemen" value="{{ __('Departemen') }}" />
+                <x-input id="departemen" class="block mt-1 w-full" type="text" name="departemen" :value="old('departemen')" required autofocus autocomplete="departemen" />
+            </div>
+
+            <div>
+                <x-label for="level" value="{{ __('Level') }}" />
+                <x-input id="level" class="block mt-1 w-full" type="text" name="level" :value="old('level')" required autofocus autocomplete="level" />
             </div>
 
             <div class="mt-4">

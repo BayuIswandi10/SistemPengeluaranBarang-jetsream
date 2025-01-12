@@ -20,16 +20,25 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         Validator::make($input, [
+            'nrp_karyawan' => ['required', 'string', 'max:255', 'unique:users,nrp_karyawan'], // Validasi NRP
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'seksi' => ['required', 'string', 'max:255'],
+            'departemen' => ['required', 'string', 'max:255'],
+            'level' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
-
+        
         return User::create([
+            'nrp_karyawan' => $input['nrp_karyawan'], // Simpan NRP
             'name' => $input['name'],
             'email' => $input['email'],
+            'seksi' => $input['seksi'],
+            'departemen' => $input['departemen'],
+            'level' => $input['level'],
             'password' => Hash::make($input['password']),
         ]);
+        
     }
 }

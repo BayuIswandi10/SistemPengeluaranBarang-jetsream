@@ -25,8 +25,17 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    protected $primaryKey = 'nrp_karyawan';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
+        'nrp_karyawan',
         'name',
+        'seksi',
+        'departemen',
+        'level',
         'email',
         'password',
     ];

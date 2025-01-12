@@ -66,8 +66,8 @@
                         @csrf
 
                         <div class="form-group">
-                            <x-label for="email" value="{{ __('Email') }}" />
-                            <x-input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                            <x-label for="email" value="{{ __('Nrp/Email') }}" />
+                            <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="username" />
                         </div>
 
                         <div class="form-group mt-4">
