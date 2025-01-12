@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class BarangKeluar extends Model
 {
@@ -16,11 +17,24 @@ class BarangKeluar extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'barang_keluar_id',
         'nama_barang',
         'jumlah_barang',
         'satuan_barang',
         'keterangan_barang',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Generate UUID for barang_keluar_id automatically
+        static::creating(function ($model) {
+            if (empty($model->barang_keluar_id)) {
+                $model->barang_keluar_id = (string) Str::uuid();
+            }
+        });
+    }
 
     public function pengeluaranBarang()
     {

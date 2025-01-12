@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('detail_pengeluaran_id')->primary();
             $table->string('barang_keluar_id');
             $table->string('pengeluaran_barang_id');
-            $table->integer('jumlah');
 
             $table->foreign('barang_keluar_id')
                 ->references('barang_keluar_id')->on('tb_barang_keluar')

@@ -16,6 +16,7 @@ class PengeluaranBarang extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'pengeluaran_barang_id', 
         'created_by',
         'created_date',
         'tujuan_pengeluaran_barang',
