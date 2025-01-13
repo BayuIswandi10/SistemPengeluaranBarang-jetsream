@@ -4,81 +4,189 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PengeluaranBarang;
-use Illuminate\Support\Str;
 use App\Models\BarangKeluar;
-
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PengeluaranBarangController extends Controller
 {
-    public function index()
+    private function generateSuratJalan()
     {
-        //
+        // Ambil user yang sedang login
+        $user = Auth::user();
+        $dept = $user->departemen; // Kolom departemen dari tabel users
+        $plant = 'P1'; // Plant diatur statis
+
+        // Ambil tahun dan bulan saat ini
+        $tahun = now()->format('Y');
+        $bulanAngka = now()->format('m');
+        $bulanRomawi = $this->convertToRoman($bulanAngka);
+
+        // Hitung nomor urut surat jalan untuk bulan dan tahun yang sama
+        $lastNumber = DB::table('tb_pengeluaran_barang')
+            ->whereYear('created_date', $tahun)
+            ->whereMonth('created_date', $bulanAngka)
+            ->count();
+
+        $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+
+        // Gabungkan menjadi format surat jalan
+        return "{$noSurat} / {$dept} / {$plant} / {$bulanRomawi} / {$tahun}";
     }
 
-    public function create()
+    private function generateBarangKeluarId()
     {
-        return view('livewire.form-pengeluaran');
+        // Ambil user yang sedang login
+        $user = Auth::user();
+        $dept = $user->departemen; // Kolom departemen dari tabel users
+        $plant = 'P1'; // Plant diatur statis
+        $bulanAngka = now()->format('m');
+        $tahun = now()->format('Y');
+        $bulanRomawi = $this->convertToRoman($bulanAngka); // Konversi bulan ke romawi
+
+        // Cari nomor terbesar yang sudah ada untuk departemen ini
+        $lastNumber = DB::table('tb_barang_keluar')
+            ->where('barang_keluar_id', 'LIKE', 'BGKLR%' . $dept . '%')
+            ->where('barang_keluar_id', 'LIKE', '%/' . $plant . '/%' . $bulanRomawi . '/' . $tahun)
+            ->max(DB::raw('CAST(SUBSTRING(barang_keluar_id, 7, 4) AS UNSIGNED)'));
+
+        // Tentukan nomor urut berikutnya
+        $nextNumber = $lastNumber + 1;
+        $barangKeluarId = 'BGKLR/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT) . '/' . $dept . '/' . $plant . '/' . $bulanRomawi . '/' . $tahun;
+
+        return $barangKeluarId;
     }
 
+    private function generateDetailPengeluaranId($index)
+    {
+        // Ambil user yang sedang login
+        $user = Auth::user();
+        $dept = $user->departemen; // Kolom departemen dari tabel users
+        $plant = 'P1'; // Plant diatur statis
+        $bulanAngka = now()->format('m');
+        $tahun = now()->format('Y');
+        $bulanRomawi = $this->convertToRoman($bulanAngka); // Konversi bulan ke romawi
 
+        // Cari nomor terbesar yang sudah ada untuk departemen ini
+        $lastNumber = DB::table('tb_detail_pengeluaran')
+            ->where('detail_pengeluaran_id', 'LIKE', 'DTPGL%' . $dept . '%')
+            ->where('detail_pengeluaran_id', 'LIKE', '%/' . $plant . '/%' . $bulanRomawi . '/' . $tahun)
+            ->max(DB::raw('CAST(SUBSTRING(detail_pengeluaran_id, 7, 5) AS UNSIGNED)'));
+
+        // Tentukan nomor urut berikutnya
+        $nextNumber = $lastNumber + 1;
+        $detailPengeluaranId = 'DTPGL/' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT) . '/' . $dept . '/' . $plant . '/' . $bulanRomawi . '/' . $tahun;
+
+        return $detailPengeluaranId;
+    }
+
+    private function convertToRoman($month)
+    {
+        $romans = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV',
+            5 => 'V', 6 => 'VI', 7 => 'VII', 8 => 'VIII',
+            9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+
+        return $romans[intval($month)];
+    }
+
+    // public function store(Request $request)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $user = Auth::user();
+    //         $nrpKaryawan = $user->nrp_karyawan;
+
+    //         // Generate nomor surat jalan
+    //         $pengeluaranBarangId = $this->generateSuratJalan();
+
+    //         // Insert ke tabel pengeluaran_barang
+    //         $pengeluaranBarang = PengeluaranBarang::create([
+    //             'pengeluaran_barang_id' => $pengeluaranBarangId,
+    //             'created_by' => $nrpKaryawan,
+    //             'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
+    //             'jenis_kendaraan' => $request->input('jenis_kendaraan'),
+    //         ]);
+
+    //         // Iterasi barang dan buat entry pada barang_keluar
+    //         foreach ($request->input('barang_ids') as $index => $barangId) {
+    //             // Generate barang_keluar_id secara otomatis
+    //             $barangKeluarId = 'BGKLR/' . str_pad($index + 1, 4, '0', STR_PAD_LEFT) . '/' . Auth::user()->departemen . '/P1/' . $this->convertToRoman(now()->format('m')) . '/' . now()->format('Y');
+
+    //             // Insert ke tabel barang_keluar
+    //             $barangKeluar = BarangKeluar::create([
+    //                 'barang_keluar_id' => $barangKeluarId,
+    //                 'nama_barang' => $barangId,
+    //                 'jumlah_barang' => $request->input('jumlah')[$index],
+    //                 'satuan_barang' => $request->input('satuan')[$index],
+    //                 'keterangan_barang' => $request->input('keterangan')[$index],
+    //             ]);
+
+    //             // Hubungkan dengan tabel pivot
+    //             $pengeluaranBarang->barangKeluar()->attach($barangKeluar->barang_keluar_id, [
+    //                 'detail_pengeluaran_id' => 'DTPGL/' . str_pad($index + 1, 5, '0', STR_PAD_LEFT) . '/' . Auth::user()->departemen . '/P1/' . $this->convertToRoman(now()->format('m')) . '/' . now()->format('Y'),
+    //             ]);
+    //         }
+
+    //         DB::commit();
+
+    //         return redirect()->route('form')->with('success', 'Data berhasil disimpan!');
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    //     }
+    // }
 
     public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
+            $user = Auth::user();
+            $nrpKaryawan = $user->nrp_karyawan;
+
+            // Generate nomor surat jalan
+            $pengeluaranBarangId = $this->generateSuratJalan();
+
             // Insert ke tabel pengeluaran_barang
             $pengeluaranBarang = PengeluaranBarang::create([
-                'pengeluaran_barang_id' => Str::uuid()->toString(),
-                'created_by' => $request->input('created_by'),
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
                 'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
                 'jenis_kendaraan' => $request->input('jenis_kendaraan'),
             ]);
 
             // Iterasi barang dan buat entry pada barang_keluar
             foreach ($request->input('barang_ids') as $index => $barangId) {
+                // Generate barang_keluar_id secara otomatis
+                $barangKeluarId = $this->generateBarangKeluarId();
+
                 // Insert ke tabel barang_keluar
                 $barangKeluar = BarangKeluar::create([
+                    'barang_keluar_id' => $barangKeluarId,
                     'nama_barang' => $barangId,
                     'jumlah_barang' => $request->input('jumlah')[$index],
                     'satuan_barang' => $request->input('satuan')[$index],
                     'keterangan_barang' => $request->input('keterangan')[$index],
                 ]);
 
+                // Generate detail_pengeluaran_id
+                $detailPengeluaranId = $this->generateDetailPengeluaranId($index);
+
                 // Hubungkan dengan tabel pivot
                 $pengeluaranBarang->barangKeluar()->attach($barangKeluar->barang_keluar_id, [
-                    'detail_pengeluaran_id' => Str::uuid()->toString(),
+                    'detail_pengeluaran_id' => $detailPengeluaranId,
                 ]);
             }
 
             DB::commit();
 
-            return redirect()->route('pengeluaran_barang.index')->with('success', 'Data berhasil disimpan!');
+            return redirect()->route('form')->with('success', 'Data berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-    }
-    
-
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
     }
 }

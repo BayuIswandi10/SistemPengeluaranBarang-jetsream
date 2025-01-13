@@ -21,17 +21,26 @@
                 <!-- Input Fields -->
                 <div class="form-group">
                     <label for="pengeluaran_barang_id">No Pengeluaran <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ old('pengeluaran_barang_id') }}" placeholder="" required>
-                </div>
-                <div class="form-group">
+                    <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ $pengeluaranBarangId }}" placeholder="No Surat Jalan" readonly required>
+                </div>                
+                
+                {{-- <div class="form-group">
                     <label for="created_by">NRP Karyawan <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukkan NRP Karyawan" required>
-                </div>
+                </div> --}}
 
                 <div class="form-group">
                     <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" value="{{ old('jenis_kendaraan') }}" placeholder="Masukkan Jenis Kendaraan" required>
+                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required>
+                        <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                        <option value="TRUCK" {{ old('jenis_kendaraan') == 'TRUCK' ? 'selected' : '' }}>TRUCK</option>
+                        <option value="PICK UP" {{ old('jenis_kendaraan') == 'PICK UP' ? 'selected' : '' }}>PICK UP</option>
+                        <option value="SEDAN" {{ old('jenis_kendaraan') == 'SEDAN' ? 'selected' : '' }}>SEDAN</option>
+                        <option value="JEEP" {{ old('jenis_kendaraan') == 'JEEP' ? 'selected' : '' }}>JEEP</option>
+                        <option value="SP. MOTOR" {{ old('jenis_kendaraan') == 'SP. MOTOR' ? 'selected' : '' }}>SP. MOTOR</option>
+                    </select>
                 </div>
+                
 
                 <div class="form-group">
                     <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
@@ -40,7 +49,9 @@
 
                 <!-- Barang Keluar Table -->
                 <div class="form-group">
-                    <label>Detail Barang Keluar <span class="text-danger">*</span></label>
+                    <label>Detail Barang Keluar <span class="text-danger">*</span>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="tambahComboBox()">Tambah Barang</button>
+                    </label>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -48,6 +59,7 @@
                                 <th>Jumlah</th>
                                 <th>Satuan</th>
                                 <th>Keterangan</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="barangTable">
@@ -56,6 +68,7 @@
                                 <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
                                 <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
                                 <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">Hapus</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -82,33 +95,22 @@
             <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
             <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
             <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">Hapus</button></td>
         `;
 
         container.appendChild(newRow);
     }
 
-    document.addEventListener('keydown', function(event) {
-        const activeElement = document.activeElement;
-        const isInputField = activeElement.tagName === 'INPUT' && (activeElement.name === 'barang_ids[]' || activeElement.name === 'jumlah[]' 
-        || activeElement.name === 'satuan[]' || activeElement.name === 'keterangan[]');
-
-        if (isInputField) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                tambahComboBox();
-            } else if (event.key === 'Backspace' && activeElement.value === '') {
-                event.preventDefault();
-                const row = activeElement.closest('tr');
-                const container = document.getElementById('barangTable');
-                const rows = container.getElementsByTagName('tr');
-                if (rows.length > 1) {
-                    row.remove();
-                } else {
-                    alert('Tidak bisa menghapus baris terakhir.');
-                }
-            }
+    function hapusComboBox(button) {
+        const container = document.getElementById('barangTable');
+        const rows = container.getElementsByTagName('tr');
+        if (rows.length > 1) {
+            const row = button.closest('tr');
+            row.remove();
+        } else {
+            alert('Tidak bisa menghapus baris terakhir.');
         }
-    });
+    }
 
     // Display validation errors in Swal
     @if ($errors->any())
@@ -140,5 +142,4 @@
             text: '{{ session('error') }}'
         });
     @endif
-
 </script>

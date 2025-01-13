@@ -16,6 +16,5 @@ Route::middleware([
     Route::get('/dashboard',Dashboard::class)->name('dashboard');
     Route::get('/form',FormPengeluaran::class)->name('form');
 
-    Route::get('/pengeluaran_barang/create', [PengeluaranBarangController::class, 'create'])->name('pengeluaran_barang.create');
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 });
