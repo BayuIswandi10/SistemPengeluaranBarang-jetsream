@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 
 <head>
     <meta charset="utf-8">
@@ -42,7 +43,7 @@
        <link rel="stylesheet" href="{{ asset('assets/adminlte3.2/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
        
        <!-- Favicon -->
-       <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('assets/adminlte3.2/dist/img/favicon.png') }}">
+       <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('assets/img/logo C YMI - 2017.png') }}">
        
        <!-- jQuery -->
        <script src="{{ asset('js/adminlte3.2/jquery.min.js') }}"></script>
@@ -61,11 +62,7 @@
    
    
    
-       <!-- Control Sidebar -->
-       <aside class="control-sidebar control-sidebar-dark">
-       <!-- Control sidebar content goes here -->
-       </aside>
-       <!-- /.control-sidebar -->
+    
        </div>
        <!-- ./wrapper -->
    

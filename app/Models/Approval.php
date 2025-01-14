@@ -16,6 +16,7 @@ class Approval extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'approval_id',
         'pengeluaran_barang_id',
         'created_by',
         'created_date',

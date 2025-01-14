@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PengeluaranBarang;
 use App\Models\BarangKeluar;
+use App\Models\Approval;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -80,6 +81,23 @@ class PengeluaranBarangController extends Controller
         return $detailPengeluaranId;
     }
 
+    private function generateApprovalId()
+    {
+        // Mendapatkan ID terakhir
+        $lastId = Approval::max('approval_id');
+
+        // Jika belum ada ID, mulai dari APR0001
+        if (!$lastId) {
+            return 'APR0001';
+        }
+
+        // Ekstrak angka dari ID terakhir dan increment
+        $lastNumber = (int) substr($lastId, 3);
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+
+        return 'APR' . $newNumber;
+    }
+
     private function convertToRoman($month)
     {
         $romans = [
@@ -90,54 +108,6 @@ class PengeluaranBarangController extends Controller
 
         return $romans[intval($month)];
     }
-
-    // public function store(Request $request)
-    // {
-    //     DB::beginTransaction();
-
-    //     try {
-    //         $user = Auth::user();
-    //         $nrpKaryawan = $user->nrp_karyawan;
-
-    //         // Generate nomor surat jalan
-    //         $pengeluaranBarangId = $this->generateSuratJalan();
-
-    //         // Insert ke tabel pengeluaran_barang
-    //         $pengeluaranBarang = PengeluaranBarang::create([
-    //             'pengeluaran_barang_id' => $pengeluaranBarangId,
-    //             'created_by' => $nrpKaryawan,
-    //             'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
-    //             'jenis_kendaraan' => $request->input('jenis_kendaraan'),
-    //         ]);
-
-    //         // Iterasi barang dan buat entry pada barang_keluar
-    //         foreach ($request->input('barang_ids') as $index => $barangId) {
-    //             // Generate barang_keluar_id secara otomatis
-    //             $barangKeluarId = 'BGKLR/' . str_pad($index + 1, 4, '0', STR_PAD_LEFT) . '/' . Auth::user()->departemen . '/P1/' . $this->convertToRoman(now()->format('m')) . '/' . now()->format('Y');
-
-    //             // Insert ke tabel barang_keluar
-    //             $barangKeluar = BarangKeluar::create([
-    //                 'barang_keluar_id' => $barangKeluarId,
-    //                 'nama_barang' => $barangId,
-    //                 'jumlah_barang' => $request->input('jumlah')[$index],
-    //                 'satuan_barang' => $request->input('satuan')[$index],
-    //                 'keterangan_barang' => $request->input('keterangan')[$index],
-    //             ]);
-
-    //             // Hubungkan dengan tabel pivot
-    //             $pengeluaranBarang->barangKeluar()->attach($barangKeluar->barang_keluar_id, [
-    //                 'detail_pengeluaran_id' => 'DTPGL/' . str_pad($index + 1, 5, '0', STR_PAD_LEFT) . '/' . Auth::user()->departemen . '/P1/' . $this->convertToRoman(now()->format('m')) . '/' . now()->format('Y'),
-    //             ]);
-    //         }
-
-    //         DB::commit();
-
-    //         return redirect()->route('form')->with('success', 'Data berhasil disimpan!');
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
-    //         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-    //     }
-    // }
 
     public function store(Request $request)
     {
@@ -178,6 +148,17 @@ class PengeluaranBarangController extends Controller
                 // Hubungkan dengan tabel pivot
                 $pengeluaranBarang->barangKeluar()->attach($barangKeluar->barang_keluar_id, [
                     'detail_pengeluaran_id' => $detailPengeluaranId,
+                ]);
+
+                $approvalId = $this->generateApprovalId();
+
+                // Insert ke tabel tb_approval
+                Approval::create([
+                    'approval_id' => $approvalId,
+                    'pengeluaran_barang_id' => $pengeluaranBarangId,
+                    'created_by' => $nrpKaryawan,
+                    'created_date' => now(),
+                    'status_approval' => 'Level 1',
                 ]);
             }
 
