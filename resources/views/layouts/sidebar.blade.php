@@ -106,6 +106,26 @@
                             </p>
                         </a>
                     </li>
+
+                    <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
+                        <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>
+                                Data Persetujuan Barang Keluar
+                                <i class="right fas"></i>
+                            </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <form method="POST" action="{{ route('logout') }}" class="nav-link p-0">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link text-gray-600">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Keluar</span>
+                            </button>
+                        </form>
+                    </li>
                 </li>
             </ul>
         </nav>

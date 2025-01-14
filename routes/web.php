@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
 use App\Livewire\FormPengeluaran;
 use App\Http\Controllers\PengeluaranBarangController;
+use App\Livewire\FormApproval;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -15,6 +16,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard',Dashboard::class)->name('dashboard');
     Route::get('/form',FormPengeluaran::class)->name('form');
+    Route::get('/approval',FormApproval::class)->name('approval');
 
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 });
