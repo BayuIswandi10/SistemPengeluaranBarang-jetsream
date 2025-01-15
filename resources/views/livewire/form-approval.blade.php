@@ -28,6 +28,8 @@
                                         Menunggu Persetujuan Ka.Dept Ybs
                                     @elseif($approval->status_approval == 'Level 3')
                                         Menunggu Persetujuan Ka.Dept GA
+                                    @elseif($approval->status_approval == 'Level 4')
+                                        Diperiksa Security
                                     @else
                                         {{ $approval->status_approval }}
                                     @endif

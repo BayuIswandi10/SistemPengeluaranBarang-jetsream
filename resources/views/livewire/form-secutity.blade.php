@@ -5,7 +5,7 @@
 
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Pengeluaran Barang</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
             </div>
             <div class="card-body">
                 <table id="dataTable" class="display nowrap table-striped table" style="width:100%">
@@ -23,11 +23,25 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $approval->pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                <td>{{ $approval->status_approval }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    @if ($approval->status_approval == 'Level 4')
+                                        Menunggu Persetujuan
+                                    @elseif ($approval->status_approval == 'Level 5')
+                                        Sudah Disetujui
+                                    @else
+                                        {{ $approval->status_approval }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($approval->status_approval == 'Level 4')
+                                        <button type="button" class="btn btn-success btn-sm" onclick="editApproval('{{ $approval->pengeluaranBarang->pengeluaran_barang_id }}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    @elseif ($approval->status_approval == 'Level 5')
+                                        <button type="button" class="btn btn-info btn-sm" onclick="viewDetails(this)">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -36,99 +50,94 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Edit Approval -->
+    <div class="modal fade" id="editApprovalModal" tabindex="-1" aria-labelledby="editApprovalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editApprovalLabel">Edit Pengeluaran Barang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editApprovalForm">
+                        <div class="mb-3">
+                            <label for="pengeluaranBarangId" class="form-label">Nomor Pengeluaran Barang</label>
+                            <input type="text" class="form-control" id="pengeluaranBarangId" name="pengeluaranBarangId" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="statusApproval" class="form-label">Status</label>
+                            <select class="form-control" id="statusApproval" name="statusApproval">
+                                <option value="Level 4">Menunggu Persetujuan</option>
+                                <option value="Level 5">Sudah Disetujui</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="saveApproval()">Simpan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
+
+
 <script>
-    let counter = 1;
-
-    function tambahComboBox() {
-        const container = document.getElementById('barangTable');
-        const newRow = document.createElement('tr');
-
-        newRow.innerHTML = `
-            <td class="nomor">${counter += 1}</td>
-            <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
-            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
-            <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
-            <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-
-        container.appendChild(newRow);
-        updateNomor();
-    }
-
-    function hapusComboBox(button) {
-        const container = document.getElementById('barangTable');
-        const rows = container.getElementsByTagName('tr');
-        if (rows.length > 1) {
-            const row = button.closest('tr');
-            
-            // SweetAlert konfirmasi untuk baris selain baris terakhir
-            Swal.fire({
-                icon: 'warning',
-                title: 'Apakah Anda yakin?',
-                text: 'Baris ini akan dihapus.',
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    row.remove();
-                    updateNomor();
-                }
-            });
-        } else {
-            // Ganti alert dengan SweetAlert untuk baris terakhir
-            Swal.fire({
-                icon: 'info',
-                title: 'Tidak bisa menghapus baris terakhir.',
-                text: 'Harap tambahkan baris baru jika perlu.',
-                confirmButtonText: 'OK'
-            });
-        }
-    }
-    function updateNomor() {
-    const rows = document.querySelectorAll('#barangTable .nomor');
-        rows.forEach((cell, index) => {
-            cell.textContent = index + 1;
+    $(document).ready(function() {
+        var table = $('#dataTable').DataTable({
+            columnDefs: [
+                {className: 'dt-body-center',targets: 0},
+                {className: 'dt-head-center',targets: 0},
+                {className: 'dt-body-center',targets: 3},
+                {className: 'dt-head-center',targets: 3}
+            ],
+              scrollX: true,
+              responsive: true
         });
-    }
-
-    // Display validation errors in Swal
-    @if ($errors->any())
-    Swal.fire({
-        icon: 'error',
-        title: 'Whoops!',
-        html: '<ul>' +
-            @foreach ($errors->all() as $error)
-                '<li>{{ $error }}</li>' +
-            @endforeach
-            '</ul>'
     });
-    @endif
+    function editApproval(pengeluaranBarangId) {
+        // Set data ke modal
+        document.getElementById('pengeluaranBarangId').value = pengeluaranBarangId;
+        document.getElementById('statusApproval').value = 'Level 4'; // Default value, ubah sesuai kebutuhan
 
-    // Display success message in Swal
-    @if (session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: '{{ session('success') }}'
-        });
-    @endif
+        // Tampilkan modal
+        const modal = new bootstrap.Modal(document.getElementById('editApprovalModal'));
+        modal.show();
+    }
 
-    // Display error message in Swal
-    @if (session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '{{ session('error') }}'
-        });
-    @endif
+    function saveApproval() {
+        const form = document.getElementById('editApprovalForm');
+        const pengeluaranBarangId = form.pengeluaranBarangId.value;
+        const statusApproval = form.statusApproval.value;
+
+        // Kirim data ke server (contoh AJAX)
+        fetch('/save-approval', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ pengeluaranBarangId, statusApproval })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Berhasil!',
+                      text: 'Data berhasil disimpan.'
+                  });
+
+                  // Refresh atau perbarui tabel
+                  location.reload();
+              } else {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Gagal!',
+                      text: data.message || 'Terjadi kesalahan.'
+                  });
+              }
+          });
+    }
 </script>
