@@ -46,9 +46,19 @@
 
                     <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                         <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <i class="nav-icon fas fa-file-signature"></i>
                             <p>
                                 Data Persetujuan Barang Keluar
+                                <i class="right fas"></i>
+                            </p>                            
+                        </a>
+                    </li>
+
+                    <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}">
+                        <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shield-alt"></i>
+                            <p>
+                                Pemeriksaan Barang Keluar
                                 <i class="right fas"></i>
                             </p>
                         </a>

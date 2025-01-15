@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
+                    <table id="dataTable" class="display nowrap table-striped table" style="width:100%">
                         <thead>
                             <tr>
                                 <th>NO</th>

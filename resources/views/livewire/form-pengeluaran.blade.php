@@ -50,7 +50,7 @@
                     <!-- Barang Keluar Table -->
                     <div class="form-group">
                         <label>Detail Barang Keluar <span class="text-danger">*</span></label>
-                        <table class="table table-bordered">
+                        <table id="dataTable" class="display nowrap table-striped table" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>No</th> 
