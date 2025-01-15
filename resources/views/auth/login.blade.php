@@ -7,7 +7,6 @@
                 justify-content: center;
                 height: 100vh;
                 margin: 0;
-                background-image: url('{{ asset('assets/adminlte3.2/dist/img/IMG_Background.jpg') }}');
                 background-repeat: no-repeat;
                 background-size: cover;
             }
@@ -71,26 +70,28 @@
                         </div>
 
                         <div class="form-group mt-4">
-                            <x-label for="password" value="{{ __('Password') }}" />
+                            <x-label for="password" value="{{ __('Sandi') }}" />
                             <x-input id="password" class="form-control" type="password" name="password" required autocomplete="current-password" />
                         </div>
 
-                        <div class="form-group mt-4">
+                        <div class="form-group mt-4 flex items-center justify-between">
                             <label for="remember_me" class="flex items-center">
                                 <x-checkbox id="remember_me" name="remember" />
-                                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                                <span class="ms-2 text-sm text-gray-600">{{ __('Ingat Saya') }}</span>
                             </label>
+                            @if (Route::has('password.request'))
+                                <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
+                                    {{ __('Lupa kata sandi ?') }}
+                                </a>
+                            @endif
                         </div>
                         
                         <div class="text-center mt-4">
-                            @if (Route::has('password.request'))
-                                <a class="btn btn-danger" href="{{ route('password.request') }}">
-                                    {{ __('Forgot your password?') }}
-                                </a>
-                            @endif
-                            <button type="submit" class="btn btn-primary ms-2">
-                                {{ __('Log in') }}
-                            </button>
+                          
+                        <button type="submit" class="btn btn-primary w-60" style="background-color: #3674A7; border-color: #3674A7;">
+                            {{ __('Masuk') }}
+                        </button>
+
                         </div>
                     </form>
                 </div>
