@@ -23,7 +23,7 @@
                       <img src="check-icon.png" alt="Check Icon">
                     </div>
                     <div class="content">
-                      <img src="package-icon.png" alt="Package Icon" class="icon">
+                      <img src="assets/img/Level_1" alt="Package Icon" class="icon">
                       <p>Ka.Dept. Ybs</p>
                     </div>
                   </div>
