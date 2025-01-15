@@ -5,6 +5,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\FormPengeluaran;
 use App\Http\Controllers\PengeluaranBarangController;
 use App\Livewire\FormApproval;
+use App\Http\Controllers\ApprovalController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -19,4 +20,5 @@ Route::middleware([
     Route::get('/approval',FormApproval::class)->name('approval');
 
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
+    Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
 });

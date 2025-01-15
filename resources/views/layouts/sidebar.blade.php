@@ -70,3 +70,23 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+
+
+<!-- Sidebar Collapse Script -->
+<script>
+    $(document).ready(function() {
+        // Mendapatkan URL saat ini
+        var currentUrl = window.location.href;
+
+        // Mengidentifikasi elemen sidebar yang sesuai dengan URL saat ini
+        $('.nav-item').each(function() {
+            var link = $(this).find('a').attr('href');
+            
+            // Memeriksa apakah URL saat ini cocok dengan link di sidebar
+            if (currentUrl.includes(link)) {
+                $(this).addClass('menu-open'); // Menambahkan kelas menu-open
+                $(this).children('ul').css('display', 'block'); // Menampilkan sub-menu jika ada
+            }
+        });
+    });
+</script>

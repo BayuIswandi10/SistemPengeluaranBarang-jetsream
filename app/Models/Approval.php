@@ -32,4 +32,27 @@ class Approval extends Model
     {
         return $this->belongsTo(PengeluaranBarang::class, 'pengeluaran_barang_id', 'pengeluaran_barang_id');
     }
+
+    public function updateApprovalStatus()
+    {
+        // Define the levels
+        $levels = [
+            'Level 1',
+            'Level 2',
+            'Level 3',
+            'Level 4',
+            'Level 5',
+        ];
+
+        // Get the current level
+        $currentLevelIndex = array_search($this->status_approval, $levels);
+
+        // Check if the current status is not at the maximum level (Level 5)
+        if ($currentLevelIndex !== false && $currentLevelIndex < 4) {
+            // Set the next level status
+            $this->status_approval = $levels[$currentLevelIndex + 1];
+            $this->save();
+        }
+    }
+
 }

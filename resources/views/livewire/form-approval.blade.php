@@ -21,10 +21,18 @@
                             <div class="form-group">
                                 <label style="font-weight: bold;">Status : </label><br>
                                 <span class="badge 
-                                    {{ $approval->status_approval == 'Menunggu Persetujuan Ka.Dept GA' ? 'bg-warning' : 'bg-success' }}">
-                                    {{ $approval->status_approval }}
+                                    {{ in_array($approval->status_approval, ['Level 1', 'Level 2', 'Level 3']) ? 'bg-warning' : 'bg-success' }}">
+                                    @if($approval->status_approval == 'Level 1')
+                                        Menunggu Persetujuan PIC/Ka.Sie
+                                    @elseif($approval->status_approval == 'Level 2')
+                                        Menunggu Persetujuan Ka.Dept Ybs
+                                    @elseif($approval->status_approval == 'Level 3')
+                                        Menunggu Persetujuan Ka.Dept GA
+                                    @else
+                                        {{ $approval->status_approval }}
+                                    @endif
                                 </span>
-                            </div>
+                            </div>                                                        
                         </div>
                     </div>
                     <div class="row">
@@ -49,7 +57,14 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <button class="btn btn-success">Setujui</button>
+                                <form action="{{ route('approval.update', $approval->approval_id) }}" method="POST">
+                                    @csrf
+                                    @method('POST')
+                                    <button class="btn btn-success" type="submit" 
+                                        @if($approval->status_approval == 'Level 5') disabled @endif>
+                                        @if($approval->status_approval == 'Level 5') Sudah Level 5 @else Setujui @endif
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
