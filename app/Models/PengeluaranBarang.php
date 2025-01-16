@@ -21,6 +21,7 @@ class PengeluaranBarang extends Model
         'created_date',
         'tujuan_pengeluaran_barang',
         'jenis_kendaraan',
+        'no_polisi'
     ];
 
     public function user()

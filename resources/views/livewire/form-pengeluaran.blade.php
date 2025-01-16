@@ -31,7 +31,8 @@
     
                     <div class="form-group">
                         <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                        <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required>
+                        
+                        <select class="form-control" id="select-tools" name="jenis_kendaraan" required>
                             <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                             <option value="TRUCK" {{ old('jenis_kendaraan') == 'TRUCK' ? 'selected' : '' }}>TRUCK</option>
                             <option value="PICK UP" {{ old('jenis_kendaraan') == 'PICK UP' ? 'selected' : '' }}>PICK UP</option>
@@ -185,4 +186,46 @@
             text: '{{ session('error') }}'
         });
     @endif
+
+    var $select = $('#select-tools').selectize({
+    
+    create: true
+    });
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+var control = $select[0].selectize;
+
+$('#button-clear').on('click', function() {
+  control.clear();
+});
+
+$('#button-clearoptions').on('click', function() {
+  control.clearOptions();
+});
+
+$('#button-addoption').on('click', function() {
+  control.addOption({
+    id: 4,
+    title: 'Something New',
+    url: 'http://google.com'
+  });
+});
+
+$('#button-additem').on('click', function() {
+  control.addItem(2);
+});
+
+$('#button-maxitems2').on('click', function() {
+  control.setMaxItems(2);
+});
+
+$('#button-maxitems100').on('click', function() {
+  control.setMaxItems(100);
+});
+
+$('#button-setvalue').on('click', function() {
+  control.setValue([2, 3]);
+});
+        
 </script>

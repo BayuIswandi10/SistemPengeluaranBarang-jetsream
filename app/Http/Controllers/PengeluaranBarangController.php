@@ -34,52 +34,6 @@ class PengeluaranBarangController extends Controller
         // Gabungkan menjadi format surat jalan
         return "{$noSurat} / {$dept} / {$plant} / {$bulanRomawi} / {$tahun}";
     }
-
-    // private function generateBarangKeluarId()
-    // {
-    //     // Ambil user yang sedang login
-    //     $user = Auth::user();
-    //     $dept = $user->departemen; // Kolom departemen dari tabel users
-    //     $plant = 'P1'; // Plant diatur statis
-    //     $bulanAngka = now()->format('m');
-    //     $tahun = now()->format('Y');
-    //     $bulanRomawi = $this->convertToRoman($bulanAngka); // Konversi bulan ke romawi
-
-    //     // Cari nomor terbesar yang sudah ada untuk departemen ini
-    //     $lastNumber = DB::table('tb_barang_keluar')
-    //         ->where('barang_keluar_id', 'LIKE', 'BGKLR%' . $dept . '%')
-    //         ->where('barang_keluar_id', 'LIKE', '%/' . $plant . '/%' . $bulanRomawi . '/' . $tahun)
-    //         ->max(DB::raw('CAST(SUBSTRING(barang_keluar_id, 7, 4) AS UNSIGNED)'));
-
-    //     // Tentukan nomor urut berikutnya
-    //     $nextNumber = $lastNumber + 1;
-    //     $barangKeluarId = 'BGKLR/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT) . '/' . $dept . '/' . $plant . '/' . $bulanRomawi . '/' . $tahun;
-
-    //     return $barangKeluarId;
-    // }
-    // private function generateDetailPengeluaranId($index)
-    // {
-    //     // Ambil user yang sedang login
-    //     $user = Auth::user();
-    //     $dept = $user->departemen; // Kolom departemen dari tabel users
-    //     $plant = 'P1'; // Plant diatur statis
-    //     $bulanAngka = now()->format('m');
-    //     $tahun = now()->format('Y');
-    //     $bulanRomawi = $this->convertToRoman($bulanAngka); // Konversi bulan ke romawi
-
-    //     // Cari nomor terbesar yang sudah ada untuk departemen ini
-    //     $lastNumber = DB::table('tb_detail_pengeluaran')
-    //         ->where('detail_pengeluaran_id', 'LIKE', 'DTPGL%' . $dept . '%')
-    //         ->where('detail_pengeluaran_id', 'LIKE', '%/' . $plant . '/%' . $bulanRomawi . '/' . $tahun)
-    //         ->max(DB::raw('CAST(SUBSTRING(detail_pengeluaran_id, 7, 5) AS UNSIGNED)'));
-
-    //     // Tentukan nomor urut berikutnya
-    //     $nextNumber = $lastNumber + 1;
-    //     $detailPengeluaranId = 'DTPGL/' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT) . '/' . $dept . '/' . $plant . '/' . $bulanRomawi . '/' . $tahun;
-
-    //     return $detailPengeluaranId;
-    // }
-
     private function generateBarangKeluarId()
     {
         // Mendapatkan nomor terakhir

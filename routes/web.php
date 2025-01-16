@@ -23,4 +23,7 @@ Route::middleware([
 
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
     Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
+    Route::post('/approve-security/{approval}', [ApprovalController::class, 'approveSecurity'])->name('approve.security');
+
+
 });

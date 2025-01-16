@@ -14,6 +14,7 @@ return new class extends Migration
             $table->timestamp('created_date')->useCurrent();
             $table->string('tujuan_pengeluaran_barang');
             $table->string('jenis_kendaraan');
+            $table->string('no_polisi')->nullable();
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
