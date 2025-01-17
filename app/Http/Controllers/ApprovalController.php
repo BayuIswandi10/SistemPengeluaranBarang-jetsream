@@ -8,15 +8,29 @@ use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
+    // public function approve(Approval $approval)
+    // {
+    //     // Update status approval level by level
+    //     $approval->updateApprovalStatus();
+
+    //     // Redirect back with a success message
+    //     return redirect()->back()->with('success', 'Status approval updated!');
+    // }
+
     public function approve(Approval $approval)
     {
-        // Update status approval level by level
-        $approval->updateApprovalStatus();
+        // Menambahkan data approval dengan level berikutnya jika sudah ada data sebelumnya
+        $newApproval = $approval->addNextApprovalLevel();
 
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Status approval updated!');
+        if ($newApproval) {
+            // Jika berhasil menambahkan data approval baru
+            return redirect()->back()->with('success', 'Approval level updated to next level!');
+        } else {
+            // Jika sudah mencapai level maksimal atau tidak ada perubahan
+            return redirect()->back()->with('error', 'No more levels available for approval!');
+        }
     }
-
+    
     public function approveSecurity(Request $request, Approval $approval)
     {
         // Validasi data yang masuk
