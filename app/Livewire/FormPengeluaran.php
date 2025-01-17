@@ -9,6 +9,8 @@ use App\Models\PengeluaranBarang;
 
 class FormPengeluaran extends Component
 {
+    public $pengeluaranBarangId; // Menyimpan nomor surat jalan
+
     public function mount()
     {
         $this->generateSuratJalan(); // Panggil fungsi untuk generate no surat jalan
@@ -51,7 +53,8 @@ class FormPengeluaran extends Component
 
     public function render()
     {
-        $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
+        $pengeluaranBarangs = PengeluaranBarang::with(['approval', 'barangKeluar'])->get(); 
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
+
 }

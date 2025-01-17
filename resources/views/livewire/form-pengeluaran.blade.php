@@ -10,6 +10,29 @@
                 </button>            
             </div>
             <div class="card-body">
+                @if (session('success'))
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: '{{ session('success') }}',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    </script>
+                @endif
+
+                @if (session('error'))
+                    <script>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: '{{ session('error') }}',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    </script>
+                @endif
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
@@ -30,15 +53,34 @@
                                     <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
                                     <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
                                     <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
-                                    <td>{{ $approval->status_approval }}</td>
+                                    <td>
+                                        @if ($approval->status_approval == 'Level 4')
+                                            Menunggu Persetujuan Security
+                                        @elseif ($approval->status_approval == 'Level 5')
+                                            Sudah Disetujui
+                                        @elseif ($approval->status_approval == 'Level 1')
+                                            Menunggu Persetujuan PIC/Ka.Sie
+                                        @elseif ($approval->status_approval == 'Level 2')
+                                            Menunggu Persetujuan Ka.Dept Ybs
+                                        @elseif ($approval->status_approval == 'Level 3')
+                                            Menunggu Persetujuan Ka.Dept GA
+                                        @else
+                                            {{ $approval->status_approval }}
+                                        @endif
+
+                                    </td>
                                     <td>
                                         <div class="button-group">
                                         <!-- Button detail -->
-                                        <a href="" 
-                                            class="btn btn-info btn-sm">
-                                            
-                                            <i class="fa fa-list color-muted""></i>
-                                        </a>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-info btn-sm" 
+                                            data-toggle="modal" 
+                                            data-target="#detailModal" 
+                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
+                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                            <i class="fa fa-list"></i>
+                                        </button>
                                         <!-- Button Edit -->
                                         <a href="" 
                                             class="btn btn-warning btn-sm">
@@ -155,7 +197,36 @@
     </div>
     
     {{-- Detail Modal --}}
-
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>NO</th>
+                                <th>Nomor Pengeluaran Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBody">
+                            <!-- Data akan diisi secara dinamis -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     
     {{-- Edit Modal --}}    
 
@@ -164,6 +235,34 @@
 
 
 <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        $('#detailModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget); // Button yang diklik
+            const items = button.data('items'); // Data barang
+            const nomor = button.data('nomor'); // Nomor pengeluaran barang
+
+            // Kosongkan tabel modal
+            const tbody = document.getElementById('detailBody');
+            tbody.innerHTML = '';
+
+            // Isi tabel modal dengan data
+            items.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${nomor}</td>
+                        <td>${item.nama_barang}</td>
+                        <td>${item.jumlah_barang}</td>
+                        <td>${item.satuan_barang}</td>
+                        <td>${item.keterangan_barang}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        });
+    });
+
 
     $(document).ready(function() {
         var table = $('#dataTable').DataTable({
