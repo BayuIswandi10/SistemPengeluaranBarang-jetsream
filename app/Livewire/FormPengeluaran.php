@@ -5,11 +5,10 @@ namespace App\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PengeluaranBarang;
 
 class FormPengeluaran extends Component
 {
-    public $pengeluaranBarangId; // Menyimpan nomor surat jalan
-
     public function mount()
     {
         $this->generateSuratJalan(); // Panggil fungsi untuk generate no surat jalan
@@ -52,6 +51,7 @@ class FormPengeluaran extends Component
 
     public function render()
     {
-        return view('livewire.form-pengeluaran');
+        $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
+        return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 }

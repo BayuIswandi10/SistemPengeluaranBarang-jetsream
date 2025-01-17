@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class PengeluaranBarangController extends Controller
 {
+    public function index()
+    {
+        $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
+        return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
+    }
+
     private function generateSuratJalan()
     {
         // Ambil user yang sedang login
