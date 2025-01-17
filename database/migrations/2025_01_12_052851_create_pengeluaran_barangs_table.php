@@ -12,9 +12,11 @@ return new class extends Migration
             $table->string('pengeluaran_barang_id')->primary();
             $table->string('created_by');
             $table->timestamp('created_date')->useCurrent();
+            $table->string('lokasi_barang_keluar');
             $table->string('tujuan_pengeluaran_barang');
             $table->string('jenis_kendaraan');
             $table->string('no_polisi')->nullable();
+            $table->string('status');
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
