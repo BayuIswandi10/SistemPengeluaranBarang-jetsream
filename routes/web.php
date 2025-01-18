@@ -25,5 +25,5 @@ Route::middleware([
     Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
     Route::post('/approve-security/{approval}', [ApprovalController::class, 'approveSecurity'])->name('approve.security');
     Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
-
+    Route::post('/pengeluaran/update-status', [PengeluaranBarangController::class, 'updateStatus'])->name('pengeluaran.updateStatus');
 });

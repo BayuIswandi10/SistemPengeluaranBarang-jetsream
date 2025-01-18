@@ -6,36 +6,39 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\PengeluaranBarang;
+use Illuminate\Http\Request;
 
 class FormPengeluaran extends Component
 {
     public $pengeluaranBarangId; // Menyimpan nomor surat jalan
 
-    public function mount()
+    public function mount(Request $request)
     {
-        $this->generateSuratJalan(); // Panggil fungsi untuk generate no surat jalan
+        // Ambil lokasi_barang_keluar dari request
+        $plant = $request->input('lokasi_barang_keluar', 'P1'); // Default 'P1' jika tidak ada input
+        $this->generateSuratJalan($plant);
     }
+    
 
-    private function generateSuratJalan()
+    private function generateSuratJalan($plant)
     {
         // Ambil user yang sedang login
         $user = Auth::user();
         $dept = $user->departemen; // Kolom departemen dari tabel users
-        $plant = 'P1'; // Plant diatur statis
-
+    
         // Ambil tahun dan bulan saat ini
         $tahun = now()->format('Y');
         $bulanAngka = now()->format('m');
         $bulanRomawi = $this->convertToRoman($bulanAngka);
-
+    
         // Hitung nomor urut surat jalan untuk bulan dan tahun yang sama
         $lastNumber = DB::table('tb_pengeluaran_barang')
             ->whereYear('created_date', $tahun)
             ->whereMonth('created_date', $bulanAngka)
             ->count();
-
+    
         $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-
+    
         // Gabungkan menjadi format surat jalan
         $this->pengeluaranBarangId = "{$noSurat} / {$dept} / {$plant} / {$bulanRomawi} / {$tahun}";
     }

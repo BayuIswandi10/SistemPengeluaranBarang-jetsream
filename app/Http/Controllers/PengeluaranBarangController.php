@@ -35,12 +35,11 @@ class PengeluaranBarangController extends Controller
     }
 
 
-    private function generateSuratJalan()
+    private function generateSuratJalan($lokasi)
     {
         // Ambil user yang sedang login
         $user = Auth::user();
         $dept = $user->departemen; // Kolom departemen dari tabel users
-        $plant = 'P1'; // Plant diatur statis
 
         // Ambil tahun dan bulan saat ini
         $tahun = now()->format('Y');
@@ -56,7 +55,7 @@ class PengeluaranBarangController extends Controller
         $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
         // Gabungkan menjadi format surat jalan
-        return "{$noSurat} / {$dept} / {$plant} / {$bulanRomawi} / {$tahun}";
+        return "{$noSurat} / {$dept} / {$lokasi} / {$bulanRomawi} / {$tahun}";
     }
     private function generateBarangKeluarId()
     {
@@ -130,7 +129,7 @@ class PengeluaranBarangController extends Controller
             $nrpKaryawan = $user->nrp_karyawan;
     
             // Generate nomor surat jalan
-            $pengeluaranBarangId = $this->generateSuratJalan();
+            $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'));
     
             // Insert ke tabel pengeluaran_barang
             $pengeluaranBarang = PengeluaranBarang::create([
@@ -138,6 +137,8 @@ class PengeluaranBarangController extends Controller
                 'created_by' => $nrpKaryawan,
                 'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
                 'jenis_kendaraan' => $request->input('jenis_kendaraan'),
+                'lokasi_barang_keluar' => $request->input('lokasi_barang_keluar'), // Simpan lokasi
+                'status' => 'Level 0', // Set Level 0 saat pengeluaran dibuat
             ]);
     
             // Iterasi barang dan buat entry pada barang_keluar
@@ -172,7 +173,7 @@ class PengeluaranBarangController extends Controller
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'created_date' => now(),
-                'status_approval' => 'Level 1',
+                'status_approval' => 'Level 0',
             ]);
     
             DB::commit();
@@ -183,6 +184,56 @@ class PengeluaranBarangController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function updateStatus(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Update status pada tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update(['status' => 'Level 1']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 1',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+
     
 
     

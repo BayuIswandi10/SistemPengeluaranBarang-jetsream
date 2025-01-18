@@ -18,6 +18,8 @@
                             text: '{{ session('success') }}',
                             showConfirmButton: false,
                             timer: 2000
+                        }).then(() => {
+                            location.reload(); // Reload halaman untuk merefleksikan perubahan
                         });
                     </script>
                 @endif
@@ -47,65 +49,74 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                            @foreach ($pengeluaranBarang->approval as $approval)
+                            {{-- @foreach ($pengeluaranBarang->approval as $approval) --}}
                                 <tr>
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
                                     <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
                                     <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
                                     <td>
-                                        @if ($approval->status_approval == 'Level 4')
+                                        @if ($pengeluaranBarang->status == 'Level 4')
                                             Menunggu Persetujuan Security
-                                        @elseif ($approval->status_approval == 'Level 5')
+                                        @elseif ($pengeluaranBarang->status == 'Level 5')
                                             Sudah Disetujui
-                                        @elseif ($approval->status_approval == 'Level 1')
+                                        @elseif ($pengeluaranBarang->status == 'Level 1')
                                             Menunggu Persetujuan PIC/Ka.Sie
-                                        @elseif ($approval->status_approval == 'Level 2')
+                                        @elseif ($pengeluaranBarang->status == 'Level 2')
                                             Menunggu Persetujuan Ka.Dept Ybs
-                                        @elseif ($approval->status_approval == 'Level 3')
+                                        @elseif ($pengeluaranBarang->status == 'Level 3')
                                             Menunggu Persetujuan Ka.Dept GA
                                         @else
-                                            {{ $approval->status_approval }}
+                                            {{ $pengeluaranBarang->status }}
                                         @endif
 
                                     </td>
                                     <td>
                                         <div class="button-group">
-                                        <!-- Button detail -->
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-info btn-sm" 
-                                            data-toggle="modal" 
-                                            data-target="#detailModal" 
-                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
-                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                            <i class="fa fa-list"></i>
-                                        </button>
-                                        <!-- Button Edit -->
-                                        <a href="" 
-                                            class="btn btn-warning btn-sm">
-                                            
-                                            <i class="fas fa-edit""></i>
-                                        </a>
-                                        <!-- Button Hapus -->
-                                        <form action="" 
-                                            method="POST" 
-                                            style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                
-                                                <i class="fas fa-trash""></i>
+                                            @if($pengeluaranBarang->status === 'Level 0')
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-primary btn-sm update-status" 
+                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                            @endif
+
+                                            <!-- Button detail -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-info btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#detailModal" 
+                                                data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
+                                                data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa fa-list"></i>
                                             </button>
-                                        </form>
+                                            <!-- Button Edit -->
+                                            <a href="" 
+                                                class="btn btn-warning btn-sm">
+                                                
+                                                <i class="fas fa-edit""></i>
+                                            </a>
+                                            <!-- Button Hapus -->
+                                            <form action="" 
+                                                method="POST" 
+                                                style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-danger btn-sm" 
+                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                    
+                                                    <i class="fas fa-trash""></i>
+                                                </button>
+                                            </form>
 
                                         </div>
 
                                     </td>
                                 </tr>
-                            @endforeach
+                            {{-- @endforeach --}}
                         @endforeach
                     </tbody>
                 </table>
@@ -129,10 +140,10 @@
                         @csrf
     
                         <!-- Input Fields -->
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="pengeluaran_barang_id">No Pengeluaran <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ $pengeluaranBarangId }}" placeholder="No Surat Jalan" readonly required>
-                        </div>                
+                        </div>                 --}}
     
                         <div class="form-group">
                             <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
@@ -144,6 +155,11 @@
                                 <option value="JEEP">JEEP</option>
                                 <option value="SP. MOTOR">SP. MOTOR</option>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required>
                         </div>
     
                         <div class="form-group">
@@ -338,41 +354,76 @@
         });
     }
 
-    // Display validation errors in Swal
-    @if ($errors->any())
-    Swal.fire({
-        icon: 'error',
-        title: 'Whoops!',
-        html: '<ul>' +
-            @foreach ($errors->all() as $error)
-                '<li>{{ $error }}</li>' +
-            @endforeach
-            '</ul>'
-    });
-    @endif
-
-    // Display success message in Swal
-    @if (session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: '{{ session('success') }}'
-        });
-    @endif
-
-    // Display error message in Swal
-    @if (session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '{{ session('error') }}'
-        });
-    @endif
-
     var $select = $('#select-tools').selectize({
     
     create: true
     });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle click event on update status button
+        document.querySelectorAll('.update-status').forEach(button => {
+            button.addEventListener('click', function () {
+                const pengeluaranBarangId = this.getAttribute('data-id');
+
+                // Konfirmasi menggunakan SweetAlert
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Anda akan melakukan submit pengeluaran barang!",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, submit!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("{{ route('pengeluaran.updateStatus') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({ pengeluaran_barang_id: pengeluaranBarangId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Tampilkan notifikasi berhasil
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload(); // Reload halaman untuk merefleksikan perubahan
+                                });
+                            } else {
+                                // Tampilkan notifikasi error
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Tampilkan notifikasi error jika terjadi kesalahan
+                            Swal.fire({
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Error: ' + error.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
