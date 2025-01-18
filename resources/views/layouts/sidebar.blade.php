@@ -54,15 +54,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}">
-                        <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shield-alt"></i>
-                            <p>
-                                Pemeriksaan Barang Keluar
-                                <i class="right fas"></i>
-                            </p>
-                        </a>
-                    </li>
+                    @if(Auth::check() && Auth::user()->level === 'LEVEL 5')
+                        <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
+                            <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}"> 
+                        <i class="nav-icon fas fa-shield-alt"></i> 
+                        <p>Pemeriksaan Barang Keluar</p> </a> </li> 
+                    @endif
 
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}" class="nav-link p-0">
