@@ -15,9 +15,6 @@ class CheckLevel
         if ($user && $user->level === $level) {
             return $next($request);
         }
-
-        $logMessage = $user ? 'User Level: ' . $user->level . ', Required Level: ' . $level : 'No user authenticated';
-        
         return redirect()->route('unauthorized.show');
     }
 }
