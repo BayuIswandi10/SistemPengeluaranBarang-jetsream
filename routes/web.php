@@ -19,6 +19,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::middleware([CheckLevel::class . ':Level 5'])->group(function () {
         Route::get('/security', FormSecutity::class)->name('security');
+        Route::post('/approval/update-status-security', [ApprovalController::class, 'updateStatusSecurity'])->name('approval.updateStatusSecurity');
+
     });
 
     Route::get('/form', FormPengeluaran::class)->name('form');

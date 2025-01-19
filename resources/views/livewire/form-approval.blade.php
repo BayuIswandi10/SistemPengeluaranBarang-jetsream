@@ -45,25 +45,24 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                            @foreach ($pengeluaranBarang->approval as $approval)
                                 <tr>
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
                                     <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
                                     <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
                                     <td>
-                                        @if ($approval->status_approval == 'Level 4')
+                                        @if ($pengeluaranBarang->status == 'Level 4')
                                             Menunggu Persetujuan Security
-                                        @elseif ($approval->status_approval == 'Level 5')
+                                        @elseif ($pengeluaranBarang->status == 'Level 5')
                                             Sudah Disetujui
-                                        @elseif ($approval->status_approval == 'Level 1')
+                                        @elseif ($pengeluaranBarang->status == 'Level 1')
                                             Menunggu Persetujuan PIC/Ka.Sie
-                                        @elseif ($approval->status_approval == 'Level 2')
+                                        @elseif ($pengeluaranBarang->status == 'Level 2')
                                             PIC/Ka.Sie Sudah Menyetujui
-                                        @elseif ($approval->status_approval == 'Level 3')
+                                        @elseif ($pengeluaranBarang->status == 'Level 3')
                                             Menunggu Persetujuan Ka.Dept GA
                                         @else
-                                            {{ $approval->status_approval }}
+                                            {{ $pengeluaranBarang->status }}
                                         @endif
 
                                     </td>
@@ -80,13 +79,13 @@
                                             <i class="fa fa-list"></i>
                                         </button>
                                         <!-- Button Approve -->
-                                        <form action="{{ route('approval.update', $approval->approval_id) }}" method="POST">
+                                        <form action="" method="POST">
                                             @csrf
                                             @method('POST')
                                             <button class="btn btn-success" type="submit" 
-                                                @if($approval->status_approval == 'Level 5') disabled @endif>
+                                                @if($pengeluaranBarang->status == 'Level 5') disabled @endif>
                                                 
-                                                @if($approval->status_approval == 'Level 5') 
+                                                @if($pengeluaranBarang->status == 'Level 5') 
                                                     <i class="fas fa-check-circle"></i> 
                                                 @else 
                                                     <i class="fas fa-thumbs-up"></i> 
@@ -99,7 +98,6 @@
 
                                     </td>
                                 </tr>
-                            @endforeach
                         @endforeach
                     </tbody>
                 </table>

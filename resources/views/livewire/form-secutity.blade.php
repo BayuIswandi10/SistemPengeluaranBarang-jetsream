@@ -19,31 +19,31 @@
                     </thead>
                     <tbody>
                         <?php $i = 0; ?>
-                        @foreach ($approvals as $approval)
-                            <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $approval->pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                <td>
-                                    @if ($approval->status_approval == 'Level 4')
-                                        Menunggu Persetujuan
-                                    @elseif ($approval->status_approval == 'Level 5')
-                                        Sudah Disetujui
-                                    @else
-                                        {{ $approval->status_approval }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($approval->status_approval == 'Level 4')
-                                        <button type="button" class="btn btn-success btn-sm" onclick="editApproval('{{ $approval->pengeluaranBarang->pengeluaran_barang_id }}', '{{ $approval->pengeluaranBarang->tujuan_pengeluaran_barang }}', '{{ $approval->pengeluaranBarang->jenis_kendaraan }}', '{{ $approval->pengeluaranBarang->no_polisi }}')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    @elseif ($approval->status_approval == 'Level 5')
-                                        <button type="button" class="btn btn-info btn-sm" onclick="viewDetails(this)">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    @endif
-                                </td>
-                            </tr>
+                        @foreach ($pengeluaranBarangs as $pengeluaranBarang)
+                                <tr>
+                                    <td>{{ ++$i }}</td>
+                                    <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
+                                    <td>
+                                        @if ($pengeluaranBarang->status == 'Level 4')
+                                            Menunggu Persetujuan
+                                        @elseif ($pengeluaranBarang->status == 'Level 5')
+                                            Sudah Disetujui
+                                        @else
+                                            {{ $pengeluaranBarang->status }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($pengeluaranBarang->status == 'Level 4')
+                                            <button type="button" class="btn btn-success btn-sm" onclick="editApproval('{{ $pengeluaranBarang->pengeluaran_barang_id }}', '{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}', '{{ $pengeluaranBarang->jenis_kendaraan }}', '{{ $pengeluaranBarang->no_polisi }}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        @elseif ($pengeluaranBarang->status == 'Level 5')
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="editApproval('{{ $pengeluaranBarang->pengeluaran_barang_id }}', '{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}', '{{ $pengeluaranBarang->jenis_kendaraan }}', '{{ $pengeluaranBarang->no_polisi }}')">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -104,11 +104,20 @@
                     </table>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <form action="{{ route('approval.update', $approval->approval_id) }}" method="POST" id="approvalForm">
-                        @csrf
-                        @method('POST')
-                        <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
-                    </form>
+                    @if ($pengeluaranBarang->status == 'Level 5')
+                        <!-- Jika status adalah Level 5, tombol "Setujui" disembunyikan -->
+                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm" style="display:none;">
+                            @csrf
+                            @method('POST')
+                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
+                        </form>
+                    @elseif ($pengeluaranBarang->status == 'Level 4')
+                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
+                            @csrf
+                            @method('POST')
+                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
+                        </form>
+                    @endif                
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
                
@@ -164,7 +173,33 @@
     }
 
     function saveApproval() {
+        var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
+        var noPolisi = document.getElementById('noPolisi').value;
 
-        
+        // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
+        $.ajax({
+            url: "{{ route('approval.updateStatusSecurity') }}",  // Ganti dengan route yang sesuai
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
+                pengeluaran_barang_id: pengeluaranBarangId,
+                no_polisi: noPolisi
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Tampilkan pesan sukses
+                    alert(response.message);
+                    // Tutup modal setelah sukses
+                    $('#editApprovalModal').modal('hide');
+                    // Refresh halaman atau update data sesuai kebutuhan
+                    location.reload();  // Untuk me-refresh halaman setelah perubahan berhasil
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Terjadi kesalahan: ' + error);
+            }
+        });
     }
-</script>
+</script>  
