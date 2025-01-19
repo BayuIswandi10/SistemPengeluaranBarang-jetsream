@@ -5,51 +5,126 @@ namespace App\Http\Controllers;
 use App\Models\Approval;
 use App\Models\PengeluaranBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ApprovalController extends Controller
 {
-    // public function approve(Approval $approval)
-    // {
-    //     // Update status approval level by level
-    //     $approval->updateApprovalStatus();
-
-    //     // Redirect back with a success message
-    //     return redirect()->back()->with('success', 'Status approval updated!');
-    // }
-
-    public function approve(Approval $approval)
+    private function generateApprovalId()
     {
-        // Menambahkan data approval dengan level berikutnya jika sudah ada data sebelumnya
-        $newApproval = $approval->addNextApprovalLevel();
+        // Mendapatkan ID terakhir
+        $lastId = Approval::max('approval_id');
+    
+        // Jika belum ada ID, mulai dari APR0001
+        if (!$lastId) {
+            return 'APR0001';
+        }
+    
+        // Ekstrak angka dari ID terakhir dan increment
+        $lastNumber = (int) substr($lastId, 3);
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+    
+        return 'APR' . $newNumber;
+    }
 
-        if ($newApproval) {
-            // Jika berhasil menambahkan data approval baru
-            return redirect()->back()->with('success', 'Approval level updated to next level!');
-        } else {
-            // Jika sudah mencapai level maksimal atau tidak ada perubahan
-            return redirect()->back()->with('error', 'No more levels available for approval!');
+    public function updateStatus(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Update status pada tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update(['status' => 'Level 1']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 1',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
         }
     }
-    
-    public function approveSecurity(Request $request, Approval $approval)
+
+
+    public function updateStatusSecurity(Request $request)
     {
-        // Validasi data yang masuk
-        $request->validate([
-            'no_polisi' => 'required|string|max:20',
-        ]);
+        DB::beginTransaction();
 
-        // Update no_polisi pada pengeluaran_barang terkait
-        $pengeluaranBarang = PengeluaranBarang::where('pengeluaran_barang_id', $approval->pengeluaran_barang_id)->first();
-        if ($pengeluaranBarang) {
-            $pengeluaranBarang->no_polisi = $request->no_polisi;
-            $pengeluaranBarang->save();
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil data dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+            $noPolisi = $request->input('no_polisi');
+    
+            // Update status pada tb_pengeluaran_barang menjadi "Level 5" dan update no_polisi
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update([
+                    'status' => 'Level 5',
+                    'no_polisi' => $noPolisi,
+                ]);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 5',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
         }
-
-        // Update status_approval menjadi Level 5
-        $approval->status_approval = 'Level 5';
-        $approval->save();
-
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Approval updated successfully!');
     }
 }
