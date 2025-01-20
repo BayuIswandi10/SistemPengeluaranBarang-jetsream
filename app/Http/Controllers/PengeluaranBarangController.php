@@ -233,9 +233,40 @@ class PengeluaranBarangController extends Controller
             ], 500);
         }
     }
-    
 
-    
 
-    
+    public function update(Request $request)
+    {
+        $data = $request->validate([
+            'pengeluaran_barang_id' => 'required',
+            'jenis_kendaraan' => 'required',
+            'lokasi_barang_keluar' => 'required',
+            'tujuan_pengeluaran_barang' => 'required',
+            'barang_ids' => 'required|array',
+            'jumlah' => 'required|array',
+            'satuan' => 'required|array',
+            'keterangan' => 'required|array',
+        ]);
+
+        // Cari pengeluaran barang berdasarkan ID
+        $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
+        $pengeluaranBarang->update([
+            'jenis_kendaraan' => $data['jenis_kendaraan'],
+            'lokasi_barang_keluar' => $data['lokasi_barang_keluar'],
+            'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
+        ]);
+
+        // Update detail barang keluar
+        foreach ($data['barang_ids'] as $index => $barangId) {
+            $barang = $pengeluaranBarang->barangKeluar[$index];
+            $barang->update([
+                'nama_barang' => $data['barang_ids'][$index],
+                'jumlah_barang' => $data['jumlah'][$index],
+                'satuan_barang' => $data['satuan'][$index],
+                'keterangan_barang' => $data['keterangan'][$index],
+            ]);
+        }
+
+        return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
+    }    
 }
