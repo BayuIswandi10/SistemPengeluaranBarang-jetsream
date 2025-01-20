@@ -28,10 +28,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
     Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
-  
+    Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
+
     Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
+    Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
+    Route::post('/pengeluaran/update-status-kadeptybs', [ApprovalController::class, 'updateStatusKaDeptYBS'])->name('approval.updateStatusKaDeptYBS');
+    Route::post('/pengeluaran/update-status-kadeptga', [ApprovalController::class, 'updateStatusKaDeptGA'])->name('approval.updateStatusKaDeptGA');
+
+    
     Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
     Route::post('/pengeluaran/update-status', [PengeluaranBarangController::class, 'updateStatus'])->name('pengeluaran.updateStatus');
+    Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
 });
 
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');

@@ -69,30 +69,44 @@
                                     <td>
                                         <div class="button-group d-flex">
                                         <!-- Button detail -->
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-info btn-sm mr-2" 
-                                            data-toggle="modal" 
-                                            data-target="#detailModal" 
-                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
-                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                            <i class="fa fa-list"></i>
-                                        </button>
-                                        <!-- Button Approve -->
-                                        <form action="" method="POST">
-                                            @csrf
-                                            @method('POST')
-                                            <button class="btn btn-success" type="submit" 
-                                                @if($pengeluaranBarang->status == 'Level 5') disabled @endif>
-                                                
-                                                @if($pengeluaranBarang->status == 'Level 5') 
-                                                    <i class="fas fa-check-circle"></i> 
-                                                @else 
-                                                    <i class="fas fa-thumbs-up"></i> 
-                                                @endif
-                                                
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-info btn-sm mr-2" 
+                                                data-toggle="modal" 
+                                                data-target="#detailModal" 
+                                                data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
+                                                data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa fa-list"></i>
                                             </button>
-                                        </form>
+                                                <!-- Button for Level 1 (Ka.Sie) -->
+                                            @if($pengeluaranBarang->status === 'Level 1')
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-success btn-sm update-status-kasie" 
+                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                    Ka.Sie Setujui
+                                                </button>
+                                            @endif
+
+                                            <!-- Button for Level 2 (Ka.Dept YBS) -->
+                                            @if($pengeluaranBarang->status === 'Level 2')
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-success btn-sm update-status-kadeptybs" 
+                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                    Ka.Dept YBS Setujui
+                                                </button>
+                                            @endif
+
+                                            <!-- Button for Level 3 (Ka.Dept GA) -->
+                                            @if($pengeluaranBarang->status === 'Level 3')
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-success btn-sm update-status-kadeptga" 
+                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                    Ka.Dept GA Setujui
+                                                </button>
+                                            @endif
 
                                         </div>
 
@@ -145,6 +159,87 @@
 
 
 <script>
+
+$(document).ready(function() {
+    // Button for Ka.Sie approval
+    $('.update-status-kasie').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
+    });
+
+    // Button for Ka.Dept YBS approval
+    $('.update-status-kadeptybs').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
+    });
+
+    // Button for Ka.Dept GA approval
+    $('.update-status-kadeptga').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
+    });
+
+    // Common function to show confirmation and then update status
+    function confirmUpdate(pengeluaranBarangId, url) {
+        Swal.fire({
+            title: 'Konfirmasi Persetujuan',
+            text: 'Apakah Anda yakin ingin menyetujui data pengeluaran ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Setuju!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateStatus(pengeluaranBarangId, url);
+            }
+        });
+    }
+
+    // Common function to handle status update
+    function updateStatus(pengeluaranBarangId, url) {
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    pengeluaran_barang_id: pengeluaranBarangId,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Success alert using SweetAlert
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload(); // Reload the table after successful update
+                        });
+                    } else {
+                        // Error alert using SweetAlert
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: response.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(response) {
+                    // Handle any error response using SweetAlert
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.responseJSON.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+
 
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {

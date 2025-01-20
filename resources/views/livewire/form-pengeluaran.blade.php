@@ -329,34 +329,34 @@
 
 <script>
     $('#editDataModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget); // Button yang memicu modal
+        var button = $(event.relatedTarget); 
         var pengeluaranBarangId = button.data('id');
         var jenisKendaraan = button.data('jenis_kendaraan');
         var lokasiBarangKeluar = button.data('lokasi_barang_keluar');
         var tujuanPengeluaranBarang = button.data('tujuan_pengeluaran_barang');
-        var barangDetails = button.data('barang');
+        var barangDetails = button.data('barang'); // Detail barang berupa array
 
-        // Set value untuk input form
         $('#edit_pengeluaran_barang_id').val(pengeluaranBarangId);
         $('#edit_jenis_kendaraan').val(jenisKendaraan);
         $('#edit_lokasi_barang_keluar').val(lokasiBarangKeluar);
         $('#edit_tujuan_pengeluaran_barang').val(tujuanPengeluaranBarang);
 
-        // Clear the modal's barang table body
         const tableBody = $('#editBarangTable tbody');
         tableBody.empty();
 
-        // Isi tabel barang di modal
         barangDetails.forEach((barang, index) => {
             const row = `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><input type="text" name="barang_ids[]" class="form-control" value="${barang.nama_barang}" required></td>
+                    <td>
+                        <input type="hidden" name="barang_ids[]" value="${barang.barang_keluar_id || ''}">
+                        <input type="text" name="nama_barang[]" class="form-control" value="${barang.nama_barang}" required>
+                    </td>
                     <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" required></td>
                     <td><input type="text" name="satuan[]" class="form-control" value="${barang.satuan_barang}" required></td>
                     <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required></td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -371,17 +371,24 @@
         const row = `
             <tr>
                 <td>${rowCount + 1}</td>
-                <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
+                <td>
+                    <input type="hidden" name="barang_ids[]" value="">
+                    <input type="text" name="nama_barang[]" class="form-control" placeholder="Nama Barang" required>
+                </td>
                 <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
                 <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
                 <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>`;
         tableBody.append(row);
+    }
+
+    function hapusComboBoxEdit(button) {
+        $(button).closest('tr').remove();
     }
     
 
