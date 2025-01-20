@@ -93,11 +93,17 @@
                                                 <i class="fa fa-list"></i>
                                             </button>
                                             <!-- Button Edit -->
-                                            <a href="" 
-                                                class="btn btn-warning btn-sm">
-                                                
-                                                <i class="fas fa-edit""></i>
-                                            </a>
+                                            <button type="button" 
+                                                class="btn btn-warning btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editDataModal" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}"
+                                                data-jenis_kendaraan="{{ $pengeluaranBarang->jenis_kendaraan }}"
+                                                data-lokasi_barang_keluar="{{ $pengeluaranBarang->lokasi_barang_keluar }}"
+                                                data-tujuan_pengeluaran_barang="{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}"
+                                                data-barang="{{ json_encode($pengeluaranBarang->barangKeluar) }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
                                             <!-- Button Hapus -->
                                             <form action="" 
                                                 method="POST" 
@@ -244,13 +250,141 @@
     </div>
     
     
-    {{-- Edit Modal --}}    
+ 
+    {{-- Edit Modal --}}
+    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Pengeluaran Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('pengeluaran_barang.update') }}" enctype="multipart/form-data" id="editForm">
+                        @csrf
+                        @method('PUT')
+        
+                        <input type="hidden" name="pengeluaran_barang_id" id="edit_pengeluaran_barang_id">
+        
+                        <div class="form-group">
+                            <label for="edit_jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                            <select class="form-control" id="edit_jenis_kendaraan" name="jenis_kendaraan" required>
+                                <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                <option value="TRUCK">TRUCK</option>
+                                <option value="PICK UP">PICK UP</option>
+                                <option value="SEDAN">SEDAN</option>
+                                <option value="JEEP">JEEP</option>
+                                <option value="SP. MOTOR">SP. MOTOR</option>
+                            </select>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="edit_lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_lokasi_barang_keluar" name="lokasi_barang_keluar" readonly>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="edit_tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required>
+                        </div>
+        
+                        <div class="form-group">
+                            <label>Detail Barang Keluar <span class="text-danger">*</span></label>
+                            <table id="editBarangTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan diisi melalui JavaScript -->
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxEdit()">
+                                <i class="fas fa-plus"></i> Tambah Barang
+                            </button>
+                        </div>
+        
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Ubah Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 </div>
 
 
 <script>
+    $('#editDataModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button yang memicu modal
+        var pengeluaranBarangId = button.data('id');
+        var jenisKendaraan = button.data('jenis_kendaraan');
+        var lokasiBarangKeluar = button.data('lokasi_barang_keluar');
+        var tujuanPengeluaranBarang = button.data('tujuan_pengeluaran_barang');
+        var barangDetails = button.data('barang');
+
+        // Set value untuk input form
+        $('#edit_pengeluaran_barang_id').val(pengeluaranBarangId);
+        $('#edit_jenis_kendaraan').val(jenisKendaraan);
+        $('#edit_lokasi_barang_keluar').val(lokasiBarangKeluar);
+        $('#edit_tujuan_pengeluaran_barang').val(tujuanPengeluaranBarang);
+
+        // Clear the modal's barang table body
+        const tableBody = $('#editBarangTable tbody');
+        tableBody.empty();
+
+        // Isi tabel barang di modal
+        barangDetails.forEach((barang, index) => {
+            const row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><input type="text" name="barang_ids[]" class="form-control" value="${barang.nama_barang}" required></td>
+                    <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" required></td>
+                    <td><input type="text" name="satuan[]" class="form-control" value="${barang.satuan_barang}" required></td>
+                    <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            tableBody.append(row);
+        });
+    });
+
+    function tambahComboBoxEdit() {
+        const tableBody = $('#editBarangTable tbody');
+        const rowCount = tableBody.children().length;
+        const row = `
+            <tr>
+                <td>${rowCount + 1}</td>
+                <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
+                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
+                <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
+                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+        tableBody.append(row);
+    }
+    
+
 
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
@@ -422,6 +556,7 @@
             });
         });
     });
+    
 
 
 

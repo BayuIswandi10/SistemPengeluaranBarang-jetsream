@@ -25,9 +25,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/form', FormPengeluaran::class)->name('form');
     Route::get('/approval', FormApproval::class)->name('approval');
+
     Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
+    Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
+  
     Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
-    Route::post('/approve-security/{approval}', [ApprovalController::class, 'approveSecurity'])->name('approve.security');
     Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
     Route::post('/pengeluaran/update-status', [PengeluaranBarangController::class, 'updateStatus'])->name('pengeluaran.updateStatus');
 });
