@@ -65,8 +65,11 @@
                         <form method="POST" action="{{ route('logout') }}" class="nav-link p-0">
                             @csrf
                             <button type="submit" class="btn btn-link nav-link text-gray-600">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Keluar</span>
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <p>
+                                    Keluar
+                                    <i class="right fas"></i>
+                                </p>
                             </button>
                         </form>
                     </li>

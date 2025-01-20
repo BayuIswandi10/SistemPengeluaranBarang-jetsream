@@ -96,7 +96,7 @@
                                             <a href="" 
                                                 class="btn btn-warning btn-sm">
                                                 
-                                                <i class="fas fa-edit""></i>
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                             <!-- Button Hapus -->
                                             <form action="" 
@@ -136,7 +136,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('pengeluaran_barang.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('pengeluaran_barang.store') }}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
                         @csrf
     
                         <!-- Input Fields -->
@@ -156,16 +156,33 @@
                                 <option value="SP. MOTOR">SP. MOTOR</option>
                             </select>
                         </div>
-
+                        
                         <div class="form-group">
-                            <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
+                            <label>Lokasi Barang Keluar<span class="text-danger">*</span></label>
+                            <div class="btn-group" role="group" style="display: block; width: 100%;">
+                                <button type="button" class="btn btn-primary btn-plant" id="btn-plant-1" data-value='Plant 1'>Plant 1</button>
+                                <button type="button" class="btn btn-primary btn-plant" id="btn-plant-2" data-value='Plant 2'>Plant 2</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3" id="custom-location-group" style="display: none;">
                             <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required>
                         </div>
-    
+
                         <div class="form-group">
+                            <label>Tujuan Barang Keluar<span class="text-danger">*</span></label>
+                            <div class="btn-group" role="group" style="display: block; width: 100%;">
+                                <button type="button" class="btn btn-primary btn-plant-2" id="btn-plant-1-to" data-value='Plant 1'>Plant 1</button>
+                                <button type="button" class="btn btn-primary  btn-plant-2" id="btn-plant-2-to" data-value='Plant 2'>Plant 2</button>
+                                <button type="button" class="btn btn-primary  btn-plant-2" id="btn-other" data-value='Lainya'>Lainnya</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3" id="custom-location-group-destination" style="display: none;">
                             <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required>
                         </div>
+
     
                         <!-- Barang Keluar Table -->
                         <div class="form-group">
@@ -347,6 +364,7 @@
             });
         }
     }
+
     function updateNomor() {
     const rows = document.querySelectorAll('#barangTable .nomor');
         rows.forEach((cell, index) => {
@@ -361,6 +379,123 @@
 
 
     document.addEventListener('DOMContentLoaded', function () {
+        const btnFromPlant1 = document.getElementById("btn-plant-1-from");
+        const btnFromPlant2 = document.getElementById("btn-plant-2-from");
+        const btnToPlant1 = document.getElementById("btn-plant-1-to");
+        const btnToPlant2 = document.getElementById("btn-plant-2-to");
+        const btnOther = document.getElementById("btn-other");
+        const customLocationGroupFrom = document.getElementById("custom-location-group");
+        const customLocationGroupTo = document.getElementById("custom-location-group-destination");
+        const lokasiInputAwal = document.getElementById("lokasi_barang_keluar");
+        const lokasiInputAkhir = document.getElementById("tujuan_pengeluaran_barang");
+        let selectedFromPlant = null;
+        let selectedToPlant = null;
+        
+        $('.btn-plant').click(function(){
+            selectFromPlant($(this).data("value"));
+        })
+        
+        $('.btn-plant-2').click(function(){
+            selectToPlant($(this).data("value"));
+        })
+
+        function selectFromPlant(plant) {
+            selectedFromPlant = plant;
+
+            // Update button styles untuk grup "Lokasi Barang Keluar"
+            const fromButtons = document.querySelectorAll('.form-group:first-child .btn');
+            fromButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Tampilkan/hilangkan input custom
+            if (plant === 'Lainnya') {
+                document.getElementById('custom-location-group').style.display = 'block';
+            } else {
+                document.getElementById('custom-location-group').style.display = 'none';
+            }
+        }
+
+        function selectToPlant(plant) {
+            selectedToPlant = plant;
+
+            // Update button styles untuk grup "Tujuan Barang Keluar"
+            const toButtons = document.querySelectorAll('.form-group:nth-child(3) .btn');
+            toButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Tampilkan/hilangkan input custom
+            if (plant === 'Lainya') {
+                document.getElementById('custom-location-group-destination').style.display = 'block';
+            } else {
+                document.getElementById('custom-location-group-destination').style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            if (!selectedFromPlant) {
+                alert('Silakan pilih destinasi awal barang keluar');
+                return false;
+            }
+            else if(!selectedToPlant){
+                alert('Silakan pilih destinasi akhir barang keluar');
+                return false;
+            }
+            return true;
+        }
+
+        document.getElementById('tambah_pengeluaran_barang').addEventListener('submit', validateForm);
+
+        // Fungsi untuk reset tampilan tombol dari
+        function resetButtonsFrom() {
+            btnFromPlant1.classList.remove("active");
+            btnFromPlant2.classList.remove("active");
+            customLocationGroupFrom.style.display = "none";
+            lokasiInputAwal.value = ""; // Reset input jika sebelumnya diisi
+        }
+
+         // Fungsi untuk reset tampilan tombol destinasi
+        function resetButtonsTo() {
+            btnToPlant1.classList.remove("active");
+            btnToPlant2.classList.remove("active");
+            customLocationGroupTo.style.display = "none";
+            lokasiInputAkhir.value = ""; // Reset input jika sebelumnya diisi
+        }
+
+        // Event listener untuk barang keluar dari Plant 1
+        btnFromPlant1.addEventListener("click", function () {
+            resetButtonsFrom();
+            btnFromPlant1.classList.add("active");
+            lokasiInput.value = "Plant 1";
+        });
+
+        // Event listener untuk barang keluar dari Plant 2
+        btnFromPlant2.addEventListener("click", function () {
+            resetButtonsFrom();
+            btnFromPlant2.classList.add("active");
+            lokasiInput.value = "Plant 2";
+        });
+
+        // Event listener untuk destinasi barang keluar dari Plant 1
+        btnToPlant1.addEventListener("click", function () {
+            resetButtonsTo();
+            btnToPlant1.classList.add("active");
+            lokasiInput.value = "Plant 1";
+        });
+
+        // Event listener untuk destinasi barang keluar dari Plant 2
+        btnToPlant2.addEventListener("click", function () {
+            resetButtonsTo();
+            btnToPlant2.classList.add("active");
+            lokasiInput.value = "Plant 2";
+        });
+
+        // Event listener untuk destinasi Lainnya
+        btnOther.addEventListener("click", function () {
+            resetButtonsTo();
+            btnOther.classList.add("active");
+            customLocationGroupTo.style.display = "block";
+        });
+
         // Handle click event on update status button
         document.querySelectorAll('.update-status').forEach(button => {
             button.addEventListener('click', function () {

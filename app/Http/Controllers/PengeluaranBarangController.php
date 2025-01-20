@@ -57,6 +57,7 @@ class PengeluaranBarangController extends Controller
         // Gabungkan menjadi format surat jalan
         return "{$noSurat} / {$dept} / {$lokasi} / {$bulanRomawi} / {$tahun}";
     }
+    
     private function generateBarangKeluarId()
     {
         // Mendapatkan nomor terakhir
