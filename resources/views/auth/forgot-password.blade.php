@@ -78,9 +78,9 @@
 
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('login') }}">
-                                <button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
+                                <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
                                     {{ __('Kembali') }}
-                                </button>
+                                </x-button>
                             </a>
 
                             <x-button type="submit" style="background-color: #3674A7;">
@@ -91,7 +91,5 @@
                 </div>
             </div>
         </div>
-
-        
     </body>
 </x-guest-layout>
