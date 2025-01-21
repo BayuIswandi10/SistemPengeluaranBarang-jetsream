@@ -73,7 +73,6 @@
                                             class="btn btn-info btn-sm mr-2" 
                                             data-toggle="modal" 
                                             data-target="#detailModal" 
-                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
                                             data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                             <i class="fa fa-list"></i>
                                         </button>
@@ -246,24 +245,49 @@ $(document).ready(function() {
             const items = button.data('items'); // Data barang
             const nomor = button.data('nomor'); // Nomor pengeluaran barang
 
-            // Kosongkan tabel modal
-            const tbody = document.getElementById('detailBody');
-            tbody.innerHTML = '';
+            $.ajax({
+                url: "/pengeluaran/detail",
+                method: "POST",
+                data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                success: function (data) {
+                  //  const barang_keluar = data.map(item => item.barang_keluar)
+                    console.log(data.barang_keluar);
+                    //console.log(barang_keluar);
+                    const data_barang = data.barang_keluar;
+                    
+                    const tbody = document.getElementById('detailBody');
+                    tbody.innerHTML = '';
+                    
+                    tbody.innerHTML  = data_barang.map((item, index) => {
+                        return `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${nomor}</td>
+                                <td>${item.nama_barang}</td>
+                                <td>${item.jumlah_barang}</td>
+                                <td>${item.satuan_barang}</td>
+                                <td>${item.keterangan_barang}</td>
+                            </tr>
+                        `;
+                    }).join('');
 
-            // Isi tabel modal dengan data
-            items.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${nomor}</td>
-                        <td>${item.nama_barang}</td>
-                        <td>${item.jumlah_barang}</td>
-                        <td>${item.satuan_barang}</td>
-                        <td>${item.keterangan_barang}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                    // // Isi tabel modal dengan data
+                    // data.barang_keluar.forEach((item, index) => {
+                    //     const row = `
+                    //         <tr>
+                    //             <td>${index + 1}</td>
+                    //             <td>${nomor}</td>
+                    //             <td>${item.nama_barang}</td>
+                    //             <td>${item.jumlah_barang}</td>
+                    //             <td>${item.satuan_barang}</td>
+                    //             <td>${item.keterangan_barang}</td>
+                    //         </tr>
+                    //     `;
+                    //     tbody.innerHTML += row;
+                    // });
+                }
             });
+
         });
     });
 

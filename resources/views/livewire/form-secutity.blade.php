@@ -164,36 +164,7 @@
         modal.show();
     }
 
-    // function saveApproval() {
-    //     var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
-    //     var noPolisi = document.getElementById('noPolisi').value;
 
-    //     // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
-    //     $.ajax({
-    //         url: "{{ route('approval.updateStatusSecurity') }}",  // Ganti dengan route yang sesuai
-    //         method: "POST",
-    //         data: {
-    //             _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
-    //             pengeluaran_barang_id: pengeluaranBarangId,
-    //             no_polisi: noPolisi
-    //         },
-    //         success: function(response) {
-    //             if (response.success) {
-    //                 // Tampilkan pesan sukses
-    //                 alert(response.message);
-    //                 // Tutup modal setelah sukses
-    //                 $('#editApprovalModal').modal('hide');
-    //                 // Refresh halaman atau update data sesuai kebutuhan
-    //                 location.reload();  // Untuk me-refresh halaman setelah perubahan berhasil
-    //             } else {
-    //                 alert('Terjadi kesalahan: ' + response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             alert('Terjadi kesalahan: ' + error);
-    //         }
-    //     });
-    // }
     function saveApproval() {
         var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
         var noPolisi = document.getElementById('noPolisi').value;

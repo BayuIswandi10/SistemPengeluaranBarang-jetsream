@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ApprovalController extends Controller
 {
+    public function getDetail(Request $request){
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+        return response()->json($pengeluaranBarang,200);
+    }
+    
     private function generateApprovalId()
     {
         // Mendapatkan ID terakhir

@@ -92,15 +92,12 @@
                                                 <i class="fa fa-list"></i>
                                             </button>
                                             <!-- Button Edit -->
-                                            <button type="button" 
+                                            <button 
+                                                type="button" 
                                                 class="btn btn-warning btn-sm" 
                                                 data-toggle="modal" 
                                                 data-target="#editDataModal" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}"
-                                                data-jenis_kendaraan="{{ $pengeluaranBarang->jenis_kendaraan }}"
-                                                data-lokasi_barang_keluar="{{ $pengeluaranBarang->lokasi_barang_keluar }}"
-                                                data-tujuan_pengeluaran_barang="{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}"
-                                                data-barang="{{ json_encode($pengeluaranBarang->barangKeluar) }}">
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <!-- Button Hapus -->
@@ -146,12 +143,12 @@
                         <!-- Input Fields -->
                         {{-- <div class="form-group">
                             <label for="pengeluaran_barang_id">No Pengeluaran <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ $pengeluaranBarangId }}" placeholder="No Surat Jalan" readonly required>
+                            <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ $pengeluaranBarangId }}" placeholder="No Surat Jalan" readonly required autocomplete="off">
                         </div>                 --}}
     
                         <div class="form-group">
                             <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                            <select class="form-control" id="select-tools" name="jenis_kendaraan" required>
+                            <select class="form-control" id="select-tools" name="jenis_kendaraan" required autocomplete="off">
                                 <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                                 <option value="TRUCK">TRUCK</option>
                                 <option value="PICK UP">PICK UP</option>
@@ -163,12 +160,22 @@
 
                         <div class="form-group">
                             <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required>
+                            {{-- <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required autocomplete="off"> --}}
+                            <select class="form-control" id="select-tools" name="lokasi_barang_keluar" required autocomplete="off">
+                                <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
+                                <option value="YMI PLANT 1">YMI PLANT 1</option>
+                                <option value="YMI PLANT 2">YMI PLANT 2</option>
+                            </select>
                         </div>
     
                         <div class="form-group">
                             <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required>
+                            {{-- <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required autocomplete="off"> --}}
+                            <select class="form-control" id="select-tools" name="tujuan_pengeluaran_barang" required autocomplete="off">
+                                <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
+                                <option value="YMI PLANT 1">YMI PLANT 1</option>
+                                <option value="YMI PLANT 2">YMI PLANT 2</option>
+                            </select>
                         </div>
     
                         <!-- Barang Keluar Table -->
@@ -188,10 +195,10 @@
                                 <tbody>
                                     <tr>
                                         <td class="nomor">1</td>
-                                        <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
-                                        <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
-                                        <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
-                                        <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+                                        <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
+                                        <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
+                                        <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+                                        <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
                                         <td>
                                             <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                                                 <i class="fas fa-trash"></i>
@@ -268,7 +275,7 @@
         
                         <div class="form-group">
                             <label for="edit_jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                            <select class="form-control" id="edit_jenis_kendaraan" name="jenis_kendaraan" required>
+                            <select class="form-control" id="edit_jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off">
                                 <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                                 <option value="TRUCK">TRUCK</option>
                                 <option value="PICK UP">PICK UP</option>
@@ -285,7 +292,7 @@
         
                         <div class="form-group">
                             <label for="edit_tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required>
+                            <input type="text" class="form-control" id="edit_tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
                         </div>
         
                         <div class="form-group">
@@ -327,41 +334,59 @@
 
 <script>
     $('#editDataModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget); 
-        var pengeluaranBarangId = button.data('id');
-        var jenisKendaraan = button.data('jenis_kendaraan');
-        var lokasiBarangKeluar = button.data('lokasi_barang_keluar');
-        var tujuanPengeluaranBarang = button.data('tujuan_pengeluaran_barang');
-        var barangDetails = button.data('barang'); // Detail barang berupa array
+        const button = $(event.relatedTarget); 
+        const pengeluaranBarangId = button.data('id'); 
 
-        $('#edit_pengeluaran_barang_id').val(pengeluaranBarangId);
-        $('#edit_jenis_kendaraan').val(jenisKendaraan);
-        $('#edit_lokasi_barang_keluar').val(lokasiBarangKeluar);
-        $('#edit_tujuan_pengeluaran_barang').val(tujuanPengeluaranBarang);
 
-        const tableBody = $('#editBarangTable tbody');
-        tableBody.empty();
+        $('#edit_pengeluaran_barang_id').val('');
+        $('#edit_jenis_kendaraan').val('');
+        $('#edit_lokasi_barang_keluar').val('');
+        $('#edit_tujuan_pengeluaran_barang').val('');
+        $('#editBarangTable tbody').empty();
 
-        barangDetails.forEach((barang, index) => {
-            const row = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>
-                        <input type="hidden" name="barang_ids[]" value="${barang.barang_keluar_id || ''}">
-                        <input type="text" name="nama_barang[]" class="form-control" value="${barang.nama_barang}" required>
-                    </td>
-                    <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" required></td>
-                    <td><input type="text" name="satuan[]" class="form-control" value="${barang.satuan_barang}" required></td>
-                    <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>`;
-            tableBody.append(row);
+        
+        $.ajax({
+            url: `/pengeluaran/edit`, 
+            method: 'POST',
+            data: {
+                pengeluaran_barang_id: pengeluaranBarangId,
+                "_token": "{{ csrf_token() }}" // CSRF Token
+            },
+            success: function (response) {
+                
+                $('#edit_pengeluaran_barang_id').val(response.pengeluaran_barang_id);
+                $('#edit_jenis_kendaraan').val(response.jenis_kendaraan);
+                $('#edit_lokasi_barang_keluar').val(response.lokasi_barang_keluar);
+                $('#edit_tujuan_pengeluaran_barang').val(response.tujuan_pengeluaran_barang);
+
+                const tableBody = $('#editBarangTable tbody');
+                response.barangKeluar.forEach((barang, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <input type="hidden" name="barang_ids[]" value="${barang.barang_keluar_id || ''}">
+                                <input type="text" name="nama_barang[]" class="form-control" value="${barang.nama_barang}" required autocomplete="off">
+                            </td>
+                            <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" required autocomplete="off"></td>
+                            <td><input type="text" name="satuan[]" class="form-control" value="${barang.satuan_barang}" required autocomplete="off"></td>
+                            <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required autocomplete="off"></td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    tableBody.append(row);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(`Error: ${error}`);
+                alert('Gagal mengambil data. Silakan coba lagi.');
+            }
         });
     });
+
 
     function tambahComboBoxEdit() {
         const tableBody = $('#editBarangTable tbody');
@@ -371,11 +396,11 @@
                 <td>${rowCount + 1}</td>
                 <td>
                     <input type="hidden" name="barang_ids[]" value="">
-                    <input type="text" name="nama_barang[]" class="form-control" placeholder="Nama Barang" required>
+                    <input type="text" name="nama_barang[]" class="form-control" placeholder="Nama Barang" required autocomplete="off">
                 </td>
-                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
-                <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
-                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
+                <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
                         <i class="fas fa-trash"></i>
@@ -465,10 +490,10 @@
 
         newRow.innerHTML = `
             <td class="nomor">${counter += 1}</td>
-            <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
-            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
-            <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
-            <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
+            <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
+            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
+            <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+            <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                     <i class="fas fa-trash"></i>
@@ -525,6 +550,11 @@
 
 
     document.addEventListener('DOMContentLoaded', function () {
+        $('.select-tools').selectize({
+            create: true, // Memungkinkan pengguna menambahkan opsi baru
+            sortField: 'text' // Mengurutkan opsi berdasarkan teks
+        });
+
         // Handle click event on update status button
         document.querySelectorAll('.update-status').forEach(button => {
             button.addEventListener('click', function () {
