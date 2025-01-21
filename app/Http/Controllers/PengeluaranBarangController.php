@@ -18,22 +18,22 @@ class PengeluaranBarangController extends Controller
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 
-    public function getDetail($pengeluaranBarangId)
-    {
-        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranBarangId);
+    // public function getDetail($pengeluaranBarangId)
+    // {
+    //     $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranBarangId);
 
-        return response()->json([
-            'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
-            'barangKeluar' => $pengeluaranBarang->barangKeluar->map(function ($barang) {
-                return [
-                    'nama_barang' => $barang->nama_barang,
-                    'jumlah_barang' => $barang->jumlah_barang,
-                    'satuan_barang' => $barang->satuan_barang,
-                    'keterangan_barang' => $barang->keterangan_barang,
-                ];
-            }),
-        ]);
-    }
+    //     return response()->json([
+    //         'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
+    //         'barangKeluar' => $pengeluaranBarang->barangKeluar->map(function ($barang) {
+    //             return [
+    //                 'nama_barang' => $barang->nama_barang,
+    //                 'jumlah_barang' => $barang->jumlah_barang,
+    //                 'satuan_barang' => $barang->satuan_barang,
+    //                 'keterangan_barang' => $barang->keterangan_barang,
+    //             ];
+    //         }),
+    //     ]);
+    // }
 
 
     private function generateSuratJalan($lokasi)
@@ -91,6 +91,12 @@ class PengeluaranBarangController extends Controller
 
     //     return 'DTL' . $newNumber;
     // }
+
+    public function getDetail(Request $request){
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+        return response()->json($pengeluaranBarang,200);
+    }
 
 
     private function generateApprovalId()

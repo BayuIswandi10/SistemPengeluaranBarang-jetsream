@@ -45,76 +45,75 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                                <tr>
-                                    <td>{{ ++$i }}</td>
-                                    <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                    <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
-                                    <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
-                                    <td>
-                                        @if ($pengeluaranBarang->status == 'Level 4')
-                                            Menunggu Persetujuan Security
-                                        @elseif ($pengeluaranBarang->status == 'Level 5')
-                                            Sudah Disetujui
-                                        @elseif ($pengeluaranBarang->status == 'Level 1')
-                                            Menunggu Persetujuan PIC/Ka.Sie
-                                        @elseif ($pengeluaranBarang->status == 'Level 2')
-                                            PIC/Ka.Sie Sudah Menyetujui
-                                        @elseif ($pengeluaranBarang->status == 'Level 3')
-                                            Menunggu Persetujuan Ka.Dept GA
-                                        @else
-                                            {{ $pengeluaranBarang->status }}
-                                        @endif
-
-                                    </td>
-                                    <td>
-                                        <div class="button-group d-flex">
+                            <tr>
+                                <td>{{ ++$i }}</td>
+                                <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
+                                <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
+                                <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
+                                <td>
+                                    @if ($pengeluaranBarang->status == 'Level 1')
+                                        Menunggu Persetujuan PIC/Ka.Sie
+                                    @elseif ($pengeluaranBarang->status == 'Level 2')
+                                        PIC/Ka.Sie Sudah Menyetujui
+                                    @elseif ($pengeluaranBarang->status == 'Level 3')
+                                        Menunggu Persetujuan Ka.Dept GA
+                                    @elseif ($pengeluaranBarang->status == 'Level 4')
+                                        Menunggu Persetujuan Security
+                                    @elseif ($pengeluaranBarang->status == 'Level 5')
+                                        Sudah Disetujui
+                                    @else
+                                        {{ $pengeluaranBarang->status }}
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="button-group d-flex">
                                         <!-- Button detail -->
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-info btn-sm mr-2" 
+                                            data-toggle="modal" 
+                                            data-target="#detailModal" 
+                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
+                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                            <i class="fa fa-list"></i>
+                                        </button>
+                                        <!-- Button for Level 1 (Ka.Sie) -->
+                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Level 2')
                                             <button 
                                                 type="button" 
-                                                class="btn btn-info btn-sm mr-2" 
-                                                data-toggle="modal" 
-                                                data-target="#detailModal" 
-                                                data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
-                                                data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa fa-list"></i>
+                                                class="btn btn-success btn-sm update-status-kasie" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Sie Setujui
                                             </button>
-                                                <!-- Button for Level 1 (Ka.Sie) -->
-                                            @if($pengeluaranBarang->status === 'Level 1')
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-success btn-sm update-status-kasie" 
-                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                    Ka.Sie Setujui
-                                                </button>
-                                            @endif
-
-                                            <!-- Button for Level 2 (Ka.Dept YBS) -->
-                                            @if($pengeluaranBarang->status === 'Level 2')
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-success btn-sm update-status-kadeptybs" 
-                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                    Ka.Dept YBS Setujui
-                                                </button>
-                                            @endif
-
-                                            <!-- Button for Level 3 (Ka.Dept GA) -->
-                                            @if($pengeluaranBarang->status === 'Level 3')
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-success btn-sm update-status-kadeptga" 
-                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                    Ka.Dept GA Setujui
-                                                </button>
-                                            @endif
-
-                                        </div>
-
-                                    </td>
-                                </tr>
+                                        @endif
+                
+                                        <!-- Button for Level 2 (Ka.Dept YBS) -->
+                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Level 3')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm update-status-kadeptybs" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Dept YBS Setujui
+                                            </button>
+                                        @endif
+                
+                                        <!-- Button for Level 3 (Ka.Dept GA) -->
+                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Level 4')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm update-status-kadeptga" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Dept GA Setujui
+                                            </button>
+                                        @endif
+                
+                                    </div>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
+                
 
             </div>
         </div>
@@ -184,12 +183,12 @@ $(document).ready(function() {
         Swal.fire({
             title: 'Konfirmasi Persetujuan',
             text: 'Apakah Anda yakin ingin menyetujui data pengeluaran ini?',
-            icon: 'warning',
+            icon: 'info',
             showCancelButton: true,
-            confirmButtonText: 'Ya, Setuju!',
-            cancelButtonText: 'Batal',
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Setuju!',
         }).then((result) => {
             if (result.isConfirmed) {
                 updateStatus(pengeluaranBarangId, url);

@@ -39,6 +39,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
     Route::post('/pengeluaran/update-status', [PengeluaranBarangController::class, 'updateStatus'])->name('pengeluaran.updateStatus');
     Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
+
+    Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
 });
 
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');

@@ -202,10 +202,12 @@
         Swal.fire({
             title: 'Apakah Anda yakin?',
             text: 'Setujui pengeluaran ini?',
-            icon: 'warning',
+            icon: 'info',
             showCancelButton: true,
-            confirmButtonText: 'Ya, Setuju!',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
             cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Setuju!',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
