@@ -16,6 +16,45 @@ class FormApproval extends Component
         
     // }
 
+    public function render()
+    {
+        $user = Auth::user(); // Dapatkan user yang sedang login
+        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']); // Relasi
+    
+        // Filter data berdasarkan level user
+        if ($user->level === 'Level 1') {
+            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri atau yang dibuat oleh dirinya sendiri
+            $pengeluaranBarangs = $query->where(function ($q) use ($user) {
+                $q->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen); // Departemen user
+                })->orWhere('created_by', $user->nrp_karyawan); // Dibuat oleh user
+            })->get();
+        } elseif ($user->level === 'Level 2') {
+            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri
+            $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })->get();
+        } elseif ($user->level === 'Level 3') {
+            // Data default: Pengeluaran dari departemennya sendiri
+            $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })->get();
+    
+            // Jika mencari data dari seluruh departemen (opsional, tergantung permintaan)
+            if (request()->has('cari_departemen')) {
+                $pengeluaranBarangs = $query->get(); // Lihat semua departemen
+            }
+        } elseif ($user->level === 'Level 4') {
+            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
+            $pengeluaranBarangs = $query->get();
+        } else {
+            // Jika level tidak dikenali, tampilkan data kosong
+            $pengeluaranBarangs = collect();
+        }    
+
+        return view('livewire.form-approval', compact('pengeluaranBarangs','user')); 
+    }
+
     // public function render()
     // {
     //     $user = Auth::user(); // Dapatkan user yang login
@@ -39,10 +78,10 @@ class FormApproval extends Component
     //             })
     //             ->get();
     //     } elseif ($user->level === 'Level 3') {
-    //         // Default: Lihat data dengan status Level 2 dari departemen user
+    //         // Lihat data dengan status Level 2 dari departemen user
     //         $pengeluaranBarangs = $query->where('status', 'Level 2')
     //             ->whereHas('user', function ($query) use ($user) {
-    //                 $query->where('departemen', $user->departemen);
+    //                 $query->where('departemen', $user->departemen); // Filter berdasarkan departemen
     //             })
     //             ->get();
     //     } elseif ($user->level === 'Level 4') {
@@ -53,49 +92,7 @@ class FormApproval extends Component
     //         $pengeluaranBarangs = collect();
     //     }
 
-    //     return view('livewire.form-approval', compact('pengeluaranBarangs'));
+    //     return view('livewire.form-approval', compact('pengeluaranBarangs','user')); 
     // }
-
-    public function render()
-    {
-        $user = Auth::user(); // Dapatkan user yang login
-        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']);
-
-        // Filter data berdasarkan level user
-        if ($user->level === 'Level 1') {
-            // Lihat data dengan status Level 1 dari departemen user atau yang dibuat oleh dirinya sendiri
-            $pengeluaranBarangs = $query->where('status', 'Level 1')
-                ->where(function ($q) use ($user) {
-                    $q->whereHas('user', function ($query) use ($user) {
-                        $query->where('departemen', $user->departemen); // Filter berdasarkan departemen
-                    })->orWhere('created_by', $user->nrp_karyawan); // Filter berdasarkan user
-                })
-                ->get();
-        } elseif ($user->level === 'Level 2') {
-            // Lihat data dengan status Level 1 dari departemen user
-            $pengeluaranBarangs = $query->where('status', 'Level 1')
-                ->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen); // Filter berdasarkan departemen
-                })
-                ->get();
-        } elseif ($user->level === 'Level 3') {
-            // Lihat data dengan status Level 2 dari departemen user
-            $pengeluaranBarangs = $query->where('status', 'Level 2')
-                ->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen); // Filter berdasarkan departemen
-                })
-                ->get();
-        } elseif ($user->level === 'Level 4') {
-            // Lihat semua data dengan status Level 3
-            $pengeluaranBarangs = $query->where('status', 'Level 3')->get();
-        } else {
-            // Jika level tidak dikenali, tampilkan data kosong
-            $pengeluaranBarangs = collect();
-        }
-
-        return view('livewire.form-approval', compact('pengeluaranBarangs','user')); 
-    }
-
-
 
 }
