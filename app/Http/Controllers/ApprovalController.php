@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ApprovalController extends Controller
 {
+    public function getDetail(Request $request){
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+        return response()->json($pengeluaranBarang,200);
+    }
+    
     private function generateApprovalId()
     {
         // Mendapatkan ID terakhir
@@ -127,4 +133,149 @@ class ApprovalController extends Controller
             ], 500);
         }
     }
+
+    public function updateStatusKaSie(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Update status pada tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update(['status' => 'Level 2']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 2',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateStatusKaDeptYBS(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Update status pada tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update(['status' => 'Level 3']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 3',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateStatusKaDeptGA(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Update status pada tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update(['status' => 'Level 4']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record
+            $approvalId = $this->generateApprovalId();
+            $approval = Approval::create([
+                'approval_id' => $approvalId,
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 4',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

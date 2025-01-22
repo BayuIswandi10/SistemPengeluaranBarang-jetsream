@@ -8,6 +8,7 @@ use App\Models\BarangKeluar;
 use App\Models\Approval;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PengeluaranBarangController extends Controller
 {
@@ -17,23 +18,12 @@ class PengeluaranBarangController extends Controller
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 
-    public function getDetail($pengeluaranBarangId)
-    {
-        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranBarangId);
 
-        return response()->json([
-            'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
-            'barangKeluar' => $pengeluaranBarang->barangKeluar->map(function ($barang) {
-                return [
-                    'nama_barang' => $barang->nama_barang,
-                    'jumlah_barang' => $barang->jumlah_barang,
-                    'satuan_barang' => $barang->satuan_barang,
-                    'keterangan_barang' => $barang->keterangan_barang,
-                ];
-            }),
-        ]);
+    public function getDetail(Request $request){
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+        return response()->json($pengeluaranBarang,200);
     }
-
 
     private function generateSuratJalan($lokasi)
     {
@@ -57,40 +47,7 @@ class PengeluaranBarangController extends Controller
         // Gabungkan menjadi format surat jalan
         return "{$noSurat} / {$dept} / {$lokasi} / {$bulanRomawi} / {$tahun}";
     }
-    
-    private function generateBarangKeluarId()
-    {
-        // Mendapatkan nomor terakhir
-        $lastNumber = DB::table('tb_barang_keluar')
-            ->max(DB::raw('CAST(SUBSTRING(barang_keluar_id, 4) AS UNSIGNED)'));
 
-        // Jika belum ada ID, mulai dari BKL0001
-        if (!$lastNumber) {
-            return 'BKL0001';
-        }
-
-        // Increment nomor terakhir
-        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-
-        return 'BKL' . $newNumber;
-    }
-
-    private function generateDetailPengeluaranId()
-    {
-        // Mendapatkan nomor terakhir
-        $lastNumber = DB::table('tb_detail_pengeluaran')
-            ->max(DB::raw('CAST(SUBSTRING(detail_pengeluaran_id, 4) AS UNSIGNED)'));
-
-        // Jika belum ada ID, mulai dari DTL0001
-        if (!$lastNumber) {
-            return 'DTL0001';
-        }
-
-        // Increment nomor terakhir
-        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-
-        return 'DTL' . $newNumber;
-    }
 
 
     private function generateApprovalId()
@@ -109,7 +66,21 @@ class PengeluaranBarangController extends Controller
     
         return 'APR' . $newNumber;
     }
+    private function generateBarangKeluarId()
+    {
+        $lastNumber = DB::table('tb_barang_keluar')
+            ->max(DB::raw('CAST(SUBSTRING(barang_keluar_id, 4) AS UNSIGNED)'));
 
+        return 'BKL' . str_pad(($lastNumber + 1), 4, '0', STR_PAD_LEFT);
+    }
+
+    private function generateDetailPengeluaranId()
+    {
+        $lastNumber = DB::table('tb_detail_pengeluaran')
+            ->max(DB::raw('CAST(SUBSTRING(detail_pengeluaran_id, 4) AS UNSIGNED)'));
+
+        return 'DTL' . str_pad(($lastNumber + 1), 4, '0', STR_PAD_LEFT);
+    }
     private function convertToRoman($month)
     {
         $romans = [
@@ -234,6 +205,21 @@ class PengeluaranBarangController extends Controller
         }
     }
 
+    public function edit(Request $request)
+    {
+        $pengeluaranId = $request->pengeluaran_barang_id;
+
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+
+        return response()->json([
+            'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
+            'jenis_kendaraan' => $pengeluaranBarang->jenis_kendaraan,
+            'lokasi_barang_keluar' => $pengeluaranBarang->lokasi_barang_keluar,
+            'tujuan_pengeluaran_barang' => $pengeluaranBarang->tujuan_pengeluaran_barang,
+            'barangKeluar' => $pengeluaranBarang->barangKeluar
+        ]);
+    }
+
 
     public function update(Request $request)
     {
@@ -243,30 +229,84 @@ class PengeluaranBarangController extends Controller
             'lokasi_barang_keluar' => 'required',
             'tujuan_pengeluaran_barang' => 'required',
             'barang_ids' => 'required|array',
+            'barang_ids.*' => 'nullable|string',
+            'nama_barang' => 'required|array',
             'jumlah' => 'required|array',
             'satuan' => 'required|array',
             'keterangan' => 'required|array',
         ]);
 
-        // Cari pengeluaran barang berdasarkan ID
-        $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
-        $pengeluaranBarang->update([
-            'jenis_kendaraan' => $data['jenis_kendaraan'],
-            'lokasi_barang_keluar' => $data['lokasi_barang_keluar'],
-            'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
-        ]);
+        DB::beginTransaction();
 
-        // Update detail barang keluar
-        foreach ($data['barang_ids'] as $index => $barangId) {
-            $barang = $pengeluaranBarang->barangKeluar[$index];
-            $barang->update([
-                'nama_barang' => $data['barang_ids'][$index],
-                'jumlah_barang' => $data['jumlah'][$index],
-                'satuan_barang' => $data['satuan'][$index],
-                'keterangan_barang' => $data['keterangan'][$index],
+        try {
+            // Cari pengeluaran barang berdasarkan ID
+            $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
+
+            // Update data utama di `tb_pengeluaran_barang`
+            $pengeluaranBarang->update([
+                'jenis_kendaraan' => $data['jenis_kendaraan'],
+                'lokasi_barang_keluar' => $data['lokasi_barang_keluar'],
+                'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
             ]);
-        }
 
-        return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
-    }    
+            // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini
+            $existingBarangIds = DB::table('tb_barang_keluar')
+                ->join('tb_detail_pengeluaran', 'tb_barang_keluar.barang_keluar_id', '=', 'tb_detail_pengeluaran.barang_keluar_id')
+                ->where('tb_detail_pengeluaran.pengeluaran_barang_id', $pengeluaranBarang->pengeluaran_barang_id)
+                ->pluck('tb_barang_keluar.barang_keluar_id')
+                ->toArray();
+
+            // Barang yang tetap ada (dari form)
+            $barangIdsFromForm = array_filter($data['barang_ids']);
+
+            // Barang yang perlu dihapus
+            $barangIdsToDelete = array_diff($existingBarangIds, $barangIdsFromForm);
+
+            // Hapus barang dari database dan tabel pivot
+            if (!empty($barangIdsToDelete)) {
+                BarangKeluar::whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
+                DB::table('tb_detail_pengeluaran')->whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
+            }
+
+            // Sinkronisasi barang di tabel pivot
+            foreach ($data['barang_ids'] as $index => $barangId) {
+                if (empty($barangId)) {
+                    // Jika barang ID kosong, buat record baru di `tb_barang_keluar`
+                    $barangKeluarId = $this->generateBarangKeluarId();
+                    $barang = BarangKeluar::create([
+                        'barang_keluar_id' => $barangKeluarId,
+                        'nama_barang' => $data['nama_barang'][$index],
+                        'jumlah_barang' => $data['jumlah'][$index],
+                        'satuan_barang' => $data['satuan'][$index],
+                        'keterangan_barang' => $data['keterangan'][$index],
+                    ]);
+
+                    // Insert ke tabel pivot `tb_detail_pengeluaran`
+                    DB::table('tb_detail_pengeluaran')->insert([
+                        'barang_keluar_id' => $barangKeluarId,
+                        'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
+                        'detail_pengeluaran_id' => $this->generateDetailPengeluaranId(),
+                    ]);
+                } else {
+                    // Update barang jika sudah ada
+                    $barang = BarangKeluar::findOrFail($barangId);
+                    $barang->update([
+                        'nama_barang' => $data['nama_barang'][$index],
+                        'jumlah_barang' => $data['jumlah'][$index],
+                        'satuan_barang' => $data['satuan'][$index],
+                        'keterangan_barang' => $data['keterangan'][$index],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
 }

@@ -104,20 +104,12 @@
                     </table>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    @if ($pengeluaranBarang->status == 'Level 5')
-                        <!-- Jika status adalah Level 5, tombol "Setujui" disembunyikan -->
-                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm" style="display:none;">
-                            @csrf
-                            @method('POST')
-                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
-                        </form>
-                    @elseif ($pengeluaranBarang->status == 'Level 4')
                         <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
                             @csrf
                             @method('POST')
                             <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
                         </form>
-                    @endif                
+
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
                
@@ -172,34 +164,68 @@
         modal.show();
     }
 
+
     function saveApproval() {
         var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
         var noPolisi = document.getElementById('noPolisi').value;
 
-        // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
-        $.ajax({
-            url: "{{ route('approval.updateStatusSecurity') }}",  // Ganti dengan route yang sesuai
-            method: "POST",
-            data: {
-                _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
-                pengeluaran_barang_id: pengeluaranBarangId,
-                no_polisi: noPolisi
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Tampilkan pesan sukses
-                    alert(response.message);
-                    // Tutup modal setelah sukses
-                    $('#editApprovalModal').modal('hide');
-                    // Refresh halaman atau update data sesuai kebutuhan
-                    location.reload();  // Untuk me-refresh halaman setelah perubahan berhasil
-                } else {
-                    alert('Terjadi kesalahan: ' + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('Terjadi kesalahan: ' + error);
+        // Konfirmasi dengan Swal sebelum melakukan update
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'Setujui pengeluaran ini?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Setuju!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
+                $.ajax({
+                    url: "{{ route('approval.updateStatusSecurity') }}",  // Ganti dengan route yang sesuai
+                    method: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
+                        pengeluaran_barang_id: pengeluaranBarangId,
+                        no_polisi: noPolisi
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Tampilkan pesan sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sukses!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                // Reload halaman setelah sukses
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan!',
+                            text: 'Error: ' + error,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                });
             }
         });
     }
+
 </script>  

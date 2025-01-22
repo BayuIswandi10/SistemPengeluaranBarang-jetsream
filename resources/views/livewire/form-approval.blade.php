@@ -45,62 +45,74 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                                <tr>
-                                    <td>{{ ++$i }}</td>
-                                    <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                    <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
-                                    <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
-                                    <td>
-                                        @if ($pengeluaranBarang->status == 'Level 4')
-                                            Menunggu Persetujuan Security
-                                        @elseif ($pengeluaranBarang->status == 'Level 5')
-                                            Sudah Disetujui
-                                        @elseif ($pengeluaranBarang->status == 'Level 1')
-                                            Menunggu Persetujuan PIC/Ka.Sie
-                                        @elseif ($pengeluaranBarang->status == 'Level 2')
-                                            PIC/Ka.Sie Sudah Menyetujui
-                                        @elseif ($pengeluaranBarang->status == 'Level 3')
-                                            Menunggu Persetujuan Ka.Dept GA
-                                        @else
-                                            {{ $pengeluaranBarang->status }}
-                                        @endif
-
-                                    </td>
-                                    <td>
-                                        <div class="button-group d-flex">
+                            <tr>
+                                <td>{{ ++$i }}</td>
+                                <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
+                                <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
+                                <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
+                                <td>
+                                    @if ($pengeluaranBarang->status == 'Level 1')
+                                        Menunggu Persetujuan PIC/Ka.Sie
+                                    @elseif ($pengeluaranBarang->status == 'Level 2')
+                                        PIC/Ka.Sie Sudah Menyetujui
+                                    @elseif ($pengeluaranBarang->status == 'Level 3')
+                                        Menunggu Persetujuan Ka.Dept GA
+                                    @elseif ($pengeluaranBarang->status == 'Level 4')
+                                        Menunggu Persetujuan Security
+                                    @elseif ($pengeluaranBarang->status == 'Level 5')
+                                        Sudah Disetujui
+                                    @else
+                                        {{ $pengeluaranBarang->status }}
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="button-group d-flex">
                                         <!-- Button detail -->
                                         <button 
                                             type="button" 
                                             class="btn btn-info btn-sm mr-2" 
                                             data-toggle="modal" 
                                             data-target="#detailModal" 
-                                            data-items="{{ json_encode($pengeluaranBarang->barangKeluar) }}" 
                                             data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                             <i class="fa fa-list"></i>
                                         </button>
-                                        <!-- Button Approve -->
-                                        <form action="" method="POST">
-                                            @csrf
-                                            @method('POST')
-                                            <button class="btn btn-success" type="submit" 
-                                                @if($pengeluaranBarang->status == 'Level 5') disabled @endif>
-                                                
-                                                @if($pengeluaranBarang->status == 'Level 5') 
-                                                    <i class="fas fa-check-circle"></i> 
-                                                @else 
-                                                    <i class="fas fa-thumbs-up"></i> 
-                                                @endif
-                                                
+                                        <!-- Button for Level 1 (Ka.Sie) -->
+                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Level 2')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm update-status-kasie" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Sie Setujui
                                             </button>
-                                        </form>
-
-                                        </div>
-
-                                    </td>
-                                </tr>
+                                        @endif
+                
+                                        <!-- Button for Level 2 (Ka.Dept YBS) -->
+                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Level 3')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm update-status-kadeptybs" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Dept YBS Setujui
+                                            </button>
+                                        @endif
+                
+                                        <!-- Button for Level 3 (Ka.Dept GA) -->
+                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Level 4')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm update-status-kadeptga" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                Ka.Dept GA Setujui
+                                            </button>
+                                        @endif
+                
+                                    </div>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
+                
 
             </div>
         </div>
@@ -146,30 +158,136 @@
 
 <script>
 
+$(document).ready(function() {
+    // Button for Ka.Sie approval
+    $('.update-status-kasie').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
+    });
+
+    // Button for Ka.Dept YBS approval
+    $('.update-status-kadeptybs').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
+    });
+
+    // Button for Ka.Dept GA approval
+    $('.update-status-kadeptga').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
+    });
+
+    // Common function to show confirmation and then update status
+    function confirmUpdate(pengeluaranBarangId, url) {
+        Swal.fire({
+            title: 'Konfirmasi Persetujuan',
+            text: 'Apakah Anda yakin ingin menyetujui data pengeluaran ini?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Setuju!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateStatus(pengeluaranBarangId, url);
+            }
+        });
+    }
+
+    // Common function to handle status update
+    function updateStatus(pengeluaranBarangId, url) {
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    pengeluaran_barang_id: pengeluaranBarangId,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Success alert using SweetAlert
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload(); // Reload the table after successful update
+                        });
+                    } else {
+                        // Error alert using SweetAlert
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: response.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(response) {
+                    // Handle any error response using SweetAlert
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.responseJSON.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+
+
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
             const items = button.data('items'); // Data barang
             const nomor = button.data('nomor'); // Nomor pengeluaran barang
 
-            // Kosongkan tabel modal
-            const tbody = document.getElementById('detailBody');
-            tbody.innerHTML = '';
+            $.ajax({
+                url: "/pengeluaran/detail",
+                method: "POST",
+                data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                success: function (data) {
+                  //  const barang_keluar = data.map(item => item.barang_keluar)
+                    console.log(data.barang_keluar);
+                    //console.log(barang_keluar);
+                    const data_barang = data.barang_keluar;
+                    
+                    const tbody = document.getElementById('detailBody');
+                    tbody.innerHTML = '';
+                    
+                    tbody.innerHTML  = data_barang.map((item, index) => {
+                        return `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${nomor}</td>
+                                <td>${item.nama_barang}</td>
+                                <td>${item.jumlah_barang}</td>
+                                <td>${item.satuan_barang}</td>
+                                <td>${item.keterangan_barang}</td>
+                            </tr>
+                        `;
+                    }).join('');
 
-            // Isi tabel modal dengan data
-            items.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${nomor}</td>
-                        <td>${item.nama_barang}</td>
-                        <td>${item.jumlah_barang}</td>
-                        <td>${item.satuan_barang}</td>
-                        <td>${item.keterangan_barang}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                    // // Isi tabel modal dengan data
+                    // data.barang_keluar.forEach((item, index) => {
+                    //     const row = `
+                    //         <tr>
+                    //             <td>${index + 1}</td>
+                    //             <td>${nomor}</td>
+                    //             <td>${item.nama_barang}</td>
+                    //             <td>${item.jumlah_barang}</td>
+                    //             <td>${item.satuan_barang}</td>
+                    //             <td>${item.keterangan_barang}</td>
+                    //         </tr>
+                    //     `;
+                    //     tbody.innerHTML += row;
+                    // });
+                }
             });
+
         });
     });
 
