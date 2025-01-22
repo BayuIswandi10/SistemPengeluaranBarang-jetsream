@@ -8,6 +8,6 @@ class DashboardLinearProgress extends Component
 {
     public function render()
     {
-        return view('livewire.dashboard-linear-progress');
+        return view('livewire.linear-progress');
     }
 }

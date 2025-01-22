@@ -2,5 +2,5 @@
     {{-- Komponen Notif Card --}}
     @livewire('dashboard-notif-card')
     {{-- Komponen Linear Progress --}}
-    @livewire('dashboard-linear-progress')
+    @livewire('dashboard-diagram-batang')
 </div>
