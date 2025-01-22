@@ -48,23 +48,22 @@
                 <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
             </div>
 
-            <div class="card mt-5">
+            <div class="card text-left mt-3">
             <div class="card-header">
-                Diagram Kuantitas Pengeluaran Barang
-                <select id="filter" class="float-end">
-                    <option value="harian">Harian</option>
-                    <option value="bulanan">Bulanan</option>
-                    <option value="tahunan">Tahunan</option>
-                </select>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
+                </div>
             </div>
-            <div class="card-body mt-5">
+            <h5 class="card-title mt-3 text-center">Diagram Kuantitas Pengeluaran Barang</h5>
+            <div class="card-body">
                 <div class="chart">
-                    <canvas id="barChart" style="mt-5 min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             const dailyData = {
                 labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
@@ -112,26 +111,30 @@
                 }
             });
 
-            document.getElementById('filter').addEventListener('change', function () {
-                const filterValue = this.value;
-                let selectedData;
+            document.querySelectorAll('.btn-group .btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
 
-                if (filterValue === 'harian') {
-                    selectedData = dailyData;
-                } else if (filterValue === 'bulanan') {
-                    selectedData = monthlyData;
-                } else if (filterValue === 'tahunan') {
-                    selectedData = yearlyData;
-                }
+                    const filterValue = this.getAttribute('data-filter');
+                    let selectedData;
 
-                // Update chart data
-                barChart.data.labels = selectedData.labels;
-                barChart.data.datasets[0].data = selectedData.data;
-                barChart.update();
+                    if (filterValue === 'harian') {
+                        selectedData = dailyData;
+                    } else if (filterValue === 'bulanan') {
+                        selectedData = monthlyData;
+                    } else if (filterValue === 'tahunan') {
+                        selectedData = yearlyData;
+                    }
+
+                    // Update chart data
+                    barChart.data.labels = selectedData.labels;
+                    barChart.data.datasets[0].data = selectedData.data;
+                    barChart.update();
+                });
             });
         </script>
 
         </body>
-        
     </div>
 </div>
