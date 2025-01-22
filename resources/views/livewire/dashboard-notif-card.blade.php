@@ -33,7 +33,7 @@
             </style>
         </head>
         <body>
-            <div class="card-custom" style="background-color: white; border-top: 5px solid #5A6ACF;">
+            <div class="card-custom" style="background-color: white; border-top: 5px solid #F99C30;">
                 <div class="card-header" style="font-size:16">Jumlah Pengajuan</div>
                 <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
                 </div>
@@ -43,13 +43,13 @@
                 <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
                 </div>
 
-                <div class="card-custom" style="background-color: white; border-top: 5px solid #F99C30;">
+                <div class="card-custom" style="background-color: white; border-top: 5px solid #FF0000;">
                 <div class="card-header">Jumlah Menunggu</div>
                 <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
             </div>
 
             <div class="card text-left mt-3">
-            <div class="card-header">
+            <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
                     <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
