@@ -161,20 +161,20 @@
                         <div class="form-group">
                             <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
                             {{-- <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required autocomplete="off"> --}}
-                            <select class="form-control" id="select-tools" name="lokasi_barang_keluar" required autocomplete="off">
+                            <select class="form-control select-tools" id="lokasi_barang_keluar" name="lokasi_barang_keluar" required autocomplete="off">
                                 <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
-                                <option value="YMI PLANT 1">YMI PLANT 1</option>
-                                <option value="YMI PLANT 2">YMI PLANT 2</option>
+                                <option value="P1">P1</option>
+                                <option value="P2">P2</option>
                             </select>
                         </div>
     
                         <div class="form-group">
                             <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
                             {{-- <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required autocomplete="off"> --}}
-                            <select class="form-control" id="select-tools" name="tujuan_pengeluaran_barang" required autocomplete="off">
+                            <select class="form-control select-tools" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
                                 <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
-                                <option value="YMI PLANT 1">YMI PLANT 1</option>
-                                <option value="YMI PLANT 2">YMI PLANT 2</option>
+                                <option value="P1">P1</option>
+                                <option value="P2">P2</option>
                             </select>
                         </div>
     
@@ -196,8 +196,14 @@
                                     <tr>
                                         <td class="nomor">1</td>
                                         <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                                        <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
-                                        <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+                                        <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                                        <td>
+                                            <select name="satuan[]" class="form-control" required>
+                                                <option value="" disabled selected>Pilih Satuan</option>
+                                                <option value="unit">Unit</option>
+                                                <option value="pcs">PCS</option>
+                                            </select>
+                                        </td>
                                         <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
                                         <td>
                                             <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
@@ -368,8 +374,14 @@
                                 <input type="hidden" name="barang_ids[]" value="${barang.barang_keluar_id || ''}">
                                 <input type="text" name="nama_barang[]" class="form-control" value="${barang.nama_barang}" required autocomplete="off">
                             </td>
-                            <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" required autocomplete="off"></td>
-                            <td><input type="text" name="satuan[]" class="form-control" value="${barang.satuan_barang}" required autocomplete="off"></td>
+                            <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" min="1" required autocomplete="off"></td>
+                            <td>
+                                <select name="satuan[]" class="form-control" required>
+                                    <option value="" disabled>Pilih Satuan</option>
+                                    <option value="unit" ${barang.satuan_barang === 'unit' ? 'selected' : ''}>Unit</option>
+                                    <option value="pcs" ${barang.satuan_barang === 'pcs' ? 'selected' : ''}>PCS</option>
+                                </select>
+                            </td>
                             <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required autocomplete="off"></td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
@@ -398,8 +410,14 @@
                     <input type="hidden" name="barang_ids[]" value="">
                     <input type="text" name="nama_barang[]" class="form-control" placeholder="Nama Barang" required autocomplete="off">
                 </td>
-                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
-                <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                <td>
+                    <select name="satuan[]" class="form-control" required>
+                        <option value="" disabled selected>Pilih Satuan</option>
+                        <option value="unit">Unit</option>
+                        <option value="pcs">PCS</option>
+                    </select>
+                </td>
                 <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
@@ -491,8 +509,14 @@
         newRow.innerHTML = `
             <td class="nomor">${counter += 1}</td>
             <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required autocomplete="off"></td>
-            <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required autocomplete="off"></td>
+            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+            <td>
+                <select name="satuan[]" class="form-control" required>
+                    <option value="" disabled selected>Pilih Satuan</option>
+                    <option value="unit">Unit</option>
+                    <option value="pcs">PCS</option>
+                </select>
+            </td>
             <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">

@@ -66,12 +66,12 @@
 
                         <div class="form-group">
                             <x-label for="email" value="{{ __('Nrp/Email') }}" />
-                            <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="username" />
+                            <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="off" />
                         </div>
 
                         <div class="form-group mt-4">
                             <x-label for="password" value="{{ __('Sandi') }}" />
-                            <x-input id="password" class="form-control" type="password" name="password" required autocomplete="current-password" />
+                            <x-input id="password" class="form-control" type="password" name="password" required autocomplete="off" />
                         </div>
 
                         <div class="form-group mt-4 flex items-center justify-between">
