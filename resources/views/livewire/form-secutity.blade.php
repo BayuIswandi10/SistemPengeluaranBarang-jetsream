@@ -53,7 +53,7 @@
 
     <!-- Modal Approval -->
     <div class="modal fade" id="editApprovalModal" tabindex="-1" aria-labelledby="editApprovalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title" id="editApprovalLabel">Edit Approval</h5>
@@ -62,27 +62,37 @@
                 <div class="modal-body">
                     <form id="editApprovalForm">
                         <div class="row mb-3">
-                            <label for="pengeluaranBarangId" class="col-sm-4 col-form-label">No. Pengeluaran</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="pengeluaranBarangId" name="pengeluaranBarangId" readonly>
+                            <div class="col-md-8">
+                                <div class="row mb-3">
+                                    <label for="pengeluaranBarangId" class="col-sm-4 col-form-label">No. Pengeluaran</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="pengeluaranBarangId" name="pengeluaranBarangId" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="tujuan" class="col-sm-4 col-form-label">Tujuan</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="tujuan" name="tujuan" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="jenisKendaraan" class="col-sm-4 col-form-label">Jenis Kendaraan</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="jenisKendaraan" name="jenisKendaraan" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="noPolisi" class="col-sm-4 col-form-label">No. Polisi</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="noPolisi" name="noPolisi">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label for="tujuan" class="col-sm-4 col-form-label">Tujuan</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="tujuan" name="tujuan" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label for="jenisKendaraan" class="col-sm-4 col-form-label">Jenis Kendaraan</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="jenisKendaraan" name="jenisKendaraan" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label for="noPolisi" class="col-sm-4 col-form-label">No. Polisi</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="noPolisi" name="noPolisi">
+                            <div class="col-md-4 text-end">
+                                <div id="qrcodeContainer" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                                    <!-- QR Code akan diisi oleh JavaScript -->
+                                    <img src="path/to/qrcode.png" alt="QR Code" id="qrcode" style="width: 100%;">
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -104,21 +114,35 @@
                     </table>
                 </div>
                 <div class="modal-footer justify-content-center">
-                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
-                            @csrf
-                            @method('POST')
-                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
-                        </form>
-
+                    <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
+                        @csrf
+                        @method('POST')
+                        <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
+                    </form>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="printQRCode()">Cetak QR Code</button>
                 </div>
-               
             </div>
         </div>
     </div>
+    
 </div>
 
 <script>
+
+    function printQRCode() {
+        var originalContent = document.body.innerHTML;
+        var qrCodeContent = document.getElementById("qrcodeContainer").innerHTML;
+
+        // Tampilkan hanya QR Code
+        document.body.innerHTML = qrCodeContent;
+
+        window.print();
+
+        // Kembalikan tampilan asli setelah pencetakan
+        document.body.innerHTML = originalContent;
+    }
+
     $(document).ready(function() {
         var table = $('#dataTable').DataTable({
             columnDefs: [
@@ -158,6 +182,13 @@
                 </tr>`;
             tableBody.innerHTML += row;
         });
+
+
+        // Tampilkan QR Code
+        const qrCodeContainer = document.getElementById('qrcodeContainer');
+        qrCodeContainer.innerHTML = '';
+        const qrCodes = @json($qrCodes);
+        qrCodeContainer.innerHTML = qrCodes[pengeluaranBarangId] || '<p>QR Code tidak tersedia.</p>';
 
         // Tampilkan modal
         const modal = new bootstrap.Modal(document.getElementById('editApprovalModal'));
