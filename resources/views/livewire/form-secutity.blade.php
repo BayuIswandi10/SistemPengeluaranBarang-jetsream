@@ -57,7 +57,9 @@
             <div class="modal-content">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title" id="editApprovalLabel">Edit Approval</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <form id="editApprovalForm">
@@ -119,7 +121,7 @@
                         @method('POST')
                         <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
                     </form>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-primary" onclick="printQRCode()">Cetak QR Code</button>
                 </div>
             </div>
