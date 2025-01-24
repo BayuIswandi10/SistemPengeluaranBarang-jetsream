@@ -1,51 +1,68 @@
 <div class ="content-wrapper">
     <div class="container-fluid">
-        <head>
-            <style>
-            .content-wrapper {
-            display: flex; 
-            flex-wrap: wrap;
-            align-items: flex-start; 
-            justify-content: flex-start;
-            padding: 10px;
-            height: 10%;;
-            }
-            
-            .card-custom {
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-            transition: 0.3s;
-            border-radius: 5px;
-            width: 180px;
-            height: 115px;
-            margin: 10px;
-            display: inline-block;
-            text-align: left;
-            padding: 5px;
-            }   
-
-            .card-custom:hover {
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-            }
-
-            .card-header {
-            font-weight: reguler;
-            }
-            </style>
-        </head>
         <body>
-            <div class="card-custom" style="background-color: white; border-top: 5px solid #F99C30;">
-                <div class="card-header" style="font-size:16">Jumlah Pengajuan</div>
-                <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
-                </div>
+            <div class="mt-3" id="root">
+                <div class="row">
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>150</h3>
 
-                <div class="card-custom" style="background-color: white; border-top: 5px solid #149D52;">
-                <div class="card-header">Jumlah Disetujui</div>
-                <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
+                        <p>New Orders</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
                 </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>53<sup style="font-size: 20px">%</sup></h3>
 
-                <div class="card-custom" style="background-color: white; border-top: 5px solid #FF0000;">
-                <div class="card-header">Jumlah Menunggu</div>
-                <div style="font-size: 40px; font-weight: bold; text-align: left;">10</div>
+                        <p>Bounce Rate</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>44</h3>
+
+                        <p>User Registrations</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>65</h3>
+
+                        <p>Unique Visitors</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-pie-graph"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            <!-- ./col -->
             </div>
 
             <div class="card text-left mt-3">
@@ -62,7 +79,7 @@
                     <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
             </div>
-        </div>
+        </body>
 
         <script>
             const dailyData = {

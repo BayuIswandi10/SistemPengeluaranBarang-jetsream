@@ -48,7 +48,7 @@
                         <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-file-signature"></i>
                             <p>
-                                Data Persetujuan Barang Keluar
+                                Data Persetujuan
                                 <i class="right fas"></i>
                             </p>                            
                         </a>
