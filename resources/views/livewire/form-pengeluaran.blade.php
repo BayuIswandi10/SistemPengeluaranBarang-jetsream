@@ -632,40 +632,40 @@
 
 
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-var control = $select[0].selectize;
+    var control = $select[0].selectize;
 
-$('#button-clear').on('click', function() {
-  control.clear();
-});
+    $('#button-clear').on('click', function() {
+    control.clear();
+    });
 
-$('#button-clearoptions').on('click', function() {
-  control.clearOptions();
-});
+    $('#button-clearoptions').on('click', function() {
+    control.clearOptions();
+    });
 
-$('#button-addoption').on('click', function() {
-  control.addOption({
-    id: 4,
-    title: 'Something New',
-    url: 'http://google.com'
-  });
-});
+    $('#button-addoption').on('click', function() {
+    control.addOption({
+        id: 4,
+        title: 'Something New',
+        url: 'http://google.com'
+    });
+    });
 
-$('#button-additem').on('click', function() {
-  control.addItem(2);
-});
+    $('#button-additem').on('click', function() {
+    control.addItem(2);
+    });
 
-$('#button-maxitems2').on('click', function() {
-  control.setMaxItems(2);
-});
+    $('#button-maxitems2').on('click', function() {
+    control.setMaxItems(2);
+    });
 
-$('#button-maxitems100').on('click', function() {
-  control.setMaxItems(100);
-});
+    $('#button-maxitems100').on('click', function() {
+    control.setMaxItems(100);
+    });
 
-$('#button-setvalue').on('click', function() {
-  control.setValue([2, 3]);
-});
+    $('#button-setvalue').on('click', function() {
+    control.setValue([2, 3]);
+    });
         
 </script>
