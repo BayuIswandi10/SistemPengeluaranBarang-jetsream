@@ -62,11 +62,19 @@
                     <x-validation-errors class="mb-4" />    
 
                     <!-- Tampilkan status session -->
-                    @if (session('status'))
-                        <div class="mb-4 font-medium text-sm text-green-600">
-                            {{ session('status') }}
-                        </div>
+                    @if (session()->has('status'))
+                        @if (!session('status'))
+                            <div class="mb-4 font-medium text-sm text-red-600">
+                                {{ __('Gagal mengirim tautan reset password. Silakan coba lagi atau periksa email Anda.') }}
+                            </div>
+                        @else
+                            <div class="mb-4 font-medium text-sm text-green-600">
+                                {{ __('Kami telah mengirimkan tautan reset password ke email Anda.') }}
+                            </div>
+                        @endif
                     @endif
+                
+                    
 
                     <form method="POST" action="{{ route('password.email') }}">
                         @csrf

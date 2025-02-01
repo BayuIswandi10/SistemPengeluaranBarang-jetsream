@@ -39,15 +39,10 @@
         <div class="nav-static-top d-flex justify-content-between align-items-center p-3 bg-light">
             <div class="float-left">
                 <a href="#">
-                    <img class="mt-3 ml-4" src="{{ asset('assets/img/logo A YMI - 2017.png') }}" style="height:40px;">
+                    <img class="mt-3 ml-4" src="{{ asset('assets/img/logo YMI-DLT.png') }}" style="height:40px;">
                 </a>
             </div>
 
-            <ul class="nav">
-                <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Tentang</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Kontak</a></li>
-            </ul>
         </div>
 
         <div class="login-box">
@@ -92,12 +87,17 @@
                             @endif
                         </div>
                         
-                        <div class="text-center mt-4">
-                          
-                        <button type="submit" class="btn btn-primary w-60" style="background-color: #3674A7; border-color: #3674A7;">
-                            {{ __('Masuk') }}
-                        </button>
+                   
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="/">
+                                <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:2px;">
+                                    {{ __('Kembali') }}
+                                </x-button>
+                            </a>
 
+                            <button type="submit" class="btn btn-primary w-60" style="background-color: #3674A7; border-color: #3674A7;">
+                                {{ __('Masuk') }}
+                            </button>
                         </div>
                     </form>
                 </div>

@@ -7,12 +7,11 @@
                     <!-- small box -->
                     <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>150</h3>
-
-                        <p>New Orders</p>
+                        <h3>{{ $pengeluaranBarangs->count() }}</h3>
+                        <p>Jumlah Pengajuan</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-bag"></i>
+                        <i class="ion ion-document"></i>
                     </div>
                     <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
@@ -22,27 +21,12 @@
                     <!-- small box -->
                     <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
+                        <h3>{{ $pengeluaranBarangsDisetujui}}</h3>
 
-                        <p>Bounce Rate</p>
+                        <p>Jumlah Disetujui</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
-                    </div>
-                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>44</h3>
-
-                        <p>User Registrations</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-person-add"></i>
+                        <i class="ion ion-document"></i>
                     </div>
                     <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
@@ -52,12 +36,12 @@
                     <!-- small box -->
                     <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>65</h3>
+                        <h3>{{ $pengeluaranBarangsDisetujui}}</h3>
 
-                        <p>Unique Visitors</p>
+                        <p>Jumlah Menunggu</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
+                        <i class="ion ion-document"></i>
                     </div>
                     <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
@@ -82,23 +66,12 @@
         </body>
 
         <script>
-            const dailyData = {
-                labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-                data: [5, 8, 12, 7, 9, 6, 4]
-            };
-
-            const monthlyData = {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-                data: [120, 150, 100, 180, 200, 170, 130, 160, 190, 220, 210, 250]
-            };
-
-            const yearlyData = {
-                labels: ['2020', '2021', '2022', '2023', '2024'],
-                data: [1500, 1800, 2000, 2300, 2500]
-            };
-
+            const dailyData = {!! $dailyData !!};
+            const monthlyData = {!! $monthlyData !!};
+            const yearlyData = {!! $yearlyData !!};
+        
             const ctx = document.getElementById('barChart').getContext('2d');
-
+        
             let barChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -127,15 +100,15 @@
                     }
                 }
             });
-
+        
             document.querySelectorAll('.btn-group .btn').forEach(button => {
                 button.addEventListener('click', function () {
                     document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
-
+        
                     const filterValue = this.getAttribute('data-filter');
                     let selectedData;
-
+        
                     if (filterValue === 'harian') {
                         selectedData = dailyData;
                     } else if (filterValue === 'bulanan') {
@@ -143,14 +116,18 @@
                     } else if (filterValue === 'tahunan') {
                         selectedData = yearlyData;
                     }
-
+        
                     // Update chart data
                     barChart.data.labels = selectedData.labels;
                     barChart.data.datasets[0].data = selectedData.data;
+        
+                    // Update chart
                     barChart.update();
                 });
             });
         </script>
+        
+    
 
         </body>
     </div>

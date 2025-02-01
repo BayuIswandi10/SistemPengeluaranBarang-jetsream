@@ -33,7 +33,7 @@
         <div class="nav-static-top d-flex justify-content-between align-items-center p-3 bg-light">
             <div class="float-left">
                 <a href="#">
-                    <img class="mt-3 ml-4" src="{{ asset('assets/img/logo A YMI - 2017.png') }}" style="height:40px;">
+                    <img class="mt-3 ml-4" src="{{ asset('assets/img/Logo YMI-DLT.png') }}" style="height:40px;">
                 </a>
             </div>
 

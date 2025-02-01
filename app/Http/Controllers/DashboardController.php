@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use App\Models\PengeluaranBarang;
 
 class DashboardController extends Controller
 {
-    //
+    public function index()
+    {
+        $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
+        return view('livewire.dashboard-notif-card', compact('pengeluaranBarangs'));
+    }
+
 }

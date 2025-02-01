@@ -9,6 +9,7 @@ use App\Livewire\FormApproval;
 use App\Http\Controllers\ApprovalController;
 use App\Livewire\FormSecutity;
 use App\Http\Middleware\CheckLevel; 
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/pengeluaran/update-status', [PengeluaranBarangController::class, 'updateStatus'])->name('pengeluaran.updateStatus');
     Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit']);
     Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
+    Route::get('/pengeluaran/detail/{pengeluaran_barang_id}', [DashboardController::class, 'getDetailQty']);
 
     Route::post('/approve/{approval}', [ApprovalController::class, 'approve'])->name('approval.update');
     Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
