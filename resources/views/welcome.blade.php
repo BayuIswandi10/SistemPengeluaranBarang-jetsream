@@ -1,10 +1,7 @@
 
 
 <x-guest-layout>
-    <head>
-    </head>
-
-    <body  style="background-image: url('{{ asset('assets/img/motto.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <body  style="background-image: url('{{ asset('assets/img/PT YMI Plant 2.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; overflow: hidden;">
         @if (session('success'))
             <script>
                 Swal.fire({
@@ -18,7 +15,7 @@
                 
             </script>
         @endif
-
+        <div class="rectangle-81"></div>
         @if (session('error'))
             <script>
                 Swal.fire({
@@ -30,6 +27,8 @@
                 });
             </script>
         @endif
+
+
         <div class="nav-static-top d-flex justify-content-between align-items-center p-3 bg-light">
             <div class="float-left">
                 <a href="#">
@@ -49,6 +48,7 @@
                     </div>
                 </li>
             </ul>
+            
 
             {{-- Tambah Modal --}}
             <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">

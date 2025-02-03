@@ -69,6 +69,30 @@ class Dashboard extends Component
             'data' => $yearlyDataQuery->pluck('jumlah')->toArray()
         ];
 
+        //Pie Data
+        // $pengeluaranBarangs = collect([
+        //     (object) ['pengeluaran_barang_id' => '001 / IT / P2 / I / 2025'],
+        //     (object) ['pengeluaran_barang_id' => '002 / HRD / P1 / II / 2025'],
+        //     (object) ['pengeluaran_barang_id' => '003 / IT / P3 / III / 2025'],
+        //     (object) ['pengeluaran_barang_id' => '004 / FINANCE / P2 / IV / 2025'],
+        //     (object) ['pengeluaran_barang_id' => '005 / HRD / P1 / V / 2025']
+        // ]);
+
+        // // Dummy Pie Chart Data (mengambil atribut kedua setelah "/")
+        // $pieData = $pengeluaranBarangs->map(function ($item) {
+        //     $parts = explode(' / ', $item->pengeluaran_barang_id);
+        //     return $parts[1] ?? null; // Mengambil bagian kedua, contoh: IT, HRD, FINANCE
+        // })->filter()->countBy()->toArray();
+
+        // 🔹 Data diagram pie (TANPA FILTER)
+        $pieQuery = PengeluaranBarang::select('pengeluaran_barang_id')->get(); // Ambil semua data
+        
+        $pieData = $pieQuery->map(function ($item) {
+            $parts = explode(' / ', $item->pengeluaran_barang_id);
+            return $parts[1] ?? null; // Mengambil bagian kedua yang merupakan nama departemen
+        })->filter()->countBy()->toArray();
+
+
         return view('livewire.dashboard-notif-card', [
             'pengeluaranBarangs' => $pengeluaranBarangs,
             'pengeluaranBarangsDisetujui' => $pengeluaranBarangsDisetujui,
@@ -76,6 +100,7 @@ class Dashboard extends Component
             'dailyData' => json_encode($dailyData),
             'monthlyData' => json_encode($monthlyData),
             'yearlyData' => json_encode($yearlyData),
+            'pieData' => json_encode($pieData),
             'user' => $user
         ]);
     }
