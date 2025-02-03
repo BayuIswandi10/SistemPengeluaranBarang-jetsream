@@ -65,10 +65,10 @@
                                 @csrf
             
                                 <!-- Input Fields -->
-                                {{-- <div class="form-group">
-                                    <label for="pengeluaran_barang_id">No Pengeluaran <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="pengeluaran_barang_id" name="pengeluaran_barang_id" value="{{ $pengeluaranBarangId }}" placeholder="No Surat Jalan" readonly required autocomplete="off">
-                                </div>                 --}}
+                                <div class="form-group">
+                                    <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
+                                </div>                
             
                                 <div class="form-group">
                                     <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
