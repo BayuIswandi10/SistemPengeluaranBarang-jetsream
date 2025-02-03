@@ -50,35 +50,42 @@
             </div>
 
             <div class="card text-left mt-3">
-            <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
-                    <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
-                    <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
-                </div>
-            </div>
-            <h5 class="card-title mt-3 text-center">Diagram Kuantitas Pengeluaran Barang</h5>
-            <div class="d-flex flex-wrap justify-content-center">
-                <!-- Bar Chart -->
-                <div class="card m-2" style="width: 48%;">
+            <div class="row">
+            <!-- Bagian Kiri - Diagram Batang dengan Filter -->
+            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4'])) col-md-6 @else col-md-12 @endif">
+                <div class="card">
+                    <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
+                        <div class="btn-group d-flex justify-content-center" role="group">
+                            <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
+                            <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
+                            <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div class="chart">
                             <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                @if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4']))
-                    <!-- Pie Chart -->
-                    <div class="card m-2" style="width: 48%;">
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
+            <!-- Bagian Kanan - Diagram Pie -->
+            @if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4']))
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
+                        <h5 class="card-title text-center">Distribusi Pengeluaran Barang Berdasarkan Departemen</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
+            @endif
+        </div>
+
 
         </body>
 
