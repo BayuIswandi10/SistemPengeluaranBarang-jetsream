@@ -5,6 +5,8 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\PengeluaranBarang;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class Dashboard extends Component
 {
@@ -19,32 +21,54 @@ class Dashboard extends Component
                     $query->where('departemen', $user->departemen);
                 })->orWhere('created_by', $user->nrp_karyawan);
             })->get();
-        } elseif ($user->level === 'Level 2' || $user->level === 'Level 3') {
+        } elseif ($user->level === 'Level 2') {
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Level 4') {
+        } elseif ($user->level === 'Level 4' || $user->level === 'Level 3' || $user->level === 'Level 5' ) {
             $pengeluaranBarangs = $query->get();
         } else {
             $pengeluaranBarangs = collect();
         }
     
-        // Menghitung jumlah yang sudah disetujui dan yang masih menunggu
-        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => $item->status !== $user->level)->count();
-        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) => $item->status === $user->level)->count();
+       // Ekstrak angka dari level user
+        $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
+
+        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
+            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel
+        )->count();
+
+        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) => 
+            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
+        )->count();
 
         // 📊 Data Harian (7 hari terakhir)
+        $startDate = now()->subDays(6)->startOfDay();
+        $endDate = now()->endOfDay();
+
+        // Ambil data dari database
         $dailyDataQuery = PengeluaranBarang::selectRaw("DATE(created_date) as tanggal, COUNT(*) as jumlah")
-            ->whereBetween('created_date', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+            ->whereBetween('created_date', [$startDate, $endDate])
             ->groupBy('tanggal')
             ->orderBy('tanggal', 'asc')
-            ->get();
+            ->get()
+            ->keyBy('tanggal'); // Index berdasarkan tanggal
 
+        // Generate semua tanggal dari 7 hari terakhir
+        $period = CarbonPeriod::create($startDate, $endDate);
         $dailyData = [
-            'labels' => $dailyDataQuery->pluck('tanggal')->toArray(),
-            'data' => $dailyDataQuery->pluck('jumlah')->toArray()
+            'labels' => [],
+            'data' => [],
+            'days' => []
         ];
-    
+
+        foreach ($period as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $dailyData['labels'][] = $formattedDate;
+            $dailyData['days'][] = $date->translatedFormat('l'); // Nama hari
+            $dailyData['data'][] = $dailyDataQuery[$formattedDate]->jumlah ?? 0; // Ambil jumlah atau set ke 0
+        }
+
         // 📊 Data Bulanan (12 bulan terakhir)
         $monthlyDataQuery = PengeluaranBarang::selectRaw("DATE_FORMAT(created_date, '%Y-%m') as bulan, COUNT(*) as jumlah")
             ->whereBetween('created_date', [now()->subMonths(11)->startOfMonth(), now()->endOfMonth()])
@@ -69,13 +93,12 @@ class Dashboard extends Component
             'data' => $yearlyDataQuery->pluck('jumlah')->toArray()
         ];
 
-        $pieQuery = PengeluaranBarang::select('pengeluaran_barang_id')->get(); // Ambil semua data
-        
+        // 📊 Data Pie Chart berdasarkan Departemen
+        $pieQuery = PengeluaranBarang::pluck('pengeluaran_barang_id'); // Ambil hanya kolom ID
         $pieData = $pieQuery->map(function ($item) {
-            $parts = explode(' / ', $item->pengeluaran_barang_id);
-            return $parts[1] ?? null; // Mengambil bagian kedua yang merupakan nama departemen
+            $parts = explode(' / ', $item);
+            return $parts[1] ?? null; // Ambil bagian kedua (Departemen)
         })->filter()->countBy()->toArray();
-
 
         return view('livewire.dashboard-notif-card', [
             'pengeluaranBarangs' => $pengeluaranBarangs,

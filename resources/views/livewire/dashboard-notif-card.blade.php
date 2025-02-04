@@ -36,7 +36,7 @@
                     <!-- small box -->
                     <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>{{ $pengeluaranBarangsDisetujui}}</h3>
+                        <h3>{{ $pengeluaranBarangsMenunggu}}</h3>
 
                         <p>Jumlah Menunggu</p>
                     </div>
@@ -49,10 +49,10 @@
             <!-- ./col -->
             </div>
 
-            <div class="card text-left mt-3">
+            <div>
             <div class="row">
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
-            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4'])) col-md-6 @else col-md-12 @endif">
+            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Level 4', 'Level 5'])) col-md-6 @else col-md-12 @endif">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
                         <div class="btn-group d-flex justify-content-center" role="group">
@@ -95,8 +95,8 @@
             const yearlyData = {!! $yearlyData !!};
             const pieData = {!! $pieData !!};
 
+            // Ambil elemen canvas untuk Bar Chart
             const ctxBar = document.getElementById('barChart').getContext('2d');
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
 
             // 🔹 Inisialisasi Bar Chart
             let barChart = new Chart(ctxBar, {
@@ -126,36 +126,45 @@
                 }
             });
 
-            // 🔹 Inisialisasi Pie Chart
-            let pieChart = new Chart(ctxPie, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(pieData),
-                    datasets: [{
-                        label: 'Departemen',
-                        data: Object.values(pieData),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(153, 102, 255, 0.6)',
-                            'rgba(255, 159, 64, 0.6)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right'
+            // 🔹 Cek apakah elemen pieChart ada sebelum membuat Pie Chart
+            const pieCanvas = document.getElementById('pieChart');
+
+            if (pieCanvas) {
+                try {
+                    const ctxPie = pieCanvas.getContext('2d');
+                    let pieChart = new Chart(ctxPie, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(pieData),
+                            datasets: [{
+                                label: 'Departemen',
+                                data: Object.values(pieData),
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(75, 192, 192, 0.6)',
+                                    'rgba(153, 102, 255, 0.6)',
+                                    'rgba(255, 159, 64, 0.6)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'right'
+                                }
+                            }
                         }
-                    }
+                    });
+                } catch (error) {
+                    console.error("Pie Chart tidak dapat diinisialisasi:", error);
                 }
-            });
+            }
 
             // 🔹 Filter untuk Bar Chart (Harian, Bulanan, Tahunan)
             document.querySelectorAll('.btn-group .btn').forEach(button => {
@@ -182,6 +191,7 @@
                     barChart.update();
                 });
             });
+
         </script>
         
         </body>
