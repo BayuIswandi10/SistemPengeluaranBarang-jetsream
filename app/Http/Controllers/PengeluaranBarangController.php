@@ -8,7 +8,7 @@ use App\Models\BarangKeluar;
 use App\Models\Approval;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use App\Models\User;
 
 class PengeluaranBarangController extends Controller
 {
@@ -25,12 +25,8 @@ class PengeluaranBarangController extends Controller
         return response()->json($pengeluaranBarang,200);
     }
 
-    private function generateSuratJalan($lokasi)
+    private function generateSuratJalan($lokasi, $departemen)
     {
-        // Ambil user yang sedang login
-        $user = Auth::user();
-        $dept = $user->departemen; // Kolom departemen dari tabel users
-
         // Ambil tahun dan bulan saat ini
         $tahun = now()->format('Y');
         $bulanAngka = now()->format('m');
@@ -45,7 +41,7 @@ class PengeluaranBarangController extends Controller
         $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
         // Gabungkan menjadi format surat jalan
-        return "{$noSurat} / {$dept} / {$lokasi} / {$bulanRomawi} / {$tahun}";
+        return "{$noSurat} / {$departemen} / {$lokasi} / {$bulanRomawi} / {$tahun}";
     }
 
 
@@ -97,11 +93,18 @@ class PengeluaranBarangController extends Controller
         DB::beginTransaction();
     
         try {
-            $user = Auth::user();
-            $nrpKaryawan = $user->nrp_karyawan;
-    
+            
+            $nrpKaryawan = $request->input('created_by');
+
+            $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
+            if (!$user) {
+                return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
+            }
+
+            $departemen = $user->departemen;
+
             // Generate nomor surat jalan
-            $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'));
+            $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'), $departemen);
     
             // Insert ke tabel pengeluaran_barang
             $pengeluaranBarang = PengeluaranBarang::create([
@@ -150,7 +153,7 @@ class PengeluaranBarangController extends Controller
     
             DB::commit();
     
-            return redirect()->route('form')->with('success', 'Data berhasil disimpan!');
+            return redirect()->back()->with('success', 'Data berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
