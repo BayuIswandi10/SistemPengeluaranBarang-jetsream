@@ -19,11 +19,39 @@ class PengeluaranBarangController extends Controller
     }
 
 
-    public function getDetail(Request $request){
+    // public function getDetail(Request $request){
+    //     $pengeluaranId = $request->pengeluaran_barang_id;
+    //     $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+    //     return response()->json($pengeluaranBarang,200);
+    // }
+
+    public function getDetail(Request $request)
+    {
         $pengeluaranId = $request->pengeluaran_barang_id;
+
+        // Mengambil data pengeluaran barang beserta barang keluar
         $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
-        return response()->json($pengeluaranBarang,200);
+
+        // Mengambil informasi tambahan terkait pengeluaran barang (misal: User yang mengeluarkan barang)
+        $approvalData = Approval::with('user')
+            ->where('pengeluaran_barang_id', $pengeluaranId)
+            ->get()
+            ->map(function ($approval, $index) {
+                return [
+                    'no' => $index + 1,
+                    'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                    'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                    'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                    'status' => $approval->status_approval,
+                ];
+            });
+
+        return response()->json([
+            'barang_keluar' => $pengeluaranBarang->barangKeluar,
+            'informasi_tambahan' => $approvalData,
+        ], 200);
     }
+
 
     private function generateSuratJalan($lokasi, $departemen)
     {

@@ -139,8 +139,6 @@
                         @endforeach
                     </tbody>
                 </table>
-                
-
             </div>
         </div>
     </div>
@@ -156,28 +154,60 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>NO</th>
-                                <th>Nomor Pengeluaran Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Jumlah</th>
-                                <th>Satuan</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detailBody">
-                            <!-- Data akan diisi secara dinamis -->
-                        </tbody>
-                    </table>
+                    <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    <!-- Card untuk Tabel Barang Keluar -->
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Detail Barang Keluar</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nomor Pengeluaran Barang</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Card untuk Tabel Informasi Tambahan -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Informasi Tambahan</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="additionalInfoBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    
-    {{-- Edit Modal --}}    
+
 
 
 </div>
@@ -269,24 +299,25 @@ $(document).ready(function() {
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
-            const items = button.data('items'); // Data barang
             const nomor = button.data('nomor'); // Nomor pengeluaran barang
+            document.getElementById('nomorPengeluaranCard').innerText = nomor;
 
             $.ajax({
                 url: "/pengeluaran/detail",
                 method: "POST",
                 data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                 success: function (data) {
-                  //  const barang_keluar = data.map(item => item.barang_keluar)
-                    console.log(data.barang_keluar);
-                    //console.log(barang_keluar);
-                    const data_barang = data.barang_keluar;
-                    
+                    // console.log("Response dari server:", data); // Debugging
+
                     const tbody = document.getElementById('detailBody');
+                    const additionalInfoBody = document.getElementById('additionalInfoBody');
+
                     tbody.innerHTML = '';
-                    
-                    tbody.innerHTML  = data_barang.map((item, index) => {
-                        return `
+                    additionalInfoBody.innerHTML = '';
+
+                    // Validasi data barang_keluar
+                    if (data.barang_keluar && data.barang_keluar.length > 0) {
+                        tbody.innerHTML = data.barang_keluar.map((item, index) => `
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${nomor}</td>
@@ -295,28 +326,54 @@ $(document).ready(function() {
                                 <td>${item.satuan_barang}</td>
                                 <td>${item.keterangan_barang}</td>
                             </tr>
-                        `;
-                    }).join('');
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                    }
 
-                    // // Isi tabel modal dengan data
-                    // data.barang_keluar.forEach((item, index) => {
-                    //     const row = `
-                    //         <tr>
-                    //             <td>${index + 1}</td>
-                    //             <td>${nomor}</td>
-                    //             <td>${item.nama_barang}</td>
-                    //             <td>${item.jumlah_barang}</td>
-                    //             <td>${item.satuan_barang}</td>
-                    //             <td>${item.keterangan_barang}</td>
-                    //         </tr>
-                    //     `;
-                    //     tbody.innerHTML += row;
-                    // });
+                    const tingkatMapping = {
+                        "Level 1": "Civitas",
+                        "Level 2": "PIC/Ka.Sie",
+                        "Level 3": "Ka.Dept.Ybs",
+                        "Level 4": "Ka.Dept.GA",
+                        "Level 5": "Security"
+                    };
+
+                    const approvMapping = {
+                        "Level 1": "Mengeluarkan",
+                        "Level 2": "Membawa",
+                        "Level 3": "Menyetujui",
+                        "Level 4": "Mengetahui",
+                        "Level 5": "Memeriksa"
+                    };
+
+
+                    // Validasi data informasi_tambahan
+                    if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                        additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${info.nama}</td>
+                                <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                <td>${info.departemen}</td>
+                                <td>${approvMapping[info.status] || info.status}</td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                    }
+
+                    // Pastikan modal terbuka setelah data dimuat
+                    $('#detailModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                    alert("Terjadi kesalahan saat mengambil data.");
                 }
             });
-
         });
     });
+
 
     document.addEventListener('DOMContentLoaded', function () {
         $('.select-tools').selectize({
