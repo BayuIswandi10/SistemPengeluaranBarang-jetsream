@@ -85,7 +85,7 @@
                                 <div class="form-group">
                                     <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required autocomplete="off"> --}}
-                                    <select class="form-control select-tools" id="lokasi_barang_keluar" name="lokasi_barang_keluar" required autocomplete="off">
+                                    <select class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" required autocomplete="off">
                                         <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
                                         <option value="P1">P1</option>
                                         <option value="P2">P2</option>
@@ -95,7 +95,7 @@
                                 <div class="form-group mt-3" id="custom-location-group-destination">
                                     <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required autocomplete="off"> --}}
-                                    <select class="form-control select-tools" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
+                                    <select class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
                                         <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
                                         <option value="P1">P1</option>
                                         <option value="P2">P2</option>
@@ -231,6 +231,19 @@
 
         create: true
         });
+
+        $(document).ready(function() {
+            $('#lokasi_barang_keluar').selectize({
+                create: true,
+                sortField: 'text'
+            });
+
+            $('#tujuan_pengeluaran_barang').selectize({
+                create: true,
+                sortField: 'text'
+            });
+        });
+
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

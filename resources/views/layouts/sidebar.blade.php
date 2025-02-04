@@ -34,7 +34,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('form') ? 'menu-open' : '' }}">
+                    {{-- <li class="nav-item {{ request()->routeIs('form') ? 'menu-open' : '' }}">
                         <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-clipboard-list"></i>
                             <p>
@@ -42,7 +42,7 @@
                                 <i class="right fas"></i>
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                         <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">

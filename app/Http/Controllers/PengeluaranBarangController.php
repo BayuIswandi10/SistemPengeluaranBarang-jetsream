@@ -113,7 +113,7 @@ class PengeluaranBarangController extends Controller
                 'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
                 'jenis_kendaraan' => $request->input('jenis_kendaraan'),
                 'lokasi_barang_keluar' => $request->input('lokasi_barang_keluar'), // Simpan lokasi
-                'status' => 'Level 0', // Set Level 0 saat pengeluaran dibuat
+                'status' => 'Level 1', // Set Level 0 saat pengeluaran dibuat
             ]);
     
             // Iterasi barang dan buat entry pada barang_keluar
@@ -148,7 +148,7 @@ class PengeluaranBarangController extends Controller
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'created_date' => now(),
-                'status_approval' => 'Level 0',
+                'status_approval' => 'Level 1',
             ]);
     
             DB::commit();
@@ -173,7 +173,7 @@ class PengeluaranBarangController extends Controller
     
             // Update status pada tb_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
-                ->update(['status' => 'Level 1']);
+                ->update(['status' => 'Level 0']);
     
             if (!$updatePengeluaran) {
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
@@ -185,7 +185,7 @@ class PengeluaranBarangController extends Controller
                 'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
-                'status_approval' => 'Level 1',
+                'status_approval' => 'Level 0',
                 'created_date' => now(),
             ]);
     

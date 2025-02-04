@@ -67,22 +67,22 @@
                                 </td>
                                 <td>
                                     <div class="button-group d-flex">
-                                        <!-- Button detail -->
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-info btn-sm mr-2" 
-                                            data-toggle="modal" 
-                                            data-target="#detailModal" 
-                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                            <i class="fa fa-list"></i>
-                                        </button>
                                         <!-- Button for Level 1 (Ka.Sie) -->
                                         @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Level 2')
+                                            
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm update-status-kasie" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kasie" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                Ka.Sie Setujui
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
                                             </button>
                                         @endif
                 
@@ -90,22 +90,49 @@
                                         @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Level 3')
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm update-status-kadeptybs" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                Ka.Dept YBS Setujui
+                                                <i class="fa-solid fa-paper-plane"></i>
                                             </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
+                                            </button>
+
                                         @endif
                 
                                         <!-- Button for Level 3 (Ka.Dept GA) -->
                                         @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Level 4')
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm update-status-kadeptga" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                Ka.Dept GA Setujui
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
                                             </button>
                                         @endif
-                
+
+                                        <!-- Button detail -->
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-primary btn-sm mr-2" 
+                                            data-toggle="modal" 
+                                            data-target="#detailModal" 
+                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </button>
+
                                     </div>
                                 </td>
                             </tr>
@@ -291,6 +318,74 @@ $(document).ready(function() {
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.select-tools').selectize({
+            create: true, // Memungkinkan pengguna menambahkan opsi baru
+            sortField: 'text' // Mengurutkan opsi berdasarkan teks
+        });
+
+        // Handle click event on update status button
+        document.querySelectorAll('.reject-status').forEach(button => {
+            button.addEventListener('click', function () {
+                const pengeluaranBarangId = this.getAttribute('data-id');
+
+                // Konfirmasi menggunakan SweetAlert
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Anda akan Menolak pengajuan pengeluaran barang!",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: 'Batal',
+                    confirmButtonText: 'Ya, tolak!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("{{ route('approval.rejectStatus') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({ pengeluaran_barang_id: pengeluaranBarangId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Tampilkan notifikasi berhasil
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload(); // Reload halaman untuk merefleksikan perubahan
+                                });
+                            } else {
+                                // Tampilkan notifikasi error
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Tampilkan notifikasi error jika terjadi kesalahan
+                            Swal.fire({
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Error: ' + error.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+
 
     $(document).ready(function() {
         var table = $('#dataTable').DataTable({
@@ -305,66 +400,6 @@ $(document).ready(function() {
         });
     });
 
-    let counter = 1;
-
-    function tambahComboBox() {
-        const container = document.getElementById('barangTable');
-        const newRow = document.createElement('tr');
-
-        newRow.innerHTML = `
-            <td class="nomor">${counter += 1}</td>
-            <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required></td>
-            <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required></td>
-            <td><input type="text" name="satuan[]" class="form-control" placeholder="Satuan" required></td>
-            <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required></td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-
-        container.appendChild(newRow);
-        updateNomor();
-    }
-
-    function hapusComboBox(button) {
-        const container = document.getElementById('barangTable');
-        const rows = container.getElementsByTagName('tr');
-        if (rows.length > 1) {
-            const row = button.closest('tr');
-            
-            // SweetAlert konfirmasi untuk baris selain baris terakhir
-            Swal.fire({
-                icon: 'warning',
-                title: 'Apakah Anda yakin?',
-                text: 'Baris ini akan dihapus.',
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    row.remove();
-                    updateNomor();
-                }
-            });
-        } else {
-            // Ganti alert dengan SweetAlert untuk baris terakhir
-            Swal.fire({
-                icon: 'info',
-                title: 'Tidak bisa menghapus baris terakhir.',
-                text: 'Harap tambahkan baris baru jika perlu.',
-                confirmButtonText: 'OK'
-            });
-        }
-    }
-    function updateNomor() {
-    const rows = document.querySelectorAll('#barangTable .nomor');
-        rows.forEach((cell, index) => {
-            cell.textContent = index + 1;
-        });
-    }
 
     // Display validation errors in Swal
     @if ($errors->any())
