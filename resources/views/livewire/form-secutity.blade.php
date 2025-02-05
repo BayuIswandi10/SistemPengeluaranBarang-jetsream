@@ -103,40 +103,10 @@
                         </div>
                     </form>
 
-                    <iframe hidden id="qrFrame" width="500" height="400" srcdoc="
-                        <!DOCTYPE html>
-                        <html lang='id'>
-                        <head>
-                            <meta charset='UTF-8'>
-                            <style>
-                                body { font-family: Arial, sans-serif; text-align: center; }
-                                .container { width: 400px; border: 2px solid black; padding: 10px; margin: auto; }
-                                .box { border: 1px solid black; padding: 10px; margin: 5px 0; }
-                                .header { display: flex; justify-content: space-between; }
-                                .header .box { width: 48%; }
-                                .content { height: 100px; }
-                                .footer { font-size: 12px; text-align: left; }
-                            </style>
-                        </head>
-                        <body>
-                            <div class='container'>
-                                <div class='header'>
-                                    <div class='box'><img src='{{ asset('assets/img/logo YMI-DLT.png') }}' style='height: 50px;'></div>
-                                    <div class='box'>[QR CODE]</div>
-                                </div>
-                                <div class='box'><strong>SURAT PENGELUARAN BARANG</strong></div>
-                                <div class='box'>[NO PENGELUARAN]</div>
-                                <div class='box content'>[Barang Yang Keluar]</div>
-                                <div class='footer'>
-                                    MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520<br>
-                                    Phone: +62 21 8980769; Fax: +62 21 8980770
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    ">
+                    <iframe hidden id="qrFrame" width="500" height="400" srcdoc="">
                         Browser Anda tidak mendukung iframe.
                     </iframe>
+                    
                     
                     <h6 class="mt-4">Detail Barang</h6>
                     <table id="barangTable" class="table table-striped table-bordered">
@@ -216,33 +186,30 @@
                 $('#tujuan').val(response.tujuan_pengeluaran_barang);
                 $('#jenisKendaraan').val(response.jenis_kendaraan);
                 
-                if(response.no_polisi !== null && response.no_polisi !== '') {
+                // Tampilkan nilai no_polisi jika ada, dan disable field tersebut
+                if (response.no_polisi !== null && response.no_polisi !== '') {
                     $('#noPolisi').val(response.no_polisi);
                     $('#noPolisi').prop('disabled', true);
-                    // Disable tombol "Setujui" jika no_polisi sudah ada
                     $('#btnSaveApproval').prop('disabled', true);
                 } else {
                     $('#noPolisi').val('');
                     $('#noPolisi').prop('disabled', false);
-                    // Aktifkan tombol "Setujui" apabila belum ada no_polisi
                     $('#btnSaveApproval').prop('disabled', false);
                 }
 
                 // Jika status adalah Level 5, sembunyikan tombol "Setujui"
-                if(response.status && response.status === 'Level 5') {
+                if (response.status && response.status === 'Level 5') {
                     $('#btnSaveApproval').hide();
                 } else {
                     $('#btnSaveApproval').show();
                 }
 
-                // Pastikan field selain noPolisi dalam keadaan disabled
-                $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').attr('disabled', true);
-                $('#noPolisi').attr('disabled', false);
+                $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').prop('disabled', true);
 
-                // Isi tabel detail barang
+                // Isi tabel detail barang di modal
                 let tbody = $('#barangTable tbody');
                 tbody.empty();
-                if(response.barangKeluar && response.barangKeluar.length > 0) {
+                if (response.barangKeluar && response.barangKeluar.length > 0) {
                     $.each(response.barangKeluar, function(index, barang) {
                         tbody.append(`
                             <tr>
@@ -261,6 +228,31 @@
                 // Update container QR Code dengan output dari BaconQrCode
                 $('#qrcodeContainer').html(response.qr_code);
 
+                // Buat konten barang keluar untuk ditampilkan di dalam iframe
+                let barangContent = '';
+                if (response.barangKeluar && response.barangKeluar.length > 0) {
+                    barangContent += '<table style="width:100%; border-collapse: collapse;" border="1">';
+                    barangContent += '<thead><tr>';
+                    barangContent += '<th>No</th>';
+                    barangContent += '<th>Nama Barang</th>';
+                    barangContent += '<th>Jumlah</th>';
+                    barangContent += '<th>Satuan</th>';
+                    barangContent += '<th>Keterangan</th>';
+                    barangContent += '</tr></thead><tbody>';
+                    response.barangKeluar.forEach((barang, index) => {
+                        barangContent += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${barang.nama_barang}</td>
+                            <td>${barang.jumlah_barang}</td>
+                            <td>${barang.satuan_barang}</td>
+                            <td>${barang.keterangan_barang}</td>
+                        </tr>`;
+                    });
+                    barangContent += '</tbody></table>';
+                } else {
+                    barangContent = '<p>Tidak ada data barang keluar.</p>';
+                }
+
                 // Perbarui isi srcdoc pada iframe dengan data terbaru
                 let iframeContent = `
                     <!DOCTYPE html>
@@ -269,32 +261,50 @@
                         <meta charset="UTF-8">
                         <style>
                             body { font-family: Arial, sans-serif; text-align: center; }
-                            .container { width: 400px; border: 2px solid black; padding: 10px; margin: auto; }
-                            .box { border: 1px solid black; padding: 10px; margin: 5px 0; }
-                            .header { display: flex; justify-content: space-between; }
-                            .header .box { width: 48%; }
-                            .content { height: 100px; }
-                            .footer { font-size: 12px; text-align: left; }
+                            .container { width: 420px; border: 2px solid black; padding: 10px; margin: auto; }
+                            .row { display: flex; justify-content: space-between; align-items: center; }
+                            .column-left { width: 60%; }
+                            .column-right { width: 38%; text-align: center; }
+                            .box { border: 1px solid black; padding: 10px; margin: 5px 0; text-align: center; }
+                            .content { min-height: 100px; margin-top: 10px; }
+                            .footer { font-size: 12px; text-align: left; margin-top: 10px; }
+                            .qrcode { padding: 10px; display: flex; justify-content: center; align-items: center; }
+                            .qrcode img { width: 120px; height: 120px; }
                         </style>
                     </head>
                     <body>
                         <div class="container">
-                            <div class="header">
-                                <div class="box"><img src="{{ asset('assets/img/logo YMI-DLT.png') }}" style="height: 50px;"></div>
-                                <div class="box">${response.qr_code}</div>
+                            <div class="row">
+                                <div class="column-left">
+                                    <div class="box"><img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 50px;"></div>
+                                    <div class="box"><strong>SURAT PENGELUARAN BARANG</strong></div>
+                                    <div class="box">${response.pengeluaran_barang_id}</div>
+                                </div>
+                                <div class="column-right">
+                                    <div class="box">${response.qr_code}</div>
+                                </div>
                             </div>
-                            <div class="box"><strong>SURAT PENGELUARAN BARANG</strong></div>
-                            <div class="box">${response.pengeluaran_barang_id}</div>
-                            <div class="box content">[Barang Yang Keluar]</div>
+
+                            <div class="box content">${barangContent}</div>
+
                             <div class="footer">
-                                MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520<br>
-                                Phone: +62 21 8980769; Fax: +62 21 8980770
+                                <div class="row">
+                                    <div class="column-left">
+                                        MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520
+                                    </div>
+
+                                    <div class="column-right">
+                                        Phone: +62 21 8980769 
+                                        <br> 
+                                        Fax: +62 21 8980770
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </body>
                     </html>
                 `;
-                $('#qrFrame').attr('srcdoc', iframeContent).prop('hidden', false);
+                $('#qrFrame').attr('srcdoc', iframeContent).prop('hidden', true);
 
                 // Tampilkan modal menggunakan Bootstrap Modal
                 var modal = new bootstrap.Modal(document.getElementById('editApprovalModal'));
@@ -311,6 +321,8 @@
             }
         });
     }
+
+
 
 
     function saveApproval() {

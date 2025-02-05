@@ -317,7 +317,7 @@ class PengeluaranBarangController extends Controller
 
         // Generate QR Code menggunakan BaconQrCode
         $renderer = new ImageRenderer(
-            new RendererStyle(140), // Ukuran QR Code
+            new RendererStyle(148), // Ukuran QR Code
             new SvgImageBackEnd()
         );
         $writer = new Writer($renderer);
