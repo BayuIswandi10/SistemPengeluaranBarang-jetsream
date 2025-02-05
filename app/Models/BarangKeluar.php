@@ -12,8 +12,8 @@ class BarangKeluar extends Model
 
     protected $primaryKey = 'barang_keluar_id';
     protected $table = 'tb_barang_keluar';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int'; 
     public $timestamps = false;
 
     protected $fillable = [
@@ -23,18 +23,6 @@ class BarangKeluar extends Model
         'satuan_barang',
         'keterangan_barang',
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        // Generate UUID for barang_keluar_id automatically
-        static::creating(function ($model) {
-            if (empty($model->barang_keluar_id)) {
-                $model->barang_keluar_id = (string) Str::uuid();
-            }
-        });
-    }
 
     public function pengeluaranBarang()
     {

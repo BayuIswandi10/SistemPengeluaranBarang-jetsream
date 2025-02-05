@@ -53,9 +53,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            // $approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 1',
@@ -106,9 +105,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            // $approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 5',
@@ -154,9 +152,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            //$approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 2',
@@ -202,9 +199,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            // $approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 3',
@@ -250,9 +246,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            // $approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 4',
@@ -298,9 +293,8 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            $approvalId = $this->generateApprovalId();
+            // $approvalId = $this->generateApprovalId();
             $approval = Approval::create([
-                'approval_id' => $approvalId,
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 0',

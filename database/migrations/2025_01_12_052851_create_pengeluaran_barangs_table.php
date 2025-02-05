@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tb_pengeluaran_barang', function (Blueprint $table) {
-            $table->string('pengeluaran_barang_id')->primary();
-            $table->string('created_by');
+            $table->string('pengeluaran_barang_id', 35)->primary();
+            $table->string('created_by', 35);
             $table->timestamp('created_date')->useCurrent();
-            $table->string('lokasi_barang_keluar');
-            $table->string('tujuan_pengeluaran_barang');
-            $table->string('jenis_kendaraan');
-            $table->string('no_polisi')->nullable();
-            $table->string('status');
+            $table->string('lokasi_barang_keluar', 35);
+            $table->string('tujuan_pengeluaran_barang', 35);
+            $table->string('jenis_kendaraan', 35);
+            $table->string('no_polisi', 35)->nullable();
+            $table->string('status', 35);
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
@@ -25,9 +25,9 @@ return new class extends Migration
         });
 
         Schema::create('tb_detail_pengeluaran', function (Blueprint $table) {
-            $table->string('detail_pengeluaran_id')->primary();
-            $table->string('barang_keluar_id');
-            $table->string('pengeluaran_barang_id');
+            $table->bigIncrements('detail_pengeluaran_id');
+            $table->unsignedBigInteger('barang_keluar_id');
+            $table->string('pengeluaran_barang_id', 35);
 
             $table->foreign('barang_keluar_id')
                 ->references('barang_keluar_id')->on('tb_barang_keluar')

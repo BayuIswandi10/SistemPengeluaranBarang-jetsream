@@ -11,8 +11,8 @@ class Approval extends Model
     use HasFactory;
 
     protected $primaryKey = 'approval_id';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int'; 
     protected $table = 'tb_approval';
     public $timestamps = false;
 
