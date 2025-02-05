@@ -241,10 +241,11 @@ $(document).ready(function() {
             text: 'Apakah Anda yakin ingin menyetujui data pengeluaran ini?',
             icon: 'info',
             showCancelButton: true,
+            reverseButtons: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            cancelButtonText: 'Batal',
             confirmButtonText: 'Ya, Setuju!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 updateStatus(pengeluaranBarangId, url);
@@ -392,10 +393,11 @@ $(document).ready(function() {
                     text: "Anda akan Menolak pengajuan pengeluaran barang!",
                     icon: 'info',
                     showCancelButton: true,
+                    reverseButtons: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    cancelButtonText: 'Batal',
-                    confirmButtonText: 'Ya, tolak!'
+                    confirmButtonText: 'Ya, tolak!',
+                    cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         fetch("{{ route('approval.rejectStatus') }}", {

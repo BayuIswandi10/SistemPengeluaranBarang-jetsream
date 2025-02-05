@@ -33,7 +33,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
     // Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
     // Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
-    // Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit']);
+    Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit'])->name('pengeluaran.edit');
+    Route::post('/generate-qrcode', [PengeluaranBarangController::class, 'generateQRCode']);
     Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
     // Route::get('/pengeluaran/detail/{pengeluaran_barang_id}', [DashboardController::class, 'getDetailQty']);
 

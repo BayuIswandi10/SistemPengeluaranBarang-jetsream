@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+
 class PengeluaranBarangController extends Controller
 {
     public function index()
@@ -304,6 +309,30 @@ class PengeluaranBarangController extends Controller
     //         'barangKeluar' => $pengeluaranBarang->barangKeluar
     //     ]);
     // }
+
+    public function edit(Request $request)
+    {
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+
+        // Generate QR Code menggunakan BaconQrCode
+        $renderer = new ImageRenderer(
+            new RendererStyle(140), // Ukuran QR Code
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qrCode = $writer->writeString($pengeluaranBarang->pengeluaran_barang_id);
+
+        return response()->json([
+            'pengeluaran_barang_id'      => $pengeluaranBarang->pengeluaran_barang_id,
+            'jenis_kendaraan'            => $pengeluaranBarang->jenis_kendaraan,
+            'no_polisi'                  => $pengeluaranBarang->no_polisi,
+            'lokasi_barang_keluar'       => $pengeluaranBarang->lokasi_barang_keluar,
+            'tujuan_pengeluaran_barang'  => $pengeluaranBarang->tujuan_pengeluaran_barang,
+            'barangKeluar'               => $pengeluaranBarang->barangKeluar,
+            'qr_code'                    => $qrCode
+        ]);
+    }
 
     // public function update(Request $request)
     // {

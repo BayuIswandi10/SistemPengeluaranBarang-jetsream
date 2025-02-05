@@ -1,3 +1,11 @@
+{{-- <style>
+    iframe {
+        width: 80mm;
+        height: 80mm;
+        border: none;
+    }
+</style> --}}
+
 <div class="content-wrapper">
     <div class="container-fluid">
         <!-- Page Heading -->
@@ -32,14 +40,10 @@
                                             {{ $pengeluaranBarang->status }}
                                         @endif
                                     </td>
-                                    <td>
-                                        @if ($pengeluaranBarang->status == 'Level 4')
-                                            <button type="button" class="btn btn-success btn-sm" onclick="editApproval('{{ $pengeluaranBarang->pengeluaran_barang_id }}', '{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}', '{{ $pengeluaranBarang->jenis_kendaraan }}', '{{ $pengeluaranBarang->no_polisi }}')">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                        @elseif ($pengeluaranBarang->status == 'Level 5')
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="editApproval('{{ $pengeluaranBarang->pengeluaran_barang_id }}', '{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}', '{{ $pengeluaranBarang->jenis_kendaraan }}', '{{ $pengeluaranBarang->no_polisi }}')">
-                                                <i class="fas fa-info-circle"></i>
+                                    <td >
+                                        @if (in_array($pengeluaranBarang->status, ['Level 4', 'Level 5']))
+                                            <button type="button" class="btn btn-{{ $pengeluaranBarang->status == 'Level 4' ? 'success' : 'primary' }} btn-sm" onclick="editApproval('{{ $pengeluaranBarang->pengeluaran_barang_id }}')">
+                                                <i class="fas {{ $pengeluaranBarang->status == 'Level 4' ? 'fa-edit' : 'fa-info-circle' }}"></i>
                                             </button>
                                         @endif
                                     </td>
@@ -98,7 +102,42 @@
                             </div>
                         </div>
                     </form>
-    
+
+                    <iframe hidden id="qrFrame" width="500" height="400" srcdoc="
+                        <!DOCTYPE html>
+                        <html lang='id'>
+                        <head>
+                            <meta charset='UTF-8'>
+                            <style>
+                                body { font-family: Arial, sans-serif; text-align: center; }
+                                .container { width: 400px; border: 2px solid black; padding: 10px; margin: auto; }
+                                .box { border: 1px solid black; padding: 10px; margin: 5px 0; }
+                                .header { display: flex; justify-content: space-between; }
+                                .header .box { width: 48%; }
+                                .content { height: 100px; }
+                                .footer { font-size: 12px; text-align: left; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class='container'>
+                                <div class='header'>
+                                    <div class='box'><img src='{{ asset('assets/img/logo YMI-DLT.png') }}' style='height: 50px;'></div>
+                                    <div class='box'>[QR CODE]</div>
+                                </div>
+                                <div class='box'><strong>SURAT PENGELUARAN BARANG</strong></div>
+                                <div class='box'>[NO PENGELUARAN]</div>
+                                <div class='box content'>[Barang Yang Keluar]</div>
+                                <div class='footer'>
+                                    MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520<br>
+                                    Phone: +62 21 8980769; Fax: +62 21 8980770
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    ">
+                        Browser Anda tidak mendukung iframe.
+                    </iframe>
+                    
                     <h6 class="mt-4">Detail Barang</h6>
                     <table id="barangTable" class="table table-striped table-bordered">
                         <thead>
@@ -122,7 +161,7 @@
                         <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
                     </form>
                     <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="printQRCode()">Cetak QR Code</button>
+                    <button type="button" class="btn btn-primary" onclick="printIframe()">Cetak QR Code</button>
                 </div>
             </div>
         </div>
@@ -131,6 +170,11 @@
 </div>
 
 <script>
+
+    function printIframe() {
+        var iframe = document.getElementById('qrFrame');
+        iframe.contentWindow.print(); // Cetak isi dalam iframe
+    }
 
     function printQRCode() {
         var originalContent = document.body.innerHTML;
@@ -158,43 +202,114 @@
         });
     });
 
-    function editApproval(pengeluaranBarangId, tujuan, jenisKendaraan, noPolisi) {
-        document.getElementById('pengeluaranBarangId').value = pengeluaranBarangId;
-        document.getElementById('tujuan').value = tujuan;
-        document.getElementById('jenisKendaraan').value = jenisKendaraan;
-        document.getElementById('noPolisi').value = noPolisi;
+    function editApproval(pengeluaranBarangId) {
+        $.ajax({
+            url: "{{ route('pengeluaran.edit') }}", // Pastikan route sudah benar
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                pengeluaran_barang_id: pengeluaranBarangId
+            },
+            success: function(response) {
+                // Isi field pada modal
+                $('#pengeluaranBarangId').val(response.pengeluaran_barang_id);
+                $('#tujuan').val(response.tujuan_pengeluaran_barang);
+                $('#jenisKendaraan').val(response.jenis_kendaraan);
+                
+                if(response.no_polisi !== null && response.no_polisi !== '') {
+                    $('#noPolisi').val(response.no_polisi);
+                    $('#noPolisi').prop('disabled', true);
+                    // Disable tombol "Setujui" jika no_polisi sudah ada
+                    $('#btnSaveApproval').prop('disabled', true);
+                } else {
+                    $('#noPolisi').val('');
+                    $('#noPolisi').prop('disabled', false);
+                    // Aktifkan tombol "Setujui" apabila belum ada no_polisi
+                    $('#btnSaveApproval').prop('disabled', false);
+                }
 
-        // Clear the modal's table body
-        const tableBody = document.querySelector('#barangTable tbody');
-        tableBody.innerHTML = '';
+                // Jika status adalah Level 5, sembunyikan tombol "Setujui"
+                if(response.status && response.status === 'Level 5') {
+                    $('#btnSaveApproval').hide();
+                } else {
+                    $('#btnSaveApproval').show();
+                }
 
-        // Cari data barang terkait pengeluaranBarangId
-        const barangDetails = @json($barangDetails);  // Mendapatkan data barang ke dalam JavaScript
-        const filteredBarang = barangDetails.filter(barang => barang.pengeluaran_barang_id === pengeluaranBarangId);  // Filter barang berdasarkan pengeluaranBarangId
+                // Pastikan field selain noPolisi dalam keadaan disabled
+                $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').attr('disabled', true);
+                $('#noPolisi').attr('disabled', false);
 
-        // Isi tabel barang di modal
-        filteredBarang.forEach((barang, index) => {
-            const row = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${barang.nama_barang}</td>
-                    <td>${barang.jumlah_barang}</td>
-                    <td>${barang.satuan_barang}</td>
-                    <td>${barang.keterangan_barang}</td>
-                </tr>`;
-            tableBody.innerHTML += row;
+                // Isi tabel detail barang
+                let tbody = $('#barangTable tbody');
+                tbody.empty();
+                if(response.barangKeluar && response.barangKeluar.length > 0) {
+                    $.each(response.barangKeluar, function(index, barang) {
+                        tbody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${barang.nama_barang}</td>
+                                <td>${barang.jumlah_barang}</td>
+                                <td>${barang.satuan_barang}</td>
+                                <td>${barang.keterangan_barang}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="5" class="text-center">Tidak ada data barang</td></tr>');
+                }
+
+                // Update container QR Code dengan output dari BaconQrCode
+                $('#qrcodeContainer').html(response.qr_code);
+
+                // Perbarui isi srcdoc pada iframe dengan data terbaru
+                let iframeContent = `
+                    <!DOCTYPE html>
+                    <html lang="id">
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { font-family: Arial, sans-serif; text-align: center; }
+                            .container { width: 400px; border: 2px solid black; padding: 10px; margin: auto; }
+                            .box { border: 1px solid black; padding: 10px; margin: 5px 0; }
+                            .header { display: flex; justify-content: space-between; }
+                            .header .box { width: 48%; }
+                            .content { height: 100px; }
+                            .footer { font-size: 12px; text-align: left; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header">
+                                <div class="box"><img src="{{ asset('assets/img/logo YMI-DLT.png') }}" style="height: 50px;"></div>
+                                <div class="box">${response.qr_code}</div>
+                            </div>
+                            <div class="box"><strong>SURAT PENGELUARAN BARANG</strong></div>
+                            <div class="box">${response.pengeluaran_barang_id}</div>
+                            <div class="box content">[Barang Yang Keluar]</div>
+                            <div class="footer">
+                                MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520<br>
+                                Phone: +62 21 8980769; Fax: +62 21 8980770
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                $('#qrFrame').attr('srcdoc', iframeContent).prop('hidden', false);
+
+                // Tampilkan modal menggunakan Bootstrap Modal
+                var modal = new bootstrap.Modal(document.getElementById('editApprovalModal'));
+                modal.show();
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan!',
+                    text: 'Tidak dapat mengambil data. Error: ' + error,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
         });
-
-
-        // Tampilkan QR Code
-        const qrCodeContainer = document.getElementById('qrcodeContainer');
-        qrCodeContainer.innerHTML = '';
-        const qrCodes = @json($qrCodes);
-        qrCodeContainer.innerHTML = qrCodes[pengeluaranBarangId] || '<p>QR Code tidak tersedia.</p>';
-
-        // Tampilkan modal
-        const modal = new bootstrap.Modal(document.getElementById('editApprovalModal'));
-        modal.show();
     }
 
 
@@ -210,8 +325,8 @@
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            cancelButtonText: 'Batal',
             confirmButtonText: 'Ya, Setuju!',
+            cancelButtonText: 'Batal',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
