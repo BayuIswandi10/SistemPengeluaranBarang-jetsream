@@ -73,6 +73,8 @@
         <script type="text/javascript" src="{{ asset('assets/other_scripts.js') }}"></script>
 
 
+        <script src="{{ asset('assets/js/instascan.min.js') }}"></script> 
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -85,5 +87,10 @@
         </div>
 
         @livewireScripts
+
+        
+       
+        <script src="{{ asset('assets/js/qr-scanner.umd.min.js') }}"></script>        
+        {{-- <script src="{{ asset('assets/js/qr-scanner-worker.min.js') }}"></script> --}}
     </body>
 </html>

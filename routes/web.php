@@ -10,10 +10,14 @@ use App\Http\Controllers\ApprovalController;
 use App\Livewire\FormSecutity;
 use App\Http\Middleware\CheckLevel; 
 use App\Http\Controllers\DashboardController;
+use App\Livewire\FormScanQrCode;
+
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/scan', FormScanQrCode::class)->name('scanner');
 
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 

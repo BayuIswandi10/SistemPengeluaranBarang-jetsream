@@ -126,6 +126,8 @@
         referrerpolicy="no-referrer"
     ></script>
 
+    <script src="{{ asset('assets/js/instascan.min.js') }}"></script> 
+
     @livewireStyles
 </head>
 
@@ -165,6 +167,7 @@
     </div>
     @livewireScripts
     
+
 </body>
 
 </html>

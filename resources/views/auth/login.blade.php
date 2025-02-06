@@ -98,11 +98,98 @@
                             <button type="submit" class="btn btn-primary w-60" style="background-color: #3674A7; border-color: #3674A7;">
                                 {{ __('Masuk') }}
                             </button>
+
+                            
                         </div>
                     </form>
                 </div>
             </div>
+
+            <!-- Tombol untuk membuka modal -->
+            <button id="openScanner">Scan QR</button>
+
+            <!-- QR Scanner Modal -->
+            <div id="qrScannerModal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Scan QR Code</h2>
+                <video id="qr-video" style="width: 60%;"></video>
+                <p id="scan-result"></p>
+            </div>
         </div>
+
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const openScannerButton = document.getElementById("openScanner");
+                const qrScannerModal = document.getElementById("qrScannerModal");
+                const scanResult = document.getElementById("scan-result");
+                const videoElement = document.getElementById("qr-video");
+                let scanner;
+            
+                openScannerButton.addEventListener("click", function () {
+                    qrScannerModal.style.display = "block";
+                    startScanner();
+                });
+            
+                function closeModal() {
+                    qrScannerModal.style.display = "none";
+                    if (scanner) {
+                        scanner.stop();
+                    }
+                }
+            
+                function startScanner() {
+                    scanner = new Instascan.Scanner({ video: videoElement });
+                    scanner.addListener("scan", function (content) {
+                        scanResult.textContent = "QR Code scanned: " + content;
+                        closeModal();
+                        document.getElementById("loginkey").value = content;
+                    });
+            
+                    Instascan.Camera.getCameras().then(function (cameras) {
+                        scanner.start(cameras[0]);
+
+                        // if (cameras.length > 0) {
+                        //     scanner.start(cameras[0]);
+                        // } else {
+                        //     alert("No cameras found.");
+                        // }
+                    }).catch(function (error) {
+                        console.error("Error accessing camera:", error);
+                    });
+                }
+            
+                document.querySelector(".close").addEventListener("click", closeModal);
+            });
+        </script>        
+
+        {{-- <script>
+            let qrScanner;
+        
+            document.getElementById('openScanner').addEventListener('click', function () {
+                document.getElementById('qrScannerModal').style.display = 'block';
+                startScanner();
+            });
+        
+            function startScanner() {
+                const videoElem = document.getElementById('qr-video');
+                qrScanner = new QrScanner(videoElem, result => {
+                    console.log('QR Code:', result);
+                    document.getElementById('scan-result').innerText = "Hasil Scan: " + result;
+                    closeModal();
+                });
+                qrScanner.start();
+            }
+        
+            function closeModal() {
+                document.getElementById('qrScannerModal').style.display = 'none';
+                if (qrScanner) {
+                    qrScanner.stop();
+                }
+            }
+        </script>    --}}
+
 
         @if (session('success'))
             <script>
