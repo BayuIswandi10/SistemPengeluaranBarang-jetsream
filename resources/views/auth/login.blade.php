@@ -106,7 +106,7 @@
             </div>
 
             <!-- Tombol untuk membuka modal -->
-            <button id="openScanner">Scan QR</button>
+            <a href="{{ route('kamera') }}" id="openScanner">Scan QR</a>
 
 
         </div>

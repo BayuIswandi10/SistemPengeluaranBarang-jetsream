@@ -19,7 +19,7 @@ Route::get('/', function () {
 
 
 Route::get('/scan', FormScanQrCode::class)->name('scanner');
-Route::get('/kamera', [QRCodeController::class, 'scanner']);
+Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
 
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 

@@ -52,7 +52,7 @@
               <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
             </div>
         </div>
-        <audio id="beep" src="{{ asset('assets/sound/Beep 3.mp3') }}" autostart="false" ></audio>
+        <audio id="beep" src="{{ asset('assets/sound/beep-sound-8333.mp3') }}" autostart="false" ></audio>
     </div>
 
     <script type="text/javascript">

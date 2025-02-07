@@ -1,3 +1,4 @@
+
 <div class="content-wrapper">
   <div class="container-fluid">
       <!-- Page Heading -->
@@ -8,8 +9,10 @@
               <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
           </div>
           <div class="card-body">
-            <video id="preview"></video>
-            <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+            <div class="container">
+              <video id="preview" style="width: 100%; max-height: 250px; border-radius: 8px;"></video>
+              <input type="text" style="width: 100%; max-height: 250px; border-radius: 8px;" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+            </div>
           </div>
       </div>
   </div>
