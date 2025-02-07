@@ -11,13 +11,15 @@ use App\Livewire\FormSecutity;
 use App\Http\Middleware\CheckLevel; 
 use App\Http\Controllers\DashboardController;
 use App\Livewire\FormScanQrCode;
-
+use App\Http\Controllers\QRCodeController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::get('/scan', FormScanQrCode::class)->name('scanner');
+Route::get('/kamera', [QRCodeController::class, 'scanner']);
 
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 
