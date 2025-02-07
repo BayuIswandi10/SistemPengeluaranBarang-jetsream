@@ -1,7 +1,102 @@
 
-
 <x-guest-layout>
-    <body  style="background-image: url('{{ asset('assets/img/PT YMI Plant 2.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; overflow: hidden;">
+    <style>
+        /* Hero Section Styling */
+        .hero-section {
+            background: linear-gradient(135deg, #6d5efc, #42a5f5);
+            height: 200px;
+            position: auto;
+            overflow: hidden;
+        }
+
+        .pull-top {
+            position: relative;
+            top: -60px; /* Tarik ke atas */
+            z-index: 3; /* Berada di atas hero-section */
+        }
+
+        .hero-title {
+            font-size: 2.5rem; /* Ukuran default untuk layar besar */
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem; /* Ukuran default untuk layar besar */
+        }
+
+        .hero-section .text-center {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Text Container Styling */
+        .text-container {
+            position: relative;
+            z-index: 2; /* Supaya tetap di depan elemen dekoratif */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .text-container h1 {
+            font-size: 2.5rem; /* Ukuran default untuk layar besar */
+        }
+
+        .text-container p {
+            font-size: 1.25rem; /* Ukuran default untuk layar besar */
+        }
+
+        /* Decorative Shapes */
+        .decorative-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .decorative-elements .circle-1,
+        .decorative-elements .circle-2{
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .decorative-elements .circle-1 {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            top: 20%;
+            left: 10%;
+        }
+
+        .decorative-elements .circle-2 {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            top: 20%;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+
+        /* Animation for floating effect */
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <body>
         @if (session('success'))
             <script>
                 Swal.fire({
@@ -27,28 +122,26 @@
             </script>
         @endif
 
-
-        <div class="nav-static-top d-flex justify-content-between align-items-center p-3 bg-light">
-            <div class="float-left">
-                <a href="#">
-                    <img class="mt-3 ml-4" src="{{ asset('assets/img/Logo YMI-DLT.png') }}" style="height:40px;">
-                </a>
+        <nav class="navbar main-nav navbar-expand-lg px-2 px-sm-0 py-2 py-lg-0">
+            <div class="container">
+                <a class="navbar-brand" href="index.html"><img src="{{ asset('assets/img/logo-YMI-DLTP.png') }}" style="height:80px;" alt="logo"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+                <span class="ti-menu"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="modal" data-target="#tambahDataModal">Pengajuan Pengeluaran Barang</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Pengajuan Kendaraan Dinas</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href={{ route('login') }}>Masuk</a></li>
+                </ul>
+                </div>
             </div>
-
-            <ul class="nav">
-                <li class="nav-item"><a class="nav-link" data-toggle="modal" data-target="#tambahDataModal">Pengajuan Pengeluaran Barang</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Pengajuan Kendaraan Dinas</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user"></i>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href={{ route('login') }}>Masuk</a>
-                    </div>
-                </li>
-            </ul>
             
-
             {{-- Tambah Modal --}}
             <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
@@ -152,8 +245,86 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
+       <!-- Grafis Section -->
+        <div class="hero-section">
+            <div class="text-container">
+                <div class="text-center text-white">
+                    <h1 class="display-4 mt-3 font-weight-bold">Digital Logistic Transport Permit</h1>
+                        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                        <div id="textCarousel" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <p class="lead">Memudahkan Pengurusan Administrasi</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Mempermudah Pengeluaran Barang</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Mengoptimalkan Penggunaan Kendaraan Dinas</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Meningkatkan Transparansi</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Mengurangi Kesalahan Data</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Meningkatkan Kecepatan dan Efisiensi Operasional</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Notifikasi via Email Secara Realtime</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <p class="lead">Memantau Status Secara Real-Time</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="decorative-elements">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+        </div>
+
+        <section class="section position-relative pull-top">
+        <div class="container">
+            <div class="rounded shadow p-5 bg-white">
+                <div class="row">
+                    <!-- Card 1: Efisiensi Administrasi -->
+                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center">
+                        <i class="fas fa-tasks text-primary h1"></i>
+                        <h3 class="mt-4 text-capitalize h5">Efisiensi Administrasi</h3>
+                        <p class="regular text-muted">Sistem digital untuk mempercepat dan mempermudah administrasi.</p>
+                    </div>
+                    <!-- Card 2: Pengelolaan Barang -->
+                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center">
+                        <i class="fas fa-box text-primary h1"></i>
+                        <h3 class="mt-4 text-capitalize h5">Pengelolaan Barang</h3>
+                        <p class="regular text-muted">Pelacakan dan pengelolaan barang secara akurat dan terstruktur.</p>
+                    </div>
+                    <!-- Card 3: Pengelolaan Kendaraan Dinas -->
+                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center">
+                        <i class="fas fa-car text-primary h1"></i>
+                        <h3 class="mt-4 text-capitalize h5">Kendaraan Dinas</h3>
+                        <p class="regular text-muted">Pengajuan dan pemantauan kendaraan dinas yang lebih mudah.</p>
+                    </div>
+                    <!-- Card 4: Notifikasi Realtime -->
+                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center">
+                        <i class="fas fa-bell text-primary h1"></i>
+                        <h3 class="mt-4 text-capitalize h5">Notifikasi Realtime</h3>
+                        <p class="regular text-muted">Pemberitahuan langsung untuk memastikan proses berjalan lancar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
     </body>
     <script>
 
