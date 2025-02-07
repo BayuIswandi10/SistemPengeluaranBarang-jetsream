@@ -29,8 +29,7 @@
         <link rel="stylesheet" href="{{ asset('assets/adminlte3.2/dist/css/adminlte.min.css') }}">
         <!-- overlayScrollbars -->
         <link rel="stylesheet" href="{{ asset('assets/adminlte3.2/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
-        <!-- Ekko Lightbox -->
-        <link rel="stylesheet" href="{{ asset('assets/adminlte3.2/plugins/ekko-lightbox/ekko-lightbox.min.css') }}">
+
         <!-- Custom Header Style -->
         <link rel="stylesheet" type="text/css" href="{{ asset('assets/Style/Header_style.css') }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">
@@ -65,19 +64,17 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
         <script src="https://cdn.datatables.net/v/bs4/jszip-3.10.1/dt-2.2.1/b-3.2.0/b-html5-3.2.0/r-3.0.3/datatables.min.js"></script>
-        <script src="{{ asset('assets/adminlte3.2/plugins/ekko-lightbox/ekko-lightbox.min.js') }}"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <script src="{{ asset('assets/adminlte3.2/plugins/chart.js/Chart.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js" integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script type="text/javascript" src="{{ asset('assets/other_scripts.js') }}"></script>
 
-
-        <script src="{{ asset('assets/js/instascan.min.js') }}"></script> 
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+
+        <script src="{{ asset('assets/js/instascan.min.js') }}"></script> 
         <!-- Styles -->
         @livewireStyles
     </head>
@@ -88,8 +85,6 @@
 
         @livewireScripts
 
-        
-       
         <script src="{{ asset('assets/js/qr-scanner.umd.min.js') }}"></script>        
         {{-- <script src="{{ asset('assets/js/qr-scanner-worker.min.js') }}"></script> --}}
     </body>

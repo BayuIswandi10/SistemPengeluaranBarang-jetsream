@@ -106,63 +106,13 @@
             </div>
 
             <!-- Tombol untuk membuka modal -->
-            <button id="openScanner">Scan QR</button>
+            <a href="{{ route('kamera') }}" id="openScanner">Scan QR</a>
 
-            <!-- QR Scanner Modal -->
-            <div id="qrScannerModal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h2>Scan QR Code</h2>
-                <video id="qr-video" style="width: 60%;"></video>
-                <p id="scan-result"></p>
-            </div>
+
         </div>
 
 
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const openScannerButton = document.getElementById("openScanner");
-                const qrScannerModal = document.getElementById("qrScannerModal");
-                const scanResult = document.getElementById("scan-result");
-                const videoElement = document.getElementById("qr-video");
-                let scanner;
-            
-                openScannerButton.addEventListener("click", function () {
-                    qrScannerModal.style.display = "block";
-                    startScanner();
-                });
-            
-                function closeModal() {
-                    qrScannerModal.style.display = "none";
-                    if (scanner) {
-                        scanner.stop();
-                    }
-                }
-            
-                function startScanner() {
-                    scanner = new Instascan.Scanner({ video: videoElement });
-                    scanner.addListener("scan", function (content) {
-                        scanResult.textContent = "QR Code scanned: " + content;
-                        closeModal();
-                        document.getElementById("loginkey").value = content;
-                    });
-            
-                    Instascan.Camera.getCameras().then(function (cameras) {
-                        scanner.start(cameras[0]);
-
-                        // if (cameras.length > 0) {
-                        //     scanner.start(cameras[0]);
-                        // } else {
-                        //     alert("No cameras found.");
-                        // }
-                    }).catch(function (error) {
-                        console.error("Error accessing camera:", error);
-                    });
-                }
-            
-                document.querySelector(".close").addEventListener("click", closeModal);
-            });
-        </script>        
+   
 
         {{-- <script>
             let qrScanner;
