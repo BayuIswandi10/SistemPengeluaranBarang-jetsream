@@ -47,6 +47,7 @@ class ApprovalController extends Controller
 
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
 
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -81,7 +82,12 @@ class ApprovalController extends Controller
             if (!$approval) {
                 throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $pengeluaranBarangId);
             }
-        
+            
+             //Mencari Email Pembawa
+             $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+             ->where('status_approval', 'Level 1')
+             ->value('created_by');
+
             // Ambil email penerima berdasarkan created_by yang ditemukan
             $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
             
@@ -91,7 +97,8 @@ class ApprovalController extends Controller
         
             // Kirim email ke penerima
             $statusText = $this->getStatusText('Level 1');
-            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+            $userDepartment = $this->getDepartmentName($levelKaryawan);
+            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
     
     
             DB::commit();
@@ -115,7 +122,8 @@ class ApprovalController extends Controller
         DB::beginTransaction();
 
         $user = Auth::user();
-        $nrpKaryawan = $user->nrp_karyawan;
+        $nrpKaryawan = $user->nrp_karyawan;        
+        $levelKaryawan = $user->level;
 
         try {
             // Ambil data dari request
@@ -154,6 +162,11 @@ class ApprovalController extends Controller
               if (!$approval) {
                   throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $pengeluaranBarangId);
               }
+
+                //Mencari Email Pembawa
+                $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->where('status_approval', 'Level 1')
+                ->value('created_by');
           
               // Ambil email penerima berdasarkan created_by yang ditemukan
               $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
@@ -164,7 +177,8 @@ class ApprovalController extends Controller
           
               // Kirim email ke penerima
               $statusText = $this->getStatusText('Level 5');
-              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+              $userDepartment = $this->getDepartmentName($levelKaryawan);
+              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
     
             DB::commit();
     
@@ -187,6 +201,7 @@ class ApprovalController extends Controller
 
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
 
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -212,6 +227,11 @@ class ApprovalController extends Controller
               if (!$approval) {
                   throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $pengeluaranBarangId);
               }
+
+            //Mencari Email Pembawa
+            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            ->where('status_approval', 'Level 1')
+            ->value('created_by');
           
               // Ambil email penerima berdasarkan created_by yang ditemukan
               $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
@@ -222,7 +242,8 @@ class ApprovalController extends Controller
           
               // Kirim email ke penerima
               $statusText = $this->getStatusText('Level 2');
-              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+              $userDepartment = $this->getDepartmentName($levelKaryawan);
+              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
             DB::commit();
     
@@ -245,6 +266,7 @@ class ApprovalController extends Controller
 
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
 
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -270,6 +292,11 @@ class ApprovalController extends Controller
              if (!$approval) {
                  throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $pengeluaranBarangId);
              }
+
+            //Mencari Email Pembawa
+            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            ->where('status_approval', 'Level 1')
+            ->value('created_by');
          
              // Ambil email penerima berdasarkan created_by yang ditemukan
              $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
@@ -280,7 +307,8 @@ class ApprovalController extends Controller
          
              // Kirim email ke penerima
              $statusText = $this->getStatusText('Level 3');
-             $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+             $userDepartment = $this->getDepartmentName($levelKaryawan);
+             $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
             DB::commit();
     
@@ -303,6 +331,7 @@ class ApprovalController extends Controller
 
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
 
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -345,9 +374,10 @@ class ApprovalController extends Controller
                   throw new \Exception('Email penerima tidak ditemukan.');
               }
           
-              // Kirim email ke penerima
-              $statusText = $this->getStatusText('Level 4');
-              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+            // Kirim email ke penerima
+            $statusText = $this->getStatusText('Level 4');
+            $userDepartment = $this->getDepartmentName($levelKaryawan);
+            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
             DB::commit();
     
@@ -370,6 +400,7 @@ class ApprovalController extends Controller
     
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
     
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -409,7 +440,8 @@ class ApprovalController extends Controller
         
             // Kirim email ke penerima
             $statusText = $this->getStatusText('Level 0');
-            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText);
+            $userDepartment = $this->getDepartmentName($levelKaryawan);
+            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
     
             DB::commit();
     
@@ -426,24 +458,11 @@ class ApprovalController extends Controller
         }
     }
 
-    private function sendApprovalEmail($userEmail, $pengeluaranBarangId, $approvedBy, $status)
+    private function sendApprovalEmail($userEmail, $pengeluaranBarangId, $approvedBy, $status, $fromDepartment)
     {
-        // // Buat QR code
-        // $qrCode = new QrCode($pengeluaranBarangId);
-        // $qrCode->size(200);
-        // $qrCode->setMargin(10);
-
-        // // Konversi QR code ke base64
-        // $writer = new PngWriter();
-        // $qrCodeImage = $writer->write($qrCode);
-        // $qrCodeBase64 = 'data:image/png;base64,' . base64_encode($qrCodeImage->getString());
-
-        // Kirim email dengan QR code
-        Mail::to($userEmail)->send(new ApprovalNotification($pengeluaranBarangId, $approvedBy, $status));
+        Mail::to($userEmail)->send(new ApprovalNotification($pengeluaranBarangId, $approvedBy, $status, $fromDepartment));
     }
 
-    
-    
     private function getStatusText($level)
     {
         $statusMap = [
@@ -455,6 +474,18 @@ class ApprovalController extends Controller
         ];
 
         return $statusMap[$level] ?? 'Ditolak';
+    }
+
+    private function getDepartmentName($departmentId)
+    {
+        $statusDepartmentMap = [
+            'Level 2' => 'PIC/Ka.Sie',
+            'Level 3' => 'Ka.Dept Ybs',
+            'Level 4' => 'Ka.Dept GA',
+            'Level 5' => 'Security',
+        ];
+
+        return $statusDepartmentMap[$departmentId] ?? 'Tidak Diketahui';
     }
 
 

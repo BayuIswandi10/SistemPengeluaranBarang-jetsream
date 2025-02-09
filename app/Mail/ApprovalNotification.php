@@ -1,24 +1,21 @@
 <?php
 
 namespace App\Mail;
-
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 
 class ApprovalNotification extends Mailable
 {
     public $pengeluaranBarangId;
     public $approvedBy;
     public $status;
-    public $qrCodeBase64;
+    public $fromDepartment;
 
-    public function __construct($pengeluaranBarangId, $approvedBy, $status)
+    public function __construct($pengeluaranBarangId, $approvedBy, $status, $fromDepartment)
     {
         $this->pengeluaranBarangId = $pengeluaranBarangId;
         $this->approvedBy = $approvedBy;
         $this->status = $status;
+        $this->fromDepartment = $fromDepartment;
     }
 
     public function build()
@@ -29,6 +26,7 @@ class ApprovalNotification extends Mailable
                 'pengeluaranBarangId' => $this->pengeluaranBarangId,
                 'approvedBy' => $this->approvedBy,
                 'status' => $this->status,
+                'fromDepartment'=> $this->fromDepartment
             ]);
     }
 }
