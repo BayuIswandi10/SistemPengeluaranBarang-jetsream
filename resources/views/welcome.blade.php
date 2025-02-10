@@ -4,14 +4,32 @@
         /* Hero Section Styling */
         .hero-section {
             background: linear-gradient(135deg, #6d5efc, #42a5f5);
-            height: 200px;
+            height: 350px;
             position: auto;
             overflow: hidden;
         }
 
+         /* Efek hover untuk setiap card */
+        .card-hover:hover {
+            transform: scale(1.05); /* Membesarkan card */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Bayangan lebih besar */
+        }
+
+        .card-hover:hover i {
+            color: #0d6efd; /* Ganti warna ikon */
+        }
+
+        .card-hover:hover h3 {
+            color: #0d6efd; /* Ganti warna teks judul */
+        }
+
+        .card-hover {
+            transition: all 0.3s ease; /* Animasi smooth */
+        }
+
         .pull-top {
             position: relative;
-            top: -60px; /* Tarik ke atas */
+            top: -100px; /* Tarik ke atas */
             z-index: 3; /* Berada di atas hero-section */
         }
 
@@ -295,25 +313,25 @@
             <div class="rounded shadow p-5 bg-white">
                 <div class="row">
                     <!-- Card 1: Efisiensi Administrasi -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center">
+                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center card-hover">
                         <i class="fas fa-tasks text-primary h1"></i>
                         <h3 class="mt-4 text-capitalize h5">Efisiensi Administrasi</h3>
                         <p class="regular text-muted">Sistem digital untuk mempercepat dan mempermudah administrasi.</p>
                     </div>
                     <!-- Card 2: Pengelolaan Barang -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center">
+                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center card-hover">
                         <i class="fas fa-box text-primary h1"></i>
                         <h3 class="mt-4 text-capitalize h5">Pengelolaan Barang</h3>
                         <p class="regular text-muted">Pelacakan dan pengelolaan barang secara akurat dan terstruktur.</p>
                     </div>
                     <!-- Card 3: Pengelolaan Kendaraan Dinas -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center">
+                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center card-hover">
                         <i class="fas fa-car text-primary h1"></i>
                         <h3 class="mt-4 text-capitalize h5">Kendaraan Dinas</h3>
                         <p class="regular text-muted">Pengajuan dan pemantauan kendaraan dinas yang lebih mudah.</p>
                     </div>
                     <!-- Card 4: Notifikasi Realtime -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center">
+                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center card-hover">
                         <i class="fas fa-bell text-primary h1"></i>
                         <h3 class="mt-4 text-capitalize h5">Notifikasi Realtime</h3>
                         <p class="regular text-muted">Pemberitahuan langsung untuk memastikan proses berjalan lancar.</p>
