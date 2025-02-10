@@ -61,6 +61,8 @@
                                         Menunggu Persetujuan Security
                                     @elseif ($pengeluaranBarang->status == 'Level 5')
                                         Sudah Disetujui
+                                    @elseif ($pengeluaranBarang->status == 'Level 0')
+                                        Ditolak
                                     @else
                                         {{ $pengeluaranBarang->status }}
                                     @endif

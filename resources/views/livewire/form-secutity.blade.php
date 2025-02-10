@@ -36,6 +36,14 @@
                                             Menunggu Persetujuan
                                         @elseif ($pengeluaranBarang->status == 'Level 5')
                                             Sudah Disetujui
+                                        @elseif ($pengeluaranBarang->status == 'Level 1')
+                                            Menunggu Persetujuan PIC/Ka.Sie
+                                        @elseif ($pengeluaranBarang->status == 'Level 2')
+                                            Menunggu Persetujuan Ka.Dept Ybs
+                                        @elseif ($pengeluaranBarang->status == 'Level 3')
+                                            Menunggu Persetujuan Ka.Dept GA
+                                        @elseif ($pengeluaranBarang->status == 'Level 0')
+                                            Ditolak
                                         @else
                                             {{ $pengeluaranBarang->status }}
                                         @endif

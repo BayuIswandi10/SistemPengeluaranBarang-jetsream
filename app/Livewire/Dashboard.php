@@ -14,6 +14,8 @@ class Dashboard extends Component
     {
         $user = Auth::user();
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']);
+
+        
     
         if ($user->level === 'Level 1') {
             $pengeluaranBarangs = $query->where(function ($q) use ($user) {
@@ -34,12 +36,19 @@ class Dashboard extends Component
        // Ekstrak angka dari level user
         $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
 
+        // Mengambil data status yang disetujui
         $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel
         )->count();
 
+        // Mengambil data status yang menunggu
         $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) => 
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
+        )->count();
+
+        // Mengambil data status yang ditolak
+        $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) => 
+            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
         )->count();
 
         // 📊 Data Harian (7 hari terakhir)
@@ -104,6 +113,7 @@ class Dashboard extends Component
             'pengeluaranBarangs' => $pengeluaranBarangs,
             'pengeluaranBarangsDisetujui' => $pengeluaranBarangsDisetujui,
             'pengeluaranBarangsMenunggu' => $pengeluaranBarangsMenunggu,
+            'pengeluaranBarangsDitolak' => $pengeluaranBarangsDitolak,
             'dailyData' => json_encode($dailyData),
             'monthlyData' => json_encode($monthlyData),
             'yearlyData' => json_encode($yearlyData),

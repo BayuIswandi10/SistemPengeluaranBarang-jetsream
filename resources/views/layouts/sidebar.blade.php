@@ -62,17 +62,18 @@
                     @endif
 
                     <li class="nav-item">
-                        <form method="POST" action="{{ route('logout') }}" class="nav-link p-0">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="btn btn-link nav-link text-gray-600">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            <a href="#" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
                                 <p>
                                     Keluar
                                     <i class="right fas"></i>
                                 </p>
-                            </button>
+                            </a>
                         </form>
                     </li>
+
                 </li>
             </ul>
         </nav>

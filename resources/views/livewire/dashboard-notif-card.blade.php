@@ -1,52 +1,75 @@
 <div class ="content-wrapper">
     <div class="container-fluid">
         <body>
-            <div class="mt-3" id="root">
-                <div class="row">
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $pengeluaranBarangs->count() }}</h3>
-                        <p>Jumlah Pengajuan</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-document"></i>
-                    </div>
-                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
+            <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+                <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
+                <div class="input-group w-auto">
+                    <input type="date" class="form-control custom-date" id="filter-date" value="{{ date('Y-m-d') }}" />
                 </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{ $pengeluaranBarangsDisetujui}}</h3>
+            </div>
 
-                        <p>Jumlah Disetujui</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-document"></i>
-                    </div>
-                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{ $pengeluaranBarangsMenunggu}}</h3>
 
-                        <p>Jumlah Menunggu</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-document"></i>
-                    </div>
-                    <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Card Jumlah Pengajuan -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ $pengeluaranBarangs->count() ?? 0 }}</h3>
+                                    <p>Jumlah Pengajuan</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-file-alt"></i> <!-- Ikon dokumen -->
+                                </div>
+                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <!-- Card Jumlah Disetujui -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
+                                    <p>Jumlah Disetujui</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-check-circle"></i> <!-- Ikon centang -->
+                                </div>
+                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <!-- Card Jumlah Menunggu -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
+                                    <p>Jumlah Menunggu</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-clock"></i> <!-- Ikon jam -->
+                                </div>
+                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <!-- Card Jumlah Ditolak -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3>{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
+                                    <p>Jumlah Ditolak</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-times-circle"></i> <!-- Ikon silang -->
+                                </div>
+                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
                     </div>
                 </div>
-            <!-- ./col -->
             </div>
 
             <div>
@@ -54,8 +77,8 @@
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
             <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Level 4', 'Level 5'])) col-md-6 @else col-md-12 @endif">
                 <div class="card">
-                    <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                        <div class="btn-group d-flex justify-content-center" role="group">
+                    <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
+                        <div class="btn-group" role="group" style="margin-left: 0;">
                             <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
                             <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
                             <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
@@ -68,6 +91,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Bagian Kanan - Diagram Pie -->
             @if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4']))
@@ -190,6 +214,11 @@
                     // 🔄 Update Chart
                     barChart.update();
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const today = new Date().toISOString().split('T')[0]; // Mengambil tanggal hari ini
+                document.getElementById('filter-date').value = today; // Set nilai input tanggal
             });
 
         </script>

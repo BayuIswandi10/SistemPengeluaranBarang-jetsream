@@ -66,6 +66,8 @@
                                             Menunggu Persetujuan Ka.Dept Ybs
                                         @elseif ($pengeluaranBarang->status == 'Level 3')
                                             Menunggu Persetujuan Ka.Dept GA
+                                        @elseif ($pengeluaranBarang->status == 'Level 0')
+                                            Ditolak
                                         @else
                                             {{ $pengeluaranBarang->status }}
                                         @endif
