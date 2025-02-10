@@ -269,7 +269,10 @@
         <div class="hero-section">
             <div class="text-container">
                 <div class="text-center text-white">
-                    <h1 class="display-4 mt-3 font-weight-bold">Digital Logistic Transport Permit</h1>
+                <div class="d-flex justify-content-center align-items-center" style="background-color: white; border-radius: 12px; padding: 25px; display: inline-block;">
+                    <img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 80px;">
+                </div>
+                    <h2 class="h1 font-weight-bold mt-2">Digital Logistic Transport Permit</h2>
                         <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                         <div id="textCarousel" class="carousel slide" data-ride="carousel">
                             <div class="carousel-inner">
