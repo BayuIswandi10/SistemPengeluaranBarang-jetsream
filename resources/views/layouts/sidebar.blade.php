@@ -56,7 +56,7 @@
 
                     @if(Auth::check() && Auth::user()->level === 'Level 5')
                         <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
-                            <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}"> 
+                            <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security', 'scan') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 
                         <p>Pemeriksaan Barang Keluar</p> </a> </li> 
                     @endif

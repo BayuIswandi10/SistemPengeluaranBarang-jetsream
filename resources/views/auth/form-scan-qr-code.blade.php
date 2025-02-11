@@ -42,37 +42,165 @@
                 <img class="mt-3 ml-4" src="{{ asset('assets/img/logo YMI-DLT.png') }}" style="height:40px;">
             </a>
         </div>
-
     </div>
 
     <div class="login-box">
         <div class="card card-outline card-primary login-card">
             <div class="card-body">
-              <video id="preview"></video>
-              <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+                <video id="preview"></video>
+                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+            </div>
+            {{-- <div class="card-footer d-flex justify-content-center">
+              <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#scanModal">Cari</button>
+            </div> --}}
+        </div>
+        <audio id="beep" src="{{ asset('assets/sound/beep-sound-8333.mp3') }}" autostart="false"></audio>
+    </div>
+
+    <!-- Modal untuk Menampilkan Detail -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Pengeluaran Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Nomor Pengeluaran: <span id="nomorPengeluaranCard"></span></h6>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nomor</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBody">
+                            <tr><td colspan="6" class="text-center">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                    <h6>Informasi Tambahan</h6>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama</th>
+                                <th>Tingkat</th>
+                                <th>Departemen</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="additionalInfoBody">
+                            <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
             </div>
         </div>
-        <audio id="beep" src="{{ asset('assets/sound/beep-sound-8333.mp3') }}" autostart="false" ></audio>
     </div>
 
     <script type="text/javascript">
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-        document.getElementById('scanResult').value = content;
-        document.getElementById('beep').play();
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
+        document.addEventListener('DOMContentLoaded', () => {
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+            scanner.addListener('scan', function (content) {
+                document.getElementById('scanResult').value = content;
+                document.getElementById('beep').play();
+                fetchDetailPengeluaran(content);
+            });
+
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    console.error('No cameras found.');
+                }
+            }).catch(function (e) {
+                console.error(e);
+            });
+
+            function fetchDetailPengeluaran(nomor) {
+                document.getElementById('nomorPengeluaranCard').innerText = nomor;
+
+                $.ajax({
+                    url: "/pengeluaran/detail",
+                    method: "POST",
+                    data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                    success: function (data) {
+                        const tbody = document.getElementById('detailBody');
+                        const additionalInfoBody = document.getElementById('additionalInfoBody');
+
+                        tbody.innerHTML = '';
+                        additionalInfoBody.innerHTML = '';
+
+                        if (data.barang_keluar && data.barang_keluar.length > 0) {
+                            tbody.innerHTML = data.barang_keluar.map((item, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${nomor}</td>
+                                    <td>${item.nama_barang}</td>
+                                    <td>${item.jumlah_barang}</td>
+                                    <td>${item.satuan_barang}</td>
+                                    <td>${item.keterangan_barang}</td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                        }
+
+                        const tingkatMapping = {
+                            "Level 1": "Civitas",
+                            "Level 2": "PIC/Ka.Sie",
+                            "Level 3": "Ka.Dept.Ybs",
+                            "Level 4": "Ka.Dept.GA",
+                            "Level 5": "Security"
+                        };
+
+                        const approvMapping = {
+                            "Level 1": "Mengeluarkan",
+                            "Level 2": "Membawa",
+                            "Level 3": "Menyetujui",
+                            "Level 4": "Mengetahui",
+                            "Level 5": "Memeriksa"
+                        };
+
+                        if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                            additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${info.nama}</td>
+                                    <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                    <td>${info.departemen}</td>
+                                    <td>${approvMapping[info.status] || info.status}</td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                        }
+
+                        $('#detailModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                        Swal.fire({
+                          title: 'Error!',
+                          text: 'Gagal mengambil data pengeluaran.',
+                          icon: 'error',
+                          confirmButtonText: 'OK'
+                      });
+                    }
+                });
+            }
+        });
     </script>
+</body>
 
-  </body>
 </x-guest-layout>
-
-

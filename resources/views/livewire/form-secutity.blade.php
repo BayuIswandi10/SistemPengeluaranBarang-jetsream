@@ -14,6 +14,7 @@
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
+                <a href="{{ route('scan') }}" id="openScanner">Scan QR</a>
             </div>
             <div class="card-body">
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
@@ -68,7 +69,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="editApprovalLabel">Edit Approval</h5>
+                    <h5 class="modal-title" id="editApprovalLabel">Pemeriksaan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

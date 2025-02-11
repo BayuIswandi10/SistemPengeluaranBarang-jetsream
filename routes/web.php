@@ -12,15 +12,15 @@ use App\Http\Middleware\CheckLevel;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\FormScanQrCode;
 use App\Http\Controllers\QRCodeController;
+// use App\Livewire\WelcomePage;
 
+// Route::get('/',WelcomePage::class);
+    
 Route::get('/', function () {
     return view('welcome');
 });
 
-
-Route::get('/scan', FormScanQrCode::class)->name('scanner');
 Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
-
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -29,7 +29,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::middleware([CheckLevel::class . ':Level 5'])->group(function () {
         Route::get('/security', FormSecutity::class)->name('security');
         Route::post('/approval/update-status-security', [ApprovalController::class, 'updateStatusSecurity'])->name('approval.updateStatusSecurity');
-
+        Route::get('/scan', FormScanQrCode::class)->name('scan');
     });
 
     Route::get('/form', FormPengeluaran::class)->name('form');
