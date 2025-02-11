@@ -13,7 +13,8 @@ class Dashboard extends Component
     public function render()
     {
         $user = Auth::user();
-        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']);
+        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
+        ->whereDate('created_date', Carbon::today()); // Hanya ambil data hari ini
 
         
     
@@ -36,18 +37,18 @@ class Dashboard extends Component
        // Ekstrak angka dari level user
         $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
 
-        // Mengambil data status yang disetujui
-        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
+        // Mengambil data status yang disetujui (hanya dari data hari ini)
+        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel
         )->count();
 
-        // Mengambil data status yang menunggu
-        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) => 
+        // Mengambil data status yang menunggu (hanya dari data hari ini)
+        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
         )->count();
 
-        // Mengambil data status yang ditolak
-        $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) => 
+        // Mengambil data status yang ditolak (hanya dari data hari ini)
+        $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
         )->count();
 
@@ -121,4 +122,5 @@ class Dashboard extends Component
             'user' => $user
         ]);
     }
+
 }

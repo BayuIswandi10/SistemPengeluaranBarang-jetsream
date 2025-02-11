@@ -2,21 +2,26 @@
     <div class="container-fluid">
         <body>
             <div class="card mt-3">
-            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
-                <div class="input-group w-auto">
-                    <input type="date" class="form-control custom-date" id="filter-date" value="{{ date('Y-m-d') }}" />
+                <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+                    <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
+                    <div class="d-flex w-auto align-items-center">
+                        <div class="me-3">
+                            <input type="text" id="start-date" class="form-control" placeholder="Dari" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                        </div>
+                        <div>
+                            <input type="text" id="end-date" class="form-control" placeholder="Sampai" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-
+                
+                
                 <div class="card-body">
                     <div class="row">
                         <!-- Card Jumlah Pengajuan -->
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>{{ $pengeluaranBarangs->count() ?? 0 }}</h3>
+                                    <h3 class="jumlah-pengajuan">{{ $pengeluaranBarangs->count() ?? 0 }}</h3>
                                     <p>Jumlah Pengajuan</p>
                                 </div>
                                 <div class="icon">
@@ -30,7 +35,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
+                                    <h3  class="jumlah-disetujui">{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
                                     <p>Jumlah Disetujui</p>
                                 </div>
                                 <div class="icon">
@@ -44,7 +49,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3>{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
+                                    <h3  class="jumlah-menunggu">{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
                                     <p>Jumlah Menunggu</p>
                                 </div>
                                 <div class="icon">
@@ -58,7 +63,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3>{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
+                                    <h3 class="jumlah-ditolak">{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
                                     <p>Jumlah Ditolak</p>
                                 </div>
                                 <div class="icon">
@@ -216,10 +221,46 @@
                 });
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const today = new Date().toISOString().split('T')[0]; // Mengambil tanggal hari ini
-                document.getElementById('filter-date').value = today; // Set nilai input tanggal
+            $(document).ready(function () {
+                const startDateInput = $('#start-date');
+                const endDateInput = $('#end-date');
+
+                function fetchData() {
+                    const startDate = startDateInput.val();
+                    const endDate = endDateInput.val();
+
+                    if (startDate && endDate) {
+                        $.ajax({
+                            url: `/dashboard/get-data-card?start_date=${startDate}&end_date=${endDate}`,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response.success) {
+                                    // Update elemen card dengan data dari response
+                                    $('.jumlah-pengajuan').text(response.data.pengeluaranBarangs.length || 0);
+                                    $('.jumlah-disetujui').text(response.data.pengeluaranBarangsDisetujui || 0);
+                                    $('.jumlah-menunggu').text(response.data.pengeluaranBarangsMenunggu || 0);
+                                    $('.jumlah-ditolak').text(response.data.pengeluaranBarangsDitolak || 0);
+                                }
+                            },
+                            error: function (xhr) {
+                                console.error('Error:', xhr.responseText);
+                                // Pastikan tetap menampilkan 0 jika terjadi kesalahan
+                                $('.jumlah-pengajuan').text(0);
+                                $('.jumlah-disetujui').text(0);
+                                $('.jumlah-menunggu').text(0);
+                                $('.jumlah-ditolak').text(0);
+                            }
+                        });
+                    }
+                }
+
+                startDateInput.change(fetchData);
+                endDateInput.change(fetchData);
             });
+
+
+
 
         </script>
         

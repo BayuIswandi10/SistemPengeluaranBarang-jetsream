@@ -34,7 +34,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/form', FormPengeluaran::class)->name('form');
     Route::get('/approval', FormApproval::class)->name('approval');
-
+    Route::get('/dashboard/get-data-card', [DashboardController::class, 'getData']);
     
     // Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
     // Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
