@@ -5,11 +5,18 @@
                 <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
                     <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
                     <div class="d-flex w-auto align-items-center">
+                       
                         <div class="me-3">
                             <input type="text" id="start-date" class="form-control" placeholder="Dari" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
                         </div>
                         <div>
                             <input type="text" id="end-date" class="form-control" placeholder="Sampai" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                        </div>
+                        <div>
+                            
+                            <button class="btn btn-primary ml-3" id="refresh-button" onclick="resetDatesToToday()">
+                                <i class="fa fa-undo" aria-hidden="true"></i> Reset
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -255,11 +262,26 @@
                     }
                 }
 
+                // Event listener untuk perubahan pada input tanggal
                 startDateInput.change(fetchData);
                 endDateInput.change(fetchData);
+
+                // Fungsi untuk mengatur tanggal ke default hari ini dan memanggil fetchData
+                function resetDatesToToday() {
+                    const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+                    startDateInput.val(today);
+                    endDateInput.val(today);
+
+                    // Panggil fetchData setelah mengatur nilai default
+                    fetchData();
+                }
+
+                // Hubungkan fungsi reset ke tombol dengan ID 'refresh-button'
+                $('#refresh-button').click(resetDatesToToday);
+
+                // Set tanggal default ke hari ini saat halaman pertama kali dimuat dan panggil fetchData
+                resetDatesToToday();
             });
-
-
 
 
         </script>

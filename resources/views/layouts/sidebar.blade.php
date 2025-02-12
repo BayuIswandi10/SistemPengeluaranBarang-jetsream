@@ -44,15 +44,17 @@
                         </a>
                     </li> --}}
 
-                    <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
-                        <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-signature"></i>
-                            <p>
-                                Data Persetujuan
-                                <i class="right fas"></i>
-                            </p>                            
-                        </a>
-                    </li>
+                    @if(Auth::check() && Auth::user()->level !== 'Level 5')
+                        <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
+                            <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-file-signature"></i>
+                                <p>
+                                    Data Persetujuan
+                                    <i class="right fas"></i>
+                                </p>                            
+                            </a>
+                        </li>
+                    @endif
 
                     @if(Auth::check() && Auth::user()->level === 'Level 5')
                         <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
