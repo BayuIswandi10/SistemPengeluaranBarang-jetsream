@@ -17,7 +17,7 @@ class Dashboard extends Component
         ->whereDate('created_date', Carbon::today()); // Hanya ambil data hari ini
 
         
-    
+
         if ($user->level === 'Level 1') {
             $pengeluaranBarangs = $query->where(function ($q) use ($user) {
                 $q->whereHas('user', function ($query) use ($user) {
