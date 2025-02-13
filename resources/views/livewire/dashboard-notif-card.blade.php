@@ -7,18 +7,10 @@
                     <div class="d-flex align-items-center w-100 justify-content-end">
                         <!-- Input Tanggal -->
                         <div class="row g-3">
-                        <!-- Input "Dari" -->
+                        <!-- Input "Range Date FlatPicker" -->
                         <div class="col-auto">
                             <div class="input-group">
-                            <input type="text" id="start-date" class="form-control" placeholder="Dari" 
-                                onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
-                            </div>
-                        </div>
-                        <!-- Input "Sampai" -->
-                        <div class="col-auto">
-                            <div class="input-group">
-                            <input type="text" id="end-date" class="form-control" placeholder="Sampai" 
-                                onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
                             </div>
                         </div>
                         </div>
@@ -551,16 +543,26 @@
                         });
                     }
 
-                    // Event listener untuk memuat count data saat input tanggal diisi
-                    $('#start-date, #end-date').on('change', function () {
-                        const startDate = $('#start-date').val();
-                        const endDate = $('#end-date').val();
+                   // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
+                    flatpickr("#date-range-picker", {
+                        mode: "range", // Mode range date picker
+                        dateFormat: "Y-m-d", // Format tanggal
+                        locale: "id", // Opsional: Locale Indonesia
+                        onChange: function (selectedDates, dateStr, instance) {
+                            // Hanya jalankan jika kedua tanggal (range) sudah dipilih
+                            if (selectedDates.length === 2) {
+                                const startDate = selectedDates[0].toISOString().split('T')[0]; // Format start date ke YYYY-MM-DD
+                                const endDate = selectedDates[1].toISOString().split('T')[0];   // Format end date ke YYYY-MM-DD
 
-                        // Hanya tembak API jika kedua tanggal sudah diisi
-                        if (startDate && endDate) {
-                            loadCounts(startDate, endDate);
-                        }
+                                console.log("Start Date:", startDate); // Debug tanggal mulai
+                                console.log("End Date:", endDate);   // Debug tanggal akhir
+
+                                // Panggil fungsi untuk memuat count data
+                                loadCounts(startDate, endDate);
+                            }
+                        },
                     });
+
 
                     // Fungsi untuk memuat data tabel
                     function loadTableData(statusFilter, startDate, endDate) {
@@ -653,16 +655,32 @@
                             return; // Jika tidak ada status, hentikan
                         }
 
-                        // Ambil input tanggal dari kalender
-                        const startDate = $('#start-date').val();
-                        const endDate = $('#end-date').val();
+                        // Ambil instance Flatpickr yang sudah ada
+                        const dateRangeInstance = document.getElementById("date-range-picker")._flatpickr;
+
+                        if (!dateRangeInstance) {
+                            console.error('Flatpickr tidak ditemukan pada elemen #date-range-picker.');
+                            return; // Jika Flatpickr belum diinisialisasi, hentikan
+                        }
+
+                        const selectedDates = dateRangeInstance.selectedDates; // Ambil tanggal yang dipilih
+
+                        if (selectedDates.length !== 2) {
+                            console.warn('Tanggal belum dipilih atau tidak lengkap.');
+                            return; // Jika tanggal belum dipilih atau tidak lengkap, hentikan
+                        }
+
+                        // Format tanggal menjadi YYYY-MM-DD
+                        const startDate = selectedDates[0].toISOString().split('T')[0];
+                        const endDate = selectedDates[1].toISOString().split('T')[0];
+
+                        console.log('Start Date:', startDate); // Debug tanggal mulai
+                        console.log('End Date:', endDate); // Debug tanggal akhir
 
                         // Panggil fungsi untuk memuat data tabel
                         loadTableData(statusFilter, startDate, endDate);
                     });
                 });
-
-
             });
 
             $(document).ready(function () {
@@ -719,6 +737,30 @@
             function resetPage() {
                 location.reload(); // Reload halaman
             }
+
+            // Inisialisasi Flatpickr
+            flatpickr("#date-range-picker", {
+                mode: "range", // Mode range date picker
+                dateFormat: "Y-m-d", // Format tanggal (contoh: 2025-02-13)
+                locale: "id", // Opsional: Locale Indonesia
+                onClose: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) { // Pastikan ada dua tanggal yang dipilih
+                        // Format tanggal menjadi YYYY-MM-DD
+                        const formattedStartDate = selectedDates[0].toISOString().split('T')[0];
+                        const formattedEndDate = selectedDates[1].toISOString().split('T')[0];
+
+                        // Tampilkan hasil format pada konsol
+                        console.log("Start Date:", formattedStartDate); // Contoh: 2025-01-31
+                        console.log("End Date:", formattedEndDate); // Contoh: 2025-02-20
+
+                        // Gunakan tanggal yang sudah diformat untuk kebutuhan lainnya
+                        // Contoh: Memperbarui input value atau mengirim ke fungsi lain
+                        document.querySelector("#start-date").value = formattedStartDate;
+                        document.querySelector("#end-date").value = formattedEndDate;
+                    }
+                },
+            });
+
         </script>
         
         </body>

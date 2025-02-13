@@ -25,6 +25,9 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.4/css/buttons.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     
@@ -61,11 +64,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/Style/Header_style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-
-
-
-
     </div>
     <!-- ./wrapper -->
 
@@ -94,6 +92,9 @@
     <script src="{{ asset('assets/adminlte3.2/dist/js/pages/dashboard.js') }}"></script>
 
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     {{-- <script src="{{ asset('assets/adminlte3.2/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script> --}}
     <!-- Ekko Lightbox -->
