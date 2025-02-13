@@ -38,8 +38,9 @@ class Dashboard extends Component
         $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
 
         // Mengambil data status yang disetujui (hanya dari data hari ini)
-        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) =>
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel
+        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
+            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 
+            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
         )->count();
 
         // Mengambil data status yang menunggu (hanya dari data hari ini)

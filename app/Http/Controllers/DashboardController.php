@@ -52,39 +52,50 @@ class DashboardController extends Controller
             // Ekstrak angka dari level user
             $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
 
-            // Mengambil data status yang disetujui
-            $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) =>
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel
-            )->count();
+            // Mengambil data berdasarkan status
+            $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
+                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 
+                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
+            )->values();
 
-            // Mengambil data status yang menunggu
             $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
-            )->count();
+            )->values();
 
-            // Mengambil data status yang ditolak
             $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) =>
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
-            )->count();
+            )->values();
 
-            // Response JSON dengan data
+            // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([
                 'success' => true,
                 'message' => 'Data berhasil diambil.',
                 'data' => [
-                    'pengeluaranBarangs' => $pengeluaranBarangs,
-                    'pengeluaranBarangsDisetujui' => $pengeluaranBarangsDisetujui,
-                    'pengeluaranBarangsMenunggu' => $pengeluaranBarangsMenunggu,
-                    'pengeluaranBarangsDitolak' => $pengeluaranBarangsDitolak
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                    'pengeluaranBarangs' => [
+                        'count' => $pengeluaranBarangs->count(),
+                        'data' => $pengeluaranBarangs
+                    ],
+                    'pengeluaranBarangsDisetujui' => [
+                        'count' => $pengeluaranBarangsDisetujui->count(),
+                        'data' => $pengeluaranBarangsDisetujui
+                    ],
+                    'pengeluaranBarangsMenunggu' => [
+                        'count' => $pengeluaranBarangsMenunggu->count(),
+                        'data' => $pengeluaranBarangsMenunggu
+                    ],
+                    'pengeluaranBarangsDitolak' => [
+                        'count' => $pengeluaranBarangsDitolak->count(),
+                        'data' => $pengeluaranBarangsDitolak
+                    ],
                 ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()  // Pesan error lengkap untuk debug
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage() // Pesan error lengkap untuk debug
             ], 500);
         }
     }
-
-
 }

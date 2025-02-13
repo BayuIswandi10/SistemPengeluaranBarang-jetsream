@@ -2,25 +2,28 @@
     <div class="container-fluid">
         <body>
             <div class="card mt-3">
-                <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                    <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
-                    <div class="d-flex w-auto align-items-center">
-                       
-                        <div class="me-3 mr-3">
-                            <input type="text" id="start-date" class="form-control" placeholder="Dari" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+                <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
+                    <div class="d-flex align-items-center w-100 justify-content-end">
+                        <!-- Input Tanggal -->
+                        <div class="row g-3">
+                        <!-- Input "Dari" -->
+                        <div class="col-auto">
+                            <div class="input-group">
+                            <input type="text" id="start-date" class="form-control" placeholder="Dari" 
+                                onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                            </div>
                         </div>
-                        <div>
-                            <input type="text" id="end-date" class="form-control" placeholder="Sampai" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                        <!-- Input "Sampai" -->
+                        <div class="col-auto">
+                            <div class="input-group">
+                            <input type="text" id="end-date" class="form-control" placeholder="Sampai" 
+                                onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+                            </div>
                         </div>
-                        <div>    
-                            <button class="btn btn-primary ml-3" id="refresh-button" onclick="resetPage()">
-                                <i class="fa fa-undo" aria-hidden="true"></i> Reset
-                            </button>
                         </div>
                     </div>
-                </div>
-                
-                
+                </div>                   
                 <div class="card-body">
                     <div class="row">
                         <!-- Card Jumlah Pengajuan -->
@@ -33,13 +36,60 @@
                                 <div class="icon">
                                     <i class="fas fa-file-alt"></i> <!-- Ikon dokumen -->
                                 </div>
-                                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#modalPengajuan">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                                <!-- Card Jumlah Pengajuan -->
+                                <a href="#" class="small-box-footer" data-toggle="modal" data-target="#modalPengajuan" data-status="all">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                         <!-- ./col -->
-                       <!-- Modal -->
-                        <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
+                        <!-- Card Jumlah Disetujui -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3  class="jumlah-disetujui">{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
+                                    <p>Jumlah Disetujui</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-check-circle"></i> <!-- Ikon centang -->
+                                </div>
+                                <!-- Card Jumlah Disetujui -->
+                                <a href="#" class="small-box-footer" data-toggle="modal" data-target="#modalPengajuan" data-status="approved">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <!-- Card Jumlah Menunggu -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3  class="jumlah-menunggu">{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
+                                    <p>Jumlah Menunggu</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-clock"></i> <!-- Ikon jam -->
+                                </div>
+                                <!-- Card Jumlah Menunggu -->
+                                <a href="#" class="small-box-footer" data-toggle="modal" data-target="#modalPengajuan" data-status="pending">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <!-- Card Jumlah Ditolak -->
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3 class="jumlah-ditolak">{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
+                                    <p>Jumlah Ditolak</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-times-circle"></i> <!-- Ikon silang -->
+                                </div>
+                                <!-- Card Jumlah Ditolak -->
+                                <a href="#" class="small-box-footer" data-toggle="modal" data-target="#modalPengajuan" data-status="rejected">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+
+                         <!-- Modal -->
+                         <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
@@ -169,49 +219,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Card Jumlah Disetujui -->
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3  class="jumlah-disetujui">{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
-                                    <p>Jumlah Disetujui</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-check-circle"></i> <!-- Ikon centang -->
-                                </div>
-                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                            </div>
-                        </div>
-                        <!-- ./col -->
-                        <!-- Card Jumlah Menunggu -->
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-warning">
-                                <div class="inner">
-                                    <h3  class="jumlah-menunggu">{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
-                                    <p>Jumlah Menunggu</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-clock"></i> <!-- Ikon jam -->
-                                </div>
-                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                            </div>
-                        </div>
-                        <!-- ./col -->
-                        <!-- Card Jumlah Ditolak -->
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-danger">
-                                <div class="inner">
-                                    <h3 class="jumlah-ditolak">{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
-                                    <p>Jumlah Ditolak</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-times-circle"></i> <!-- Ikon silang -->
-                                </div>
-                                <a href="#" class="small-box-footer">Lebih Banyak <i class="fas fa-arrow-circle-right"></i></a>
-                            </div>
-                        </div>
-                        <!-- ./col -->
                     </div>
                 </div>
             </div>
@@ -458,6 +465,204 @@
                         }
                     });
                 });
+
+
+                $(document).ready(function () {
+                    // Fungsi untuk mendapatkan tanggal hari ini
+                    function getTodayDate() {
+                        const today = new Date();
+                        const year = today.getFullYear();
+                        const month = String(today.getMonth() + 1).padStart(2, '0');
+                        const day = String(today.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`; // Format YYYY-MM-DD
+                    }
+
+                    // Fungsi untuk memformat tanggal ke awal hari
+                    function formatDateToStartOfDay(dateString) {
+                        return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                    }
+
+                    // Fungsi untuk memformat tanggal ke akhir hari
+                    function formatDateToEndOfDay(dateString) {
+                        return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                    }
+
+                    // Fungsi untuk memuat jumlah data
+                    function loadCounts(startDate, endDate) {
+                        const today = getTodayDate();
+                        const formattedStartDate = startDate ? formatDateToStartOfDay(startDate) : formatDateToStartOfDay(today);
+                        const formattedEndDate = endDate ? formatDateToEndOfDay(endDate) : formatDateToEndOfDay(today);
+
+                        // Tampilkan placeholder sementara
+                        $('.jumlah-pengajuan').text('Loading...');
+                        $('.jumlah-disetujui').text('Loading...');
+                        $('.jumlah-menunggu').text('Loading...');
+                        $('.jumlah-ditolak').text('Loading...');
+
+                        // AJAX request untuk mengambil count data
+                        $.ajax({
+                            url: `/dashboard/get-data-card`,
+                            method: 'GET',
+                            dataType: 'json',
+                            data: {
+                                start_date: formattedStartDate,
+                                end_date: formattedEndDate,
+                            },
+                            success: function (response) {
+                                console.log('Response from server:', response); // Debugging: Lihat data yang diterima
+
+                                // Validasi data yang diterima
+                                if (response.success && response.data) {
+                                    const data = response.data;
+
+                                    // Pastikan semua data yang diperlukan ada
+                                    const counts = {
+                                        pengajuan: data.pengeluaranBarangs?.count ?? 0,
+                                        disetujui: data.pengeluaranBarangsDisetujui?.count ?? 0,
+                                        menunggu: data.pengeluaranBarangsMenunggu?.count ?? 0,
+                                        ditolak: data.pengeluaranBarangsDitolak?.count ?? 0,
+                                    };
+
+                                    console.log('Counts calculated:', counts); // Debugging: Lihat hasil perhitungan
+
+                                    // Update elemen DOM hanya setelah semua data siap
+                                    $('.jumlah-pengajuan').text(counts.pengajuan);
+                                    $('.jumlah-disetujui').text(counts.disetujui);
+                                    $('.jumlah-menunggu').text(counts.menunggu);
+                                    $('.jumlah-ditolak').text(counts.ditolak);
+                                } else {
+                                    console.error('Invalid response format:', response); // Debugging: Log jika format respons tidak valid
+                                    // Jika tidak ada data ditemukan atau format tidak valid, tampilkan 0
+                                    $('.jumlah-pengajuan').text(0);
+                                    $('.jumlah-disetujui').text(0);
+                                    $('.jumlah-menunggu').text(0);
+                                    $('.jumlah-ditolak').text(0);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching counts:', error); // Debugging: Log error
+                                alert('Terjadi kesalahan saat mengambil data count.');
+                                // Reset nilai menjadi 0 jika terjadi error
+                                $('.jumlah-pengajuan').text(0);
+                                $('.jumlah-disetujui').text(0);
+                                $('.jumlah-menunggu').text(0);
+                                $('.jumlah-ditolak').text(0);
+                            }
+                        });
+                    }
+
+                    // Event listener untuk memuat count data saat input tanggal diisi
+                    $('#start-date, #end-date').on('change', function () {
+                        const startDate = $('#start-date').val();
+                        const endDate = $('#end-date').val();
+
+                        // Hanya tembak API jika kedua tanggal sudah diisi
+                        if (startDate && endDate) {
+                            loadCounts(startDate, endDate);
+                        }
+                    });
+
+                    // Fungsi untuk memuat data tabel
+                    function loadTableData(statusFilter, startDate, endDate) {
+                        const today = getTodayDate();
+                        const formattedStartDate = startDate ? formatDateToStartOfDay(startDate) : formatDateToStartOfDay(today);
+                        const formattedEndDate = endDate ? formatDateToEndOfDay(endDate) : formatDateToEndOfDay(today);
+
+                        // Reset tabel DataTable sebelum memuat data baru
+                        let table = $('#dataTable').DataTable();
+                        table.clear();
+
+                        // AJAX request untuk mengambil data tabel
+                        $.ajax({
+                            url: `/dashboard/get-data-card`,
+                            method: 'GET',
+                            dataType: 'json',
+                            data: {
+                                start_date: formattedStartDate,
+                                end_date: formattedEndDate,
+                            },
+                            success: function (response) {
+                                if (response.success && response.data) {
+                                    // Pilih data berdasarkan status yang diminta
+                                    let filteredData = [];
+                                    if (statusFilter === 'approved') {
+                                        filteredData = response.data.pengeluaranBarangsDisetujui.data || [];
+                                    } else if (statusFilter === 'pending') {
+                                        filteredData = response.data.pengeluaranBarangsMenunggu.data || [];
+                                    } else if (statusFilter === 'rejected') {
+                                        filteredData = response.data.pengeluaranBarangsDitolak.data || [];
+                                    } else {
+                                        filteredData = response.data.pengeluaranBarangs.data || []; // Tampilkan semua data jika statusFilter kosong
+                                    }
+
+                                    // Mapping status untuk tabel
+                                    const statusMapping = {
+                                        'Level 1': 'Menunggu Persetujuan PIC/Ka.Sie',
+                                        'Level 2': 'PIC/Ka.Sie Sudah Menyetujui',
+                                        'Level 3': 'Menunggu Persetujuan Ka.Dept GA',
+                                        'Level 4': 'Menunggu Persetujuan Security',
+                                        'Level 5': 'Sudah Disetujui',
+                                        'Level 0': 'Ditolak',
+                                    };
+
+                                    // Masukkan data ke dalam DataTable
+                                    if (filteredData.length > 0) {
+                                        filteredData.forEach(function (item, index) {
+                                            const mappedStatus = statusMapping[item.status] || item.status; // Gunakan mapping jika status dikenali
+
+                                            table.row.add([
+                                                index + 1, // Kolom 1: No Urut
+                                                item.pengeluaran_barang_id, // Kolom 2: Nomor Pengeluaran Barang
+                                                item.tujuan_pengeluaran_barang, // Kolom 3: Tujuan
+                                                item.jenis_kendaraan, // Kolom 4: Jenis Kendaraan
+                                                mappedStatus, // Kolom 5: Status (dengan mapping)
+                                                `<button type="button" 
+                                                    class="btn btn-primary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#detailModal" 
+                                                    data-nomor="${item.pengeluaran_barang_id}">
+                                                    <i class="fa-solid fa-circle-info"></i>
+                                                </button>` // Kolom 6: Aksi
+                                            ]);
+                                        });
+                                    } else {
+                                        console.warn('Tidak ada data ditemukan untuk filter yang diterapkan.');
+                                    }
+
+                                    // Perbarui DataTable
+                                    table.draw();
+                                } else {
+                                    console.warn('Tidak ada data ditemukan.');
+                                    table.draw(); // Tabel tetap kosong tetapi dirender ulang
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching table data:', error);
+                                alert('Terjadi kesalahan saat mengambil data tabel.');
+                            }
+                        });
+                    }
+
+                    // Event untuk menangani klik elemen dengan atribut data-status
+                    $('#modalPengajuan').on('show.bs.modal', function (event) {
+                        const relatedTarget = $(event.relatedTarget); // Elemen yang memicu modal
+                        const statusFilter = relatedTarget.data('status'); // Ambil data-status dari elemen yang diklik
+
+                        if (!statusFilter) {
+                            console.warn('Data status tidak ditemukan. Pastikan elemen yang di-klik memiliki atribut data-status.');
+                            return; // Jika tidak ada status, hentikan
+                        }
+
+                        // Ambil input tanggal dari kalender
+                        const startDate = $('#start-date').val();
+                        const endDate = $('#end-date').val();
+
+                        // Panggil fungsi untuk memuat data tabel
+                        loadTableData(statusFilter, startDate, endDate);
+                    });
+                });
+
+
             });
 
             $(document).ready(function () {
@@ -468,13 +673,18 @@
                     return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
                 }
 
+                // Fungsi untuk memformat tanggal ke akhir hari
+                function formatDateToEndOfDay(dateString) {
+                    return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                }
+
                 function fetchData() {
                     const startDate = startDateInput.val();
                     const endDate = endDateInput.val();
 
                     if (startDate && endDate) {
                         const formattedStartDate = formatDateToStartOfDay(startDate);
-                        const formattedEndDate = formatDateToStartOfDay(endDate);
+                        const formattedEndDate = formatDateToEndOfDay(endDate);
 
                         $.ajax({
                             url: `/dashboard/get-data-card?start_date=${formattedStartDate}&end_date=${formattedEndDate}`,
