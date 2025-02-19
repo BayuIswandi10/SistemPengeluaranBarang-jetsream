@@ -486,10 +486,10 @@
                         const formattedEndDate = endDate ? formatDateToEndOfDay(endDate) : formatDateToEndOfDay(today);
 
                         // Tampilkan placeholder sementara
-                        $('.jumlah-pengajuan').text('Loading...');
-                        $('.jumlah-disetujui').text('Loading...');
-                        $('.jumlah-menunggu').text('Loading...');
-                        $('.jumlah-ditolak').text('Loading...');
+                        $('.jumlah-pengajuan').text('...');
+                        $('.jumlah-disetujui').text('...');
+                        $('.jumlah-menunggu').text('...');
+                        $('.jumlah-ditolak').text('...');
 
                         // AJAX request untuk mengambil count data
                         $.ajax({
