@@ -29,7 +29,7 @@
 
         .pull-top {
             position: relative;
-            top: -100px; /* Tarik ke atas */
+            top: -60px; /* Tarik ke atas */
             z-index: 3; /* Berada di atas hero-section */
         }
 
@@ -269,8 +269,9 @@
         <div class="hero-section">
             <div class="text-container">
                 <div class="text-center text-white">
-                <div class="d-flex justify-content-center align-items-center" style="background-color: white; border-radius: 12px; padding: 25px; display: inline-block;">
-                    <img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center mt-3" 
+                    style="background: rgba(255, 255, 255); padding: 10px; border-radius: 8px; width: max-content; max-width: 100%; margin: auto;">
+                    <img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 80px; max-width: 100%; object-fit: contain;">
                 </div>
                     <h2 class="h1 font-weight-bold mt-2">Digital Logistic Transport Permit</h2>
                         <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
@@ -312,45 +313,78 @@
         </div>
 
         <section class="section position-relative pull-top">
-        <div class="container">
-            <div class="rounded shadow p-5 bg-white">
-                <div class="row">
-                    <!-- Card 1: Efisiensi Administrasi -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center card-hover">
-                        <i class="fas fa-tasks text-primary h1"></i>
-                        <h3 class="mt-4 text-capitalize h5">Efisiensi Administrasi</h3>
-                        <p class="regular text-muted">Sistem digital untuk mempercepat dan mempermudah administrasi.</p>
+            <div class="container">
+                <div class="card shadow">
+                    <div class="card-header text-center"  style="border-top: 5px solid #5A6ACF;">
+                        <h4>Pengajuan yang Siap untuk Dicetak</h4>
                     </div>
-                    <!-- Card 2: Pengelolaan Barang -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0 text-center card-hover">
-                        <i class="fas fa-box text-primary h1"></i>
-                        <h3 class="mt-4 text-capitalize h5">Pengelolaan Barang</h3>
-                        <p class="regular text-muted">Pelacakan dan pengelolaan barang secara akurat dan terstruktur.</p>
+                    <div class="card-body p-5 bg-white">
+                        <div class="row">
+                            <!-- Card 1: Pengeluaran Barang -->
+                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalPengajuanTrigger">
+                                <div class="card shadow card-hover">
+                                    <div class="card-body">
+                                        <i class="fas fa-box-open text-primary h1"></i>
+                                        <h3 class="mt-4 text-capitalize h5">Pengeluaran Barang</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 2: Penggunaan Kendaraan Dinas -->
+                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center">
+                                <div class="card shadow card-hover">
+                                    <div class="card-body">
+                                        <i class="fas fa-car-side text-primary h1"></i>
+                                        <h3 class="mt-4 text-capitalize h5">Penggunaan Kendaraan Dinas</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Card 3: Pengelolaan Kendaraan Dinas -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center card-hover">
-                        <i class="fas fa-car text-primary h1"></i>
-                        <h3 class="mt-4 text-capitalize h5">Kendaraan Dinas</h3>
-                        <p class="regular text-muted">Pengajuan dan pemantauan kendaraan dinas yang lebih mudah.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <!-- Card 4: Notifikasi Realtime -->
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0 text-center card-hover">
-                        <i class="fas fa-bell text-primary h1"></i>
-                        <h3 class="mt-4 text-capitalize h5">Notifikasi Realtime</h3>
-                        <p class="regular text-muted">Pemberitahuan langsung untuk memastikan proses berjalan lancar.</p>
+                    <div class="modal-body">
+        
+                        <!-- Data Table -->
+                        <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>Nomor Pengeluaran Barang</th>
+                                    <th>Diajukan Oleh</th>
+                                    <th>Tanggal Pengajuan</th>
+                                    <th>Asal Barang Keluar</th>
+                                    <th>Tujuan Barang Keluar</th>
+                                    <th>Jenis Kendaraan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailBody">
+                                
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
-
-
     </body>
     <script>
-
-
         let counter = 1;
+
+        $(document).ready(function () {
+
+        });
 
         function tambahComboBox() {
             const container = document.getElementById('barangTable');
@@ -433,6 +467,68 @@
                 create: true,
                 sortField: 'text'
             });
+        });
+
+        $(document).ready(function () {  
+        
+            // var table = $('#dataTable').DataTable({
+              
+            //         scrollX: true,  // Jika tabel cukup lebar, aktifkan horizontal scroll
+            //         responsive: false // Coba matikan responsive untuk melihat apakah ada efek
+            //     });
+
+            // $('#modalPengajuan').on('show.bs.modal', function (event) {
+            //     const relatedTarget = $(event.relatedTarget);
+            // });
+            
+            // Event untuk menangani klik elemen dengan id modalPengajuan
+            $('#modalPengajuanTrigger').on('click', function () {
+                $('#modalPengajuan').modal('show');
+                loadTableData();
+
+            });
+
+            function loadTableData() {
+                    $.ajax({
+                    url: "/pengeluaran/get-data-level5",
+                    method: "GET",
+                    success: function (data) {
+                    //  const barang_keluar = data.map(item => item.barang_keluar)
+                        console.log(data.barang_keluar);
+                        //console.log(barang_keluar);
+                        const data_barang = data.barang_keluar;
+                        
+                        const tbody = document.getElementById('detailBody');
+                        tbody.innerHTML = '';
+                        
+                        tbody.innerHTML  = data_barang.map((item, index) => {
+                            return `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.pengeluaran_barang_id}</td>
+                                        <td>${item.created_by}</td>
+                                        <td>${item.created_date}</td>
+                                        <td>${item.lokasi_barang_keluar}</td>
+                                        <td>${item.tujuan_pengeluaran_barang}</td>
+                                        <td>${item.jenis_kendaraan}</td>
+                                        <td>
+                                            <button type="button" 
+                                                class="btn btn-primary btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#detailModal" 
+                                                data-nomor="${item.pengeluaran_barang_id}">
+                                                <i class="fa-solid fa-circle-info"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `
+                        }).join('');
+                        $('#dataTable').DataTable();
+                    }
+
+                });
+
+            }
         });
 
 

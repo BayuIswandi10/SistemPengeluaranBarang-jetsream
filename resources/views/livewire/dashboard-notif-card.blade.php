@@ -371,17 +371,6 @@
                     responsive: true
                 });
 
-                var table = $('#detaildataTableModal').DataTable({
-                    columnDefs: [
-                        {className: 'dt-body-center', targets: 0},
-                        {className: 'dt-head-center', targets: 0},
-                        {className: 'dt-body-center', targets: 5},
-                        {className: 'dt-head-center', targets: 5}
-                    ],
-                    scrollX: false,
-                    responsive: true
-                });
-
                 $('#detailModal').on('show.bs.modal', function (event) {
                     const button = $(event.relatedTarget); // Button yang diklik
                     const nomor = button.data('nomor'); // Nomor pengeluaran barang
@@ -645,7 +634,7 @@
                         });
                     }
 
-                    // Event untuk menangani klik elemen dengan atribut data-status
+                   // Event untuk menangani klik elemen dengan atribut data-status
                     $('#modalPengajuan').on('show.bs.modal', function (event) {
                         const relatedTarget = $(event.relatedTarget); // Elemen yang memicu modal
                         const statusFilter = relatedTarget.data('status'); // Ambil data-status dari elemen yang diklik
@@ -663,16 +652,19 @@
                             return; // Jika Flatpickr belum diinisialisasi, hentikan
                         }
 
+                        let startDate, endDate;
                         const selectedDates = dateRangeInstance.selectedDates; // Ambil tanggal yang dipilih
 
-                        if (selectedDates.length !== 2) {
-                            console.warn('Tanggal belum dipilih atau tidak lengkap.');
-                            return; // Jika tanggal belum dipilih atau tidak lengkap, hentikan
+                        if (selectedDates.length === 2) {
+                            // Format tanggal menjadi YYYY-MM-DD jika ada yang dipilih
+                            startDate = selectedDates[0].toISOString().split('T')[0];
+                            endDate = selectedDates[1].toISOString().split('T')[0];
+                        } else {
+                            // Default ke hari ini jika tidak ada tanggal yang dipilih
+                            const today = new Date();
+                            startDate = today.toISOString().split('T')[0];
+                            endDate = today.toISOString().split('T')[0];
                         }
-
-                        // Format tanggal menjadi YYYY-MM-DD
-                        const startDate = selectedDates[0].toISOString().split('T')[0];
-                        const endDate = selectedDates[1].toISOString().split('T')[0];
 
                         console.log('Start Date:', startDate); // Debug tanggal mulai
                         console.log('End Date:', endDate); // Debug tanggal akhir
@@ -680,6 +672,7 @@
                         // Panggil fungsi untuk memuat data tabel
                         loadTableData(statusFilter, startDate, endDate);
                     });
+
                 });
             });
 

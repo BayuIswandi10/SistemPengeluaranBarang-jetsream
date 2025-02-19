@@ -53,4 +53,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 });
 
+
+Route::get('/pengeluaran/get-data-level5', [PengeluaranBarangController::class, 'getDataLevel5']);
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');

@@ -23,6 +23,12 @@ class PengeluaranBarangController extends Controller
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 
+    public function getDataLevel5()
+    {
+        $pengeluaranBarangs = PengeluaranBarang::where('status', 'Level 4')->get();
+        return response()->json(['barang_keluar' => $pengeluaranBarangs]);
+    }
+
     public function getDetail(Request $request)
     {
         $pengeluaranId = $request->pengeluaran_barang_id;
