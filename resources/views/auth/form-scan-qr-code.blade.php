@@ -39,7 +39,7 @@
     <div class="nav-static-top d-flex justify-content-between align-items-center p-3 bg-light">
         <div class="float-left">
             <a href="#">
-                <img class="mt-3 ml-4" src="{{ asset('assets/img/logo YMI-DLT.png') }}" style="height:40px;">
+                <img class="mt-3 ml-4" src="{{ asset('assets/img/logo-YMI-DLTP.png') }}" style="height:80px;">
             </a>
         </div>
     </div>
@@ -50,10 +50,13 @@
                 <video id="preview"></video>
                 <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
             </div>
-            {{-- <div class="card-footer d-flex justify-content-center">
-              <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#scanModal">Cari</button>
-            </div> --}}
+            <div class="card-footer d-flex justify-content-center">
+                <a href="{{ route('login') }}">
+                    <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
+                        {{ __('Kembali') }}
+                    </x-button>
+                </a>
+            </div>
         </div>
         <audio id="beep" src="{{ asset('assets/sound/beep-sound-8333.mp3') }}" autostart="false"></audio>
     </div>

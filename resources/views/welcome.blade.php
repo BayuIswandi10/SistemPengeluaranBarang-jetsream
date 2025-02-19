@@ -142,7 +142,7 @@
 
         <nav class="navbar main-nav navbar-expand-lg px-2 px-sm-0 py-2 py-lg-0">
             <div class="container">
-                <a class="navbar-brand" href="index.html"><img src="{{ asset('assets/img/logo-YMI-DLTP.png') }}" style="height:80px;" alt="logo"></a>
+                <a class="navbar-brand"><img src="{{ asset('assets/img/logo-YMI-DLTP.png') }}" style="height:80px;" alt="logo"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
@@ -381,7 +381,7 @@
     </body>
     <script>
         let counter = 1;
-        
+
         function tambahComboBox() {
             const container = document.getElementById('barangTable');
             const newRow = document.createElement('tr');

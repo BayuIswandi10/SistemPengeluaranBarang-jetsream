@@ -45,74 +45,74 @@
 
         </div>
 
-        <div class="login-box">
-            <div class="card card-outline card-primary login-card">
-                <div class="card-body">
-                    <div class="text-center">
-                        <b class="h2">Pengeluaran Barang</b>
-                    </div>
-                    <hr>
-                    <h4 class="login-box-msg">Masuk User</h4>
-
-                    <x-validation-errors class="mb-4" />
-
-                    @if (session('status'))
-                        <div class="mb-4 font-medium text-sm text-green-600">
-                            {{ session('status') }}
+        <div class="container d-flex justify-content-center align-items-center min-vh-100">
+            <div class="login-box w-100" style="max-width: 400px;">
+                <div class="card card-outline card-primary login-card shadow-lg">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <b class="h2">Pengeluaran Barang</b>
                         </div>
-                    @endif
+                        <hr>
+                        <h4 class="login-box-msg">Masuk User</h4>
 
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+                        <x-validation-errors class="mb-4" />
 
-                        <div class="form-group">
-                            <x-label for="email" value="{{ __('Nrp/Email') }}" />
-                            <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="off" />
-                        </div>
+                        @if (session('status'))
+                            <div class="mb-4 font-medium text-sm text-green-600">
+                                {{ session('status') }}
+                            </div>
+                        @endif
 
-                        <div class="form-group mt-4">
-                            <x-label for="password" value="{{ __('Sandi') }}" />
-                            <x-input id="password" class="form-control" type="password" name="password" required autocomplete="off" />
-                        </div>
+                        <form method="POST" action="{{ route('login') }}">
+                            @csrf
 
-                        <div class="form-group mt-4 flex items-center justify-between">
-                            <label for="remember_me" class="flex items-center">
-                                <x-checkbox id="remember_me" name="remember" />
-                                <span class="ms-2 text-sm text-gray-600">{{ __('Ingat Saya') }}</span>
-                            </label>
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
-                                    {{ __('Lupa kata sandi ?') }}
+                            <div class="form-group">
+                                <x-label for="email" value="{{ __('Nrp/Email') }}" />
+                                <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="off" />
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <x-label for="password" value="{{ __('Sandi') }}" />
+                                <x-input id="password" class="form-control" type="password" name="password" required autocomplete="off" />
+                            </div>
+
+                            <div class="form-group mt-3 d-flex justify-content-between">
+                                <label for="remember_me" class="d-flex align-items-center">
+                                    <x-checkbox id="remember_me" name="remember" />
+                                    <span class="ms-2 text-sm text-gray-600">{{ __('Ingat Saya') }}</span>
+                                </label>
+                                @if (Route::has('password.request'))
+                                    <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
+                                        {{ __('Lupa kata sandi ?') }}
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <a href="/">
+                                    <x-button type="button" class="btn btn-secondary">
+                                        {{ __('Kembali') }}
+                                    </x-button>
                                 </a>
-                            @endif
-                        </div>
-                        
-                   
-                        <div class="flex items-center justify-end mt-4">
-                            <a href="/">
-                                <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:2px;">
-                                    {{ __('Kembali') }}
-                                </x-button>
-                            </a>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    {{ __('Masuk') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-                            <button type="submit" class="btn btn-primary w-60" style="background-color: #3674A7; border-color: #3674A7;">
-                                {{ __('Masuk') }}
-                            </button>
-
-                            
-                        </div>
-                    </form>
+                <!-- Tombol Scan QR -->
+                <div class="d-flex justify-content-center align-items-center mt-3">
+                    <div class="card text-center p-3 shadow-lg" style="width: 80px; border-radius: 10px;">
+                        <a href="{{ route('kamera') }}" id="openScanner" class="text-decoration-none text-dark">
+                            <i class="fa-solid fa-qrcode fa-2x"></i>
+                            <h6 class="mt-2">Scan</h6>
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <!-- Tombol untuk membuka modal -->
-            <a href="{{ route('kamera') }}" id="openScanner">Scan QR</a>
-
-
         </div>
-
-
-   
 
         {{-- <script>
             let qrScanner;
