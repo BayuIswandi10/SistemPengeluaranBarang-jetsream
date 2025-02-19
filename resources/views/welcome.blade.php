@@ -381,11 +381,7 @@
     </body>
     <script>
         let counter = 1;
-
-        $(document).ready(function () {
-
-        });
-
+        
         function tambahComboBox() {
             const container = document.getElementById('barangTable');
             const newRow = document.createElement('tr');
@@ -470,17 +466,7 @@
         });
 
         $(document).ready(function () {  
-        
-            // var table = $('#dataTable').DataTable({
-              
-            //         scrollX: true,  // Jika tabel cukup lebar, aktifkan horizontal scroll
-            //         responsive: false // Coba matikan responsive untuk melihat apakah ada efek
-            //     });
 
-            // $('#modalPengajuan').on('show.bs.modal', function (event) {
-            //     const relatedTarget = $(event.relatedTarget);
-            // });
-            
             // Event untuk menangani klik elemen dengan id modalPengajuan
             $('#modalPengajuanTrigger').on('click', function () {
                 $('#modalPengajuan').modal('show');
@@ -489,46 +475,55 @@
             });
 
             function loadTableData() {
-                    $.ajax({
+                $.ajax({
                     url: "/pengeluaran/get-data-level5",
                     method: "GET",
                     success: function (data) {
-                    //  const barang_keluar = data.map(item => item.barang_keluar)
                         console.log(data.barang_keluar);
-                        //console.log(barang_keluar);
                         const data_barang = data.barang_keluar;
-                        
+
                         const tbody = document.getElementById('detailBody');
                         tbody.innerHTML = '';
-                        
-                        tbody.innerHTML  = data_barang.map((item, index) => {
+
+                        tbody.innerHTML = data_barang.map((item, index) => {
                             return `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.pengeluaran_barang_id}</td>
-                                        <td>${item.created_by}</td>
-                                        <td>${item.created_date}</td>
-                                        <td>${item.lokasi_barang_keluar}</td>
-                                        <td>${item.tujuan_pengeluaran_barang}</td>
-                                        <td>${item.jenis_kendaraan}</td>
-                                        <td>
-                                            <button type="button" 
-                                                class="btn btn-primary btn-sm" 
-                                                data-toggle="modal" 
-                                                data-target="#detailModal" 
-                                                data-nomor="${item.pengeluaran_barang_id}">
-                                                <i class="fa-solid fa-circle-info"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.pengeluaran_barang_id}</td>
+                                    <td>${item.created_by}</td>
+                                    <td>${item.created_date}</td>
+                                    <td>${item.lokasi_barang_keluar}</td>
+                                    <td>${item.tujuan_pengeluaran_barang}</td>
+                                    <td>${item.jenis_kendaraan}</td>
+                                    <td>
+                                        <button type="button" 
+                                            class="btn btn-primary btn-sm" 
+                                            onclick="printIframe()"
+                                            data-nomor="${item.pengeluaran_barang_id}">
+                                            <i class="fa-solid fa-print"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
                         }).join('');
-                        $('#dataTable').DataTable();
+
+                        // Hancurkan DataTable jika sudah ada
+                        if ($.fn.DataTable.isDataTable('#dataTable')) {
+                            $('#dataTable').DataTable().destroy();
+                        }
+
+                        // Inisialisasi ulang DataTable
+                        $('#dataTable').DataTable({
+                            scrollX: false,  
+                            responsive: true
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching table data:', error);
                     }
-
                 });
-
             }
+
         });
 
 
