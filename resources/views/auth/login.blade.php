@@ -45,7 +45,7 @@
 
         </div>
 
-        <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="container d-flex justify-content-center align-items-center mt-5 min-vh-100">
             <div class="login-box w-100" style="max-width: 400px;">
                 <div class="card card-outline card-primary login-card shadow-lg">
                     <div class="card-body">
@@ -89,12 +89,10 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                <a href="/">
-                                    <x-button type="button" class="btn btn-secondary">
-                                        {{ __('Kembali') }}
-                                    </x-button>
+                                <a href="/" class="btn btn-secondary w-50 me-2">
+                                    {{ __('Kembali') }}
                                 </a>
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button type="submit" class="btn btn-primary w-50">
                                     {{ __('Masuk') }}
                                 </button>
                             </div>

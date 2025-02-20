@@ -284,7 +284,7 @@
                                     <p class="lead">Mempermudah Pengeluaran Barang</p>
                                 </div>
                                 <div class="carousel-item">
-                                    <p class="lead">Mengoptimalkan Penggunaan Kendaraan Dinas</p>
+                                    <p class="lead">Penggunaan Kendaraan Dinas</p>
                                 </div>
                                 <div class="carousel-item">
                                     <p class="lead">Meningkatkan Transparansi</p>
@@ -293,10 +293,7 @@
                                     <p class="lead">Mengurangi Kesalahan Data</p>
                                 </div>
                                 <div class="carousel-item">
-                                    <p class="lead">Meningkatkan Kecepatan dan Efisiensi Operasional</p>
-                                </div>
-                                <div class="carousel-item">
-                                    <p class="lead">Notifikasi via Email Secara Realtime</p>
+                                    <p class="lead">Notifikasi Email</p>
                                 </div>
                                 <div class="carousel-item">
                                     <p class="lead">Memantau Status Secara Real-Time</p>
@@ -345,8 +342,8 @@
         </section>
 
         <!-- Modal -->
-        <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal fade" id="modalPengajuan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
@@ -496,12 +493,11 @@
                                     <td>${item.tujuan_pengeluaran_barang}</td>
                                     <td>${item.jenis_kendaraan}</td>
                                     <td>
-                                        <button type="button" 
-                                            class="btn btn-primary btn-sm" 
-                                            onclick="printIframe()"
+                                        <i class="fas fa-print text-primary" 
+                                            style="cursor: pointer; font-size: 16px;" 
+                                            onclick="printIframe()" 
                                             data-nomor="${item.pengeluaran_barang_id}">
-                                            <i class="fa-solid fa-print"></i>
-                                        </button>
+                                        </i>
                                     </td>
                                 </tr>
                             `;
