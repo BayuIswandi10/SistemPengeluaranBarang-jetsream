@@ -11,31 +11,6 @@ use BaconQrCode\Writer;
 
 class FormSecutity extends Component
 {
-    // Livewire Component
-    // public function render()
-    // {
-    //     // Ambil data pengeluaran barang beserta approval dan barang terkait
-    //     $pengeluaranBarangs = PengeluaranBarang::with(['approval', 'barangKeluar'])->get();
-        
-    //     // Mengumpulkan semua barang yang ada dalam pengeluaranBarang
-    //     $barangDetails = [];
-    //     foreach ($pengeluaranBarangs as $pengeluaranBarang) {
-    //         foreach ($pengeluaranBarang->barangKeluar as $barang) {
-    //             $barangDetails[] = (object) [
-    //                 'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
-    //                 'nama_barang' => $barang->nama_barang,
-    //                 'jumlah_barang' => $barang->jumlah_barang,
-    //                 'satuan_barang' => $barang->satuan_barang,
-    //                 'keterangan_barang' => $barang->keterangan_barang,
-    //             ];
-    //         }
-    //     }
-
-    //     // Kirim data ke view
-    //     return view('livewire.form-secutity', compact('pengeluaranBarangs', 'barangDetails'));
-    // }
-
-
     public function render()
     {
         $pengeluaranBarangs = PengeluaranBarang::with(['approval', 'barangKeluar'])->get();
@@ -64,6 +39,8 @@ class FormSecutity extends Component
             $qrCodes[$pengeluaranBarang->pengeluaran_barang_id] = $writer->writeString($pengeluaranBarang->pengeluaran_barang_id);
         }
 
-        return view('livewire.form-secutity', compact('pengeluaranBarangs', 'barangDetails', 'qrCodes'));
+         return view('livewire.form-secutity', compact('pengeluaranBarangs', 'barangDetails', 'qrCodes'));
+        // return view('livewire.form-secutity',compact('pengeluaranBarangs', 'barangDetails', 'qrCodes'))
+        // ->layout('components.layouts.landing'); 
     }
 }

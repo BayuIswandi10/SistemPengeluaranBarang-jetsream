@@ -163,7 +163,7 @@
                             <h6 class="mb-0">Detail Barang Keluar</h6>
                         </div>
                         <div class="card-body">
-                            <table class="table table-bordered">
+                            <table id="detaildataTableModal" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -189,7 +189,7 @@
                             <h6 class="mb-0">Informasi Tambahan</h6>
                         </div>
                         <div class="card-body">
-                            <table class="table table-bordered">
+                            <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -298,7 +298,6 @@ $(document).ready(function() {
         }
     });
 
-
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
@@ -310,28 +309,25 @@ $(document).ready(function() {
                 method: "POST",
                 data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                 success: function (data) {
-                    // console.log("Response dari server:", data); // Debugging
+                    const detailTable = $('#detaildataTableModal').DataTable();
 
-                    const tbody = document.getElementById('detailBody');
-                    const additionalInfoBody = document.getElementById('additionalInfoBody');
-
-                    tbody.innerHTML = '';
-                    additionalInfoBody.innerHTML = '';
+                    // Kosongkan data lama
+                    detailTable.clear();
+                    document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
 
                     // Validasi data barang_keluar
                     if (data.barang_keluar && data.barang_keluar.length > 0) {
-                        tbody.innerHTML = data.barang_keluar.map((item, index) => `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${nomor}</td>
-                                <td>${item.nama_barang}</td>
-                                <td>${item.jumlah_barang}</td>
-                                <td>${item.satuan_barang}</td>
-                                <td>${item.keterangan_barang}</td>
-                            </tr>
-                        `).join('');
+                        let newData = data.barang_keluar.map((item, index) => [
+                            index + 1,
+                            nomor,
+                            item.nama_barang,
+                            item.jumlah_barang,
+                            item.satuan_barang,
+                            item.keterangan_barang
+                        ]);
+                        detailTable.rows.add(newData).draw();
                     } else {
-                        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                        detailTable.rows.add([["", "", "Tidak ada data barang keluar", "", "", ""]]).draw();
                     }
 
                     const tingkatMapping = {
@@ -350,20 +346,28 @@ $(document).ready(function() {
                         "Level 5": "Memeriksa"
                     };
 
-
                     // Validasi data informasi_tambahan
+                    const additionalInfoBody = document.getElementById('additionalInfoBody');
+
                     if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                        additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${info.nama}</td>
-                                <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                <td>${info.departemen}</td>
-                                <td>${approvMapping[info.status] || info.status}</td>
-                            </tr>
-                        `).join('');
+                        data.informasi_tambahan.forEach((info, index) => {
+                            let row = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${info.nama}</td>
+                                    <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                    <td>${info.departemen}</td>
+                                    <td>${approvMapping[info.status] || info.status}</td>
+                                </tr>
+                            `;
+                            additionalInfoBody.innerHTML += row;
+                        });
                     } else {
-                        additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                        additionalInfoBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                            </tr>
+                        `;
                     }
 
                     // Pastikan modal terbuka setelah data dimuat
@@ -375,7 +379,111 @@ $(document).ready(function() {
                 }
             });
         });
+
+        // Inisialisasi DataTable hanya untuk tabel barang keluar
+        if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
+            $('#detaildataTableModal').DataTable({
+                responsive: true,
+                autoWidth: false,
+                scrollX: false,
+                destroy: true,
+                retrieve: true,
+                pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+            });
+        }
     });
+
+
+
+    // document.addEventListener('DOMContentLoaded', () => {
+
+    //     $('#detailModal').on('show.bs.modal', function (event) {
+    //         const button = $(event.relatedTarget); // Button yang diklik
+    //         const nomor = button.data('nomor'); // Nomor pengeluaran barang
+    //         document.getElementById('nomorPengeluaranCard').innerText = nomor;
+
+    //         $.ajax({
+    //             url: "/pengeluaran/detail",
+    //             method: "POST",
+    //             data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+    //             success: function (data) {
+    //                 // console.log("Response dari server:", data); // Debugging
+
+    //                 const tbody = document.getElementById('detailBody');
+    //                 const additionalInfoBody = document.getElementById('additionalInfoBody');
+
+    //                       // Hapus data lama sebelum mengisi data baru
+    //             $('#detaildataTableModal tbody').empty();
+    //                 tbody.innerHTML = '';
+    //                 additionalInfoBody.innerHTML = '';
+
+    //                 // Validasi data barang_keluar
+    //                 if (data.barang_keluar && data.barang_keluar.length > 0) {
+    //                     tbody.innerHTML = data.barang_keluar.map((item, index) => `
+    //                         <tr>
+    //                             <td>${index + 1}</td>
+    //                             <td>${nomor}</td>
+    //                             <td>${item.nama_barang}</td>
+    //                             <td>${item.jumlah_barang}</td>
+    //                             <td>${item.satuan_barang}</td>
+    //                             <td>${item.keterangan_barang}</td>
+    //                         </tr>
+    //                     `).join('');
+    //                 } else {
+    //                     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+    //                 }
+
+    //                 const tingkatMapping = {
+    //                     "Level 1": "Civitas",
+    //                     "Level 2": "PIC/Ka.Sie",
+    //                     "Level 3": "Ka.Dept.Ybs",
+    //                     "Level 4": "Ka.Dept.GA",
+    //                     "Level 5": "Security"
+    //                 };
+
+    //                 const approvMapping = {
+    //                     "Level 1": "Mengeluarkan",
+    //                     "Level 2": "Membawa",
+    //                     "Level 3": "Menyetujui",
+    //                     "Level 4": "Mengetahui",
+    //                     "Level 5": "Memeriksa"
+    //                 };
+
+
+    //                 // Validasi data informasi_tambahan
+    //                 if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+    //                     additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
+    //                         <tr>
+    //                             <td>${index + 1}</td>
+    //                             <td>${info.nama}</td>
+    //                             <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+    //                             <td>${info.departemen}</td>
+    //                             <td>${approvMapping[info.status] || info.status}</td>
+    //                         </tr>
+    //                     `).join('');
+    //                 } else {
+    //                     additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+    //                 }
+
+    //                 // Pastikan modal terbuka setelah data dimuat
+    //                 $('#detailModal').modal('show');
+
+    //                 if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
+    //                     let table = $('#detaildataTableModal').DataTable({
+    //                         responsive: true, // Menjadikan tabel responsif
+    //                         autoWidth: false, // Mencegah kolom terlalu lebar
+    //                         scrollX: true, // Tambahkan scroll horizontal jika diperlukan
+    //                     });
+    //                 }
+    //             },
+    //             error: function (xhr, status, error) {
+    //                 console.error("Error fetching data:", error);
+    //                 alert("Terjadi kesalahan saat mengambil data.");
+    //             }
+    //         });
+    //     });
+    // });
 
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -448,18 +556,21 @@ $(document).ready(function() {
     });
 
 
-    $(document).ready(function() {
-        var table = $('#dataTable').DataTable({
-            columnDefs: [
-                {className: 'dt-body-center', targets: 0},
-                {className: 'dt-head-center', targets: 0},
-                {className: 'dt-body-center', targets: 5},
-                {className: 'dt-head-center', targets: 5}
-            ],
-            scrollX: false,
-            responsive: true
-        });
+    $(document).ready(function () {
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                columnDefs: [
+                    { className: 'dt-body-center', targets: 0 },
+                    { className: 'dt-head-center', targets: 0 },
+                    { className: 'dt-body-center', targets: 5 },
+                    { className: 'dt-head-center', targets: 5 }
+                ],
+                scrollX: false,
+                responsive: true
+            });
+        }
     });
+
 
 
     // Display validation errors in Swal

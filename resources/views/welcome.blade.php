@@ -213,45 +213,45 @@
                                 </div>
 
             
-                                <!-- Barang Keluar Table -->
-                                <div class="form-group">
-                                    <label>Detail Barang Keluar <span class="text-danger">*</span></label>
-                                    <table id="barangTable" class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Nama Barang</th>
-                                                <th>Jumlah</th>
-                                                <th>Satuan</th>
-                                                <th>Keterangan</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="nomor">1</td>
-                                                <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                                                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
-                                                <td>
-                                                    <select name="satuan[]" class="form-control" required>
-                                                        <option value="" disabled selected>Pilih Satuan</option>
-                                                        <option value="unit">Unit</option>
-                                                        <option value="pcs">PCS</option>
-                                                    </select>
-                                                </td>
-                                                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBox()">
-                                        <i class="fas fa-plus"></i> Tambah Barang
-                                    </button>
-                                </div>
+                                    <!-- Barang Keluar Table -->
+                                    <div class="form-group">
+                                        <label>Detail Barang Keluar <span class="text-danger">*</span></label>
+                                        <table id="barangTableTambah" class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Nama Barang</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Satuan</th>
+                                                    <th>Keterangan</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="nomor">1</td>
+                                                    <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
+                                                    <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                                                    <td>
+                                                        <select name="satuan[]" class="form-control" required>
+                                                            <option value="" disabled selected>Pilih Satuan</option>
+                                                            <option value="unit">Unit</option>
+                                                            <option value="pcs">PCS</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBox()">
+                                            <i class="fas fa-plus"></i> Tambah Barang
+                                        </button>
+                                    </div>
             
                                 <!-- Submit Button -->
                                 <div class="form-group d-flex justify-content-end">
@@ -375,12 +375,94 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Approval -->
+        <div class="modal fade" id="editApprovalModal" tabindex="-1" aria-labelledby="editApprovalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title" id="editApprovalLabel">Pemeriksaan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editApprovalForm">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <div class="row mb-3">
+                                        <label for="pengeluaranBarangId" class="col-sm-4 col-form-label">No. Pengeluaran</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="pengeluaranBarangId" name="pengeluaranBarangId" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="tujuan" class="col-sm-4 col-form-label">Tujuan</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="tujuan" name="tujuan" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="jenisKendaraan" class="col-sm-4 col-form-label">Jenis Kendaraan</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="jenisKendaraan" name="jenisKendaraan" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="noPolisi" class="col-sm-4 col-form-label">No. Polisi</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="noPolisi" name="noPolisi">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div id="qrcodeContainer" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                                        <!-- QR Code akan diisi oleh JavaScript -->
+                                        <img src="path/to/qrcode.png" alt="QR Code" id="qrcode" style="width: 100%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <iframe hidden id="qrFrame" width="500" height="400" srcdoc="">
+                            Browser Anda tidak mendukung iframe.
+                        </iframe>
+                        
+                        
+                        <h6 class="mt-4">Detail Barang</h6>
+                        <table id="barangTableApproval" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan diisi melalui JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
+                            @csrf
+                            @method('POST')
+                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary" onclick="printIframe()">Cetak QR Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
     <script>
         let counter = 1;
 
         function tambahComboBox() {
-            const container = document.getElementById('barangTable');
+            const container = document.getElementById('barangTableTambah');
             const newRow = document.createElement('tr');
 
             newRow.innerHTML = `
@@ -407,7 +489,7 @@
         }
 
         function hapusComboBox(button) {
-            const container = document.getElementById('barangTable');
+            const container = document.getElementById('barangTableTambah');
             const rows = container.getElementsByTagName('tr');
             if (rows.length > 1) {
                 const row = button.closest('tr');
@@ -439,7 +521,7 @@
         }
 
         function updateNomor() {
-        const rows = document.querySelectorAll('#barangTable .nomor');
+        const rows = document.querySelectorAll('#barangTableTambah .nomor');
             rows.forEach((cell, index) => {
                 cell.textContent = index + 1;
             });
@@ -473,7 +555,7 @@
 
             function loadTableData() {
                 $.ajax({
-                    url: "/pengeluaran/get-data-level5",
+                    url: "/pengeluaran/get-data-level4",
                     method: "GET",
                     success: function (data) {
                         console.log(data.barang_keluar);
@@ -493,11 +575,9 @@
                                     <td>${item.tujuan_pengeluaran_barang}</td>
                                     <td>${item.jenis_kendaraan}</td>
                                     <td>
-                                        <i class="fas fa-print text-primary" 
-                                            style="cursor: pointer; font-size: 16px;" 
-                                            onclick="printIframe()" 
-                                            data-nomor="${item.pengeluaran_barang_id}">
-                                        </i>
+                                        <button type="button" class="btn btn-${item.status === 'Level 4' ? 'success' : 'primary'} btn-sm" onclick="editApproval('${item.pengeluaran_barang_id}')">
+                                            <i class="fas ${item.status === 'Level 4' ? 'fa-edit' : 'fa-info-circle'}"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             `;
@@ -521,6 +601,99 @@
             }
 
         });
+
+        // Fungsi untuk menampilkan modal edit approval
+        function editApproval(pengeluaranBarangId) {
+            $.ajax({
+                url: "{{ route('pengeluaran.edit') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    pengeluaran_barang_id: pengeluaranBarangId
+                },
+                success: function(response) {
+                    // Isi field pada modal
+                    $('#pengeluaranBarangId').val(response.pengeluaran_barang_id);
+                    $('#tujuan').val(response.tujuan_pengeluaran_barang);
+                    $('#jenisKendaraan').val(response.jenis_kendaraan);
+
+                    // Cek apakah No Polisi sudah ada, jika ada maka disable inputnya
+                    if (response.no_polisi) {
+                        $('#noPolisi').val(response.no_polisi).prop('disabled', true);
+                        $('#btnSaveApproval').prop('disabled', true);
+                    } else {
+                        $('#noPolisi').val('').prop('disabled', false);
+                        $('#btnSaveApproval').prop('disabled', false);
+                    }
+
+                    // Sembunyikan tombol "Setujui" jika status Level 5
+                    if (response.status === 'Level 5') {
+                        $('#btnSaveApproval').hide();
+                    } else {
+                        $('#btnSaveApproval').show();
+                    }
+
+                    // Nonaktifkan input yang tidak perlu diubah
+                    $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').prop('disabled', true);
+
+                    // Inisialisasi DataTable
+                    let table = $('#barangTableApproval').DataTable();
+                    
+                    // Hancurkan DataTable jika sudah ada agar tidak menumpuk data lama
+                    if ($.fn.DataTable.isDataTable('#barangTableApproval')) {
+                        table.destroy();
+                    }
+
+                    // Kosongkan isi tabel
+                    let tbody = $('#barangTableApproval tbody');
+                    tbody.empty();
+
+                    // Tambahkan data ke tabel
+                    if (response.barangKeluar && response.barangKeluar.length > 0) {
+                        $.each(response.barangKeluar, function(index, barangInfo) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${barangInfo.nama_barang}</td>
+                                    <td>${barangInfo.jumlah_barang}</td>
+                                    <td>${barangInfo.satuan_barang}</td>
+                                    <td>${barangInfo.keterangan_barang}</td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-center">Tidak ada data barang</td></tr>');
+                    }
+
+                    // Inisialisasi ulang DataTable setelah data diisi
+                    $('#barangTableApproval').DataTable({
+                        responsive: true,
+                        autoWidth: false,
+                        scrollX: false,
+                        destroy: true,
+                        retrieve: true,
+                        pageLength: 5, // Menampilkan 5 data per halaman
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] // Pilihan jumlah data per halaman
+                    });
+
+                    // Update container QR Code dengan output dari BaconQrCode
+                    $('#qrcodeContainer').html(response.qr_code);
+
+                    // Tampilkan modal edit approval
+                    $('#editApprovalModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Tidak dapat mengambil data. Error: ' + error,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+        }
+
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

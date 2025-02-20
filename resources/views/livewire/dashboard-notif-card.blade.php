@@ -440,11 +440,14 @@
                             // Pastikan modal terbuka setelah data dimuat
                             $('#detailModal').modal('show');
 
-                            let table = $('#detaildataTableModal').DataTable({
-                                responsive: true, // Menjadikan tabel responsif
-                                autoWidth: false, // Mencegah kolom terlalu lebar
-                                scrollX: true, // Tambahkan scroll horizontal jika diperlukan
-                            });
+                            if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                                let table = $('#detaildataTableModal').DataTable({
+                                    responsive: true, // Menjadikan tabel responsif
+                                    autoWidth: false, // Mencegah kolom terlalu lebar
+                                    scrollX: true, // Tambahkan scroll horizontal jika diperlukan
+                                });
+                            }
+                            
                         },
                         error: function (xhr, status, error) {
                             console.error("Error fetching data:", error);

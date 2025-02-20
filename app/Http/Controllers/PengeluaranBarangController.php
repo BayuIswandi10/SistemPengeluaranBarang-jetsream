@@ -23,13 +23,40 @@ class PengeluaranBarangController extends Controller
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 
-    public function getDataLevel5()
+    public function getDataLevel4()
     {
         $pengeluaranBarangs = PengeluaranBarang::where('status', 'Level 4')->get();
         return response()->json(['barang_keluar' => $pengeluaranBarangs]);
     }
 
     public function getDetail(Request $request)
+    {
+        $pengeluaranId = $request->pengeluaran_barang_id;
+
+        // Mengambil data pengeluaran barang beserta barang keluar
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+
+        // Mengambil informasi tambahan terkait pengeluaran barang (misal: User yang mengeluarkan barang)
+        $approvalData = Approval::with('user')
+            ->where('pengeluaran_barang_id', $pengeluaranId)
+            ->get()
+            ->map(function ($approval, $index) {
+                return [
+                    'no' => $index + 1,
+                    'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                    'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                    'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                    'status' => $approval->status_approval,
+                ];
+            });
+
+        return response()->json([
+            'barang_keluar' => $pengeluaranBarang->barangKeluar,
+            'informasi_tambahan' => $approvalData,
+        ], 200);
+    }
+
+    public function getDetailNonAuth(Request $request)
     {
         $pengeluaranId = $request->pengeluaran_barang_id;
 

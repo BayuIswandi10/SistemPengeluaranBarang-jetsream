@@ -20,9 +20,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
-Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
-
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
@@ -39,7 +36,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
     // Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
     // Route::get('/pengeluaran-barang/{pengeluaranBarangId}/detail', [PengeluaranBarangController::class, 'getDetail']);
-    Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit'])->name('pengeluaran.edit');
     Route::post('/generate-qrcode', [PengeluaranBarangController::class, 'generateQRCode']);
     Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
     // Route::get('/pengeluaran/detail/{pengeluaran_barang_id}', [DashboardController::class, 'getDetailQty']);
@@ -53,6 +49,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 });
 
+Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit'])->name('pengeluaran.edit');
+Route::post('/pengeluaran/detailNonAuth', [PengeluaranBarangController::class, 'getDetailNonAuth']);
+Route::get('/pengeluaran/get-data-level4', [PengeluaranBarangController::class, 'getDataLevel4']);
+Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 
-Route::get('/pengeluaran/get-data-level5', [PengeluaranBarangController::class, 'getDataLevel5']);
+Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
+
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');

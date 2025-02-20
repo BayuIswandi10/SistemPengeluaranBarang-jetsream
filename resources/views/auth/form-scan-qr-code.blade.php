@@ -134,7 +134,7 @@
                 document.getElementById('nomorPengeluaranCard').innerText = nomor;
 
                 $.ajax({
-                    url: "/pengeluaran/detail",
+                    url: "/pengeluaran/detailNonAuth",
                     method: "POST",
                     data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                     success: function (data) {

@@ -59,6 +59,7 @@
                             <th>Departemen</th>
                             <th>Status</th>
                         </tr>
+                        
                     </thead>
                     <tbody id="additionalInfoBody">
                         <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
