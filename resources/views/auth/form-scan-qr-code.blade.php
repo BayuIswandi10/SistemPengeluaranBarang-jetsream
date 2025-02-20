@@ -63,49 +63,64 @@
 
     <!-- Modal untuk Menampilkan Detail -->
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Pengeluaran Barang</h5>
+                    <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h6>Nomor Pengeluaran: <span id="nomorPengeluaranCard"></span></h6>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nomor</th>
-                                <th>Nama Barang</th>
-                                <th>Jumlah</th>
-                                <th>Satuan</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detailBody">
-                            <tr><td colspan="6" class="text-center">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
-                    <h6>Informasi Tambahan</h6>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nama</th>
-                                <th>Tingkat</th>
-                                <th>Departemen</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="additionalInfoBody">
-                            <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    <!-- Card untuk Tabel Barang Keluar -->
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Detail Barang Keluar</h6>
+                        </div>
+                        <div class="card-body">
+                            <table id="dataTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nomor Pengeluaran Barang</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Card untuk Tabel Informasi Tambahan -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Informasi Tambahan</h6>
+                        </div>
+                        <div class="card-body">
+                            <table id="additionalInfoTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="additionalInfoBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -188,6 +203,23 @@
                         } else {
                             additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
                         }
+
+                        // Aktifkan DataTable setelah data ditambahkan
+                        $('#dataTable').DataTable({
+                            columnDefs: [
+                                { className: 'dt-body-center', targets: 0 },
+                                { className: 'dt-head-center', targets: 0 },
+                                { className: 'dt-body-center', targets: 5 },
+                                { className: 'dt-head-center', targets: 5 }
+                            ],
+
+                            responsive: true,
+                            scrollX: false,
+                            destroy: true,
+                            retrieve: true,
+                            pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                        });
 
                         $('#detailModal').modal('show');
                     },

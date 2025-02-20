@@ -117,6 +117,41 @@ class ApprovalController extends Controller
     }
 
 
+    public function updateNopolisi(Request $request)
+    {
+        DB::beginTransaction();
+    
+        try {
+            // Ambil data dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+            $noPolisi = $request->input('no_polisi');
+    
+            // Update hanya tabel tb_pengeluaran_barang
+            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->update([
+                    'no_polisi' => $noPolisi,
+                ]);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pengeluaran barang berhasil diperbarui!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+
     public function updateStatusSecurity(Request $request)
     {
         DB::beginTransaction();
@@ -133,7 +168,7 @@ class ApprovalController extends Controller
             // Update status pada tb_pengeluaran_barang menjadi "Level 5" dan update no_polisi
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update([
-                    'status' => 'Level 5',
+                    //'status' => 'Level 5',
                     'no_polisi' => $noPolisi,
                 ]);
     

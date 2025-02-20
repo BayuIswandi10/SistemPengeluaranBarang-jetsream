@@ -54,6 +54,8 @@ Route::post('/pengeluaran/detailNonAuth', [PengeluaranBarangController::class, '
 Route::get('/pengeluaran/get-data-level4', [PengeluaranBarangController::class, 'getDataLevel4']);
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');
 
+Route::post('/approval/update-nopolisi', [ApprovalController::class, 'updateNopolisi'])->name('approval.updateNopolisi');
+
 Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
 
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');

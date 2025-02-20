@@ -459,6 +459,23 @@
         </div>
     </body>
     <script>
+        function printIframe() {
+            var iframe = document.getElementById('qrFrame');
+            iframe.contentWindow.print(); // Cetak isi dalam iframe
+        }
+
+        function printQRCode() {
+            var originalContent = document.body.innerHTML;
+            var qrCodeContent = document.getElementById("qrcodeContainer").innerHTML;
+
+            // Tampilkan hanya QR Code
+            document.body.innerHTML = qrCodeContent;
+
+            window.print();
+
+            // Kembalikan tampilan asli setelah pencetakan
+            document.body.innerHTML = originalContent;
+        }
         let counter = 1;
 
         function tambahComboBox() {
@@ -679,6 +696,83 @@
                     // Update container QR Code dengan output dari BaconQrCode
                     $('#qrcodeContainer').html(response.qr_code);
 
+                    // Buat konten barang keluar untuk ditampilkan di dalam iframe
+                    let barangContent = '';
+                    if (response.barangKeluar && response.barangKeluar.length > 0) {
+                        barangContent += '<table style="width:100%; border-collapse: collapse;" border="1">';
+                        barangContent += '<thead><tr>';
+                        barangContent += '<th>No</th>';
+                        barangContent += '<th>Nama Barang</th>';
+                        barangContent += '<th>Jumlah</th>';
+                        barangContent += '<th>Satuan</th>';
+                        barangContent += '<th>Keterangan</th>';
+                        barangContent += '</tr></thead><tbody>';
+                        response.barangKeluar.forEach((barang, index) => {
+                            barangContent += `<tr>
+                                <td>${index + 1}</td>
+                                <td>${barang.nama_barang}</td>
+                                <td>${barang.jumlah_barang}</td>
+                                <td>${barang.satuan_barang}</td>
+                                <td>${barang.keterangan_barang}</td>
+                            </tr>`;
+                        });
+                        barangContent += '</tbody></table>';
+                    } else {
+                        barangContent = '<p>Tidak ada data barang keluar.</p>';
+                    }
+                    // Perbarui isi srcdoc pada iframe dengan data terbaru
+                    let iframeContent = `
+                        <!DOCTYPE html>
+                        <html lang="id">
+                        <head>
+                            <meta charset="UTF-8">
+                            <style>
+                                body { font-family: Arial, sans-serif; text-align: center; }
+                                .container { width: 420px; border: 2px solid black; padding: 10px; margin: auto; }
+                                .row { display: flex; justify-content: space-between; align-items: center; }
+                                .column-left { width: 60%; }
+                                .column-right { width: 38%; text-align: center; }
+                                .box { border: 1px solid black; padding: 10px; margin: 5px 0; text-align: center; }
+                                .content { min-height: 100px; margin-top: 10px; }
+                                .footer { font-size: 12px; text-align: left; margin-top: 10px; }
+                                .qrcode { padding: 10px; display: flex; justify-content: center; align-items: center; }
+                                .qrcode img { width: 120px; height: 120px; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="column-left">
+                                        <div class="box"><img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 50px;"></div>
+                                        <div class="box"><strong>SURAT PENGELUARAN BARANG</strong></div>
+                                        <div class="box">${response.pengeluaran_barang_id}</div>
+                                    </div>
+                                    <div class="column-right">
+                                        <div class="box">${response.qr_code}</div>
+                                    </div>
+                                </div>
+
+                                <div class="box content">${barangContent}</div>
+
+                                <div class="footer">
+                                    <div class="row">
+                                        <div class="column-left">
+                                            MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520
+                                        </div>
+
+                                        <div class="column-right">
+                                            Phone: +62 21 8980769 
+                                            <br> 
+                                            Fax: +62 21 8980770
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+                    $('#qrFrame').attr('srcdoc', iframeContent).prop('hidden', true);
+
                     // Tampilkan modal edit approval
                     $('#editApprovalModal').modal('show');
                 },
@@ -689,6 +783,69 @@
                         text: 'Tidak dapat mengambil data. Error: ' + error,
                         showConfirmButton: false,
                         timer: 2000
+                    });
+                }
+            });
+        }
+
+        function saveApproval() {
+            var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
+            var noPolisi = document.getElementById('noPolisi').value;
+
+            // Konfirmasi dengan Swal sebelum melakukan update
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: 'Setujui pengeluaran ini?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Setuju!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
+                    $.ajax({
+                        url: "{{ route('approval.updateNopolisi') }}",  // Ganti dengan route yang sesuai
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
+                            pengeluaran_barang_id: pengeluaranBarangId,
+                            no_polisi: noPolisi
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Tampilkan pesan sukses
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sukses!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    // Reload halaman setelah sukses
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Error: ' + error,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
                     });
                 }
             });
