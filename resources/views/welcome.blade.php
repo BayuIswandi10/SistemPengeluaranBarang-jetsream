@@ -452,7 +452,7 @@
                             <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
                         </form>
                         <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary" onclick="printIframe()">Cetak QR Code</button>
+                        <button type="button" class="btn btn-primary" id="btnPrintQR" onclick="printIframe()">Cetak QR Code</button>
                     </div>
                 </div>
             </div>
@@ -629,6 +629,18 @@
                     pengeluaran_barang_id: pengeluaranBarangId
                 },
                 success: function(response) {
+                    $('#btnPrintQR').hide();
+
+                    //gunakan untuk membuat input field menjadi read only
+                    if (response.no_polisi) {
+                        $('#btnPrintQR').show();
+                        $('#noPolisi').val(response.no_polisi).prop('readonly', true);
+                        $('#btnSaveApproval').prop('disabled', true);
+                    } else {
+                        $('#noPolisi').val('').prop('readonly', false);
+                        $('#btnSaveApproval').prop('disabled', false);
+                    }
+
                     // Isi field pada modal
                     $('#pengeluaranBarangId').val(response.pengeluaran_barang_id);
                     $('#tujuan').val(response.tujuan_pengeluaran_barang);
