@@ -150,6 +150,28 @@ class PengeluaranBarangController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'created_by' => 'required',
+            'tujuan_pengeluaran_barang' => 'required',
+            'jenis_kendaraan' => 'required',
+            'lokasi_barang_keluar' => 'required',
+            'barang_ids' => 'required|array',
+            'barang_ids.*' => 'required',
+            'jumlah' => 'required|array',
+            'jumlah.*' => 'required|numeric|min:1',
+            'satuan' => 'required|array',
+            'satuan.*' => 'required',
+            'keterangan' => 'nullable|array',
+        ]);
+    
+        $lokasiBarangKeluar = strtoupper($request->input('lokasi_barang_keluar'));
+        $tujuanPengeluaran = strtoupper($request->input('tujuan_pengeluaran_barang'));
+    
+        // Validasi tambahan: lokasi_barang_keluar tidak boleh sama dengan tujuan_pengeluaran_barang
+        if ($lokasiBarangKeluar === $tujuanPengeluaran) {
+            return redirect()->back()->with('error', 'Lokasi barang keluar dan tujuan pengeluaran barang tidak boleh sama!')->withInput();
+        }
+
         DB::beginTransaction();
 
         try {

@@ -397,6 +397,12 @@
                                         </div>
                                     </div>
                                     <div class="row mb-3">
+                                        <label for="asal" class="col-sm-4 col-form-label">Asal</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="asal" name="asal" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
                                         <label for="tujuan" class="col-sm-4 col-form-label">Tujuan</label>
                                         <div class="col-sm-8">
                                             <input type="text" class="form-control" id="tujuan" name="tujuan" readonly>
@@ -643,6 +649,7 @@
 
                     // Isi field pada modal
                     $('#pengeluaranBarangId').val(response.pengeluaran_barang_id);
+                    $('#asal').val(response.lokasi_barang_keluar);
                     $('#tujuan').val(response.tujuan_pengeluaran_barang);
                     $('#jenisKendaraan').val(response.jenis_kendaraan);
 
