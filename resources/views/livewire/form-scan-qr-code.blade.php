@@ -33,7 +33,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    <button type="button" class="btn btn-success" id="approveButton" data-id="">Setuju</button>
+
+                </div>
+                
                 <!-- Card untuk Tabel Barang Keluar -->
                 <div class="card">
                     <div class="card-header bg-primary text-white">
@@ -92,7 +97,7 @@
 
 
 <script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
       scanner.addListener('scan', function (content) {
           document.getElementById('scanResult').value = content;
@@ -101,104 +106,172 @@
       });
 
       Instascan.Camera.getCameras().then(function (cameras) {
-          if (cameras.length > 0) {
-              scanner.start(cameras[0]);
-          } else {
-              console.error('No cameras found.');
-          }
-      }).catch(function (e) {
-          console.error(e);
-      });
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
+            } else {
+                console.error('No cameras found.');
+            }
+        }).catch(function (e) {
+            console.error(e);
+        });
+    });
 
-      function fetchDetailPengeluaran(nomor) {
-                                // Aktifkan DataTable setelah data ditambahkan
-                                $('#dataTable').DataTable({
-                        columnDefs: [
-                            { className: 'dt-body-center', targets: 0 },
-                            { className: 'dt-head-center', targets: 0 },
-                            { className: 'dt-body-center', targets: 5 },
-                            { className: 'dt-head-center', targets: 5 }
-                        ],
+    function fetchDetailPengeluaran(nomor) {
+        document.getElementById('nomorPengeluaranCard').innerText = nomor;
+        document.getElementById('approveButton').setAttribute('data-id', nomor);
 
-                        responsive: true,
-                        autoWidth: false,
-                        scrollX: false,
-                        destroy: true,
-                        retrieve: true,
-                        pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
-                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
-                    });
-          document.getElementById('nomorPengeluaranCard').innerText = nomor;
+        $.ajax({
+            url: "/pengeluaran/detail",
+            method: "POST",
+            data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+            success: function (data) {
+                const tbody = document.getElementById('detailBody');
+                const additionalInfoBody = document.getElementById('additionalInfoBody');
+                
+                tbody.innerHTML = '';
+                additionalInfoBody.innerHTML = '';
 
-          $.ajax({
-              url: "/pengeluaran/detail",
-              method: "POST",
-              data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
-              success: function (data) {
-                  const tbody = document.getElementById('detailBody');
-                  const additionalInfoBody = document.getElementById('additionalInfoBody');
+                // Hapus DataTable sebelum menambahkan data baru
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().destroy();
+                }
 
-                  tbody.innerHTML = '';
-                  additionalInfoBody.innerHTML = '';
+                // **Cek Status dari tb_pengeluaran_barang**
+                let statusPengeluaran = data.status; // Pastikan API mengembalikan status
 
-                  if (data.barang_keluar && data.barang_keluar.length > 0) {
-                      tbody.innerHTML = data.barang_keluar.map((item, index) => `
-                          <tr>
-                              <td>${index + 1}</td>
-                              <td>${nomor}</td>
-                              <td>${item.nama_barang}</td>
-                              <td>${item.jumlah_barang}</td>
-                              <td>${item.satuan_barang}</td>
-                              <td>${item.keterangan_barang}</td>
-                          </tr>
-                      `).join('');
-                  } else {
-                      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
-                  }
+                if (statusPengeluaran === "Level 4") {
+                    document.getElementById('approveButton').style.display = "inline-block"; // Tampilkan tombol
+                } else {
+                    document.getElementById('approveButton').style.display = "none"; // Sembunyikan tombol
+                }
 
-                  const tingkatMapping = {
-                      "Level 1": "Civitas",
-                      "Level 2": "PIC/Ka.Sie",
-                      "Level 3": "Ka.Dept.Ybs",
-                      "Level 4": "Ka.Dept.GA",
-                      "Level 5": "Security"
-                  };
+                
+                // Menambahkan data ke tabel barang keluar
+                if (data.barang_keluar && data.barang_keluar.length > 0) {
+                    tbody.innerHTML = data.barang_keluar.map((item, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${nomor}</td>
+                            <td>${item.nama_barang}</td>
+                            <td>${item.jumlah_barang}</td>
+                            <td>${item.satuan_barang}</td>
+                            <td>${item.keterangan_barang}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                }
+                
+                // Inisialisasi ulang DataTable
+                $('#dataTable').DataTable({
+                    responsive: true,
+                    scrollX: false,
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    destroy: true
+                });
 
-                  const approvMapping = {
-                      "Level 1": "Mengeluarkan",
-                      "Level 2": "Membawa",
-                      "Level 3": "Menyetujui",
-                      "Level 4": "Mengetahui",
-                      "Level 5": "Memeriksa"
-                  };
-
-                  if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                      additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-                          <tr>
-                              <td>${index + 1}</td>
-                              <td>${info.nama}</td>
-                              <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                              <td>${info.departemen}</td>
-                              <td>${approvMapping[info.status] || info.status}</td>
-                          </tr>
-                      `).join('');
-                  } else {
-                      additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
-                  }
-
-                  $('#detailModal').modal('show');
-              },
-              error: function (xhr, status, error) {
-                  console.error("Error fetching data:", error);
-                  Swal.fire({
+                // Mapping tingkatan dan status persetujuan
+                const tingkatMapping = {
+                    "Level 1": "Civitas",
+                    "Level 2": "PIC/Ka.Sie",
+                    "Level 3": "Ka.Dept.Ybs",
+                    "Level 4": "Ka.Dept.GA",
+                    "Level 5": "Security"
+                };
+                const approvMapping = {
+                    "Level 1": "Mengeluarkan",
+                    "Level 2": "Membawa",
+                    "Level 3": "Menyetujui",
+                    "Level 4": "Mengetahui",
+                    "Level 5": "Memeriksa"
+                };
+                
+                // Menambahkan data ke tabel informasi tambahan
+                if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                    additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${info.nama}</td>
+                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                            <td>${info.departemen}</td>
+                            <td>${approvMapping[info.status] || info.status}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                }
+                
+                $('#detailModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+                Swal.fire({
                     title: 'Error!',
                     text: 'Gagal mengambil data pengeluaran.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
+            }
+        });
+    }
+
+
+    document.getElementById('approveButton').addEventListener('click', function () {
+          let pengeluaranBarangId = this.getAttribute('data-id');
+
+          if (!pengeluaranBarangId) {
+              Swal.fire({
+                  title: 'Error!',
+                  text: 'Nomor pengeluaran tidak ditemukan.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+              });
+              return;
+          }
+
+          Swal.fire({
+              title: 'Konfirmasi',
+              text: "Apakah Anda yakin ingin menyetujui pengeluaran ini?",
+              icon: 'info',
+              showCancelButton: true,
+              reverseButtons: true,
+              onfirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Ya, setuju!',
+              cancelButtonText: 'Batal'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  $.ajax({
+                      url: "/approval/update-status-security",
+                      method: "POST",
+                      data: {
+                          pengeluaran_barang_id: pengeluaranBarangId,
+                          "_token": "{{ csrf_token() }}"
+                      },
+                      success: function (response) {
+                          Swal.fire({
+                              title: 'Berhasil!',
+                              text: response.message,
+                              icon: 'success',
+                              confirmButtonText: 'OK'
+                          }).then(() => {
+                              $('#detailModal').modal('hide');
+                              location.reload();
+                          });
+                      },
+                      error: function (xhr, status, error) {
+                          Swal.fire({
+                              title: 'Gagal!',
+                              text: xhr.responseJSON?.message || 'Terjadi kesalahan.',
+                              icon: 'error',
+                              confirmButtonText: 'OK'
+                          });
+                      }
+                  });
               }
           });
-      }
-  });
+    });
+  
 </script>
 

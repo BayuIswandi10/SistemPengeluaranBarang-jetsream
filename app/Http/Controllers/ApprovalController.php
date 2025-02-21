@@ -168,8 +168,8 @@ class ApprovalController extends Controller
             // Update status pada tb_pengeluaran_barang menjadi "Level 5" dan update no_polisi
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update([
-                    //'status' => 'Level 5',
-                    'no_polisi' => $noPolisi,
+                    'status' => 'Level 5',
+                    //'no_polisi' => $noPolisi,
                 ]);
     
             if (!$updatePengeluaran) {

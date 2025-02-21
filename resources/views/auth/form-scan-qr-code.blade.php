@@ -72,7 +72,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    </div>
                     <!-- Card untuk Tabel Barang Keluar -->
                     <div class="card">
                         <div class="card-header bg-primary text-white">
@@ -159,6 +161,10 @@
                         tbody.innerHTML = '';
                         additionalInfoBody.innerHTML = '';
 
+                        if ($.fn.DataTable.isDataTable('#dataTable')) {
+                            $('#dataTable').DataTable().clear().destroy();
+                        }
+
                         if (data.barang_keluar && data.barang_keluar.length > 0) {
                             tbody.innerHTML = data.barang_keluar.map((item, index) => `
                                 <tr>
@@ -216,7 +222,6 @@
                             responsive: true,
                             scrollX: false,
                             destroy: true,
-                            retrieve: true,
                             pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
                             lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
                         });

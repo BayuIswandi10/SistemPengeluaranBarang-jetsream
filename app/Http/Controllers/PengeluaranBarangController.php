@@ -53,6 +53,7 @@ class PengeluaranBarangController extends Controller
         return response()->json([
             'barang_keluar' => $pengeluaranBarang->barangKeluar,
             'informasi_tambahan' => $approvalData,
+            'status' => $pengeluaranBarang->status, // Tambahkan status pengeluaran
         ], 200);
     }
 

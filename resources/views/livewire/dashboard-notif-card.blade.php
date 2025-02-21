@@ -389,6 +389,11 @@
                             tbody.innerHTML = '';
                             additionalInfoBody.innerHTML = '';
 
+                            // Hapus DataTable sebelum menambahkan data baru
+                            if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                                $('#detaildataTableModal').DataTable().clear().destroy();
+                            }
+
                             // Validasi data barang_keluar
                             if (data.barang_keluar && data.barang_keluar.length > 0) {
                                 tbody.innerHTML = data.barang_keluar.map((item, index) => `
@@ -404,6 +409,15 @@
                             } else {
                                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
                             }
+
+                            // Inisialisasi ulang DataTable
+                            $('#detaildataTableModal').DataTable({
+                                responsive: true,
+                                scrollX: false,
+                                pageLength: 5,
+                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                                destroy: true
+                            });
 
                             const tingkatMapping = {
                                 "Level 1": "Civitas",
@@ -439,15 +453,6 @@
 
                             // Pastikan modal terbuka setelah data dimuat
                             $('#detailModal').modal('show');
-
-                            if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
-                                let table = $('#detaildataTableModal').DataTable({
-                                    responsive: true, // Menjadikan tabel responsif
-                                    autoWidth: false, // Mencegah kolom terlalu lebar
-                                    scrollX: true, // Tambahkan scroll horizontal jika diperlukan
-                                });
-                            }
-                            
                         },
                         error: function (xhr, status, error) {
                             console.error("Error fetching data:", error);
