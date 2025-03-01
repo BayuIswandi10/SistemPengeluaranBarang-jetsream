@@ -167,27 +167,22 @@ class PengeluaranBarangController extends Controller
         $lokasiBarangKeluar = strtoupper($request->input('lokasi_barang_keluar'));
         $tujuanPengeluaran = strtoupper($request->input('tujuan_pengeluaran_barang'));
     
-        // Validasi tambahan: lokasi_barang_keluar tidak boleh sama dengan tujuan_pengeluaran_barang
         if ($lokasiBarangKeluar === $tujuanPengeluaran) {
             return redirect()->back()->with('error', 'Lokasi barang keluar dan tujuan pengeluaran barang tidak boleh sama!')->withInput();
         }
-
+    
         DB::beginTransaction();
-
+    
         try {
             $nrpKaryawan = $request->input('created_by');
-
-            // Cek apakah user ada
             $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
             if (!$user) {
                 return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
             }
-
+    
             $departemen = $user->departemen;
-
-            // Generate ID pengeluaran barang
             $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'), $departemen);
-
+    
             // Insert ke tabel pengeluaran_barang
             $pengeluaranBarang = PengeluaranBarang::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -197,23 +192,17 @@ class PengeluaranBarangController extends Controller
                 'lokasi_barang_keluar' => $request->input('lokasi_barang_keluar'),
                 'status' => 'Level 1',
             ]);
-
-            // Iterasi barang dan buat entry pada barang_keluar
+    
             foreach ($request->input('barang_ids') as $index => $barangId) {
                 $barangKeluar = BarangKeluar::create([
                     'nama_barang' => $barangId,
                     'jumlah_barang' => $request->input('jumlah')[$index],
                     'satuan_barang' => $request->input('satuan')[$index],
                     'keterangan_barang' => $request->input('keterangan')[$index],
-                ]);
-
-                // Insert langsung ke tabel tb_detail_pengeluaran tanpa model
-                DB::table('tb_detail_pengeluaran')->insert([
-                    'barang_keluar_id' => $barangKeluar->barang_keluar_id, // Auto-increment
-                    'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id, // String format
+                    'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id, // Fix error
                 ]);
             }
-
+    
             // Insert ke tabel tb_approval
             Approval::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -221,15 +210,16 @@ class PengeluaranBarangController extends Controller
                 'created_date' => now(),
                 'status_approval' => 'Level 1',
             ]);
-
+    
             DB::commit();
-
+    
             return redirect()->back()->with('success', 'Data berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+    
     
     // public function store(Request $request)
     // {

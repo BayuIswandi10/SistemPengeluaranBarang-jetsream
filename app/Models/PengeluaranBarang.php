@@ -38,6 +38,6 @@ class PengeluaranBarang extends Model
 
     public function barangKeluar()
     {
-        return $this->belongsToMany(BarangKeluar::class, 'tb_detail_pengeluaran', 'pengeluaran_barang_id', 'barang_keluar_id');
+        return $this->hasMany(BarangKeluar::class, 'pengeluaran_barang_id', 'pengeluaran_barang_id');
     }
 }

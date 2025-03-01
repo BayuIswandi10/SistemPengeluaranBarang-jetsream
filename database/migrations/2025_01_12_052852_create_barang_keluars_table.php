@@ -10,10 +10,16 @@ return new class extends Migration
     {
         Schema::create('tb_barang_keluar', function (Blueprint $table) {
             $table->bigIncrements('barang_keluar_id');
+            $table->string('pengeluaran_barang_id', 35);
             $table->string('nama_barang', 50);
             $table->bigInteger('jumlah_barang');
             $table->string('satuan_barang', 35);
             $table->string('keterangan_barang', 500);
+
+            $table->foreign('pengeluaran_barang_id')
+                ->references('pengeluaran_barang_id')->on('tb_pengeluaran_barang')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 

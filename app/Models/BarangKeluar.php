@@ -18,6 +18,7 @@ class BarangKeluar extends Model
 
     protected $fillable = [
         'barang_keluar_id',
+        'pengeluaran_barang_id', 
         'nama_barang',
         'jumlah_barang',
         'satuan_barang',
@@ -26,6 +27,6 @@ class BarangKeluar extends Model
 
     public function pengeluaranBarang()
     {
-        return $this->belongsToMany(PengeluaranBarang::class, 'tb_detail_pengeluaran', 'barang_keluar_id', 'pengeluaran_barang_id');
+        return $this->belongsTo(PengeluaranBarang::class, 'pengeluaran_barang_id', 'pengeluaran_barang_id');
     }
 }
