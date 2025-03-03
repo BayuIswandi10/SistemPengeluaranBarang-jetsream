@@ -178,7 +178,21 @@
                                 <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
-                                </div>                
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="kategori_pengeluaran">Kategori Pengeluaran <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="kategori_pengeluaran" name="kategori_pengeluaran" required onchange="togglePembawaScrap()">
+                                        <option value="" disabled selected>Pilih Kategori Pengeluaran</option>
+                                        <option value="0">Non Scrap</option>
+                                        <option value="1">Scrap</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" id="pembawa_scrap_group" style="display: none;">
+                                    <label for="pembawa_scrap">Pembawa Scrap <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="pembawa_scrap" name="pembawa_scrap" placeholder="Masukkan Nama Pembawa Scrap" autocomplete="off">
+                                </div>                                
             
                                 <div class="form-group">
                                     <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
@@ -549,6 +563,21 @@
                 cell.textContent = index + 1;
             });
         }
+
+        function togglePembawaScrap() {
+            const kategoriPengeluaran = document.getElementById("kategori_pengeluaran").value;
+            const pembawaScrapGroup = document.getElementById("pembawa_scrap_group");
+
+            if (kategoriPengeluaran === "1") {
+                pembawaScrapGroup.style.display = "block"; // Tampilkan jika Scrap
+                document.getElementById("pembawa_scrap").setAttribute("required", "required");
+            } else {
+                pembawaScrapGroup.style.display = "none"; // Sembunyikan jika Non Scrap
+                document.getElementById("pembawa_scrap").removeAttribute("required");
+                document.getElementById("pembawa_scrap").value = "";
+            }
+        }
+
 
         var $select = $('#select-tools').selectize({
 

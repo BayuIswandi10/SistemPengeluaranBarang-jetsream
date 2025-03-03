@@ -17,6 +17,8 @@ class PengeluaranBarang extends Model
 
     protected $fillable = [
         'pengeluaran_barang_id', 
+        'kategori_pengeluaran',
+        'pembawa_scrap',
         'created_by',
         'created_date',
         'lokasi_barang_keluar',

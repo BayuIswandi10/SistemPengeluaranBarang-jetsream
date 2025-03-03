@@ -58,8 +58,12 @@
                                     @elseif ($pengeluaranBarang->status == 'Level 3')
                                         Menunggu Persetujuan Ka.Dept GA
                                     @elseif ($pengeluaranBarang->status == 'Level 4')
-                                        Menunggu Persetujuan Security
-                                    @elseif ($pengeluaranBarang->status == 'Level 5')
+                                        @if ($pengeluaranBarang->kategori_pengeluaran == 1)
+                                        Menunggu Persetujuan Finance
+                                        @else
+                                            Menunggu Persetujuan Security
+                                        @endif
+                                    @elseif ($pengeluaranBarang->status == 'Level 6')
                                         Sudah Disetujui
                                     @elseif ($pengeluaranBarang->status == 'Level 0')
                                         Ditolak
@@ -125,6 +129,26 @@
                                             </button>
                                         @endif
 
+                                        <!-- Button for finance approval -->
+                                        @if($pengeluaranBarang->status === 'Level 4' && $user->level === 'Level 5' && $pengeluaranBarang->kategori_pengeluaran == 1)
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
+                                            </button>
+                                        @endif
+
+                                        
+
                                         <!-- Button detail -->
                                         <button 
                                             type="button" 
@@ -140,7 +164,7 @@
                             </tr>
                         @endforeach
                     </tbody>
-                </table>
+                </table>              
             </div>
         </div>
     </div>

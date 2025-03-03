@@ -44,7 +44,7 @@
                         </a>
                     </li> --}}
 
-                    @if(Auth::check() && Auth::user()->level !== 'Level 5')
+                    @if(Auth::check() && Auth::user()->level !== 'Level 6')
                         <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                             <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-signature"></i>
@@ -56,7 +56,7 @@
                         </li>
                     @endif
 
-                    @if(Auth::check() && Auth::user()->level === 'Level 5')
+                    @if(Auth::check() && Auth::user()->level === 'Level 6')
                         <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
                             <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security', 'scan') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 

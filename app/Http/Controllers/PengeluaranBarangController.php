@@ -152,6 +152,8 @@ class PengeluaranBarangController extends Controller
     {
         $request->validate([
             'created_by' => 'required',
+            'kategori_pengeluaran' => 'required|in:0,1',
+            'pembawa_scrap' => $request->kategori_pengeluaran == 1 ? 'required|string|max:35' : 'nullable',
             'tujuan_pengeluaran_barang' => 'required',
             'jenis_kendaraan' => 'required',
             'lokasi_barang_keluar' => 'required',
@@ -187,6 +189,8 @@ class PengeluaranBarangController extends Controller
             $pengeluaranBarang = PengeluaranBarang::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
+                'kategori_pengeluaran' => $request->kategori_pengeluaran,
+                'pembawa_scrap' => $request->kategori_pengeluaran == 1 ? $request->pembawa_scrap : null,
                 'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
                 'jenis_kendaraan' => $request->input('jenis_kendaraan'),
                 'lokasi_barang_keluar' => $request->input('lokasi_barang_keluar'),
