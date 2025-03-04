@@ -48,8 +48,14 @@
         <div class="card card-outline card-primary login-card">
             <div class="card-body">
                 <video id="preview"></video>
-                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+                <div class="input-group mt-3">
+                    <input type="text" id="scanResult" class="form-control" placeholder="Scan QR atau ketik nomor pengeluaran">
+                    <div class="input-group-append">
+                        <button id="btnCari" class="btn btn-primary" style="background-color: #4B687E; border-radius:8px;">Cari</button>
+                    </div>
+                </div>
             </div>
+            
             <div class="card-footer d-flex justify-content-center">
                 <a href="{{ route('login') }}">
                     <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
@@ -148,6 +154,15 @@
             });
 
             function fetchDetailPengeluaran(nomor) {
+                if (!nomor.trim()) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Nomor pengeluaran tidak boleh kosong!',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
                 document.getElementById('nomorPengeluaranCard').innerText = nomor;
 
                 $.ajax({
@@ -185,15 +200,16 @@
                             "Level 2": "PIC/Ka.Sie",
                             "Level 3": "Ka.Dept.Ybs",
                             "Level 4": "Ka.Dept.GA",
-                            "Level 5": "Security"
+                            "Level 5": "Finance",
+                            "Level 6": "Security"
                         };
-
                         const approvMapping = {
                             "Level 1": "Mengeluarkan",
                             "Level 2": "Membawa",
                             "Level 3": "Menyetujui",
                             "Level 4": "Mengetahui",
-                            "Level 5": "Memeriksa"
+                            "Level 5": "Menerima",
+                            "Level 6": "Memeriksa"
                         };
 
                         if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
@@ -238,7 +254,22 @@
                       });
                     }
                 });
+
             }
+            // Tambahkan event listener ke tombol "Cari"
+            document.getElementById('btnCari').addEventListener('click', function () {
+                let nomor = document.getElementById('scanResult').value;
+                fetchDetailPengeluaran(nomor);
+            });
+
+            // Biarkan pengguna menekan "Enter" untuk melakukan pencarian
+            document.getElementById('scanResult').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    let nomor = document.getElementById('scanResult').value;
+                    fetchDetailPengeluaran(nomor);
+                }
+            });
+
         });
     </script>
 </body>

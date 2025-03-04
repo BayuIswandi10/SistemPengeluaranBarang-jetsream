@@ -424,15 +424,16 @@
                                 "Level 2": "PIC/Ka.Sie",
                                 "Level 3": "Ka.Dept.Ybs",
                                 "Level 4": "Ka.Dept.GA",
-                                "Level 5": "Security"
+                                "Level 5": "Finance",
+                                "Level 6": "Security"
                             };
-
                             const approvMapping = {
                                 "Level 1": "Mengeluarkan",
                                 "Level 2": "Membawa",
                                 "Level 3": "Menyetujui",
                                 "Level 4": "Mengetahui",
-                                "Level 5": "Memeriksa"
+                                "Level 5": "Menerima",
+                                "Level 6": "Memeriksa"
                             };
 
 

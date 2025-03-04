@@ -1,27 +1,22 @@
 
 <div class="content-wrapper">
-  <div class="container-fluid">
-      <!-- Page Heading -->
-      <h1 class="h3 mb-2 mt-2 text-gray-800">Scan barcode Pengeluaran Barang</h1>
-
-      <div class="card shadow mb-4">
-          <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
-          </div>
-          <div class="card-body">
-            <div class="container">
-              <video id="preview" style="width: 100%; max-height: 250px; border-radius: 8px;"></video>
-              <input type="text" style="width: 100%; max-height: 250px; border-radius: 8px;" id="scanResult" class="form-control mt-3" placeholder="Hasil scan akan muncul di sini" readonly>
+    <div class="container-fluid">
+        <h1 class="h3 mb-2 mt-2 text-gray-800">Scan Barcode Pengeluaran Barang</h1>
+  
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
             </div>
-          </div>
-
-          {{-- <div class="card-footer d-flex justify-content-center">
-            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-success">Cari</button>
-          </div> --}}
-      </div>
-  </div>
-
+            <div class="card-body">
+              <div class="container">
+                <video id="preview" style="width: 100%; max-height: 250px; border-radius: 8px;"></video>
+                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Masukkan atau scan barcode" autofocus>
+                <button type="button" class="btn btn-success mt-2" id="searchButton">Cari</button>
+              </div>
+            </div>
+        </div>
+    </div>
+  
   <!-- Modal untuk Menampilkan Detail -->
   <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -177,14 +172,16 @@
                     "Level 2": "PIC/Ka.Sie",
                     "Level 3": "Ka.Dept.Ybs",
                     "Level 4": "Ka.Dept.GA",
-                    "Level 5": "Security"
+                    "Level 5": "Finance",
+                    "Level 6": "Security"
                 };
                 const approvMapping = {
                     "Level 1": "Mengeluarkan",
                     "Level 2": "Membawa",
                     "Level 3": "Menyetujui",
                     "Level 4": "Mengetahui",
-                    "Level 5": "Memeriksa"
+                    "Level 5": "Menerima",
+                    "Level 6": "Memeriksa"
                 };
                 
                 // Menambahkan data ke tabel informasi tambahan
@@ -216,6 +213,52 @@
         });
     }
 
+    document.getElementById('searchButton').addEventListener('click', function () {
+        let barcodeValue = document.getElementById('scanResult').value;
+        if (barcodeValue.trim() !== "") {
+            fetchDetailPengeluaran(barcodeValue);
+        } else {
+            Swal.fire({
+                title: 'Peringatan!',
+                text: 'Nomor pengeluaran tidak boleh kosong!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+
+    document.getElementById('scanResult').addEventListener('keydown', function (event) {
+        if (event.key === "Enter") { // Cek jika tombol yang ditekan adalah "Enter"
+            let barcodeValue = this.value.trim(); // Ambil nilai input dan hapus spasi berlebih
+            
+            if (barcodeValue !== "") {
+                fetchDetailPengeluaran(barcodeValue);
+            } else {
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: 'Nomor pengeluaran tidak boleh kosong!',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    });
+        
+    // Event listener untuk tombol cari
+    document.getElementById('searchButton').addEventListener('click', function () {
+        let barcodeValue = document.getElementById('scanResult').value.trim();
+        
+        if (barcodeValue !== "") {
+            fetchDetailPengeluaran(barcodeValue);
+        } else {
+            Swal.fire({
+                title: 'Peringatan!',
+                text: 'Nomor pengeluaran tidak boleh kosong!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
 
     document.getElementById('approveButton').addEventListener('click', function () {
           let pengeluaranBarangId = this.getAttribute('data-id');

@@ -383,6 +383,7 @@ class PengeluaranBarangController extends Controller
             'pengeluaran_barang_id'      => $pengeluaranBarang->pengeluaran_barang_id,
             'jenis_kendaraan'            => $pengeluaranBarang->jenis_kendaraan,
             'no_polisi'                  => $pengeluaranBarang->no_polisi,
+            'status'                  => $pengeluaranBarang->status,
             'lokasi_barang_keluar'       => $pengeluaranBarang->lokasi_barang_keluar,
             'tujuan_pengeluaran_barang'  => $pengeluaranBarang->tujuan_pengeluaran_barang,
             'barangKeluar'               => $pengeluaranBarang->barangKeluar,

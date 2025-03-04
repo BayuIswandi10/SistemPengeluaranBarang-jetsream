@@ -466,7 +466,7 @@
                         </table>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <form action="{{ route('approval.updateStatusSecurity') }}" method="POST" id="approvalForm">
+                        <form action="{{ route('approval.updateNopolisi') }}" method="POST" id="approvalForm">
                             @csrf
                             @method('POST')
                             <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
@@ -665,15 +665,15 @@
                 },
                 success: function(response) {
                     $('#btnPrintQR').hide();
-
+                    $('#btnSaveApproval').show();
                     //gunakan untuk membuat input field menjadi read only
                     if (response.no_polisi) {
                         $('#btnPrintQR').show();
                         $('#noPolisi').val(response.no_polisi).prop('readonly', true);
-                        $('#btnSaveApproval').prop('disabled', true);
+                        $('#btnSaveApproval').hide();
                     } else {
                         $('#noPolisi').val('').prop('readonly', false);
-                        $('#btnSaveApproval').prop('disabled', false);
+                        $('#btnSaveApproval').show();
                     }
 
                     // Isi field pada modal
@@ -681,22 +681,6 @@
                     $('#asal').val(response.lokasi_barang_keluar);
                     $('#tujuan').val(response.tujuan_pengeluaran_barang);
                     $('#jenisKendaraan').val(response.jenis_kendaraan);
-
-                    // Cek apakah No Polisi sudah ada, jika ada maka disable inputnya
-                    if (response.no_polisi) {
-                        $('#noPolisi').val(response.no_polisi).prop('disabled', true);
-                        $('#btnSaveApproval').prop('disabled', true);
-                    } else {
-                        $('#noPolisi').val('').prop('disabled', false);
-                        $('#btnSaveApproval').prop('disabled', false);
-                    }
-
-                    // Sembunyikan tombol "Setujui" jika status Level 5
-                    if (response.status === 'Level 5') {
-                        $('#btnSaveApproval').hide();
-                    } else {
-                        $('#btnSaveApproval').show();
-                    }
 
                     // Nonaktifkan input yang tidak perlu diubah
                     $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').prop('disabled', true);
