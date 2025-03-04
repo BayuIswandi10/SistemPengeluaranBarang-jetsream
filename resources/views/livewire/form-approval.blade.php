@@ -133,7 +133,7 @@
                                         @if($pengeluaranBarang->status === 'Level 4' && $user->level === 'Level 5' && $pengeluaranBarang->kategori_pengeluaran == 1)
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
+                                                class="btn btn-success btn-sm mr-2 update-status-finance" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                                 <i class="fa-solid fa-paper-plane"></i>
                                             </button>
@@ -258,6 +258,11 @@ $(document).ready(function() {
     $('.update-status-kadeptga').on('click', function() {
         var pengeluaranBarangId = $(this).data('id');
         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
+    });
+
+    $('.update-status-finance').on('click', function() {
+        var pengeluaranBarangId = $(this).data('id');
+        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
     });
 
     // Common function to show confirmation and then update status

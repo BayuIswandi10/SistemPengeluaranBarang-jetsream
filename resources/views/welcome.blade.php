@@ -627,8 +627,8 @@
                                     <td>${item.tujuan_pengeluaran_barang}</td>
                                     <td>${item.jenis_kendaraan}</td>
                                     <td>
-                                        <button type="button" class="btn btn-${item.status === 'Level 4' ? 'success' : 'primary'} btn-sm" onclick="editApproval('${item.pengeluaran_barang_id}')">
-                                            <i class="fas ${item.status === 'Level 4' ? 'fa-edit' : 'fa-info-circle'}"></i>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="editApproval('${item.pengeluaran_barang_id}')">
+                                            <i class="fas fa-info-circle"></i>
                                         </button>
                                     </td>
                                 </tr>

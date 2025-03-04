@@ -25,9 +25,14 @@ class PengeluaranBarangController extends Controller
 
     public function getDataLevel4()
     {
-        $pengeluaranBarangs = PengeluaranBarang::where('status', 'Level 4')->get();
+        $pengeluaranBarangs = PengeluaranBarang::where(function ($query) {
+            $query->where('kategori_pengeluaran', 1)->where('status', 'Level 5') // Jika kategori 1, harus Level 5
+                  ->orWhere('kategori_pengeluaran', 0)->where('status', 'Level 4'); // Jika kategori 0, cukup Level 4
+        })->get();
+    
         return response()->json(['barang_keluar' => $pengeluaranBarangs]);
     }
+    
 
     public function getDetail(Request $request)
     {
@@ -54,6 +59,7 @@ class PengeluaranBarangController extends Controller
             'barang_keluar' => $pengeluaranBarang->barangKeluar,
             'informasi_tambahan' => $approvalData,
             'status' => $pengeluaranBarang->status, // Tambahkan status pengeluaran
+            'kategori_pengeluaran' => $pengeluaranBarang->kategori_pengeluaran,
         ], 200);
     }
 

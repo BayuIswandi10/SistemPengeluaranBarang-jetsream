@@ -136,10 +136,10 @@
                     $('#dataTable').DataTable().clear().destroy();
                 }
 
-                // **Cek Status dari tb_pengeluaran_barang**
                 let statusPengeluaran = data.status; // Pastikan API mengembalikan status
+                let kategoriPengeluaran = data.kategori_pengeluaran;
 
-                if (statusPengeluaran === "Level 4") {
+                if (statusPengeluaran === "Level 4" && kategoriPengeluaran == 0 || (statusPengeluaran === "Level 5" && kategoriPengeluaran == 1)) {
                     document.getElementById('approveButton').style.display = "inline-block"; // Tampilkan tombol
                 } else {
                     document.getElementById('approveButton').style.display = "none"; // Sembunyikan tombol

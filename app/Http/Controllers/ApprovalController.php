@@ -168,7 +168,7 @@ class ApprovalController extends Controller
             // Update status pada tb_pengeluaran_barang menjadi "Level 5" dan update no_polisi
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update([
-                    'status' => 'Level 5',
+                    'status' => 'Level 6',
                     //'no_polisi' => $noPolisi,
                 ]);
     
@@ -181,7 +181,7 @@ class ApprovalController extends Controller
             $approval = Approval::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
-                'status_approval' => 'Level 5',
+                'status_approval' => 'Level 6',
                 'created_date' => now(),
             ]);
     
@@ -428,6 +428,83 @@ class ApprovalController extends Controller
             ], 500);
         }
     }
+
+    public function updateStatusFinance(Request $request)
+    {
+        DB::beginTransaction();
+    
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
+    
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+    
+            // Ambil data pengeluaran_barang untuk memastikan kategori_pengeluaran = 1
+            $pengeluaranBarang = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->where('kategori_pengeluaran', 1)
+                ->first();
+    
+            if (!$pengeluaranBarang) {
+                throw new \Exception('Data pengeluaran barang tidak ditemukan atau tidak termasuk kategori_pengeluaran = 1.');
+            }
+    
+            // Update status ke Level 5
+            $updatePengeluaran = $pengeluaranBarang->update(['status' => 'Level 5']);
+    
+            if (!$updatePengeluaran) {
+                throw new \Exception('Gagal memperbarui status pengeluaran barang.');
+            }
+    
+            // Tambahkan data ke tb_approval untuk tracking record (Level 5)
+            $approval = Approval::create([
+                'pengeluaran_barang_id' => $pengeluaranBarangId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 5',
+                'created_date' => now(),
+            ]);
+    
+            if (!$approval) {
+                throw new \Exception('Gagal menambahkan data approval.');
+            }
+    
+            // Mencari email pembawa (Level 1)
+            $approvalLevel1 = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->where('status_approval', 'Level 1')
+                ->value('created_by');
+    
+            if (!$approvalLevel1) {
+                throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID: " . $pengeluaranBarangId);
+            }
+    
+            // Ambil email penerima berdasarkan created_by yang ditemukan
+            $emailReceiver = User::where('nrp_karyawan', (string) $approvalLevel1)->value('email');
+    
+            if (!$emailReceiver) {
+                throw new \Exception('Email penerima tidak ditemukan.');
+            }
+    
+            // Kirim email ke penerima
+            $statusText = $this->getStatusText('Level 5');
+            $userDepartment = $this->getDepartmentName($levelKaryawan);
+            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+    
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    
 
     public function rejectStatus(Request $request)
     {

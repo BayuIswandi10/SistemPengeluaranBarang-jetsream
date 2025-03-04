@@ -45,6 +45,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/pengeluaran/update-status-kadeptybs', [ApprovalController::class, 'updateStatusKaDeptYBS'])->name('approval.updateStatusKaDeptYBS');
     Route::post('/pengeluaran/update-status-kadeptga', [ApprovalController::class, 'updateStatusKaDeptGA'])->name('approval.updateStatusKaDeptGA');
     Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
+    Route::post('/pengeluaran/update-status-finance', [ApprovalController::class, 'updateStatusFinance'])->name('approval.updateStatusFinance');
     Route::post('/pengeluaran/reject-status', [ApprovalController::class, 'rejectStatus'])->name('approval.rejectStatus');
 
 });
