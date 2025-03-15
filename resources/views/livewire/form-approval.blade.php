@@ -359,20 +359,22 @@ $(document).ready(function() {
                         detailTable.rows.add([["", "", "Tidak ada data barang keluar", "", "", ""]]).draw();
                     }
 
+                    // Mapping tingkatan dan status persetujuan
                     const tingkatMapping = {
                         "Level 1": "Civitas",
                         "Level 2": "PIC/Ka.Sie",
                         "Level 3": "Ka.Dept.Ybs",
                         "Level 4": "Ka.Dept.GA",
-                        "Level 5": "Security"
+                        "Level 5": "Finance",
+                        "Level 6": "Security"
                     };
-
                     const approvMapping = {
                         "Level 1": "Mengeluarkan",
                         "Level 2": "Membawa",
                         "Level 3": "Menyetujui",
                         "Level 4": "Mengetahui",
-                        "Level 5": "Memeriksa"
+                        "Level 5": "Menerima",
+                        "Level 6": "Memeriksa"
                     };
 
                     // Validasi data informasi_tambahan
@@ -422,97 +424,6 @@ $(document).ready(function() {
             });
         }
     });
-
-
-
-    // document.addEventListener('DOMContentLoaded', () => {
-
-    //     $('#detailModal').on('show.bs.modal', function (event) {
-    //         const button = $(event.relatedTarget); // Button yang diklik
-    //         const nomor = button.data('nomor'); // Nomor pengeluaran barang
-    //         document.getElementById('nomorPengeluaranCard').innerText = nomor;
-
-    //         $.ajax({
-    //             url: "/pengeluaran/detail",
-    //             method: "POST",
-    //             data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
-    //             success: function (data) {
-    //                 // console.log("Response dari server:", data); // Debugging
-
-    //                 const tbody = document.getElementById('detailBody');
-    //                 const additionalInfoBody = document.getElementById('additionalInfoBody');
-
-    //                       // Hapus data lama sebelum mengisi data baru
-    //             $('#detaildataTableModal tbody').empty();
-    //                 tbody.innerHTML = '';
-    //                 additionalInfoBody.innerHTML = '';
-
-    //                 // Validasi data barang_keluar
-    //                 if (data.barang_keluar && data.barang_keluar.length > 0) {
-    //                     tbody.innerHTML = data.barang_keluar.map((item, index) => `
-    //                         <tr>
-    //                             <td>${index + 1}</td>
-    //                             <td>${nomor}</td>
-    //                             <td>${item.nama_barang}</td>
-    //                             <td>${item.jumlah_barang}</td>
-    //                             <td>${item.satuan_barang}</td>
-    //                             <td>${item.keterangan_barang}</td>
-    //                         </tr>
-    //                     `).join('');
-    //                 } else {
-    //                     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
-    //                 }
-
-    //                 const tingkatMapping = {
-    //                     "Level 1": "Civitas",
-    //                     "Level 2": "PIC/Ka.Sie",
-    //                     "Level 3": "Ka.Dept.Ybs",
-    //                     "Level 4": "Ka.Dept.GA",
-    //                     "Level 5": "Security"
-    //                 };
-
-    //                 const approvMapping = {
-    //                     "Level 1": "Mengeluarkan",
-    //                     "Level 2": "Membawa",
-    //                     "Level 3": "Menyetujui",
-    //                     "Level 4": "Mengetahui",
-    //                     "Level 5": "Memeriksa"
-    //                 };
-
-
-    //                 // Validasi data informasi_tambahan
-    //                 if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-    //                     additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-    //                         <tr>
-    //                             <td>${index + 1}</td>
-    //                             <td>${info.nama}</td>
-    //                             <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-    //                             <td>${info.departemen}</td>
-    //                             <td>${approvMapping[info.status] || info.status}</td>
-    //                         </tr>
-    //                     `).join('');
-    //                 } else {
-    //                     additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
-    //                 }
-
-    //                 // Pastikan modal terbuka setelah data dimuat
-    //                 $('#detailModal').modal('show');
-
-    //                 if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
-    //                     let table = $('#detaildataTableModal').DataTable({
-    //                         responsive: true, // Menjadikan tabel responsif
-    //                         autoWidth: false, // Mencegah kolom terlalu lebar
-    //                         scrollX: true, // Tambahkan scroll horizontal jika diperlukan
-    //                     });
-    //                 }
-    //             },
-    //             error: function (xhr, status, error) {
-    //                 console.error("Error fetching data:", error);
-    //                 alert("Terjadi kesalahan saat mengambil data.");
-    //             }
-    //         });
-    //     });
-    // });
 
 
     document.addEventListener('DOMContentLoaded', function () {

@@ -14,19 +14,19 @@ class FormApproval extends Component
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']); // Relasi
     
         // Filter data berdasarkan level user
-        if ($user->level === 'Level 1') {
+        if ($user->level === 'Staff') {
             // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri atau yang dibuat oleh dirinya sendiri
             $pengeluaranBarangs = $query->where(function ($q) use ($user) {
                 $q->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen); // Departemen user
                 })->orWhere('created_by', $user->nrp_karyawan); // Dibuat oleh user
             })->get();
-        } elseif ($user->level === 'Level 2') {
+        } elseif ($user->level === 'Ka.Sie') {
             // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Level 3') {
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'GA') {
             // Data default: Pengeluaran dari departemennya sendiri
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
@@ -36,10 +36,10 @@ class FormApproval extends Component
             if (request()->has('cari_departemen')) {
                 $pengeluaranBarangs = $query->get(); // Lihat semua departemen
             }
-        } elseif ($user->level === 'Level 4') {
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GA') {
             // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
             $pengeluaranBarangs = $query->get();
-        } elseif ($user->level === 'Level 5') {
+        } elseif ($user->departemen === 'FIN') {
             // Hanya melihat data dengan status "Level 4" dan kategori_pengeluaran = 1 (Scrap)
             $pengeluaranBarangs = $query->where('status', 'Level 4')
                 ->where('kategori_pengeluaran', 1)->get();
