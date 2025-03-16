@@ -75,14 +75,14 @@
                                     </td>
                                     <td>
                                         <div class="button-group">
-                                            @if($pengeluaranBarang->status === 'Level 0')
+                                            {{-- @if($pengeluaranBarang->status === 'Level 0')
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-primary btn-sm update-status" 
                                                     data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
-                                            @endif
+                                            @endif --}}
 
                                             <!-- Button detail -->
                                             <button 
@@ -586,7 +586,7 @@
                     confirmButtonText: 'Ya, submit!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch("{{ route('pengeluaran.updateStatus') }}", {
+                        fetch("", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",

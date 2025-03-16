@@ -391,92 +391,86 @@ class PengeluaranBarangController extends Controller
         ]);
     }
 
-    // public function update(Request $request)
-    // {
-    //     $data = $request->validate([
-    //         'pengeluaran_barang_id' => 'required',
-    //         'jenis_kendaraan' => 'required',
-    //         'lokasi_barang_keluar' => 'required',
-    //         'tujuan_pengeluaran_barang' => 'required',
-    //         'barang_ids' => 'required|array',
-    //         'barang_ids.*' => 'nullable|string',
-    //         'nama_barang' => 'required|array',
-    //         'jumlah' => 'required|array',
-    //         'satuan' => 'required|array',
-    //         'keterangan' => 'required|array',
-    //     ]);
+    public function update(Request $request)
+    {
+        $data = $request->validate([
+            'pengeluaran_barang_id' => 'required',
+            'jenis_kendaraan' => 'required',
+            'lokasi_barang_keluar' => 'required',
+            'tujuan_pengeluaran_barang' => 'required',
+            'barang_ids' => 'required|array',
+            'barang_ids.*' => 'nullable|string',
+            'nama_barang' => 'required|array',
+            'jumlah' => 'required|array',
+            'satuan' => 'required|array',
+            'keterangan' => 'required|array',
+        ]);
 
-    //     DB::beginTransaction();
+        DB::beginTransaction();
 
-    //     try {
-    //         // Cari pengeluaran barang berdasarkan ID
-    //         $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
+        try {
+            // Cari pengeluaran barang berdasarkan ID
+            $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
 
-    //         // Update data utama di `tb_pengeluaran_barang`
-    //         $pengeluaranBarang->update([
-    //             'jenis_kendaraan' => $data['jenis_kendaraan'],
-    //             'lokasi_barang_keluar' => $data['lokasi_barang_keluar'],
-    //             'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
-    //         ]);
+            // Update data utama di `tb_pengeluaran_barang`
+            $pengeluaranBarang->update([
+                'jenis_kendaraan' => $data['jenis_kendaraan'],
+                'lokasi_barang_keluar' => $data['lokasi_barang_keluar'],
+                'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
+            ]);
 
-    //         // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini
-    //         $existingBarangIds = DB::table('tb_barang_keluar')
-    //             ->join('tb_detail_pengeluaran', 'tb_barang_keluar.barang_keluar_id', '=', 'tb_detail_pengeluaran.barang_keluar_id')
-    //             ->where('tb_detail_pengeluaran.pengeluaran_barang_id', $pengeluaranBarang->pengeluaran_barang_id)
-    //             ->pluck('tb_barang_keluar.barang_keluar_id')
-    //             ->toArray();
+            // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini
+            $existingBarangIds = DB::table('tb_barang_keluar')
+                ->join('tb_detail_pengeluaran', 'tb_barang_keluar.barang_keluar_id', '=', 'tb_detail_pengeluaran.barang_keluar_id')
+                ->where('tb_detail_pengeluaran.pengeluaran_barang_id', $pengeluaranBarang->pengeluaran_barang_id)
+                ->pluck('tb_barang_keluar.barang_keluar_id')
+                ->toArray();
 
-    //         // Barang yang tetap ada (dari form)
-    //         $barangIdsFromForm = array_filter($data['barang_ids']);
+            // Barang yang tetap ada (dari form)
+            $barangIdsFromForm = array_filter($data['barang_ids']);
 
-    //         // Barang yang perlu dihapus
-    //         $barangIdsToDelete = array_diff($existingBarangIds, $barangIdsFromForm);
+            // Barang yang perlu dihapus
+            $barangIdsToDelete = array_diff($existingBarangIds, $barangIdsFromForm);
 
-    //         // Hapus barang dari database dan tabel pivot
-    //         if (!empty($barangIdsToDelete)) {
-    //             BarangKeluar::whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
-    //             DB::table('tb_detail_pengeluaran')->whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
-    //         }
+            // Hapus barang dari database dan tabel pivot
+            if (!empty($barangIdsToDelete)) {
+                BarangKeluar::whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
+                DB::table('tb_detail_pengeluaran')->whereIn('barang_keluar_id', $barangIdsToDelete)->delete();
+            }
 
-    //         // Sinkronisasi barang di tabel pivot
-    //         foreach ($data['barang_ids'] as $index => $barangId) {
-    //             if (empty($barangId)) {
-    //                 // Jika barang ID kosong, buat record baru di `tb_barang_keluar`
-    //                 $barangKeluarId = $this->generateBarangKeluarId();
-    //                 $barang = BarangKeluar::create([
-    //                     'barang_keluar_id' => $barangKeluarId,
-    //                     'nama_barang' => $data['nama_barang'][$index],
-    //                     'jumlah_barang' => $data['jumlah'][$index],
-    //                     'satuan_barang' => $data['satuan'][$index],
-    //                     'keterangan_barang' => $data['keterangan'][$index],
-    //                 ]);
+            // Sinkronisasi barang di tabel pivot
+            foreach ($data['barang_ids'] as $index => $barangId) {
+                if (empty($barangId)) {
+                    // Jika barang ID kosong, buat record baru di `tb_barang_keluar`
+    
+                    $barang = BarangKeluar::create([
+                        'barang_keluar_id' => $barangId,
+                        'nama_barang' => $data['nama_barang'][$index],
+                        'jumlah_barang' => $data['jumlah'][$index],
+                        'satuan_barang' => $data['satuan'][$index],
+                        'keterangan_barang' => $data['keterangan'][$index],
+                    ]);
 
-    //                 // Insert ke tabel pivot `tb_detail_pengeluaran`
-    //                 DB::table('tb_detail_pengeluaran')->insert([
-    //                     'barang_keluar_id' => $barangKeluarId,
-    //                     'pengeluaran_barang_id' => $pengeluaranBarang->pengeluaran_barang_id,
-    //                     'detail_pengeluaran_id' => $this->generateDetailPengeluaranId(),
-    //                 ]);
-    //             } else {
-    //                 // Update barang jika sudah ada
-    //                 $barang = BarangKeluar::findOrFail($barangId);
-    //                 $barang->update([
-    //                     'nama_barang' => $data['nama_barang'][$index],
-    //                     'jumlah_barang' => $data['jumlah'][$index],
-    //                     'satuan_barang' => $data['satuan'][$index],
-    //                     'keterangan_barang' => $data['keterangan'][$index],
-    //                 ]);
-    //             }
-    //         }
+                } else {
+                    // Update barang jika sudah ada
+                    $barang = BarangKeluar::findOrFail($barangId);
+                    $barang->update([
+                        'nama_barang' => $data['nama_barang'][$index],
+                        'jumlah_barang' => $data['jumlah'][$index],
+                        'satuan_barang' => $data['satuan'][$index],
+                        'keterangan_barang' => $data['keterangan'][$index],
+                    ]);
+                }
+            }
 
-    //         DB::commit();
+            DB::commit();
 
-    //         return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-    //     }
-    // }
+            return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 
 
 }
