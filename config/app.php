@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'PengeluaranBarang'),
+    'name' => env('APP_NAME', 'Digital Logistics Transport Permit'),
 
     /*
     |--------------------------------------------------------------------------

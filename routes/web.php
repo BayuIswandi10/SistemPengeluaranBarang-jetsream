@@ -23,7 +23,7 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-    Route::middleware([CheckLevel::class . ':Level 6'])->group(function () {
+    Route::middleware([CheckLevel::class . ':Security'])->group(function () {
         Route::get('/security', FormSecutity::class)->name('security');
         Route::post('/approval/update-status-security', [ApprovalController::class, 'updateStatusSecurity'])->name('approval.updateStatusSecurity');
         Route::get('/scan', FormScanQrCode::class)->name('scan');

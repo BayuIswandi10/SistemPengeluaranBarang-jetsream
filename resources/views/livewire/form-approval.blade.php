@@ -61,8 +61,10 @@
                                         @if ($pengeluaranBarang->kategori_pengeluaran == 1)
                                         Menunggu Persetujuan Finance
                                         @else
-                                            Menunggu Persetujuan Security
+                                        Menunggu Persetujuan Security
                                         @endif
+                                    @elseif ($pengeluaranBarang->status == 'Level 5')
+                                        Menunggu Persetujuan Security
                                     @elseif ($pengeluaranBarang->status == 'Level 6')
                                         Sudah Disetujui
                                     @elseif ($pengeluaranBarang->status == 'Level 0')
@@ -74,7 +76,7 @@
                                 <td>
                                     <div class="button-group d-flex">
                                         <!-- Button for Level 1 (Ka.Sie) -->
-                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Level 2')
+                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Ka.Sie')
                                             
                                             <button 
                                                 type="button" 
@@ -93,7 +95,7 @@
                                         @endif
                 
                                         <!-- Button for Level 2 (Ka.Dept YBS) -->
-                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Level 3')
+                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Ka.Dept' && $user->departemen !== 'GA')
                                             <button 
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
@@ -112,7 +114,7 @@
                                         @endif
                 
                                         <!-- Button for Level 3 (Ka.Dept GA) -->
-                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Level 4')
+                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Ka.Dept' && $user->departemen == 'GA')
                                             <button 
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
@@ -130,7 +132,7 @@
                                         @endif
 
                                         <!-- Button for finance approval -->
-                                        @if($pengeluaranBarang->status === 'Level 4' && $user->level === 'Level 5' && $pengeluaranBarang->kategori_pengeluaran == 1)
+                                        @if($pengeluaranBarang->status === 'Level 4' && $user->departemen === 'FIN' && $pengeluaranBarang->kategori_pengeluaran == 1)
                                             <button 
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-finance" 

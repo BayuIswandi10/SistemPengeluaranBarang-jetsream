@@ -34,18 +34,17 @@
                         </a>
                     </li>
 
+                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
                     <li class="nav-item {{ request()->routeIs('form') ? 'menu-open' : '' }}">
                         <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-clipboard-list"></i>
-                            <p>
-                                Form Pengeluaran Barang
-                                <i class="right fas"></i>
-                            </p>
+                            <p>Kelola Pengeluaran Barang</p>
                         </a>
                     </li>
+                    @endif
+                
 
-                    @if(Auth::check() && Auth::user()->level !== 'Level 6')
-                        <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
+                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security','Super Admin']))                        <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                             <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-signature"></i>
                                 <p>
@@ -56,7 +55,7 @@
                         </li>
                     @endif
 
-                    @if(Auth::check() && Auth::user()->level === 'Level 6')
+                    @if(Auth::check() && Auth::user()->level === 'Security')
                         <li class="nav-item {{ request()->routeIs('scan') ? 'menu-open' : '' }}"> 
                             <a href="{{ route('scan') }}" class="nav-link {{ request()->routeIs('security', 'scan') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 
