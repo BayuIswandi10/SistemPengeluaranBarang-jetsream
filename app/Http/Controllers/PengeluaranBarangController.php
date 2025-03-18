@@ -408,6 +408,9 @@ class PengeluaranBarangController extends Controller
     
         DB::beginTransaction();
     
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+
         try {
             // Cari data pengeluaran barang berdasarkan ID
             $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
@@ -417,6 +420,8 @@ class PengeluaranBarangController extends Controller
                 'jenis_kendaraan'       => $data['jenis_kendaraan'],
                 'lokasi_barang_keluar'  => $data['lokasi_barang_keluar'],
                 'tujuan_pengeluaran_barang' => $data['tujuan_pengeluaran_barang'],
+                'updated_by'            => $nrpKaryawan, 
+                'updated_date'          => now(),
             ]);
     
             // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini dari tabel tb_barang_keluar

@@ -19,8 +19,14 @@ return new class extends Migration
             $table->string('jenis_kendaraan', 35);
             $table->string('no_polisi', 35)->nullable();
             $table->string('status', 35);
+            $table->string('updated_by', 35)->nullable();
+            $table->timestamp('updated_date')->useCurrent()->nullable();
 
             $table->foreign('created_by')
+                ->references('nrp_karyawan')->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('updated_by')
                 ->references('nrp_karyawan')->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');

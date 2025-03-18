@@ -25,7 +25,9 @@ class PengeluaranBarang extends Model
         'tujuan_pengeluaran_barang',
         'jenis_kendaraan',
         'no_polisi',
-        'status'
+        'status',
+        'updated_by',
+        'updated_date'
     ];
 
     public function user()

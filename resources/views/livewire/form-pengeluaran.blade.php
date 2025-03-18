@@ -56,22 +56,27 @@
                                     <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
                                     <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
                                     <td>
-                                        @if ($pengeluaranBarang->status == 'Level 4')
-                                            Menunggu Persetujuan Security
-                                        @elseif ($pengeluaranBarang->status == 'Level 5')
-                                            Sudah Disetujui
-                                        @elseif ($pengeluaranBarang->status == 'Level 1')
+                                        @if ($pengeluaranBarang->status == 'Level 1')
                                             Menunggu Persetujuan PIC/Ka.Sie
                                         @elseif ($pengeluaranBarang->status == 'Level 2')
-                                            Menunggu Persetujuan Ka.Dept Ybs
+                                            PIC/Ka.Sie Sudah Menyetujui
                                         @elseif ($pengeluaranBarang->status == 'Level 3')
                                             Menunggu Persetujuan Ka.Dept GA
+                                        @elseif ($pengeluaranBarang->status == 'Level 4')
+                                            @if ($pengeluaranBarang->kategori_pengeluaran == 1)
+                                            Menunggu Persetujuan Finance
+                                            @else
+                                            Menunggu Persetujuan Security
+                                            @endif
+                                        @elseif ($pengeluaranBarang->status == 'Level 5')
+                                            Menunggu Persetujuan Security
+                                        @elseif ($pengeluaranBarang->status == 'Level 6')
+                                            Sudah Disetujui
                                         @elseif ($pengeluaranBarang->status == 'Level 0')
                                             Ditolak
                                         @else
                                             {{ $pengeluaranBarang->status }}
                                         @endif
-
                                     </td>
                                     <td>
                                         <div class="button-group">
