@@ -12,6 +12,7 @@ use App\Http\Middleware\CheckLevel;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\FormScanQrCode;
 use App\Http\Controllers\QRCodeController;
+use App\Livewire\FormKendaraan;
 // use App\Livewire\WelcomePage;
 
 // Route::get('/',WelcomePage::class);
@@ -31,6 +32,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/form', FormPengeluaran::class)->name('form');
     Route::get('/approval', FormApproval::class)->name('approval');
+    Route::get('/kendaraan', FormKendaraan::class)->name('kendaraan');
     Route::get('/dashboard/get-data-card', [DashboardController::class, 'getData']);
     
     Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
