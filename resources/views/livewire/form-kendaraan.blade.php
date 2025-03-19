@@ -1,7 +1,7 @@
 <div class ="content-wrapper">
     <div class="container-fluid">
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 mt-2 text-gray-800">Form Pengeluaran Barang</h1>
+        <h1 class="h3 mb-2 mt-2 text-gray-800">Kelola Kendaraan Dinas</h1>
 
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -35,6 +35,7 @@
                         });
                     </script>
                 @endif
+        
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
@@ -50,11 +51,20 @@
                         @foreach ($kendaraanDinas as $index => $kendaraan)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $kendaraan->jenis_kendaraan }}</td>
+                                <td>
+                                    @php
+                                        $jenisKendaraan = [
+                                            1 => 'KANTOR',
+                                            2 => 'PRIBADI',
+                                            3 => 'TAXI'
+                                        ];
+                                    @endphp
+                                    {{ $jenisKendaraan[$kendaraan->jenis_kendaraan] ?? 'Tidak Diketahui' }}
+                                </td>
                                 <td>{{ $kendaraan->nomor_kendaraan }}</td>
                                 <td>{{ $kendaraan->kapasitas_kendaraan }} Penumpang</td>
                                 <td>
-                                    @if ($kendaraan->status_kendaraan == 'Tersedia')
+                                    @if ($kendaraan->status_kendaraan == 1)
                                         <span class="badge badge-success">Tersedia</span>
                                     @else
                                         <span class="badge badge-danger">Tidak Tersedia</span>
@@ -64,7 +74,13 @@
                                     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal" data-id="{{ $kendaraan->kendaraan_dinas_id }}">
                                         <i class="fa fa-list"></i>
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editDataModal" data-id="{{ $kendaraan->kendaraan_dinas_id }}">
+                                    <!-- Button Edit -->
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-warning btn-sm" 
+                                        data-toggle="modal" 
+                                        data-target="#editDataModal" 
+                                        data-id="{{ $kendaraan->kendaraan_dinas_id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form action="" method="POST" style="display:inline-block;">
@@ -78,8 +94,186 @@
                             </tr>
                         @endforeach
                     </tbody>
-                </table>
+                </table>         
+            </div>
+        </div>
+    </div>
+
+    {{-- Tambah Modal --}}
+    <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data Pengeluaran Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('kendaraan.store')}}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
+                        @csrf
+    
+                        <div class="form-group">
+                            <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                            <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off">
+                                <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                <option value="1">KANTOR</option>
+                                <option value="2">PRIBADI</option>
+                                <option value="3">TAXI</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                        </div>  
+
+                        <div class="form-group">
+                            <label for="kapasitas_kendaraan">Kapasitas Penumpang <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Penumpang" required autocomplete="off">
+                        </div> 
+    
+                        <!-- Submit Button -->
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Modal --}}
+    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Pengeluaran Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('kendaraan.update', ['id' => $kendaraan->kendaraan_dinas_id]) }}" enctype="multipart/form-data" id="editForm">
+                        @csrf
+                        @method('PUT')
+        
+                        <input type="hidden" name="kendaraan_dinas_id" id="edit_kendaraan_dinas_id">
+        
+                        <div class="form-group">
+                            <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                            <select class="form-control" id="edit_jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off">
+                                <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                <option value="1">KANTOR</option>
+                                <option value="2">PRIBADI</option>
+                                <option value="3">TAXI</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                        </div>  
+
+                        <div class="form-group">
+                            <label for="kapasitas_kendaraan">Kapasitas Penumpang <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Penumpang" required autocomplete="off">
+                        </div> 
+        
+        
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Ubah Data</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $('#editDataModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const kendaraanId = button.data('id'); 
+
+        // Kosongkan field sebelum diisi ulang
+        $('#edit_kendaraan_dinas_id').val('');
+        $('#edit_jenis_kendaraan').val('');
+        $('#edit_nomor_kendaraan').val('');
+        $('#edit_kapasitas_kendaraan').val('');
+
+        // Panggil data dari server
+        $.ajax({
+            url: `/kendaraan/edit/${kendaraanId}`,  // Gunakan metode GET
+            method: 'GET',
+            success: function (response) {
+                $('#edit_kendaraan_dinas_id').val(response.kendaraan_dinas_id);
+                $('#edit_jenis_kendaraan').val(response.jenis_kendaraan);
+                $('#edit_nomor_kendaraan').val(response.nomor_kendaraan);
+                $('#edit_kapasitas_kendaraan').val(response.kapasitas_kendaraan);
+            },
+            error: function (xhr, status, error) {
+                console.error(`Error: ${error}`);
+                alert('Gagal mengambil data. Silakan coba lagi.');
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                columnDefs: [
+                    { className: 'dt-body-center', targets: 0 },
+                    { className: 'dt-head-center', targets: 0 },
+                    { className: 'dt-body-center', targets: 5 },
+                    { className: 'dt-head-center', targets: 5 }
+                ],
+                scrollX: false,
+                responsive: true
+            });
+        }
+    });
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    var $select = $('#select-tools').selectize({
+    
+    create: true
+    });
+
+    var control = $select[0].selectize;
+
+
+    $('#button-clear').on('click', function() {
+    control.clear();
+    });
+
+    $('#button-clearoptions').on('click', function() {
+    control.clearOptions();
+    });
+
+    $('#button-addoption').on('click', function() {
+    control.addOption({
+        id: 4,
+        title: 'Something New',
+        url: 'http://google.com'
+    });
+    });
+
+    $('#button-additem').on('click', function() {
+    control.addItem(2);
+    });
+
+    $('#button-maxitems2').on('click', function() {
+    control.setMaxItems(2);
+    });
+
+    $('#button-maxitems100').on('click', function() {
+    control.setMaxItems(100);
+    });
+
+    $('#button-setvalue').on('click', function() {
+    control.setValue([2, 3]);
+    });
+</script>

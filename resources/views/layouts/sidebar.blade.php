@@ -62,6 +62,15 @@
                         <p>Pemeriksaan Barang Keluar</p> </a> </li> 
                     @endif
 
+                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
+                    <li class="nav-item {{ request()->routeIs('kendaraan') ? 'menu-open' : '' }}">
+                        <a href="{{ route('kendaraan') }}" class="nav-link {{ request()->routeIs('kendaraan') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-car-side"></i>
+                            <p>Kelola Kendaraan</p>
+                        </a>
+                    </li>
+                    @endif
+
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

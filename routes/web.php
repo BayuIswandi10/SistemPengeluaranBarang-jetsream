@@ -10,6 +10,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Livewire\FormSecutity;
 use App\Http\Middleware\CheckLevel; 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KendaraanDinasController;
 use App\Livewire\FormScanQrCode;
 use App\Http\Controllers\QRCodeController;
 use App\Livewire\FormKendaraan;
@@ -33,6 +34,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/form', FormPengeluaran::class)->name('form');
     Route::get('/approval', FormApproval::class)->name('approval');
     Route::get('/kendaraan', FormKendaraan::class)->name('kendaraan');
+
     Route::get('/dashboard/get-data-card', [DashboardController::class, 'getData']);
     
     Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
@@ -49,6 +51,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/pengeluaran/update-status-kasie', [ApprovalController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
     Route::post('/pengeluaran/update-status-finance', [ApprovalController::class, 'updateStatusFinance'])->name('approval.updateStatusFinance');
     Route::post('/pengeluaran/reject-status', [ApprovalController::class, 'rejectStatus'])->name('approval.rejectStatus');
+
+    Route::post('/kendaraan', [KendaraanDinasController::class, 'store'])->name('kendaraan.store');    
+    Route::get('/kendaraan/edit/{id}', [KendaraanDinasController::class, 'edit'])->name('kendaraan.edit');
+    Route::put('/kendaraan/update/{id}', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
+
 
 });
 
