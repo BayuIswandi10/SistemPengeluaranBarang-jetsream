@@ -14,13 +14,13 @@ class PencatatanKendaraanDinas extends Model
 
     protected $fillable = [
         'pencatatan_id',
-        'penggunaan_kendaraan_dinas_detail_id',
+        'surat_kendaraan_dinas_id',
         'nrp_karyawan',
         'updated_date',
     ];
-    public function penggunaanDetail()
+    public function suratDinas()
     {
-        return $this->belongsTo(PenggunaanKendaraanDinasDetail::class, 'penggunaan_kendaraan_dinas_detail_id', 'penggunaan_kendaraan_dinas_detail_id');
+        return $this->belongsTo(SuratKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
     }
     public function user()
     {

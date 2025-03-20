@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('tb_pencatatan_kendaraan_dinas', function (Blueprint $table) {
             $table->bigIncrements('pencatatan_id');
-            $table->unsignedBigInteger('penggunaan_kendaraan_dinas_detail_id');
+            $table->string('surat_kendaraan_dinas_id', 35);
             $table->string('nrp_karyawan', 35);
             $table->timestamp('update_date')->useCurrent();
 
-            $table->foreign('penggunaan_kendaraan_dinas_detail_id', 'fk_pencatatan_penggunaan_id')
-                ->references('penggunaan_kendaraan_dinas_detail_id')->on('tb_penggunaan_kendaraan_dinas_detail')
+            $table->foreign('surat_kendaraan_dinas_id', 'fk_pencatatan_dinas_id')
+                ->references('surat_kendaraan_dinas_id')->on('tb_surat_kendaraan_dinas')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 

@@ -153,14 +153,14 @@
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="modal" data-target="#tambahDataModal">Pengajuan Pengeluaran Barang</a></li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Pengajuan Kendaraan Dinas</a></li>
+                            <a class="nav-link" data-toggle="modal" data-target="#tambahDinasModal">Pengajuan Kendaraan Dinas</a></li>
                         <li class="nav-item">
                             <a class="nav-link" href={{ route('login') }}>Masuk</a></li>
                 </ul>
                 </div>
             </div>
             
-            {{-- Tambah Modal --}}
+            {{-- Tambah Pengeluaran Barang Modal --}}
             <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -267,6 +267,113 @@
                                         </button>
                                     </div>
             
+                                <!-- Submit Button -->
+                                <div class="form-group d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tambah Penggunaan Kendaraan Dinas Modal --}}
+            <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="tambahDinasModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="tambahDinasModalLabel">Ajukan Penggunaan Kendaraan Dinas</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
+                                @csrf
+            
+                                <!-- Input Fields -->
+                                <div class="form-group">
+                                    <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="tanggal_penggunaan">Tanggal Penggunaan <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="waktu_keluar">Waktu Keluar <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" name="waktu_keluar" value="{{ old('waktu_keluar') }}" required autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="waktu_kembali">Waktu Kembali <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" name="waktu_kembali" value="{{ old('waktu_kembali') }}" required autocomplete="off">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="tujuan_penggunaan">Tujuan Dinas <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" class="form-control" name="tujuan_penggunaan_1" 
+                                               value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Tujuan Ke-1">
+                                        <input type="text" class="form-control" name="tujuan_penggunaan_2" 
+                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2">
+                                        <input type="text" class="form-control" name="tujuan_penggunaan_3" 
+                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3">
+                                    </div>
+                                </div>
+                                
+            
+                                <div class="form-group">
+                                    <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                                    <select class="form-control" name="jenis_kendaraan" required autocomplete="off">
+                                        <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                        <option value="1">KANTOR</option>
+                                        <option value="2">PRIBADI</option>
+                                        <option value="3">TAXI</option>
+                                    </select>
+                                </div>
+            
+                                <!-- Peserta Dinas Table -->
+                                <div class="form-group">
+                                    <label>Peserta Dinas <span class="text-danger">*</span></label>
+                                    <table id="pesertaTableTambah" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>NRP</th>
+                                                <th>Nama</th>
+                                                <th>Departemen</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="nomor">1</td>
+                                                <td><input type="text" name="peserta[0][nrp]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td>
+                                                {{-- <td>
+                                                    <select name="satuan[]" class="form-control" required>
+                                                        <option value="" disabled selected>Pilih Satuan</option>
+                                                        <option value="unit">Unit</option>
+                                                        <option value="pcs">PCS</option>
+                                                    </select>
+                                                </td> --}}
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxPeserta()">
+                                        <i class="fas fa-plus"></i> Tambah Peserta
+                                    </button>
+                                </div>
+        
                                 <!-- Submit Button -->
                                 <div class="form-group d-flex justify-content-end">
                                     <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
@@ -578,12 +685,6 @@
             }
         }
 
-
-        var $select = $('#select-tools').selectize({
-
-        create: true
-        });
-
         $(document).ready(function() {
             $('#lokasi_barang_keluar').selectize({
                 create: true,
@@ -884,10 +985,75 @@
         }
 
 
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        function tambahComboBoxPeserta() {
+            const container = document.getElementById('pesertaTableTambah');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td class="nomor">${counter += 1}</td>
+                <td><input type="text" name="peserta[${counter}][nrp]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counter}][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counter}][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td>
+
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            container.appendChild(newRow);
+            updateNomorPeserta();
+        }
+
+        function hapusComboBoxPeserta(button) {
+            const container = document.getElementById('pesertaTableTambah');
+            const rows = container.getElementsByTagName('tr');
+            if (rows.length > 1) {
+                const row = button.closest('tr');
+                
+                // SweetAlert konfirmasi untuk baris selain baris terakhir
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Apakah Anda yakin?',
+                    text: 'Baris ini akan dihapus.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        row.remove();
+                        updateNomor();
+                    }
+                });
+            } else {
+                // Ganti alert dengan SweetAlert untuk baris terakhir
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak bisa menghapus baris terakhir.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        function updateNomorPeserta() {
+            const rows = document.querySelectorAll('#pesertaTableTambah .nomor');
+            rows.forEach((cell, index) => {
+                cell.textContent = index + 1;
+            });
+        }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         var control = $select[0].selectize;
+        var $select = $('#select-tools').selectize({
+
+        create: true
+        });
 
         $('#button-clear').on('click', function() {
         control.clear();

@@ -14,6 +14,7 @@ use App\Http\Controllers\KendaraanDinasController;
 use App\Livewire\FormScanQrCode;
 use App\Http\Controllers\QRCodeController;
 use App\Livewire\FormKendaraan;
+use App\Http\Controllers\SuratDinasController;
 // use App\Livewire\WelcomePage;
 
 // Route::get('/',WelcomePage::class);
@@ -69,3 +70,5 @@ Route::post('/approval/update-nopolisi', [ApprovalController::class, 'updateNopo
 Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
 
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');
+
+Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('pengajuan_dinas.store');

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tb_kendaraan_dinas', function (Blueprint $table) {
             $table->bigIncrements('kendaraan_dinas_id');
+            $table->string('merk_kendaraan', 50);
             $table->integer('jenis_kendaraan');
             $table->string('nomor_kendaraan', 15);
             $table->integer('kapasitas_kendaraan');

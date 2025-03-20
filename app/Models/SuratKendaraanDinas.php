@@ -14,13 +14,16 @@ class SuratKendaraanDinas extends Model
 
     protected $fillable = [
         'surat_kendaraan_dinas_id',
-        'tujuan_penggunaan',
+        'tujuan_penggunaan_1',
+        'tujuan_penggunaan_2',
+        'tujuan_penggunaan_3',
         'tanggal_penggunaan',
+        'jenis_kendaraan',
         'created_by',
         'created_date',
         'status',
-        'waktu keluar',
-        'waktu kembali',
+        'waktu_keluar',
+        'waktu_kembali',
         'kilometer_awal',
         'kilometer_akhir',
     ];
@@ -28,5 +31,10 @@ class SuratKendaraanDinas extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by', 'nrp_karyawan');
+    }
+
+    public function pencatatanDinas()
+    {
+        return $this->hasMany(PencatatanKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
     }
 }

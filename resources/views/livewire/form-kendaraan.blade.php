@@ -114,6 +114,11 @@
                         @csrf
     
                         <div class="form-group">
+                            <label for="merk_kendaraan">Merk Kendaraan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="merk_kendaraan" name="merk_kendaraan" required autocomplete="off">
+                        </div>  
+
+                        <div class="form-group">
                             <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
                             <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off">
                                 <option value="" disabled selected>Pilih Jenis Kendaraan</option>

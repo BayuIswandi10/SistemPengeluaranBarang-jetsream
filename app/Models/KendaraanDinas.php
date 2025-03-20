@@ -14,6 +14,7 @@ class KendaraanDinas extends Model
 
     protected $fillable = [
         'kendaraan_dinas_id',
+        'merk_kendaraan',
         'jenis_kendaraan',
         'nomor_kendaraan',
         'kapasitas_kendaraan',

@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('tb_surat_kendaraan_dinas', function (Blueprint $table) {
             $table->string('surat_kendaraan_dinas_id', 35)->primary();
-            $table->string('tujuan_penggunaan', 35);
+            $table->string('tujuan_penggunaan_1', 35);
+            $table->string('tujuan_penggunaan_2', 35)->nullable();
+            $table->string('tujuan_penggunaan_3', 35)->nullable();
             $table->date('tanggal_penggunaan');
+            $table->integer('jenis_kendaraan');
             $table->string('status', 35);
             $table->string('created_by', 35);
             $table->timestamp('created_date')->useCurrent();
             $table->time('waktu_keluar');
             $table->time('waktu_kembali');
-            $table->string('kilometer_awal', 35);
-            $table->string('kilometer_akhir', 35);
+            $table->string('kilometer_awal', 35)->nullable();
+            $table->string('kilometer_akhir', 35)->nullable();
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
