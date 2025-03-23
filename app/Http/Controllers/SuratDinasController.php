@@ -60,8 +60,10 @@ class SuratDinasController extends Controller
             'created_by' => 'required|string',
             'waktu_keluar' => 'required',
             'waktu_kembali' => 'required',
+            'peserta' => 'nullable|array', // Memastikan peserta dikirim dalam bentuk array
+            'peserta.*.nrp_karyawan' => 'required|string', // Validasi setiap peserta harus memiliki nrp_karyawan
         ]);
-
+    
         DB::beginTransaction();
         try {
             $nrpKaryawan = $request->input('created_by');
@@ -69,11 +71,11 @@ class SuratDinasController extends Controller
             if (!$user) {
                 return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
             }
-
+    
             // Generate surat_dinas_id
             $suratDinasID = $this->generateSuratDinasID($request->jenis_kendaraan, $request->tanggal_penggunaan);
-
-            // Simpan ke database
+    
+            // Simpan ke database tb_surat_kendaraan_dinas
             $suratDinas = SuratKendaraanDinas::create([
                 'surat_kendaraan_dinas_id' => $suratDinasID,
                 'tujuan_penggunaan_1' => $request->tujuan_penggunaan_1,
@@ -87,32 +89,28 @@ class SuratDinasController extends Controller
                 'waktu_keluar' => $request->waktu_keluar,
                 'waktu_kembali' => $request->waktu_kembali,
             ]);
-
-            if ($request->has('peserta') && is_array($request->input('peserta'))) {
-                foreach ($request->input('peserta') as $peserta) {
-                    if (isset($peserta['nrp_karyawan'])) {
-                        $data = [
+    
+            // Cek apakah ada peserta yang dikirim
+            if ($request->has('peserta') && is_array($request->peserta)) {
+                foreach ($request->peserta as $peserta) {
+                    // Pastikan NRP peserta tidak kosong
+                    if (!empty($peserta['nrp_karyawan'])) {
+                        PencatatanKendaraanDinas::create([
                             'nrp_karyawan' => $peserta['nrp_karyawan'],
                             'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
-                            'updated_date' => now(),
-                        ];
-                        
-                        // Cek apakah data valid
-                        dd($data);
-            
-                        PencatatanKendaraanDinas::create($data);
+                            'update_date' => now(),
+                        ]);
                     }
                 }
             }
-                 
-
-
+    
             DB::commit();
             return redirect()->back()->with('success', 'Surat Dinas berhasil disimpan dengan ID: ' . $suratDinasID);
-
+    
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal menyimpan surat dinas: ' . $e->getMessage());
         }
     }
+    
 }

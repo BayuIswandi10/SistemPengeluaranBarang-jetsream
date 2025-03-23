@@ -351,9 +351,9 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                                                <td><input type="text" name="peserta[0][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                {{-- <td><input type="text" name="peserta[0][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td> --}}
                                                 {{-- <td>
                                                     <select name="satuan[]" class="form-control" required>
                                                         <option value="" disabled selected>Pilih Satuan</option>
@@ -993,9 +993,7 @@
 
             newRow.innerHTML = `
                 <td class="nomor">${counter += 1}</td>
-                <td><input type="text" name="peserta[${counter}][nrp]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counter}][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counter}][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
 
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
