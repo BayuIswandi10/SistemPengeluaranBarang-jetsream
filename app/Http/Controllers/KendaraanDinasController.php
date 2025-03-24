@@ -156,7 +156,6 @@ class KendaraanDinasController extends Controller
             $id = $request->input('kendaraan_dinas_id');
             $kendaraan = KendaraanDinas::findOrFail($id);
     
-            // Ubah status kendaraan menjadi 0 (Tidak Tersedia)
             $kendaraan->update([
                 'status_kendaraan' => 0,
                 'updated_by' => Auth::user()->nrp_karyawan,

@@ -178,15 +178,17 @@ class PengeluaranBarangController extends Controller
         if ($lokasiBarangKeluar === $tujuanPengeluaran) {
             return redirect()->back()->with('error', 'Lokasi barang keluar dan tujuan pengeluaran barang tidak boleh sama!')->withInput();
         }
+
+        $nrpKaryawan = $request->input('created_by');
+        $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
+        }
     
         DB::beginTransaction();
     
         try {
-            $nrpKaryawan = $request->input('created_by');
-            $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
-            if (!$user) {
-                return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
-            }
+
     
             $departemen = $user->departemen;
             $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'), $departemen);

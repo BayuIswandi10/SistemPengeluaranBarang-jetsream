@@ -63,14 +63,15 @@ class SuratDinasController extends Controller
             'peserta' => 'nullable|array', // Memastikan peserta dikirim dalam bentuk array
             'peserta.*.nrp_karyawan' => 'required|string', // Validasi setiap peserta harus memiliki nrp_karyawan
         ]);
-    
+        
+        $nrpKaryawan = $request->input('created_by');
+        $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
+        }
+
         DB::beginTransaction();
         try {
-            $nrpKaryawan = $request->input('created_by');
-            $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
-            if (!$user) {
-                return redirect()->back()->with('error', 'NRP tidak ditemukan!')->withInput();
-            }
     
             // Generate surat_dinas_id
             $suratDinasID = $this->generateSuratDinasID($request->jenis_kendaraan, $request->tanggal_penggunaan);
