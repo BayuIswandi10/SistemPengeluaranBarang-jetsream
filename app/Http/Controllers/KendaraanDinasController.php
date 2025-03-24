@@ -29,7 +29,11 @@ class KendaraanDinasController extends Controller
                 Rule::unique('tb_kendaraan_dinas', 'nomor_kendaraan')
             ],
             'kapasitas_kendaraan' => 'required|integer|min:1',
+            'merk_kendaraan' => 'required|string|max:50',
         ], [
+            'merk_kendaraan.required' => 'Merk kendaraan harus diisi.',
+            'merk_kendaraan.string' => 'Merk kendaraan harus berupa teks.',
+            'merk_kendaraan.max' => 'Merk kendaraan tidak boleh lebih dari 50 karakter.',
             'jenis_kendaraan.required' => 'Jenis kendaraan harus diisi.',
             'jenis_kendaraan.integer' => 'Jenis kendaraan harus berupa angka.',
             'nomor_kendaraan.required' => 'Nomor kendaraan harus diisi.',
@@ -50,6 +54,7 @@ class KendaraanDinasController extends Controller
         try {
             // Simpan data kendaraan baru (kendaraan_dinas_id otomatis di-generate)
             KendaraanDinas::create([
+                'merk_kendaraan' => $request->merk_kendaraan,
                 'jenis_kendaraan' => $request->jenis_kendaraan,
                 'nomor_kendaraan' => $request->nomor_kendaraan,
                 'kapasitas_kendaraan' => $request->kapasitas_kendaraan,
@@ -75,19 +80,27 @@ class KendaraanDinasController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request)
     {
-        $kendaraan = KendaraanDinas::findOrFail($id);
-        return response()->json($kendaraan);
+        $kendaraanId = $request->kendaraan_dinas_id;
+        $kendaraan = KendaraanDinas::findOrFail($kendaraanId);
+        return response()->json([
+            'kendaraan_dinas_id'      => $kendaraan->kendaraan_dinas_id,
+            'jenis_kendaraan'            => $kendaraan->jenis_kendaraan,
+            'merk_kendaraan'             => $kendaraan->merk_kendaraan,
+            'nomor_kendaraan'            => $kendaraan->nomor_kendaraan,
+            'kapasitas_kendaraan'        => $kendaraan->kapasitas_kendaraan
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
+        $id = $request->kendaraan_dinas_id;
     
         $validator = Validator::make($request->all(), [
             'jenis_kendaraan' => 'required|integer',
@@ -122,6 +135,7 @@ class KendaraanDinasController extends Controller
             $kendaraan->update([
                 'jenis_kendaraan' => $request->jenis_kendaraan,
                 'nomor_kendaraan' => $request->nomor_kendaraan,
+                'merk_kendaraan' => $request->merk_kendaraan,
                 'kapasitas_kendaraan' => $request->kapasitas_kendaraan,
                 'updated_by' => $nrpKaryawan,
                 'updated_date' => now(),
@@ -136,8 +150,30 @@ class KendaraanDinasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function nonAktif(Request $request)
     {
-        //
+        try {
+            $id = $request->input('kendaraan_dinas_id');
+            $kendaraan = KendaraanDinas::findOrFail($id);
+    
+            // Ubah status kendaraan menjadi 0 (Tidak Tersedia)
+            $kendaraan->update([
+                'status_kendaraan' => 0,
+                'updated_by' => Auth::user()->nrp_karyawan,
+                'updated_at' => now(),
+            ]);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Kendaraan berhasil dinonaktifkan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
+    
+    
 }

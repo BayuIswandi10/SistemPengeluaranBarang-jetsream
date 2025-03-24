@@ -54,8 +54,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/pengeluaran/reject-status', [ApprovalController::class, 'rejectStatus'])->name('approval.rejectStatus');
 
     Route::post('/kendaraan', [KendaraanDinasController::class, 'store'])->name('kendaraan.store');    
-    Route::get('/kendaraan/edit/{id}', [KendaraanDinasController::class, 'edit'])->name('kendaraan.edit');
-    Route::put('/kendaraan/update/{id}', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
+    Route::get('/kendaraan/edit', [KendaraanDinasController::class, 'edit'])->name('kendaraan.edit');
+    Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
+    Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    
 
 
 });

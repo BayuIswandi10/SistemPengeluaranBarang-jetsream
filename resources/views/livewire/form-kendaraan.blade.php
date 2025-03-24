@@ -83,13 +83,13 @@
                                         data-id="{{ $kendaraan->kendaraan_dinas_id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="" method="POST" style="display:inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus kendaraan ini?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <!-- Button reject -->
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm mr-2 reject-status" 
+                                        data-id="{{ $kendaraan->kendaraan_dinas_id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -160,11 +160,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('kendaraan.update', ['id' => $kendaraan->kendaraan_dinas_id]) }}" enctype="multipart/form-data" id="editForm">
+                    <form method="POST" action="{{ route('kendaraan.update') }}" enctype="multipart/form-data" id="editForm">
                         @csrf
                         @method('PUT')
         
                         <input type="hidden" name="kendaraan_dinas_id" id="edit_kendaraan_dinas_id">
+
+                        <div class="form-group">
+                            <label for="merk_kendaraan">Merk Kendaraan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_merk_kendaraan" name="merk_kendaraan" required autocomplete="off">
+                        </div> 
         
                         <div class="form-group">
                             <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
@@ -204,16 +209,23 @@
 
         // Kosongkan field sebelum diisi ulang
         $('#edit_kendaraan_dinas_id').val('');
+        $('#edit_merk_kendaraan').val('');
         $('#edit_jenis_kendaraan').val('');
         $('#edit_nomor_kendaraan').val('');
         $('#edit_kapasitas_kendaraan').val('');
 
+    
         // Panggil data dari server
         $.ajax({
-            url: `/kendaraan/edit/${kendaraanId}`,  // Gunakan metode GET
+            url: `/kendaraan/edit`,  // Gunakan metode GET
             method: 'GET',
+            data: {
+                kendaraan_dinas_id: kendaraanId,
+                "_token": "{{ csrf_token() }}" // CSRF Token
+            },
             success: function (response) {
                 $('#edit_kendaraan_dinas_id').val(response.kendaraan_dinas_id);
+                $('#edit_merk_kendaraan').val(response.merk_kendaraan);
                 $('#edit_jenis_kendaraan').val(response.jenis_kendaraan);
                 $('#edit_nomor_kendaraan').val(response.nomor_kendaraan);
                 $('#edit_kapasitas_kendaraan').val(response.kapasitas_kendaraan);
@@ -224,6 +236,67 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.reject-status').forEach(button => {
+            button.addEventListener('click', function () {
+                const kendaraanId = this.getAttribute('data-id');
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Anda akan menonaktifkan kendaraan dinas!",
+                    icon: 'info',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, nonaktifkan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("{{ route('kendaraan.nonAktif') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken
+                            },
+                            body: JSON.stringify({ kendaraan_dinas_id: kendaraanId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload(); // Reload halaman setelah berhasil
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Error: ' + error.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+
 
     $(document).ready(function () {
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
