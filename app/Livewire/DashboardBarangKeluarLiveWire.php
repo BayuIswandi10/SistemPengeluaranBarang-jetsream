@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
-class Dashboard extends Component
+class DashboardBarangKeluarLiveWire extends Component
 {
     public function render()
     {
@@ -18,17 +18,17 @@ class Dashboard extends Component
 
         
 
-        if ($user->level === 'Level 1') {
+        if ($user->level === 'Staff') {
             $pengeluaranBarangs = $query->where(function ($q) use ($user) {
                 $q->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->orWhere('created_by', $user->nrp_karyawan);
             })->get();
-        } elseif ($user->level === 'Level 2') {
+        } elseif ($user->level === 'Ka.Sie') {
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Level 4' || $user->level === 'Level 3' || $user->level === 'Level 5' ) {
+        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' ) {
             $pengeluaranBarangs = $query->get();
         } else {
             $pengeluaranBarangs = collect();

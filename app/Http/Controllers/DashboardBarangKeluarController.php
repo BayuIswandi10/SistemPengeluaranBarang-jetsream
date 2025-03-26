@@ -6,7 +6,7 @@ use App\Models\PengeluaranBarang;
 
 use Illuminate\Support\Facades\Auth;
 
-class DashboardController extends Controller
+class DashboardBarangKeluarController extends Controller
 {
     public function index()
     {
@@ -33,17 +33,17 @@ class DashboardController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Level 1') {
+            if ($user->level === 'Staff') {
                 $pengeluaranBarangs = $query->where(function ($q) use ($user) {
                     $q->whereHas('user', function ($query) use ($user) {
                         $query->where('departemen', $user->departemen);
                     })->orWhere('created_by', $user->nrp_karyawan);
                 })->get();
-            } elseif ($user->level === 'Level 2') {
+            } elseif ($user->level === 'Ka.Sie') {
                 $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            } elseif (in_array($user->level, ['Level 3', 'Level 4', 'Level 5'])) {
+            } elseif (in_array($user->level, ['Ka.Dept', 'Security'])) {
                 $pengeluaranBarangs = $query->get();
             } else {
                 $pengeluaranBarangs = collect(); // Jika level tidak dikenali, kembalikan data kosong

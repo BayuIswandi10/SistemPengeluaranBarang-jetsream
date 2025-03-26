@@ -37,4 +37,9 @@ class SuratKendaraanDinas extends Model
     {
         return $this->hasMany(PencatatanKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
     }
+
+    public function approval()
+    {
+        return $this->hasMany(ApprovalKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
+    }
 }

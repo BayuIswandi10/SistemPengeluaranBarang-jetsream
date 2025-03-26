@@ -2,8 +2,8 @@
     <div class="container-fluid">
         <body>
             <div class="card mt-3">
-            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                <h5 class="card-title mb-0 flex-grow-1">Informasi Pengajuan Akumulasi Harian</h5>
+                <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+                    <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
                     <div class="d-flex align-items-center w-100 justify-content-end">
                         <!-- Input Tanggal -->
                         <div class="row g-3">
@@ -118,8 +118,14 @@
                                                             @elseif ($pengeluaranBarang->status == 'Level 3')
                                                                 Menunggu Persetujuan Ka.Dept GA
                                                             @elseif ($pengeluaranBarang->status == 'Level 4')
+                                                                @if ($pengeluaranBarang->kategori_pengeluaran == 1)
+                                                                Menunggu Persetujuan Finance
+                                                                @else
                                                                 Menunggu Persetujuan Security
+                                                                @endif
                                                             @elseif ($pengeluaranBarang->status == 'Level 5')
+                                                                Menunggu Persetujuan Security
+                                                            @elseif ($pengeluaranBarang->status == 'Level 6')
                                                                 Sudah Disetujui
                                                             @elseif ($pengeluaranBarang->status == 'Level 0')
                                                                 Ditolak
@@ -218,7 +224,7 @@
             <div>
             <div class="row">
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
-            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Level 4', 'Level 5'])) col-md-6 @else col-md-12 @endif">
+            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security'])) col-md-6 @else col-md-12 @endif">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
                         <div class="btn-group" role="group" style="margin-left: 0;">
@@ -237,7 +243,7 @@
 
 
             <!-- Bagian Kanan - Diagram Pie -->
-            @if(Auth::check() && in_array(Auth::user()->level, ['Level 5', 'Level 4']))
+            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security']))
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
@@ -601,13 +607,14 @@
                                         filteredData = response.data.pengeluaranBarangs.data || []; // Tampilkan semua data jika statusFilter kosong
                                     }
 
-                                    // Mapping status untuk tabel
+                                    // Mapping status level ke tampilan
                                     const statusMapping = {
                                         'Level 1': 'Menunggu Persetujuan PIC/Ka.Sie',
                                         'Level 2': 'PIC/Ka.Sie Sudah Menyetujui',
                                         'Level 3': 'Menunggu Persetujuan Ka.Dept GA',
-                                        'Level 4': 'Menunggu Persetujuan Security',
-                                        'Level 5': 'Sudah Disetujui',
+                                        'Level 4': 'Menunggu Persetujuan Finance/Security',
+                                        'Level 5': 'Menunggu Persetujuan Security',
+                                        'Level 6': 'Sudah Disetujui',
                                         'Level 0': 'Ditolak',
                                     };
 

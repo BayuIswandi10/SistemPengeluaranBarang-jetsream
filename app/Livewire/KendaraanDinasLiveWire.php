@@ -4,7 +4,7 @@ namespace App\Livewire;
 use App\Models\KendaraanDinas;
 use Livewire\Component;
 
-class FormKendaraan extends Component
+class KendaraanDinasLiveWire extends Component
 {
     public function render()
     {

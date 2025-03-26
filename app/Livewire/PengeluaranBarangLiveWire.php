@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PengeluaranBarang;
 use Illuminate\Http\Request;
 
-class FormPengeluaran extends Component
+class PengeluaranBarangLiveWire extends Component
 {
     public $pengeluaranBarangId; // Menyimpan nomor surat jalan
 

@@ -37,7 +37,7 @@ class PengeluaranBarang extends Model
 
     public function approval()
     {
-        return $this->hasMany(Approval::class, 'pengeluaran_barang_id', 'pengeluaran_barang_id');
+        return $this->hasMany(ApprovalBarangKeluar::class, 'pengeluaran_barang_id', 'pengeluaran_barang_id');
     }
 
     public function barangKeluar()

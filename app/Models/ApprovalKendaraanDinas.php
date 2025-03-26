@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ApprovalPenggunaanKendaraanDinas extends Model
+class ApprovalKendaraanDinas extends Model
 {
     protected $table = 'tb_approval_penggunaan_kendaraan_dinas';
     protected $primaryKey = 'approval_penggunaan_kendaraan_dinas_id';

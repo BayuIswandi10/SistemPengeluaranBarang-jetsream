@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
-class Approval extends Model
+class ApprovalBarangKeluar extends Model
 {
     use HasFactory;
 

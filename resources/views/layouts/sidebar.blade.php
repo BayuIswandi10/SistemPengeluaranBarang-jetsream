@@ -8,16 +8,20 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex flex-column">
             <div class="info">
                 @if(Auth::check())
-                    {{ Auth::user()->name }}
+                    <strong>{{ Auth::user()->level }}</strong>
+                    <strong>{{ Auth::user()->departemen }}</strong>
+                @endif
+            </div>
+
+            <div class="info mt-1">
+                @if(Auth::check())
+                    <span>{{ Auth::user()->name }}</span>
                 @endif
             </div>
         </div>
-        
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -56,8 +60,8 @@
                     @endif
 
                     @if(Auth::check() && Auth::user()->level === 'Security')
-                        <li class="nav-item {{ request()->routeIs('scan') ? 'menu-open' : '' }}"> 
-                            <a href="{{ route('scan') }}" class="nav-link {{ request()->routeIs('security', 'scan') ? 'active' : '' }}"> 
+                        <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
+                            <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 
                         <p>Pemeriksaan Barang Keluar</p> </a> </li> 
                     @endif

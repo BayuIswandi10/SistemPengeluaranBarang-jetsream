@@ -576,7 +576,7 @@
                         <form action="{{ route('approval.updateNopolisi') }}" method="POST" id="approvalForm">
                             @csrf
                             @method('POST')
-                            <button type="button" class="btn btn-success" onclick="saveApproval()">Setujui</button>
+                            <button type="button" class="btn btn-success" onclick="saveApproval()">Simpan</button>
                         </form>
                         <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-primary" id="btnPrintQR" onclick="printIframe()">Cetak QR Code</button>

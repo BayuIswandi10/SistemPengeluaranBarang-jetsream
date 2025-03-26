@@ -1,10 +1,8 @@
-
 <div class="content-wrapper">
     <div class="container-fluid">
-        <h1 class="h3 mb-2 mt-2 text-gray-800">Scan Barcode Pengeluaran Barang</h1>
   
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
                 <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
             </div>
             <div class="card-body">

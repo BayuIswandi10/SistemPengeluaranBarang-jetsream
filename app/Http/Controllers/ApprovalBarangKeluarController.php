@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Approval;
+use App\Models\ApprovalBarangKeluar;
 use App\Models\PengeluaranBarang;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ApprovalNotification;
 use Endroid\QrCode\QrCode as QrCodeQrCode;
 
-class ApprovalController extends Controller
+class ApprovalBarangKeluarController extends Controller
 {
     public function getDetail(Request $request){
         $pengeluaranId = $request->pengeluaran_barang_id;
@@ -27,7 +27,7 @@ class ApprovalController extends Controller
     private function generateApprovalId()
     {
         // Mendapatkan ID terakhir
-        $lastId = Approval::max('approval_id');
+        $lastId = ApprovalBarangKeluar::max('approval_id');
     
         // Jika belum ada ID, mulai dari APR0001
         if (!$lastId) {
@@ -63,7 +63,7 @@ class ApprovalController extends Controller
     
             // Tambahkan data ke tb_approval untuk tracking record
             // $approvalId = $this->generateApprovalId();
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 1',
@@ -75,7 +75,7 @@ class ApprovalController extends Controller
             }
 
             //Mencari Email Pembawa
-            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
             ->where('status_approval', 'Level 1')
             ->value('created_by');
         
@@ -84,7 +84,7 @@ class ApprovalController extends Controller
             }
             
              //Mencari Email Pembawa
-             $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+             $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
              ->where('status_approval', 'Level 1')
              ->value('created_by');
 
@@ -178,7 +178,7 @@ class ApprovalController extends Controller
     
             // Tambahkan data ke tb_approval untuk tracking record
             // $approvalId = $this->generateApprovalId();
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 6',
@@ -190,7 +190,7 @@ class ApprovalController extends Controller
             }
 
               //Mencari Email Pembawa
-              $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+              $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
               ->where('status_approval', 'Level 1')
               ->value('created_by');
           
@@ -199,7 +199,7 @@ class ApprovalController extends Controller
               }
 
                 //Mencari Email Pembawa
-                $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->where('status_approval', 'Level 1')
                 ->value('created_by');
           
@@ -252,7 +252,7 @@ class ApprovalController extends Controller
     
             // Tambahkan data ke tb_approval untuk tracking record
             //$approvalId = $this->generateApprovalId();
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 2',
@@ -264,7 +264,7 @@ class ApprovalController extends Controller
               }
 
             //Mencari Email Pembawa
-            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
             ->where('status_approval', 'Level 1')
             ->value('created_by');
           
@@ -317,7 +317,7 @@ class ApprovalController extends Controller
     
             // Tambahkan data ke tb_approval untuk tracking record
             // $approvalId = $this->generateApprovalId();
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 3',
@@ -329,7 +329,7 @@ class ApprovalController extends Controller
              }
 
             //Mencari Email Pembawa
-            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
             ->where('status_approval', 'Level 1')
             ->value('created_by');
          
@@ -382,7 +382,7 @@ class ApprovalController extends Controller
     
             // Tambahkan data ke tb_approval untuk tracking record
             // $approvalId = $this->generateApprovalId();
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 4',
@@ -394,7 +394,7 @@ class ApprovalController extends Controller
             }
     
               //Mencari Email Pembawa
-              $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+              $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
               ->where('status_approval', 'Level 1')
               ->value('created_by');
           
@@ -458,7 +458,7 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record (Level 5)
-            $approval = Approval::create([
+            $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 5',
@@ -470,7 +470,7 @@ class ApprovalController extends Controller
             }
     
             // Mencari email pembawa (Level 1)
-            $approvalLevel1 = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            $approvalLevel1 = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->where('status_approval', 'Level 1')
                 ->value('created_by');
     
@@ -527,7 +527,7 @@ class ApprovalController extends Controller
             }
     
             // Tambahkan data ke tb_approval untuk tracking record
-            Approval::create([
+            ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'status_approval' => 'Level 0',
@@ -535,7 +535,7 @@ class ApprovalController extends Controller
             ]);
     
             //Mencari Email Pembawa
-            $approval = Approval::where('pengeluaran_barang_id', $pengeluaranBarangId)
+            $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
             ->where('status_approval', 'Level 1')
             ->value('created_by');
         
@@ -582,7 +582,9 @@ class ApprovalController extends Controller
             'Level 2' => 'Telah Disetujui Sebagai Yang Mengeluarkan',
             'Level 3' => 'Telah Menyetujui dari Ka.Dept Ybs',
             'Level 4' => 'Telah Mengetahui dari Ka.Dept GA',
-            'Level 5' => 'Telah Memeriksa oleh Security',
+            'Level 5' => 'Telah Menerima dari Finance',
+            'Level 6' => 'Telah Memeriksa oleh Security',
+            'Level 6' => 'Telah Memeriksa oleh Security',
         ];
 
         return $statusMap[$level] ?? 'Ditolak';
@@ -591,10 +593,10 @@ class ApprovalController extends Controller
     private function getDepartmentName($departmentId)
     {
         $statusDepartmentMap = [
-            'Level 2' => 'PIC/Ka.Sie',
-            'Level 3' => 'Ka.Dept Ybs',
-            'Level 4' => 'Ka.Dept GA',
-            'Level 5' => 'Security',
+            'Staff' => 'Staff',
+            'Ka.Sie' => 'PIC/Ka.Sie',
+            'Ka.Dept' => 'Ka.Dept',
+            'Security' => 'Security',
         ];
 
         return $statusDepartmentMap[$departmentId] ?? 'Tidak Diketahui';
