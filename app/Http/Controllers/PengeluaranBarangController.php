@@ -58,8 +58,11 @@ class PengeluaranBarangController extends Controller
         return response()->json([
             'barang_keluar' => $pengeluaranBarang->barangKeluar,
             'informasi_tambahan' => $approvalData,
-            'status' => $pengeluaranBarang->status, // Tambahkan status pengeluaran
-            'kategori_pengeluaran' => $pengeluaranBarang->kategori_pengeluaran,
+            'status' => $pengeluaranBarang->status ?? 'Tidak Diketahui',
+            'kategori_pengeluaran' => isset($pengeluaranBarang->kategori_pengeluaran) 
+                ? (int) $pengeluaranBarang->kategori_pengeluaran 
+                : 0, // Default ke Non Scrap
+            'no_polisi' => $pengeluaranBarang->no_polisi ?? 'Tidak Ada',
         ], 200);
     }
 
@@ -87,6 +90,11 @@ class PengeluaranBarangController extends Controller
         return response()->json([
             'barang_keluar' => $pengeluaranBarang->barangKeluar,
             'informasi_tambahan' => $approvalData,
+            'status' => $pengeluaranBarang->status ?? 'Tidak Diketahui',
+            'kategori_pengeluaran' => isset($pengeluaranBarang->kategori_pengeluaran) 
+                ? (int) $pengeluaranBarang->kategori_pengeluaran 
+                : 0, // Default ke Non Scrap
+            'no_polisi' => $pengeluaranBarang->no_polisi ?? 'Tidak Ada',
         ], 200);
     }
 
@@ -99,7 +107,7 @@ class PengeluaranBarangController extends Controller
         $bulanRomawi = $this->convertToRoman($bulanAngka);
 
         // Hitung nomor urut surat jalan untuk bulan dan tahun yang sama
-        $lastNumber = DB::table('tb_pengeluaran_barang')
+        $lastNumber = DB::table('tb_pencatatan_pengeluaran_barang')
             ->whereYear('created_date', $tahun)
             ->whereMonth('created_date', $bulanAngka)
             ->count();
@@ -182,7 +190,7 @@ class PengeluaranBarangController extends Controller
                 ]);
             }
     
-            // Insert ke tabel tb_approval
+            // Insert ke tabel tb_approval_barang_keluar
             ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
@@ -249,7 +257,7 @@ class PengeluaranBarangController extends Controller
             // Cari data pengeluaran barang berdasarkan ID
             $pengeluaranBarang = PengeluaranBarang::findOrFail($data['pengeluaran_barang_id']);
     
-            // Update data utama di tabel tb_pengeluaran_barang
+            // Update data utama di tabel tb_pencatatan_pengeluaran_barang
             $pengeluaranBarang->update([
                 'jenis_kendaraan'       => $data['jenis_kendaraan'],
                 'lokasi_barang_keluar'  => $data['lokasi_barang_keluar'],
@@ -258,8 +266,8 @@ class PengeluaranBarangController extends Controller
                 'updated_date'          => now(),
             ]);
     
-            // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini dari tabel tb_barang_keluar
-            $existingBarangIds = DB::table('tb_barang_keluar')
+            // Ambil semua barang_keluar_id yang terkait dengan pengeluaran_barang_id ini dari tabel tb_detail_barang_keluar
+            $existingBarangIds = DB::table('tb_detail_barang_keluar')
                 ->where('pengeluaran_barang_id', $pengeluaranBarang->pengeluaran_barang_id)
                 ->pluck('barang_keluar_id')
                 ->toArray();

@@ -46,14 +46,13 @@
         </div>
 
         <div class="container d-flex justify-content-center align-items-center mt-5 min-vh-100">
-            <div class="login-box w-100" style="max-width: 400px;">
+            <div class="login-box w-150" style="max-width: 300px;">
                 <div class="card card-outline card-primary login-card shadow-lg">
                     <div class="card-body">
-                        <div class="text-center">
-                            <b class="h2">Pengeluaran Barang</b>
+                        <div class="text-center mb-3">
+                            <b class="h2">Masuk</b>
                         </div>
                         <hr>
-                        <h4 class="login-box-msg">Masuk User</h4>
 
                         <x-validation-errors class="mb-4" />
 
@@ -66,7 +65,7 @@
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
 
-                            <div class="form-group">
+                            <div class="form-group mt-3">
                                 <x-label for="email" value="{{ __('Nrp/Email') }}" />
                                 <x-input id="loginkey" class="form-control" type="text" name="loginkey" :value="old('loginkey')" required autofocus autocomplete="off" />
                             </div>
@@ -76,17 +75,6 @@
                                 <x-input id="password" class="form-control" type="password" name="password" required autocomplete="off" />
                             </div>
 
-                            <div class="form-group mt-3 d-flex justify-content-between">
-                                <label for="remember_me" class="d-flex align-items-center">
-                                    <x-checkbox id="remember_me" name="remember" />
-                                    <span class="ms-2 text-sm text-gray-600">{{ __('Ingat Saya') }}</span>
-                                </label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
-                                        {{ __('Lupa kata sandi ?') }}
-                                    </a>
-                                @endif
-                            </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-4">
                                 <a href="/" class="btn btn-secondary w-50 me-2">

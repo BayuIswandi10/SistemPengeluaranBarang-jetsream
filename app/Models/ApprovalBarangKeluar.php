@@ -13,7 +13,7 @@ class ApprovalBarangKeluar extends Model
     protected $primaryKey = 'approval_id';
     public $incrementing = true;
     protected $keyType = 'int'; 
-    protected $table = 'tb_approval';
+    protected $table = 'tb_approval_barang_keluar';
     public $timestamps = false;
 
     protected $fillable = [

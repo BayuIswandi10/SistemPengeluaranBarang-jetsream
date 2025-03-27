@@ -11,7 +11,7 @@ class BarangKeluar extends Model
     use HasFactory;
 
     protected $primaryKey = 'barang_keluar_id';
-    protected $table = 'tb_barang_keluar';
+    protected $table = 'tb_detail_barang_keluar';
     public $incrementing = true;
     protected $keyType = 'int'; 
     public $timestamps = false;

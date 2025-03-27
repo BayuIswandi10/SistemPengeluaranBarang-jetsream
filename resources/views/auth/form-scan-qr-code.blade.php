@@ -78,8 +78,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
                         <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                        <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
                     </div>
                     <!-- Card untuk Tabel Barang Keluar -->
                     <div class="card">
@@ -170,6 +174,8 @@
                     method: "POST",
                     data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                     success: function (data) {
+                        document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                        document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                         const tbody = document.getElementById('detailBody');
                         const additionalInfoBody = document.getElementById('additionalInfoBody');
 

@@ -12,7 +12,7 @@ class PengeluaranBarang extends Model
     protected $primaryKey = 'pengeluaran_barang_id';
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $table = 'tb_pengeluaran_barang';
+    protected $table = 'tb_pencatatan_pengeluaran_barang';
     public $timestamps = false;
 
     protected $fillable = [

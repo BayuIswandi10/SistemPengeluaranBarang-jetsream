@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tb_pengeluaran_barang', function (Blueprint $table) {
+        Schema::create('tb_pencatatan_pengeluaran_barang', function (Blueprint $table) {
             $table->string('pengeluaran_barang_id', 35)->primary();
             $table->integer('kategori_pengeluaran')->nullable();
             $table->string('pembawa_scrap', 35)->nullable();
@@ -35,6 +35,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tb_pengeluaran_barang');
+        Schema::dropIfExists('tb_pencatatan_pengeluaran_barang');
     }
 };

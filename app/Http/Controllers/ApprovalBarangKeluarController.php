@@ -53,7 +53,7 @@ class ApprovalBarangKeluarController extends Controller
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
     
-            // Update status pada tb_pengeluaran_barang
+            // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update(['status' => 'Level 1']);
     
@@ -61,7 +61,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             // $approvalId = $this->generateApprovalId();
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -126,7 +126,7 @@ class ApprovalBarangKeluarController extends Controller
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
             $noPolisi = $request->input('no_polisi');
     
-            // Update hanya tabel tb_pengeluaran_barang
+            // Update hanya tabel tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update([
                     'no_polisi' => $noPolisi,
@@ -165,7 +165,7 @@ class ApprovalBarangKeluarController extends Controller
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
             $noPolisi = $request->input('no_polisi');
     
-            // Update status pada tb_pengeluaran_barang menjadi "Level 5" dan update no_polisi
+            // Update status pada tb_pencatatan_pengeluaran_barang menjadi "Level 5" dan update no_polisi
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update([
                     'status' => 'Level 6',
@@ -176,7 +176,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             // $approvalId = $this->generateApprovalId();
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -242,7 +242,7 @@ class ApprovalBarangKeluarController extends Controller
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
     
-            // Update status pada tb_pengeluaran_barang
+            // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update(['status' => 'Level 2']);
     
@@ -250,7 +250,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             //$approvalId = $this->generateApprovalId();
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -307,7 +307,7 @@ class ApprovalBarangKeluarController extends Controller
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
     
-            // Update status pada tb_pengeluaran_barang
+            // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update(['status' => 'Level 3']);
     
@@ -315,7 +315,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             // $approvalId = $this->generateApprovalId();
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -372,7 +372,7 @@ class ApprovalBarangKeluarController extends Controller
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
     
-            // Update status pada tb_pengeluaran_barang
+            // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update(['status' => 'Level 4']);
     
@@ -380,7 +380,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             // $approvalId = $this->generateApprovalId();
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
@@ -457,7 +457,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Gagal memperbarui status pengeluaran barang.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record (Level 5)
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record (Level 5)
             $approval = ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
@@ -518,7 +518,7 @@ class ApprovalBarangKeluarController extends Controller
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
     
-            // Update status pada tb_pengeluaran_barang
+            // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
                 ->update(['status' => 'Level 0']);
     
@@ -526,7 +526,7 @@ class ApprovalBarangKeluarController extends Controller
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
             }
     
-            // Tambahkan data ke tb_approval untuk tracking record
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
             ApprovalBarangKeluar::create([
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,

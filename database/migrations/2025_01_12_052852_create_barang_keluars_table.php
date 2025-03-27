@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tb_barang_keluar', function (Blueprint $table) {
+        Schema::create('tb_detail_barang_keluar', function (Blueprint $table) {
             $table->bigIncrements('barang_keluar_id');
             $table->string('pengeluaran_barang_id', 35);
             $table->string('nama_barang', 50);
@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('keterangan_barang', 500);
 
             $table->foreign('pengeluaran_barang_id')
-                ->references('pengeluaran_barang_id')->on('tb_pengeluaran_barang')
+                ->references('pengeluaran_barang_id')->on('tb_pencatatan_pengeluaran_barang')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
@@ -25,7 +25,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tb_barang_keluar');
+        Schema::dropIfExists('tb_detail_barang_keluar');
         
     }
 };

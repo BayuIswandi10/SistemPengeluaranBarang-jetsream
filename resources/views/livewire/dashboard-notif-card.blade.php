@@ -164,11 +164,17 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                                            <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
+                                        </div>  
                                         <!-- Card untuk Tabel Barang Keluar -->
                                         <div class="card">
                                             <div class="card-header bg-primary text-white">
-                                                <h6 class="mb-0">Detail Barang Keluar</h6>
+                                                <h6 class="mb-0">Informasi Barang Keluar</h6>
                                             </div>
                                             <div class="card-body">
                                                 <table id="detaildataTableModal" class="table table-bordered">
@@ -381,14 +387,14 @@
                     const button = $(event.relatedTarget); // Button yang diklik
                     const nomor = button.data('nomor'); // Nomor pengeluaran barang
                     document.getElementById('nomorPengeluaranCard').innerText = nomor;
-
                     $.ajax({
                         url: "/pengeluaran/detail",
                         method: "POST",
                         data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                         success: function (data) {
                             // console.log("Response dari server:", data); // Debugging
-
+                            document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                            document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                             const tbody = document.getElementById('detailBody');
                             const additionalInfoBody = document.getElementById('additionalInfoBody');
 

@@ -26,16 +26,19 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center">
                     <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                    <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
                     <button type="button" class="btn btn-success" id="approveButton" data-id="">Setuju</button>
-
                 </div>
                 
                 <!-- Card untuk Tabel Barang Keluar -->
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h6 class="mb-0">Detail Barang Keluar</h6>
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Informasi Barang Keluar</h6>
                     </div>
                     <div class="card-body">
                         <table id="dataTable" class="table table-bordered">
@@ -118,6 +121,8 @@
             method: "POST",
             data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
             success: function (data) {
+                document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                 const tbody = document.getElementById('detailBody');
                 const additionalInfoBody = document.getElementById('additionalInfoBody');
                 
@@ -272,8 +277,8 @@
           }
 
           Swal.fire({
-              title: 'Konfirmasi',
-              text: "Apakah Anda yakin ingin menyetujui pengeluaran ini?",
+              title: 'Konfirmasi Persetujuan',
+              text: 'Apakah anda menyetujui No Pengeluaran Barang ' + pengeluaranBarangId + '?',
               icon: 'info',
               showCancelButton: true,
               reverseButtons: true,
