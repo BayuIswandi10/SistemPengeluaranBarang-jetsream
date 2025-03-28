@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('surat_kendaraan_dinas_id', 35);
             $table->string('nrp_karyawan', 35);
             $table->timestamp('update_date')->useCurrent();
+            $table->string('status', 35)->nullable();
 
             $table->foreign('surat_kendaraan_dinas_id', 'fk_pencatatan_dinas_id')
                 ->references('surat_kendaraan_dinas_id')->on('tb_surat_kendaraan_dinas')

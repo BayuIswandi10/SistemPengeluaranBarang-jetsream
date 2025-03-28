@@ -36,6 +36,7 @@ class User extends Authenticatable
         'seksi',
         'departemen',
         'level',
+        'singkatan',
         'email',
         'password',
     ];

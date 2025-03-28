@@ -115,7 +115,7 @@ class PengeluaranBarangController extends Controller
         $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
         // Gabungkan menjadi format surat jalan
-        return "{$noSurat} / {$departemen} / {$lokasi} / {$bulanRomawi} / {$tahun}";
+        return "{$noSurat}/{$departemen}/{$lokasi}/{$bulanRomawi}/{$tahun}";
     }
 
     private function convertToRoman($month)
@@ -165,7 +165,7 @@ class PengeluaranBarangController extends Controller
         try {
 
     
-            $departemen = $user->departemen;
+            $departemen = $user->singkatan;
             $pengeluaranBarangId = $this->generateSuratJalan($request->input('lokasi_barang_keluar'), $departemen);
     
             // Insert ke tabel pengeluaran_barang

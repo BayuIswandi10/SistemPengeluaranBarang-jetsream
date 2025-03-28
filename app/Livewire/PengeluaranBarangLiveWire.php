@@ -24,7 +24,7 @@ class PengeluaranBarangLiveWire extends Component
     {
         // Ambil user yang sedang login
         $user = Auth::user();
-        $dept = $user->departemen; // Kolom departemen dari tabel users
+        $dept = $user->singkatan; // Kolom singkatan departemen dari tabel users
     
         // Ambil tahun dan bulan saat ini
         $tahun = now()->format('Y');
@@ -32,7 +32,7 @@ class PengeluaranBarangLiveWire extends Component
         $bulanRomawi = $this->convertToRoman($bulanAngka);
     
         // Hitung nomor urut surat jalan untuk bulan dan tahun yang sama
-        $lastNumber = DB::table('tb_pengeluaran_barang')
+        $lastNumber = DB::table('tb_pencatatan_pengeluaran_barang')
             ->whereYear('created_date', $tahun)
             ->whereMonth('created_date', $bulanAngka)
             ->count();
@@ -40,7 +40,7 @@ class PengeluaranBarangLiveWire extends Component
         $noSurat = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
     
         // Gabungkan menjadi format surat jalan
-        $this->pengeluaranBarangId = "{$noSurat} / {$dept} / {$plant} / {$bulanRomawi} / {$tahun}";
+        $this->pengeluaranBarangId = "{$noSurat}/{$dept}/{$plant}/{$bulanRomawi}/{$tahun}";
     }
 
     private function convertToRoman($month)

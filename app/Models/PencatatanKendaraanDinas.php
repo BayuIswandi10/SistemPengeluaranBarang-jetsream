@@ -17,8 +17,9 @@ class PencatatanKendaraanDinas extends Model
         'surat_kendaraan_dinas_id',
         'nrp_karyawan',
         'update_date',
+        'status',
     ];
-    public function suratDinas()
+    public function suratKendaraanDinas()
     {
         return $this->belongsTo(SuratKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
     }

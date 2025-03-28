@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->string('nrp_karyawan', 35)->primary();
             $table->string('name', 35);
-            $table->string('seksi', 35);
-            $table->string('departemen', 20);
             $table->string('level', 15);
+            $table->string('seksi', 35);
+            $table->string('departemen', 50);
+            $table->string('singkatan', 8);
             $table->string('email', 35)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

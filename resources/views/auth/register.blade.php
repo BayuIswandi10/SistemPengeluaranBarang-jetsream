@@ -20,6 +20,11 @@
             </div>
 
             <div>
+                <x-label for="level" value="{{ __('Level') }}" />
+                <x-input id="level" class="block mt-1 w-full" type="text" name="level" :value="old('level')" required autofocus autocomplete="level" />
+            </div>
+
+            <div>
                 <x-label for="seksi" value="{{ __('Seksi') }}" />
                 <x-input id="seksi" class="block mt-1 w-full" type="text" name="seksi" :value="old('seksi')" required autofocus autocomplete="seksi" />
             </div>
@@ -30,8 +35,8 @@
             </div>
 
             <div>
-                <x-label for="level" value="{{ __('Level') }}" />
-                <x-input id="level" class="block mt-1 w-full" type="text" name="level" :value="old('level')" required autofocus autocomplete="level" />
+                <x-label for="singkatan" value="{{ __('Singkatan') }}" />
+                <x-input id="singkatan" class="block mt-1 w-full" type="text" name="singkatan" :value="old('singkatan')" required autofocus autocomplete="singkatan dept" />
             </div>
 
             <div class="mt-4">

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tb_approval_penggunaan_kendaraan_dinas', function (Blueprint $table) {
             $table->bigIncrements('approval_penggunaan_kendaraan_dinas_id');
             $table->string('surat_kendaraan_dinas_id', 35);
-            $table->string('create_by', 35);
+            $table->string('created_by', 35);
             $table->timestamp('created_date')->useCurrent();
             $table->string('status_approval', 20);
 

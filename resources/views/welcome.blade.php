@@ -165,7 +165,7 @@
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data Pengeluaran Barang</h5>
+                            <h5 class="modal-title" id="tambahDataModalLabel">Ajukan Pengeluaran Barang</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -316,11 +316,11 @@
                                     <label for="tujuan_penggunaan">Tujuan Dinas <span class="text-danger">*</span></label>
                                     <div class="d-flex gap-2">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_1" 
-                                               value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Tujuan Ke-1">
+                                               value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Tujuan Ke-1" required autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_2" 
-                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2">
+                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2" required autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_3" 
-                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3">
+                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3" required autocomplete="off">
                                     </div>
                                 </div>
                                 
@@ -351,16 +351,10 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                                                {{-- <td><input type="text" name="peserta[0][nama]" class="form-control" placeholder="Nama" required autocomplete="off"></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control" placeholder="Departemen" required autocomplete="off"></td> --}}
-                                                {{-- <td>
-                                                    <select name="satuan[]" class="form-control" required>
-                                                        <option value="" disabled selected>Pilih Satuan</option>
-                                                        <option value="unit">Unit</option>
-                                                        <option value="pcs">PCS</option>
-                                                    </select>
-                                                </td> --}}
+                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+
                                                 <td>
                                                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
                                                         <i class="fas fa-trash"></i>
@@ -993,8 +987,9 @@
 
             newRow.innerHTML = `
                 <td class="nomor">${counter += 1}</td>
-                <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control" placeholder="NRP Karyawan" required autocomplete="off"></td>
-
+                <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                         <i class="fas fa-trash"></i>
@@ -1044,6 +1039,42 @@
                 cell.textContent = index + 1;
             });
         }
+
+        $(document).ready(function () {
+            $("#created_by").on("input", function () {
+                let nrp = $(this).val();
+                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger("keyup");
+            });
+
+            $(document).on("keyup", ".nrp_karyawan", function () {
+                let nrp = $(this).val();
+                let row = $(this).closest("tr");
+
+                if (nrp.length >= 3) {
+                    $.ajax({
+                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+                        type: "GET",
+                        data: { nrp_karyawan: nrp },
+                        success: function (response) {
+                            if (response.success) {
+                                row.find(".nama").val(response.data.name);
+                                row.find(".departemen").val(response.data.departemen);
+                            } else {
+                                row.find(".nama").val("");
+                                row.find(".departemen").val("");
+                            }
+                        },
+                        error: function () {
+                            row.find(".nama").val("");
+                            row.find(".departemen").val("");
+                        }
+                    });
+                } else {
+                    row.find(".nama").val("");
+                    row.find(".departemen").val("");
+                }
+            });
+        });
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

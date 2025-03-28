@@ -71,3 +71,4 @@ Route::get('/kamera', [QRCodeController::class, 'scanner'])->name('kamera');
 Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');
 
 Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('pengajuan_dinas.store');
+Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');

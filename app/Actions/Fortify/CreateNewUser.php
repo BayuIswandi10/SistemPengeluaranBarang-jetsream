@@ -26,6 +26,7 @@ class CreateNewUser implements CreatesNewUsers
             'seksi' => ['required', 'string', 'max:255'],
             'departemen' => ['required', 'string', 'max:255'],
             'level' => ['required', 'string', 'max:255'],
+            'singkatan' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
@@ -34,9 +35,10 @@ class CreateNewUser implements CreatesNewUsers
             'nrp_karyawan' => $input['nrp_karyawan'], // Simpan NRP
             'name' => $input['name'],
             'email' => $input['email'],
+            'level' => $input['level'],
             'seksi' => $input['seksi'],
             'departemen' => $input['departemen'],
-            'level' => $input['level'],
+            'singkatan' => $input['singkatan'],
             'password' => Hash::make($input['password']),
         ]);
         

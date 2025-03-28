@@ -33,7 +33,7 @@ class SuratKendaraanDinas extends Model
         return $this->belongsTo(User::class, 'created_by', 'nrp_karyawan');
     }
 
-    public function pencatatanDinas()
+    public function pencatatanKendaraanDinas()
     {
         return $this->hasMany(PencatatanKendaraanDinas::class, 'surat_kendaraan_dinas_id', 'surat_kendaraan_dinas_id');
     }
