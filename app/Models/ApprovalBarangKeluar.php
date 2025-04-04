@@ -76,7 +76,7 @@ class ApprovalBarangKeluar extends Model
             $nextLevel = $levels[$currentLevelIndex + 1];
 
             // Generate the next approval_id based on the last entry in the database
-            $lastApproval = Approval::orderBy('approval_id', 'desc')->first();
+            $lastApproval = ApprovalBarangKeluar::orderBy('approval_id', 'desc')->first();
             if ($lastApproval) {
                 $lastNumber = (int) substr($lastApproval->approval_id, 3); // Extract numeric part
                 $nextNumber = $lastNumber + 1; // Increment the number
@@ -87,7 +87,7 @@ class ApprovalBarangKeluar extends Model
             $newApprovalId = 'APR' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT); // Format as APR0001
 
             // Create a new Approval entry with next level
-            $newApproval = new Approval();
+            $newApproval = new ApprovalBarangKeluar();
             $newApproval->approval_id = $newApprovalId;
             $newApproval->pengeluaran_barang_id = $this->pengeluaran_barang_id;
             $newApproval->status_approval = $nextLevel;

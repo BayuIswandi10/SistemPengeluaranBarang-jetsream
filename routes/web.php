@@ -7,6 +7,7 @@ use App\Livewire\PengeluaranBarangLiveWire;
 use App\Livewire\ApprovalBarangKeluarLiveWire;
 use App\Livewire\SecurityLiveWire;
 use App\Livewire\KendaraanDinasLiveWire;
+use App\Livewire\ApprovalKendaraanDinasLivewire;
 
 use App\Http\Controllers\PengeluaranBarangController;
 use App\Http\Controllers\ApprovalBarangKeluarController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\DashboardBarangKeluarController;
 use App\Http\Controllers\KendaraanDinasController;
 use App\Http\Controllers\QRCodeController;
 use App\Http\Controllers\SuratDinasController;
+use App\Http\Controllers\ApprovalKendaraanDinasController;
 
 use App\Http\Middleware\CheckLevel; 
     
@@ -35,6 +37,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
     Route::get('/approval', ApprovalBarangKeluarLiveWire::class)->name('approval');
+    Route::get('/approval-dinas', ApprovalKendaraanDinasLivewire::class)->name('approval-dinas');
 
 
     Route::get('/dashboard/get-data-card', [DashboardBarangKeluarController::class, 'getData']);
@@ -57,6 +60,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
     Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    
 
+    Route::post('/pengajuan/detailSurat', [SuratDinasController::class, 'getDetailSurat']);
+    Route::post('/pengajuan/edit', [SuratDinasController::class, 'edit'])->name('pengajuan.edit');
+
+    Route::post('/pengajuanDinas/update-status-kadeptybs', [ApprovalKendaraanDinasController::class, 'updateStatusKaDeptYBS'])->name('pengajuanDinas.updateStatusKaDeptYBS');
+    Route::post('/pengajuanDinas/update-status-kasietransportasi', [ApprovalKendaraanDinasController::class, 'updateStatusKaSieTransport'])->name('pengajuanDinas.updateStatusKaSieTransport');
+    Route::post('/pengajuanDinas/reject-status', [ApprovalKendaraanDinasController::class, 'rejectStatus'])->name('pengajuanDinas.rejectStatus');
 
 });
 Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store'])->name('pengeluaran_barang.store');

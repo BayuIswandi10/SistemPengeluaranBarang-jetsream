@@ -48,7 +48,8 @@
                     @endif
                 
 
-                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security','Super Admin']))                        <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
+                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security','Super Admin']))    
+                            <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                             <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-signature"></i>
                                 <p>
@@ -71,6 +72,18 @@
                         <a href="{{ route('kendaraan') }}" class="nav-link {{ request()->routeIs('kendaraan') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-car-side"></i>
                             <p>Kelola Kendaraan</p>
+                        </a>
+                    </li>
+                    @endif
+
+                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security']))                       
+                     <li class="nav-item {{ request()->routeIs('approval-dinas') ? 'menu-open' : '' }}">
+                        <a href="{{ route('approval-dinas') }}" class="nav-link {{ request()->routeIs('approval-dinas') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-file-signature"></i>
+                            <p>
+                                Data Persetujuan Dinas
+                                <i class="right fas"></i>
+                            </p>                            
                         </a>
                     </li>
                     @endif

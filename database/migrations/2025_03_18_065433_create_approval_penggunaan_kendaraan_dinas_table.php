@@ -23,7 +23,7 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             
-            $table->foreign('create_by')
+            $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');

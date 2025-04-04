@@ -166,7 +166,7 @@ class SuratDinasController extends Controller
                 'jenis_kendaraan' => $request->jenis_kendaraan,
                 'created_by' => $nrpKaryawan,
                 'created_date' => now(),
-                'status' => 'Pending',
+                'status' => 'Level 1',
                 'waktu_keluar' => $request->waktu_keluar,
                 'waktu_kembali' => $request->waktu_kembali,
             ]);
@@ -210,5 +210,98 @@ class SuratDinasController extends Controller
             return redirect()->back()->with('error', 'Gagal menyimpan surat dinas: ' . $e->getMessage());
         }
     }
+
+    public function getDetailSurat(Request $request)
+    {
+        $suratDinasId = $request->surat_kendaraan_dinas_id;
     
+        // Mengambil data surat dinas beserta pencatatan kendaraan dinas
+        $suratDinas = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas.user',
+            'suratDetail.kendaraan'
+        ])->findOrFail($suratDinasId);
+
+        // Mengambil informasi tambahan terkait persetujuan
+        $approvalData = ApprovalKendaraanDinas::with('user')
+            ->where('surat_kendaraan_dinas_id', $suratDinasId)
+            ->get()
+            ->map(function ($approval, $index) {
+                return [
+                    'no' => $index + 1,
+                    'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                    'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                    'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                    'status' => $approval->status_approval,
+                ];
+            });
+    
+        // Mapping data user dinas dengan nama & departemen
+        $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+            return [
+                'nrp_karyawan' => $user->nrp_karyawan,
+                'name' => $user->user->name ?? 'Tidak Diketahui',
+                'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+            ];
+        });
+
+        // Ambil data kendaraan dinas
+        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+            return [
+                'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
+                'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+                'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+            ];
+        });
+    
+        return response()->json([
+            'userDinas' => $userDinasData,
+            'informasi_tambahan' => $approvalData,
+            'data_kendaraan' => $kendaraanData,
+            'status' => $suratDinas->status ?? 'Tidak Diketahui',
+        ], 200);
+    }
+    
+    public function edit(Request $request)
+    {
+        $suratDinasId = $request->surat_kendaraan_dinas_id;
+    
+        // Mengambil data surat dinas beserta pencatatan kendaraan dinas
+        $suratDinas = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas.user',
+            'suratDetail.kendaraan'
+        ])->findOrFail($suratDinasId);
+
+    
+        // Mapping data user dinas dengan nama & departemen
+        $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+            return [
+                'nrp_karyawan' => $user->nrp_karyawan,
+                'name' => $user->user->name ?? 'Tidak Diketahui',
+                'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+            ];
+        });
+
+        // Ambil data kendaraan dinas
+        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+            return [
+                'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
+                'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+                'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+            ];
+        });
+    
+        return response()->json([
+            'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+            'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
+            'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
+            'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
+            'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
+            'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
+            'waktu_keluar' => $suratDinas->waktu_keluar,
+            'waktu_kembali' => $suratDinas->waktu_kembali,
+            'userDinas' => $userDinasData,
+            'data_kendaraan' => $kendaraanData,
+            'status' => $suratDinas->status ?? 'Tidak Diketahui',
+        ], 200);
+    }
 }

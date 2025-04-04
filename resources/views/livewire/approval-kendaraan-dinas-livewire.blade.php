@@ -33,71 +33,52 @@
                     <thead>
                         <tr>
                             <th>NO</th>
-                            <th>Nomor Pengeluaran Barang</th>
+                            <th>No Surat Pengajuan Kendaraan Dinas</th>
                             <th>Tujuan</th>
-                            <th>Jenis Kendaraan</th>
+                            <th>Jenis Mobil</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $i = 0; ?>
-                        @foreach ($pengeluaranBarangs as $pengeluaranBarang)
+                        @foreach ($kendaraanDinas as $dataKD)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
-                                <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
+                                <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
+                                <td>{{ $dataKD->tujuan_penggunaan_1 }}</td>
                                 <td>
-                                    @if ($pengeluaranBarang->status == 'Level 1')
-                                        Menunggu Persetujuan PIC/Ka.Sie
-                                    @elseif ($pengeluaranBarang->status == 'Level 2')
-                                        PIC/Ka.Sie Sudah Menyetujui
-                                    @elseif ($pengeluaranBarang->status == 'Level 3')
-                                        Menunggu Persetujuan Ka.Dept GA
-                                    @elseif ($pengeluaranBarang->status == 'Level 4')
-                                        @if ($pengeluaranBarang->kategori_pengeluaran == 1)
-                                        Menunggu Persetujuan Finance
-                                        @else
-                                        Menunggu Persetujuan Security
-                                        @endif
-                                    @elseif ($pengeluaranBarang->status == 'Level 5')
-                                        Menunggu Persetujuan Security
-                                    @elseif ($pengeluaranBarang->status == 'Level 6')
+                                    @if ($dataKD->jenis_kendaraan == 1)
+                                        Mobil Dinas
+                                    @elseif ($dataKD->jenis_kendaraan == 2)
+                                        Mobil Pribadi
+                                    @elseif ($dataKD->jenis_kendaraan == 3)
+                                        Mobil Taxi
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($dataKD->status == 'Level 1')
+                                        Menunggu Persetujuan Ka.Dept
+                                    @elseif ($dataKD->status == 'Level 2')
+                                        Menunggu Persetujuan Ka.Sie Transportasi
+                                    @elseif ($dataKD->status == 'Level 3')
                                         Sudah Disetujui
-                                    @elseif ($pengeluaranBarang->status == 'Level 0')
+                                    @elseif ($dataKD->status == 'Level 0')
                                         Ditolak
                                     @else
-                                        {{ $pengeluaranBarang->status }}
+                                        {{ $dataKD->status }}
                                     @endif
                                 </td>
                                 <td>
                                     <div class="button-group d-flex">
-                                        <!-- Button for Level 1 (Ka.Sie) -->
-                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Ka.Sie')
-                                            
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kasie" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
-                                            </button>
 
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif
                 
-                                        <!-- Button for Level 2 (Ka.Dept YBS) -->
-                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs')
+                                        <!-- Button for Level 1 (Ka.Dept YBS) -->
+                                        @if($dataKD->status === 'Level 1' && $user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs')
                                             <button 
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                                 <i class="fa-solid fa-paper-plane"></i>
                                             </button>
 
@@ -105,49 +86,39 @@
                                             <button 
                                                 type="button" 
                                                 class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                                 <i class="fa-solid fa-times-circle"></i>
                                             </button>
 
                                         @endif
                 
-                                        <!-- Button for Level 3 (Ka.Dept GA) -->
-                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Ka.Dept' && $user->departemen == 'General Affairs')
+                                        <!-- Button for Level 2 (Ka.Dept GA) -->
+                                        @if($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'General Affairs')
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                class="btn btn-success btn-sm mr-2 update-status-kasietransportasi" 
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                                 <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button Edit -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-warning btn-sm mr-2" 
+                                                data-toggle="modal" 
+                                                data-target="#editDataModal" 
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                <i class="fas fa-edit"></i>
                                             </button>
 
                                             <!-- Button reject -->
                                             <button 
                                                 type="button" 
                                                 class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                                 <i class="fa-solid fa-times-circle"></i>
                                             </button>
-                                        @endif
-
-                                        <!-- Button for finance approval -->
-                                        @if($pengeluaranBarang->status === 'Level 4' && $user->departemen === 'Finance' && $pengeluaranBarang->kategori_pengeluaran == 1)
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-finance" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif
-
-                                        
+                                        @endif                                        
 
                                         <!-- Button detail -->
                                         <button 
@@ -155,7 +126,7 @@
                                             class="btn btn-primary btn-sm mr-2" 
                                             data-toggle="modal" 
                                             data-target="#detailModal" 
-                                            data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                            data-nomor="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                             <i class="fa-solid fa-circle-info"></i>
                                         </button>
 
@@ -168,40 +139,55 @@
             </div>
         </div>
     </div>
-        
+
     {{-- Detail Modal --}}
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                    <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                        <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                        <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
+                    <!-- Card untuk Tabel Informasi Kendaraan -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">Informasi Kendaraan</h6>
+                        </div>
+                        <div class="card-body">
+                            <table id="kendaraanInfoTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No Kendaraan</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kendaraanInfoBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                     <!-- Card untuk Tabel Barang Keluar -->
                     <div class="card">
                         <div class="card-header bg-primary text-white">
-                            <h6 class="mb-0">Informasi Barang Keluar</h6>
+                            <h6 class="mb-0">Informasi Peserta</h6>
                         </div>
                         <div class="card-body">
                             <table id="detaildataTableModal" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Nomor Pengeluaran Barang</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                        <th>Satuan</th>
-                                        <th>Keterangan</th>
+                                        <th>Nrp Peserta</th>
+                                        <th>Nama Peserta</th>
+                                        <th>Departemen</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detailBody">
@@ -240,42 +226,204 @@
         </div>
     </div>
 
+    <!-- Modal Edit Order Kendaraan Dinas -->
+    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Order Kendaraan Dinas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Informasi Nomor Surat -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p><strong>Nomor Surat:</strong> <span id="nomorSurat"></span></p>
+                    </div>
+
+                    <!-- Form Edit -->
+                    <form id="editOrderForm" method="POST" action="" enctype="multipart/form-data" >
+                        @csrf
+                        @method('PUT')
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Yang Memesan -->
+                                <label for="pemesan">Yang Memesan *</label>
+                                <input type="text" id="pemesan" class="form-control" disabled>
+
+                                <!-- Rencana Pakai -->
+                                <label for="jamMulai" class="mt-2">Rencana Pakai *</label>
+                                <div class="d-flex">
+                                    <input type="time" id="jamMulai" class="form-control mr-2">
+                                    <input type="time" id="jamSelesai" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <!-- Kendaraan Info -->
+                                <label for="kendaraan" class="mt-2">Kendaraan *</label>
+                                <div class="border p-2 table-responsive">
+                                    <table id="kendaraanInfo" class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>ID Kendaraan</th>
+                                                <th>No Kendaraan</th>
+                                                <th>Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="kendaraanInfo"></tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-success btn-sm" id="addKendaraan">+ Kendaraan Dinas</button>
+                                </div>
+                            </div>
+                        </div>
 
 
+                        <label class="mt-3">Tujuan *</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" id="tujuan_1" class="form-control" placeholder="Tujuan 1">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="tujuan_2" class="form-control" placeholder="Tujuan 2">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="tujuan_3" class="form-control" placeholder="Tujuan 3">
+                            </div>
+                        </div>
+
+
+                        <!-- Jenis Mobil -->
+                        <label for="jenisMobil" class="mt-2">Jenis Mobil *</label>
+                        <input type="text" id="jenisMobil" class="form-control">
+
+                        <!-- Digunakan Pada -->
+                        <label for="tanggalPakai" class="mt-2">Digunakan Pada *</label>
+                        <input type="date" id="tanggalPakai" class="form-control">
+
+                        <!-- Tabel Peserta -->
+                        <label class="mt-3">Peserta *</label>
+                        <table id="pesertaList" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>NRP</th>
+                                    <th>Nama Karyawan</th>
+                                    <th>Divisi Departemen</th>
+                                    <th>Pilih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pesertaList"></tbody>
+                        </table>
+
+                        <!-- Tombol Pindahkan Peserta & Simpan -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-success" id="pindahkanPeserta">Pindahkan Peserta</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        
 </div>
 
 
 <script>
 
-$(document).ready(function() {
-    // Button for Ka.Sie approval
-    $('.update-status-kasie').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
+    $('#editDataModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget); 
+        const dataKD = button.data('id'); 
+
+
+        $('#nomorSurat').val('');
+        $('#pemesan').val('');
+        $('#jenisMobil').val('');
+        $('#tanggalPakai').val('');
+        $('#jamMulai').val('');
+        $('#jamSelesai').val('');
+
+        
+        $.ajax({
+            url: "/pengajuan/edit", // Sesuaikan dengan route Laravel
+            type: "POST",
+            data: { surat_kendaraan_dinas_id: dataKD,
+                "_token": "{{ csrf_token() }}"  // CSRF token
+             },
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    // Set data ke modal
+                    $("#nomorSurat").text(response.surat_kendaraan_dinas_id);
+                    $("#pemesan").val(response.userDinas[0].nrp_karyawan || "Tidak Diketahui");
+                    $("#jenisMobil").val(response.jenis_kendaraan);
+                    $("#tanggalPakai").val(response.tanggal_penggunaan);
+                    $("#jamMulai").val(response.waktu_keluar);
+                    $("#jamSelesai").val(response.waktu_kembali);
+                    $("#tujuan_1").val(response.tujuan_penggunaan_1);
+                    $("#tujuan_2").val(response.tujuan_penggunaan_2);
+                    $("#tujuan_3").val(response.tujuan_penggunaan_3);
+
+                    // Kosongkan dan isi ulang data kendaraan
+                    $("#kendaraanInfo").empty();
+                    response.data_kendaraan.forEach(function (kendaraan) {
+                        $("#kendaraanInfo").append(`
+                            <tr>
+                                <td>${kendaraan.id_kendaraan}</td>
+                                <td>${kendaraan.nomor_kendaraan}</td>
+                                <td>${kendaraan.keterangan}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Kosongkan dan isi ulang data peserta
+                    $("#pesertaList").empty();
+                    response.userDinas.forEach(function (user, index) {
+                        $("#pesertaList").append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${user.nrp_karyawan}</td>
+                                <td>${user.name}</td>
+                                <td>${user.departemen}</td>
+                                <td><input type="checkbox" class="pilihPeserta"></td>
+                            </tr>
+                        `);
+                    });
+
+                    // Tampilkan modal edit
+                    $("#editDataModal").modal("show");
+                }
+            },
+            error: function () {
+                alert("Gagal mengambil data. Coba lagi.");
+            },
+        });
     });
+
+$(document).ready(function() {
+
 
     // Button for Ka.Dept YBS approval
     $('.update-status-kadeptybs').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
+        var dataKDId = $(this).data('id');
+        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kadeptybs');
     });
 
-    // Button for Ka.Dept GA approval
-    $('.update-status-kadeptga').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
-    });
-
-    $('.update-status-finance').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
+    // Button for Ka.Sie Transport GA approval
+    $('.update-status-kasietransportasi').on('click', function() {
+        var dataKDId = $(this).data('id');
+        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
     });
 
     // Common function to show confirmation and then update status
-    function confirmUpdate(pengeluaranBarangId, url) {
+    function confirmUpdate(dataKDId, url) {
         Swal.fire({
             title: 'Konfirmasi Persetujuan',
-            text: 'Apakah anda menyetujui No Pengeluaran Barang ' + pengeluaranBarangId + '?',
+            text: 'Apakah anda menyetujui No Surat Dinas ' + dataKDId + '?',
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
@@ -285,18 +433,18 @@ $(document).ready(function() {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                updateStatus(pengeluaranBarangId, url);
+                updateStatus(dataKDId, url);
             }
         });
     }
 
     // Common function to handle status update
-    function updateStatus(pengeluaranBarangId, url) {
+    function updateStatus(dataKDId, url) {
             $.ajax({
                 url: url,
                 method: 'POST',
                 data: {
-                    pengeluaran_barang_id: pengeluaranBarangId,
+                    surat_kendaraan_dinas_id: dataKDId,
                     _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
@@ -304,7 +452,7 @@ $(document).ready(function() {
                         // Success alert using SweetAlert
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: 'Pengeluaran barang dengan no: ' + pengeluaranBarangId + ' telah disetujui.',
+                            text: 'Surat Dinas dengan No: ' + dataKDId + ' telah disetujui.',
                             icon: 'success',
                             confirmButtonText: 'OK'
                         }).then(() => {
@@ -337,34 +485,55 @@ $(document).ready(function() {
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
             const nomor = button.data('nomor'); // Nomor pengeluaran barang
-            document.getElementById('nomorPengeluaranCard').innerText = nomor;
+            document.getElementById('nomorSuratCard').innerText = nomor;
 
             $.ajax({
-                url: "/pengeluaran/detail",
+                url: "/pengajuan/detailSurat",
                 method: "POST",
-                data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
                 success: function (data) {
-                    document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
-                    document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                     const detailTable = $('#detaildataTableModal').DataTable();
+
+                    const jenisKendraan = {
+                        1 : "Mengeluarkan"
+                    };
+
+                    // Kosongkan data lama kendaraan
+                    document.getElementById('kendaraanInfoBody').innerHTML = "";
+
+                    // Validasi dan tampilkan data kendaraan
+                    if (data.data_kendaraan && data.data_kendaraan.length > 0) {
+                        data.data_kendaraan.forEach((item, index) => {
+                            let row = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.nomor_kendaraan}</td>
+                                    <td>${item.keterangan}</td>
+                                </tr>
+                            `;
+                            document.getElementById('kendaraanInfoBody').innerHTML += row;
+                        });
+                    } else {
+                        document.getElementById('kendaraanInfoBody').innerHTML = `
+                            <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
+                        `;
+                    }
 
                     // Kosongkan data lama
                     detailTable.clear();
                     document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
 
-                    // Validasi data barang_keluar
-                    if (data.barang_keluar && data.barang_keluar.length > 0) {
-                        let newData = data.barang_keluar.map((item, index) => [
+                    // Validasi data userDinas
+                    if (data.userDinas && data.userDinas.length > 0) {
+                        let newData = data.userDinas.map((item, index) => [
                             index + 1,
-                            nomor,
-                            item.nama_barang,
-                            item.jumlah_barang,
-                            item.satuan_barang,
-                            item.keterangan_barang
+                            item.nrp_karyawan,
+                            item.name,
+                            item.departemen
                         ]);
                         detailTable.rows.add(newData).draw();
                     } else {
-                        detailTable.rows.add([["", "", "Tidak ada data barang keluar", "", "", ""]]).draw();
+                        detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
                     }
 
                     // Mapping tingkatan dan status persetujuan
@@ -377,6 +546,7 @@ $(document).ready(function() {
                         "Level 6": "Security"
                     };
                     const approvMapping = {
+                        "Level 0": "Menolak",
                         "Level 1": "Mengeluarkan",
                         "Level 2": "Membawa",
                         "Level 3": "Menyetujui",
@@ -443,12 +613,12 @@ $(document).ready(function() {
         // Handle click event on update status button
         document.querySelectorAll('.reject-status').forEach(button => {
             button.addEventListener('click', function () {
-                const pengeluaranBarangId = this.getAttribute('data-id');
+                const dataKDId = this.getAttribute('data-id');
 
                 // Konfirmasi menggunakan SweetAlert
                 Swal.fire({
                     title: 'Tolak Pengajuan',
-                    text: 'Apakah anda menolak No Pengeluaran Barang ' + pengeluaranBarangId + '?',
+                    text: 'Apakah anda menolak No Surat Dinas ' + dataKDId + '?',
                     icon: 'error',
                     showCancelButton: true,
                     reverseButtons: true,
@@ -458,13 +628,13 @@ $(document).ready(function() {
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch("{{ route('approval.rejectStatus') }}", {
+                        fetch("{{ route('pengajuanDinas.rejectStatus') }}", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
                             },
-                            body: JSON.stringify({ pengeluaran_barang_id: pengeluaranBarangId })
+                            body: JSON.stringify({ surat_kendaraan_dinas_id: dataKDId })
                         })
                         .then(response => response.json())
                         .then(data => {
