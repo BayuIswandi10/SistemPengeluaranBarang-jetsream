@@ -30,6 +30,11 @@ class ApprovalKendaraanDinasLivewire extends Component
             $kendaraanDinas = (clone $query)
             ->orderBy('status', 'asc')
             ->get();
+        }elseif ($user->level === 'Super Admin' && $user->departemen === 'General Affairs') {
+            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
+            $kendaraanDinas = (clone $query)
+            ->orderBy('status', 'asc')
+            ->get();
         } else {
             // Jika level tidak dikenali, tampilkan data kosong
             $kendaraanDinas = collect();

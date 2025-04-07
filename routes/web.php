@@ -62,6 +62,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/pengajuan/detailSurat', [SuratDinasController::class, 'getDetailSurat']);
     Route::post('/pengajuan/edit', [SuratDinasController::class, 'edit'])->name('pengajuan.edit');
+    Route::put('/pengajuan/update', [SuratDinasController::class, 'update'])->name('pengajuan.update');
+    Route::get('/pengajuan/surat-tujuan', [SuratDinasController::class, 'getSuratTujuan']);
+    Route::post('/pengajuan/pindahkan-peserta', [SuratDinasController::class, 'pindahkanPeserta']);
+
 
     Route::post('/pengajuanDinas/update-status-kadeptybs', [ApprovalKendaraanDinasController::class, 'updateStatusKaDeptYBS'])->name('pengajuanDinas.updateStatusKaDeptYBS');
     Route::post('/pengajuanDinas/update-status-kasietransportasi', [ApprovalKendaraanDinasController::class, 'updateStatusKaSieTransport'])->name('pengajuanDinas.updateStatusKaSieTransport');
@@ -81,3 +85,4 @@ Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');
 
 Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('pengajuan_dinas.store');
 Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');
+

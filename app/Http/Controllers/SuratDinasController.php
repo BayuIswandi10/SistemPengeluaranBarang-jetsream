@@ -9,6 +9,9 @@ use App\Models\PencatatanKendaraanDinas;
 use Illuminate\Support\Facades\DB;
 use App\Models\ApprovalKendaraanDinas;
 use Illuminate\Support\Facades\Validator;
+use App\Models\KendaraanDinas;
+use Illuminate\Support\Facades\Auth;
+use App\Models\SuratKendaraanDinasDetail;
 
 class SuratDinasController extends Controller
 {
@@ -289,6 +292,9 @@ class SuratDinasController extends Controller
                 'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
             ];
         });
+
+        // Ambil semua kendaraan dinas aktif dari database
+        $daftarKendaraan = KendaraanDinas::all(['kendaraan_dinas_id', 'nomor_kendaraan', 'merk_kendaraan', 'jenis_kendaraan']);
     
         return response()->json([
             'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
@@ -301,7 +307,100 @@ class SuratDinasController extends Controller
             'waktu_kembali' => $suratDinas->waktu_kembali,
             'userDinas' => $userDinasData,
             'data_kendaraan' => $kendaraanData,
+            'daftar_kendaraan' => $daftarKendaraan,
             'status' => $suratDinas->status ?? 'Tidak Diketahui',
         ], 200);
     }
+
+
+    public function update(Request $request)
+    {
+        DB::beginTransaction();
+    
+        try {
+            // 1. Update data utama surat kendaraan dinas
+            $surat = SuratKendaraanDinas::findOrFail($request->surat_kendaraan_dinas_id);
+            $surat->update([
+                'tujuan_penggunaan_1' => $request->tujuan_penggunaan_1,
+                'tujuan_penggunaan_2' => $request->tujuan_penggunaan_2,
+                'tujuan_penggunaan_3' => $request->tujuan_penggunaan_3,
+                'tanggal_penggunaan'  => $request->tanggal_penggunaan,
+                'jenis_kendaraan'     => $request->jenis_kendaraan,
+                'waktu_keluar'        => $request->waktu_keluar,
+                'waktu_kembali'       => $request->waktu_kembali,
+            ]);
+    
+            // 2. Sinkronisasi kendaraan dinas
+            //$kendaraanBaru = $request->nomor_kendaraan; // Array of kendaraan_dinas_id
+            $kendaraanBaru = $request->nomor_kendaraan ?? []; // <- aman dari null
+            $suratId = $request->surat_kendaraan_dinas_id;
+    
+            // Ambil ID kendaraan lama yang terhubung ke surat ini
+            $kendaraanLama = SuratKendaraanDinasDetail::where('surat_kendaraan_dinas_id', $suratId)->pluck('kendaraan_dinas_id')->toArray();
+    
+
+            $hapus = array_diff($kendaraanLama, $kendaraanBaru);
+            $tambah = array_diff($kendaraanBaru, $kendaraanLama);
+    
+            // Hapus yang tidak dipilih lagi
+            // SuratKendaraanDinasDetail::where('surat_kendaraan_dinas_id', $suratId)
+            //     ->whereIn('kendaraan_dinas_id', $hapus)
+            //     ->delete();
+
+            // Hapus kendaraan yang tidak dipilih lagi
+            if (!empty($hapus)) {
+                SuratKendaraanDinasDetail::where('surat_kendaraan_dinas_id', $suratId)
+                    ->whereIn('kendaraan_dinas_id', $hapus)
+                    ->delete();
+            }
+    
+            // Tambah kendaraan baru
+            foreach ($tambah as $kendaraanId) {
+                SuratKendaraanDinasDetail::create([
+                    'kendaraan_dinas_id' => $kendaraanId,
+                    'surat_kendaraan_dinas_id' => $suratId,
+                ]);
+            }
+    
+            DB::commit();
+            return redirect()->back()->with('success', 'Data berhasil diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+    
+
+    public function getSuratTujuan()
+    {
+        $list = SuratKendaraanDinas::where('status', '!=', 'Sudah Dibatalkan')->get();
+
+        return response()->json($list);
+    }
+
+    public function pindahkanPeserta(Request $request)
+    {
+        $peserta = $request->peserta; // array of NRP
+        $suratBaru = $request->surat_tujuan;
+
+        foreach ($peserta as $nrp) {
+            // Ubah surat pada pencatatan kendaraan dinas
+            PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
+                ->update([
+                    'surat_kendaraan_dinas_id' => $suratBaru,
+                    'status' => 'Dipindahkan'
+                ]);
+            
+            // Tambahkan ke surat baru
+            PencatatanKendaraanDinas::create([
+                'surat_kendaraan_dinas_id' => $suratBaru,
+                'nrp_karyawan' => $nrp,
+                'update_date' => now(),
+                'status' => 'Disetujui'
+            ]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
 }

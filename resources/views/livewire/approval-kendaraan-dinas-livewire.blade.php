@@ -120,6 +120,33 @@
                                             </button>
                                         @endif                                        
 
+                                        @if($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'General Affairs')
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kasietransportasi" 
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button Edit -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-warning btn-sm mr-2" 
+                                                data-toggle="modal" 
+                                                data-target="#editDataModal" 
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
+                                            </button>
+                                        @endif 
+                                        
                                         <!-- Button detail -->
                                         <button 
                                             type="button" 
@@ -243,20 +270,21 @@
                     </div>
 
                     <!-- Form Edit -->
-                    <form id="editOrderForm" method="POST" action="" enctype="multipart/form-data" >
+                    <form id="editOrderForm" method="POST" action="{{route('pengajuan.update')}}" enctype="multipart/form-data" >
                         @csrf
                         @method('PUT')
                         <div class="row">
                             <div class="col-md-6">
                                 <!-- Yang Memesan -->
                                 <label for="pemesan">Yang Memesan *</label>
-                                <input type="text" id="pemesan" class="form-control" disabled>
+                                <input type="hidden" name="surat_kendaraan_dinas_id" id="surat_kendaraan_dinas_id">
+                                <input type="text" name="nrp_karyawan" id="pemesan" class="form-control" disabled>
 
                                 <!-- Rencana Pakai -->
                                 <label for="jamMulai" class="mt-2">Rencana Pakai *</label>
                                 <div class="d-flex">
-                                    <input type="time" id="jamMulai" class="form-control mr-2">
-                                    <input type="time" id="jamSelesai" class="form-control">
+                                    <input type="time" name="waktu_keluar" id="jamMulai" class="form-control mr-2">
+                                    <input type="time" name="waktu_kembali" id="jamSelesai" class="form-control">
                                 </div>
                             </div>
 
@@ -267,14 +295,19 @@
                                     <table id="kendaraanInfo" class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>ID Kendaraan</th>
+                                                <th>No</th>
                                                 <th>No Kendaraan</th>
                                                 <th>Keterangan</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="kendaraanInfo"></tbody>
+                                        <tbody>
+
+                                        </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" id="addKendaraan">+ Kendaraan Dinas</button>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxEdit()">
+                                        <i class="fas fa-plus"></i> Tambah Kendaraan
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -283,24 +316,24 @@
                         <label class="mt-3">Tujuan *</label>
                         <div class="row">
                             <div class="col-md-4">
-                                <input type="text" id="tujuan_1" class="form-control" placeholder="Tujuan 1">
+                                <input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="Tujuan 1">
                             </div>
                             <div class="col-md-4">
-                                <input type="text" id="tujuan_2" class="form-control" placeholder="Tujuan 2">
+                                <input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="Tujuan 2">
                             </div>
                             <div class="col-md-4">
-                                <input type="text" id="tujuan_3" class="form-control" placeholder="Tujuan 3">
+                                <input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="Tujuan 3">
                             </div>
                         </div>
 
 
                         <!-- Jenis Mobil -->
                         <label for="jenisMobil" class="mt-2">Jenis Mobil *</label>
-                        <input type="text" id="jenisMobil" class="form-control">
+                        <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control">
 
                         <!-- Digunakan Pada -->
                         <label for="tanggalPakai" class="mt-2">Digunakan Pada *</label>
-                        <input type="date" id="tanggalPakai" class="form-control">
+                        <input type="date" name="tanggal_penggunaan" id="tanggalPakai" class="form-control">
 
                         <!-- Tabel Peserta -->
                         <label class="mt-3">Peserta *</label>
@@ -314,7 +347,9 @@
                                     <th>Pilih</th>
                                 </tr>
                             </thead>
-                            <tbody id="pesertaList"></tbody>
+                            <tbody>
+
+                            </tbody>
                         </table>
 
                         <!-- Tombol Pindahkan Peserta & Simpan -->
@@ -328,6 +363,39 @@
         </div>
     </div>
 
+    <!-- Modal Pindah Peserta -->
+    <div class="modal fade" id="modalPindahPeserta" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title">Pindah Ke Surat Persetujuan</h5>
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+            <input type="hidden" id="nrpPesertaDipindah" />
+            <table class="table table-bordered" id="tabelTujuanSurat">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>No Surat</th>
+                    <th>Tujuan</th>
+                    <th>Jenis Mobil</th>
+                    <th>Status</th>
+                    <th>Pilih</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Data dari AJAX -->
+                </tbody>
+            </table>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="btnSimpanPindah">Pindah</button>
+            </div>
+        </div>
+        </div>
+    </div>
+  
 
         
 </div>
@@ -335,17 +403,87 @@
 
 <script>
 
+    let pesertaDipindahkan = [];
+
+    $('#pindahkanPeserta').click(function () {
+        pesertaDipindahkan = [];
+        $('#pesertaList input[type="checkbox"]:checked').each(function () {
+            pesertaDipindahkan.push($(this).val());
+        });
+
+        if (pesertaDipindahkan.length === 0) {
+            alert('Pilih peserta yang ingin dipindahkan!');
+            return;
+        }
+
+        // Load surat dinas tujuan
+        $.ajax({
+            url: "/pengajuan/surat-tujuan", // Buat route ini
+            type: "GET",
+            success: function (data) {
+                let tbody = $("#tabelTujuanSurat tbody");
+                tbody.empty();
+
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.nomor_surat}</td>
+                            <td>${item.tujuan}</td>
+                            <td>${item.jenis_kendaraan}</td>
+                            <td>${item.status}</td>
+                            <td>
+                                <input type="radio" name="surat_tujuan" value="${item.surat_kendaraan_dinas_id}">
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                $('#modalPindahPeserta').modal('show');
+            }
+        });
+    });
+
+    // SIMPAN PINDAH
+    $('#btnSimpanPindah').click(function () {
+        const suratTujuan = $('input[name="surat_tujuan"]:checked').val();
+        if (!suratTujuan) {
+            alert('Pilih surat tujuan!');
+            return;
+        }
+
+        $.ajax({
+            url: '/pengajuan/pindahkan-peserta',
+            type: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                peserta: pesertaDipindahkan,
+                surat_tujuan: suratTujuan
+            },
+            success: function () {
+                alert("Peserta berhasil dipindahkan!");
+                location.reload();
+            },
+            error: function () {
+                alert("Gagal memindahkan peserta.");
+            }
+        });
+    });
+
+
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget); 
         const dataKD = button.data('id'); 
 
 
-        $('#nomorSurat').val('');
+        $('#nomorSurat').text('');
         $('#pemesan').val('');
         $('#jenisMobil').val('');
         $('#tanggalPakai').val('');
         $('#jamMulai').val('');
         $('#jamSelesai').val('');
+        $('#kendaraanInfo tbody').empty();
+        $('#pesertaList tbody').empty();
 
         
         $.ajax({
@@ -357,9 +495,10 @@
             dataType: "json",
             success: function (response) {
                 if (response) {
-                    // Set data ke modal
-                    $("#nomorSurat").text(response.surat_kendaraan_dinas_id);
-                    $("#pemesan").val(response.userDinas[0].nrp_karyawan || "Tidak Diketahui");
+                    window.daftarKendaraanGlobal = response.daftar_kendaraan;
+
+                    $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
+                    $("#pemesan").val(response.userDinas[0]?.nrp_karyawan || ''); // asumsi hanya satu pemesan
                     $("#jenisMobil").val(response.jenis_kendaraan);
                     $("#tanggalPakai").val(response.tanggal_penggunaan);
                     $("#jamMulai").val(response.waktu_keluar);
@@ -368,34 +507,46 @@
                     $("#tujuan_2").val(response.tujuan_penggunaan_2);
                     $("#tujuan_3").val(response.tujuan_penggunaan_3);
 
-                    // Kosongkan dan isi ulang data kendaraan
-                    $("#kendaraanInfo").empty();
-                    response.data_kendaraan.forEach(function (kendaraan) {
-                        $("#kendaraanInfo").append(`
+                    // Render Kendaraan
+                    const tbodyKendaraan = $("#kendaraanInfo tbody");
+                    response.data_kendaraan.forEach((item, index) => {
+                        tbodyKendaraan.append(`
                             <tr>
-                                <td>${kendaraan.id_kendaraan}</td>
-                                <td>${kendaraan.nomor_kendaraan}</td>
-                                <td>${kendaraan.keterangan}</td>
+                                <td>${index + 1}</td>
+                                <td>
+                                    <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+                                        ${window.daftarKendaraanGlobal.map(k => `
+                                        <option value="${k.kendaraan_dinas_id}" 
+                                            data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
+                                            ${k.kendaraan_dinas_id === item.id_kendaraan ? 'selected' : ''}>
+                                            ${k.nomor_kendaraan}
+                                        </option>`).join('')}
+                                    </select>
+                                    <input type="hidden" name="kendaraan_ids[]" value="${item.id_kendaraan}">
+                                </td>
+                                <td class="keterangan-kendaraan">${item.keterangan}</td>
+                                <td>                
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
                         `);
                     });
 
-                    // Kosongkan dan isi ulang data peserta
-                    $("#pesertaList").empty();
-                    response.userDinas.forEach(function (user, index) {
-                        $("#pesertaList").append(`
+                    // Render Peserta
+                    const tbodyPeserta = $("#pesertaList tbody");
+                    response.userDinas.forEach((user, index) => {
+                        tbodyPeserta.append(`
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${user.nrp_karyawan}</td>
                                 <td>${user.name}</td>
                                 <td>${user.departemen}</td>
-                                <td><input type="checkbox" class="pilihPeserta"></td>
+                                <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
                             </tr>
                         `);
                     });
-
-                    // Tampilkan modal edit
-                    $("#editDataModal").modal("show");
                 }
             },
             error: function () {
@@ -403,6 +554,54 @@
             },
         });
     });
+
+    function tambahComboBoxEdit() {
+        const tbody = $("#kendaraanInfo tbody");
+        const index = tbody.children().length + 1;
+
+        const kendaraanOptions = window.daftarKendaraanGlobal.map(k => `
+            <option value="${k.kendaraan_dinas_id}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
+                ${k.nomor_kendaraan}
+            </option>
+        `).join('');
+
+        tbody.append(`
+            <tr>
+                <td>${index}</td>
+                <td>
+                    <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+                        ${kendaraanOptions}
+                    </select>
+                    <input type="hidden" name="kendaraan_ids[]" value="">
+                </td>
+                <td class="keterangan-kendaraan"></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>                
+                </td>
+            </tr>
+        `);
+    }
+
+
+
+    function hapusComboBoxEdit(button) {
+        $(button).closest('tr').remove();
+    }
+
+    function updateKeterangan(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const keterangan = selectedOption.getAttribute("data-ket") || '';
+        
+        // Cari kolom 'keterangan-kendaraan' di baris yang sama dan ganti isinya
+        const row = $(selectElement).closest("tr");
+        row.find(".keterangan-kendaraan").text(keterangan);
+    }
+
+
+
+
 
 $(document).ready(function() {
 
@@ -690,37 +889,6 @@ $(document).ready(function() {
     });
 
 
-
-    // Display validation errors in Swal
-    @if ($errors->any())
-    Swal.fire({
-        icon: 'error',
-        title: 'Whoops!',
-        html: '<ul>' +
-            @foreach ($errors->all() as $error)
-                '<li>{{ $error }}</li>' +
-            @endforeach
-            '</ul>'
-    });
-    @endif
-
-    // Display success message in Swal
-    @if (session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: '{{ session('success') }}'
-        });
-    @endif
-
-    // Display error message in Swal
-    @if (session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '{{ session('error') }}'
-        });
-    @endif
 
     var $select = $('#select-tools').selectize({
     
