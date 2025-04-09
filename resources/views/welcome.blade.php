@@ -327,13 +327,44 @@
             
                                 <div class="form-group">
                                     <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                                    <select class="form-control" name="jenis_kendaraan" required autocomplete="off">
+                                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off" required onchange="toggleKendaraanPribadi()">
                                         <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                                         <option value="1">KANTOR</option>
                                         <option value="2">PRIBADI</option>
                                         <option value="3">TAXI</option>
                                     </select>
                                 </div>
+
+                                <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
+                                    <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
+                                </div>   
+                                
+                                <div class="form-group" id="tabel_kendaraan_pribadi" style="display: none;">
+                                    <label>Kendaraan <span class="text-danger">*</span></label>
+                                    <table class="table table-bordered">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th>No Polisi</th>
+                                                <th>Merk Kendaraan</th>
+                                                <th>Kapasitas</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="kendaraanPribadiBody">
+                                            <tr>
+                                                <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
+                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
+                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
+                                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKendaraanPribadi()">
+                                        <i class="fas fa-plus"></i> Tambah Kendaraan
+                                    </button>
+                                </div>
+                                
             
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
@@ -678,6 +709,53 @@
                 document.getElementById("pembawa_scrap").value = "";
             }
         }
+
+        function toggleKendaraanPribadi() {
+            const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
+            const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
+            const tabelKendaraan = document.getElementById("tabel_kendaraan_pribadi");
+
+            if (jenisKendaraan === "2") {
+                kendaraanGroup.style.display = "block";
+                tabelKendaraan.style.display = "block";
+                document.getElementById("kilometer_awal").setAttribute("required", "required");
+            } else {
+                kendaraanGroup.style.display = "none";
+                tabelKendaraan.style.display = "none";
+                document.getElementById("kilometer_awal").removeAttribute("required");
+                document.getElementById("kilometer_awal").value = "";
+
+                // Kosongkan isian kendaraan pribadi saat disembunyikan
+                document.getElementById("kendaraanPribadiBody").innerHTML = `
+                    <tr>
+                        <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control"></td>
+                        <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control"></td>
+                        <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control"></td>
+                        <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }
+        }
+
+        function tambahKendaraanPribadi() {
+            const tableBody = document.getElementById("kendaraanPribadiBody");
+            const index = tableBody.rows.length;
+
+            const row = `
+                <tr>
+                    <td><input type="text" name="kendaraan[${index}][nomor_kendaraan]" class="form-control" required></td>
+                    <td><input type="text" name="kendaraan[${index}][merk_kendaraan]" class="form-control" required></td>
+                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control" required></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        }
+
+        function hapusKendaraanPribadi(button) {
+            button.closest("tr").remove();
+        }
+
 
         $(document).ready(function() {
             $('#lokasi_barang_keluar').selectize({

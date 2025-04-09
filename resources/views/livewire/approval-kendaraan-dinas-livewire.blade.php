@@ -46,7 +46,10 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
-                                <td>{{ $dataKD->tujuan_penggunaan_1 }}</td>
+                                <td>
+                                    {{ $dataKD->tujuan_penggunaan_1 ?? '-' }} > {{ $dataKD->tujuan_penggunaan_2 ?? '-' }}
+                                    > {{ $dataKD->tujuan_penggunaan_3 ?? '-' }}
+                                </td>
                                 <td>
                                     @if ($dataKD->jenis_kendaraan == 1)
                                         Mobil Dinas
@@ -366,33 +369,56 @@
     <!-- Modal Pindah Peserta -->
     <div class="modal fade" id="modalPindahPeserta" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title">Pindah Ke Surat Persetujuan</h5>
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pindah Ke Surat Persetujuan</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="nrpPesertaDipindah" />
+                
+                    <!-- Tabel Peserta yang Dipindahkan -->
+                    <h6><strong>Karyawan Yang Dipindahkan</strong></h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabelPesertaDipindah">
+                            <thead>
+                                <tr>
+                                    <th>NRP</th>
+                                    <th>Nama Karyawan</th>
+                                    <th>Nama Departemen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data via jQuery -->
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <!-- Tabel Tujuan Dipindahkan -->
+                    <h6 class="mt-4"><strong>Tujuan dipindahkan</strong></h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabelTujuanSurat">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>No Surat</th>
+                                    <th>Tujuan</th>
+                                    <th>Jenis Mobil</th>
+                                    <th>Status</th>
+                                    <th>Pilih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data via jQuery -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnSimpanPindah">Pindah</button>
+                </div>
             </div>
-            <div class="modal-body">
-            <input type="hidden" id="nrpPesertaDipindah" />
-            <table class="table table-bordered" id="tabelTujuanSurat">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>No Surat</th>
-                    <th>Tujuan</th>
-                    <th>Jenis Mobil</th>
-                    <th>Status</th>
-                    <th>Pilih</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Data dari AJAX -->
-                </tbody>
-            </table>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnSimpanPindah">Pindah</button>
-            </div>
-        </div>
         </div>
     </div>
   
@@ -421,6 +447,29 @@
             url: "/pengajuan/surat-tujuan", // Buat route ini
             type: "GET",
             success: function (data) {
+                // Ambil data peserta dari tabel utama
+                const pesertaList = [];
+                $('#pesertaList input[type="checkbox"]:checked').each(function () {
+                    const row = $(this).closest('tr');
+                    const nrp = row.find('td:eq(1)').text();
+                    const nama = row.find('td:eq(2)').text();
+                    const dept = row.find('td:eq(3)').text();
+                    pesertaList.push({ nrp, nama, dept });
+                });
+
+                // Render Tabel Peserta yang Dipindah
+                const tbodyPeserta = $("#tabelPesertaDipindah tbody");
+                tbodyPeserta.empty();
+                pesertaList.forEach(p => {
+                    tbodyPeserta.append(`
+                        <tr>
+                            <td>${p.nrp}</td>
+                            <td>${p.nama}</td>
+                            <td>${p.dept}</td>
+                        </tr>
+                    `);
+                });
+                
                 let tbody = $("#tabelTujuanSurat tbody");
                 tbody.empty();
 
@@ -428,8 +477,8 @@
                     tbody.append(`
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${item.nomor_surat}</td>
-                            <td>${item.tujuan}</td>
+                            <td>${item.surat_kendaraan_dinas_id}</td>
+                            <td>${item.tujuan_penggunaan_1}</td>
                             <td>${item.jenis_kendaraan}</td>
                             <td>${item.status}</td>
                             <td>

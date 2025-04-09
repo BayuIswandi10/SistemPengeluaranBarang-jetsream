@@ -172,6 +172,7 @@ class SuratDinasController extends Controller
                 'status' => 'Level 1',
                 'waktu_keluar' => $request->waktu_keluar,
                 'waktu_kembali' => $request->waktu_kembali,
+                'kilometer_awal' => $request->kilometer_awal,
             ]);
     
             // Cek apakah ada peserta yang dikirim
@@ -194,6 +195,26 @@ class SuratDinasController extends Controller
                             'update_date' => now(),
                         ]);
                     }
+                }
+            }
+
+            // Simpan kendaraan pribadi (jika jenis PRIBADI)
+            if ($request->jenis_kendaraan == 2 && $request->has('kendaraan')) {
+                foreach ($request->kendaraan as $kendaraan) {
+                    $kendaraanBaru = KendaraanDinas::create([
+                        'jenis_kendaraan' => $request->jenis_kendaraan,
+                        'nomor_kendaraan' => $kendaraan['nomor_kendaraan'],
+                        'merk_kendaraan' => $kendaraan['merk_kendaraan'],
+                        'kapasitas_kendaraan' => $kendaraan['kapasitas_kendaraan'],
+                        'status_kendaraan' => 1,
+                        'created_by' => $nrpKaryawan,
+                        'created_date' => now(),
+                    ]);
+
+                    SuratKendaraanDinasDetail::create([
+                        'kendaraan_dinas_id' => $kendaraanBaru->kendaraan_dinas_id,
+                        'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+                    ]);
                 }
             }
 
@@ -390,14 +411,6 @@ class SuratDinasController extends Controller
                     'surat_kendaraan_dinas_id' => $suratBaru,
                     'status' => 'Dipindahkan'
                 ]);
-            
-            // Tambahkan ke surat baru
-            PencatatanKendaraanDinas::create([
-                'surat_kendaraan_dinas_id' => $suratBaru,
-                'nrp_karyawan' => $nrp,
-                'update_date' => now(),
-                'status' => 'Disetujui'
-            ]);
         }
 
         return response()->json(['status' => 'success']);
