@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
-class DashboardBarangKeluarLiveWire extends Component
+class DashboardKendaraanDinasLiveWire extends Component
 {
     public function render()
     {
@@ -111,7 +111,7 @@ class DashboardBarangKeluarLiveWire extends Component
             return $parts[1] ?? null; // Ambil bagian kedua (Departemen)
         })->filter()->countBy()->toArray();
 
-        return view('livewire.dashboard-barang-keluar', [
+        return view('livewire.dashboard-kendaraan-dinas', [
             'pengeluaranBarangs' => $pengeluaranBarangs,
             'pengeluaranBarangsDisetujui' => $pengeluaranBarangsDisetujui,
             'pengeluaranBarangsMenunggu' => $pengeluaranBarangsMenunggu,
@@ -123,5 +123,4 @@ class DashboardBarangKeluarLiveWire extends Component
             'user' => $user
         ]);
     }
-
 }

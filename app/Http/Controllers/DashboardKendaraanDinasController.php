@@ -1,17 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
-use App\Models\PengeluaranBarang;
 
-use Illuminate\Support\Facades\Auth;
-
-class DashboardBarangKeluarController extends Controller
+class DashboardKendaraanDinasController extends Controller
 {
     public function index()
     {
         $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
-        return view('livewire.dashboard-barang-keluar', compact('pengeluaranBarangs'));
+        return view('livewire.dashboard-kendaraan-dinas', compact('pengeluaranBarangs'));
     }
 
     public function getData(Request $request)

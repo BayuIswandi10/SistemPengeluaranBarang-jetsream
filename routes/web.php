@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Unauthorized;
 use App\Livewire\DashboardBarangKeluarLiveWire;
+use App\Livewire\DashboardKendaraanDinasLiveWire;
 use App\Livewire\PengeluaranBarangLiveWire;
 use App\Livewire\ApprovalBarangKeluarLiveWire;
 use App\Livewire\SecurityLiveWire;
@@ -24,7 +25,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
-    Route::get('/dashboard', DashboardBarangKeluarLiveWire::class)->name('dashboard');
+    Route::get('/dashboard-barang-keluar', DashboardBarangKeluarLiveWire::class)->name('dashboard-barang-keluar');
+    Route::get('/dashboard-kendaraan-dinas', DashboardKendaraanDinasLiveWire::class)->name('dashboard-kendaraan-dinas');
 
     Route::middleware([CheckLevel::class . ':Security'])->group(function () {
         Route::get('/security', SecurityLiveWire::class)->name('security');
