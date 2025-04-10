@@ -3,7 +3,26 @@
         <body>
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+
+                @if ($user->level === 'Ka.Dept')
+                    <div class="d-flex border rounded overflow-hidden" style="width: fit-content;">
+                        <a href="{{ route('dashboard-barang-keluar') }}"
+                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
+                        style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
+                                text-decoration: none; width: 300px; white-space: nowrap; font-weight: 400;">
+                            Barang Keluar
+                        </a>
+                        <a href="{{ route('dashboard-kendaraan-dinas') }}"
+                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
+                        style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
+                                text-decoration: none; border-left: 1px solid #ccc; width: 300px; white-space: nowrap; font-weight: 400;">
+                            Penggunaan Kendaraan Dinas
+                        </a>
+                    </div>
+                @else
                     <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
+                @endif
+
                     <div class="d-flex align-items-center w-100 justify-content-end">
                         <!-- Input Tanggal -->
                         <div class="row g-3">
@@ -221,6 +240,40 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                   <!-- Row kedua -->
+                    <div class="row">
+                        <!-- Kotak besar 1 -->
+                        <div class="col-lg-6 col-12">
+                            <div class="small-box" style="background-color: #2CB3B3; color: white;">
+                                <div class="inner">
+                                    <h3>10</h3>
+                                    <p>Kendaraan Dinas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-car-side"></i>
+                                </div>
+                                <a href="#" class="small-box-footer text-white">
+                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Kotak besar 2 -->
+                        <div class="col-lg-6 col-12">
+                            <div class="small-box" style="background-color: #2C7DC3; color: white;">
+                                <div class="inner">
+                                    <h3>15</h3>
+                                    <p>Kendaraan Dinas Digunakan</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <a href="#" class="small-box-footer text-white">
+                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

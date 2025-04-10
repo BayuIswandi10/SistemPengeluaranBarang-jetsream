@@ -28,8 +28,8 @@
                 <!-- Add icons to the links using the .nav-icon class
                     with font-awesome or any other icon font library -->
                 <li class="nav-header">MENU</li>
-                    <li class="nav-item {{ request()->routeIs('dashboard') ? 'menu-open' : '' }}">
-                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('dashboard-barang-keluar') ? 'menu-open' : '' }}">
+                        <a href="{{ route('dashboard-barang-keluar') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
                                 Beranda
