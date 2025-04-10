@@ -199,7 +199,7 @@ class SuratDinasController extends Controller
             }
 
             // Simpan kendaraan pribadi (jika jenis PRIBADI)
-            if ($request->jenis_kendaraan == 2 && $request->has('kendaraan')) {
+            if (in_array($request->jenis_kendaraan, [2, 3]) && $request->has('kendaraan')) {
                 foreach ($request->kendaraan as $kendaraan) {
                     $kendaraanBaru = KendaraanDinas::create([
                         'jenis_kendaraan' => $request->jenis_kendaraan,
@@ -415,5 +415,6 @@ class SuratDinasController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
 
 }

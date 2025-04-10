@@ -208,6 +208,71 @@ class ApprovalKendaraanDinasController extends Controller
         }
     }
 
+    public function updateStatusSecurity(Request $request)
+    {
+        DB::beginTransaction();
+
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
+        $levelKaryawan = $user->level;
+
+        try {
+            // Ambil ID pengeluaran_barang dari request
+            $suratDinasId = $request->input('surat_kendaraan_dinas_id');
+    
+            // Update status pada tb_pencatatan_pengeluaran_barang
+            $updatePengajuan = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+                ->update(['status' => 'Level 4']);
+    
+            if (!$updatePengajuan) {
+                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            }
+    
+            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
+            // $approvalId = $this->generateApprovalId();
+            $approval = ApprovalKendaraanDinas::create([
+                'surat_kendaraan_dinas_id' => $suratDinasId,
+                'created_by' => $nrpKaryawan,
+                'status_approval' => 'Level 4',
+                'created_date' => now(),
+            ]);
+         
+             if (!$approval) {
+                 throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $suratDinasId);
+             }
+
+            //Mencari Email Pembawa
+            $approval = ApprovalKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+            ->where('status_approval', 'Level 1')
+            ->value('created_by');
+         
+             // Ambil email penerima berdasarkan created_by yang ditemukan
+             $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
+             
+             if (!$emailReceiver) {
+                 throw new \Exception('Email penerima tidak ditemukan.');
+             }
+         
+             // Kirim email ke penerima
+             $statusText = $this->getStatusText('Level 3');
+             $userDepartment = $this->getDepartmentName($levelKaryawan);
+             $this->sendApprovalEmail($emailReceiver, $suratDinasId, $user->name, $statusText, $userDepartment);
+
+            DB::commit();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment)
     {
         Mail::to($userEmail)->send(new ApprovalDinasNotification($suratDinasId, $approvedBy, $status, $fromDepartment));

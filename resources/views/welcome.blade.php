@@ -327,7 +327,7 @@
             
                                 <div class="form-group">
                                     <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off" required onchange="toggleKendaraanPribadi()">
+                                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off" required onchange="toggleJenisKendaraan()">
                                         <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                                         <option value="1">KANTOR</option>
                                         <option value="2">PRIBADI</option>
@@ -736,6 +736,44 @@
                 `;
             }
         }
+
+        function toggleJenisKendaraan() {
+            const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
+            const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
+            const tabelKendaraan = document.getElementById("tabel_kendaraan_pribadi");
+            const kilometerAwal = document.getElementById("kilometer_awal");
+
+            if (jenisKendaraan === "2") { // PRIBADI
+                kendaraanGroup.style.display = "block";
+                kilometerAwal.setAttribute("required", "required");
+
+                tabelKendaraan.style.display = "block";
+            } else if (jenisKendaraan === "3") { // TAXI
+                kendaraanGroup.style.display = "none";
+                kilometerAwal.removeAttribute("required");
+                kilometerAwal.value = "";
+
+                tabelKendaraan.style.display = "block";
+            } else {
+                kendaraanGroup.style.display = "none";
+                kilometerAwal.removeAttribute("required");
+                kilometerAwal.value = "";
+
+                tabelKendaraan.style.display = "none";
+            }
+
+            // Reset data kendaraan saat ganti jenis
+            document.getElementById("kendaraanPribadiBody").innerHTML = `
+                <tr>
+                    <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
+                    <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
+                    <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
+                        <i class="fas fa-trash"></i></button></td>
+                </tr>
+            `;
+        }
+
 
         function tambahKendaraanPribadi() {
             const tableBody = document.getElementById("kendaraanPribadiBody");

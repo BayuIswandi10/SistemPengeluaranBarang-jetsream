@@ -655,17 +655,17 @@
 $(document).ready(function() {
 
 
-    // Button for Ka.Dept YBS approval
-    $('.update-status-kadeptybs').on('click', function() {
-        var dataKDId = $(this).data('id');
-        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kadeptybs');
-    });
-
-    // Button for Ka.Sie Transport GA approval
-    $('.update-status-kasietransportasi').on('click', function() {
+    // Gunakan delegation
+    $(document).on('click', '.update-status-kasietransportasi', function() {
         var dataKDId = $(this).data('id');
         confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
     });
+
+    $(document).on('click', '.reject-status', function() {
+        var dataKDId = $(this).data('id');
+        confirmUpdate(dataKDId, '/pengajuanDinas/reject');
+    });
+
 
     // Common function to show confirmation and then update status
     function confirmUpdate(dataKDId, url) {
@@ -795,12 +795,10 @@ $(document).ready(function() {
                     };
                     const approvMapping = {
                         "Level 0": "Menolak",
-                        "Level 1": "Mengeluarkan",
-                        "Level 2": "Membawa",
-                        "Level 3": "Menyetujui",
-                        "Level 4": "Mengetahui",
-                        "Level 5": "Menerima",
-                        "Level 6": "Memeriksa"
+                        "Level 1": "Mengajukan",
+                        "Level 2": "Menyetujui",
+                        "Level 3": "Mengetahui",
+                        "Level 4": "Memeriksa"
                     };
 
                     // Validasi data informasi_tambahan

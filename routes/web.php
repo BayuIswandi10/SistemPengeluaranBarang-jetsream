@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::middleware([CheckLevel::class . ':Security'])->group(function () {
         Route::get('/security', SecurityLiveWire::class)->name('security');
         Route::post('/approval/update-status-security', [ApprovalBarangKeluarController::class, 'updateStatusSecurity'])->name('approval.updateStatusSecurity');
+        Route::post('/approval-dinas/update-status-security', [ApprovalKendaraanDinasController::class, 'updateStatusSecurity'])->name('approval-dinas.updateStatusSecurity');
     });
 
     Route::middleware([CheckLevel::class . ':Super Admin'])->group(function () {
