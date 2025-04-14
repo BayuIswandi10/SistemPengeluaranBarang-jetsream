@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_surat_kendaraan_dinas_details');
+        Schema::dropIfExists('tb_surat_kendaraan_dinas_detail');
     }
 };

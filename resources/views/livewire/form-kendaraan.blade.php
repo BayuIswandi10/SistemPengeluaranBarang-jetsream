@@ -199,8 +199,78 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Detail -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel">
+        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <!-- Placeholder untuk kalender -->
+            <div class="mb-3">
+                <label for="monthPicker">Pilih Bulan:</label>
+                <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
+            </div>
+            <div id="calendarBooking"></div>
+            </div>
+        </div>
+        </div>
+    </div>
+  
 </div>
 <script>
+    let calendar;
+
+    $('#detailModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const kendaraanId = button.data('id');
+
+        $.get(`/kendaraan/${kendaraanId}/booking-dates`, function (dates) {
+            const events = dates.map(date => ({
+                title: 'Digunakan',
+                start: date,
+                allDay: true,
+                backgroundColor: '#dc3545',
+                borderColor: '#dc3545'
+            }));
+
+            if (calendar) calendar.destroy();
+
+            const calendarEl = document.getElementById('calendarBooking');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 400,
+                events: events,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listMonth'
+                }
+            });
+
+            calendar.render();
+
+            // Saat bulan dipilih dari input
+            $('#monthPicker').on('change', function () {
+                const selected = this.value; // format: "2025-04"
+                if (selected) {
+                    const newDate = selected + "-01"; // format ke tanggal
+                    calendar.gotoDate(newDate);
+                }
+            });
+
+            // Set bulan input ke bulan saat ini saat modal dibuka
+            const currentDate = calendar.getDate();
+            $('#monthPicker').val(currentDate.toISOString().slice(0, 7));
+        });
+    });
+
+
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         const kendaraanId = button.data('id'); 

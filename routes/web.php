@@ -62,6 +62,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/kendaraan/edit', [KendaraanDinasController::class, 'edit'])->name('kendaraan.edit');
     Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
     Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    
+    Route::get('/kendaraan/{id}/booking-dates', [KendaraanDinasController::class, 'getBookingDates']);
 
     Route::post('/pengajuan/detailSurat', [SuratDinasController::class, 'getDetailSurat']);
     Route::post('/pengajuan/edit', [SuratDinasController::class, 'edit'])->name('pengajuan.edit');
@@ -89,3 +90,4 @@ Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');
 Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('pengajuan_dinas.store');
 Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');
 
+Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);

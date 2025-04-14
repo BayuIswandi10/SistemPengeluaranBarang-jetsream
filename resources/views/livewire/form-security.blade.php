@@ -240,12 +240,17 @@
                 let statusPengeluaran = data.status; // Pastikan API mengembalikan status
                 let kategoriPengeluaran = data.kategori_pengeluaran;
 
-                if (statusPengeluaran === "Level 4" && kategoriPengeluaran == 0 || (statusPengeluaran === "Level 5" && kategoriPengeluaran == 1)) {
+                let nomorPolisi = data.no_polisi;
+
+                if (
+                    ((statusPengeluaran === "Level 4" && kategoriPengeluaran == 0) ||
+                    (statusPengeluaran === "Level 5" && kategoriPengeluaran == 1)) &&
+                    nomorPolisi && nomorPolisi.trim() !== "Tidak Ada"
+                ) {
                     document.getElementById('approveButton').style.display = "inline-block"; // Tampilkan tombol
                 } else {
                     document.getElementById('approveButton').style.display = "none"; // Sembunyikan tombol
                 }
-
                 
                 // Menambahkan data ke tabel barang keluar
                 if (data.barang_keluar && data.barang_keluar.length > 0) {

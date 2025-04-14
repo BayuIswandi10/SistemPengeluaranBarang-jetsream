@@ -7,6 +7,7 @@ use App\Models\KendaraanDinas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class KendaraanDinasController extends Controller
 {
@@ -171,6 +172,21 @@ class KendaraanDinasController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+    
+    public function getBookingDates($id)
+    {
+        try {
+            $dates = DB::table('tb_surat_kendaraan_dinas_detail')
+                ->join('tb_surat_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id')
+                ->where('tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', $id)
+                ->pluck('tanggal_penggunaan');
+    
+            return response()->json($dates);
+        } catch (\Exception $e) {
+            \Log::error('BookingDates Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan di server'], 500);
         }
     }
     

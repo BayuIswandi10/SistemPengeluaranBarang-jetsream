@@ -65,6 +65,8 @@
                                     @elseif ($dataKD->status == 'Level 2')
                                         Menunggu Persetujuan Ka.Sie Transportasi
                                     @elseif ($dataKD->status == 'Level 3')
+                                        Menunggu Persetujuan Security 
+                                    @elseif ($dataKD->status == 'Level 4')
                                         Sudah Disetujui
                                     @elseif ($dataKD->status == 'Level 0')
                                         Ditolak
@@ -656,6 +658,12 @@ $(document).ready(function() {
 
 
     // Gunakan delegation
+
+    $(document).on('click', '.update-status-kadeptybs', function() {
+        var dataKDId = $(this).data('id');
+        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kadeptybs');
+    });
+
     $(document).on('click', '.update-status-kasietransportasi', function() {
         var dataKDId = $(this).data('id');
         confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
@@ -663,7 +671,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.reject-status', function() {
         var dataKDId = $(this).data('id');
-        confirmUpdate(dataKDId, '/pengajuanDinas/reject');
+        confirmUpdate(dataKDId, '/pengajuanDinas/reject-status');
     });
 
 
