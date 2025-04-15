@@ -13,6 +13,7 @@ use App\Livewire\ApprovalKendaraanDinasLivewire;
 use App\Http\Controllers\PengeluaranBarangController;
 use App\Http\Controllers\ApprovalBarangKeluarController;
 use App\Http\Controllers\DashboardBarangKeluarController;
+use App\Http\Controllers\DashboardKendaraanDinasController;
 use App\Http\Controllers\KendaraanDinasController;
 use App\Http\Controllers\QRCodeController;
 use App\Http\Controllers\SuratDinasController;
@@ -43,7 +44,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/approval-dinas', ApprovalKendaraanDinasLivewire::class)->name('approval-dinas');
 
 
-    Route::get('/dashboard/get-data-card', [DashboardBarangKeluarController::class, 'getData']);
+    Route::get('/dashboard-barang-keluar/get-data-card', [DashboardBarangKeluarController::class, 'getData']);
+    Route::get('/dashboard-kendaraan-dinas/get-data-card', [DashboardKendaraanDinasController::class, 'getData']);
     
     Route::put('/pengeluaran-barang/update', [PengeluaranBarangController::class, 'update'])->name('pengeluaran_barang.update');
     Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
@@ -59,6 +61,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/pengeluaran/reject-status', [ApprovalBarangKeluarController::class, 'rejectStatus'])->name('approval.rejectStatus');
 
     Route::post('/kendaraan', [KendaraanDinasController::class, 'store'])->name('kendaraan.store');    
+    Route::get('/kendaraan/getDataTersedia',[KendaraanDinasController::class,'getDataTersedia'])->name('kendaraan.getDataTersedia');
+    Route::get('/kendaraan/getDataDigunakan',[KendaraanDinasController::class,'getDataDigunakan'])->name('kendaraan.getDataDigunakan');
     Route::get('/kendaraan/edit', [KendaraanDinasController::class, 'edit'])->name('kendaraan.edit');
     Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
     Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    

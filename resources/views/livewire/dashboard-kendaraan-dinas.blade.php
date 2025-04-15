@@ -4,18 +4,19 @@
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
 
-                @if ($user->level === 'Ka.Dept')
-                    <div class="d-flex border rounded overflow-hidden" style="width: fit-content;">
+                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin')
+                    <div class="d-flex border rounded overflow-hidden w-100" style="max-width: 600px;">
                         <a href="{{ route('dashboard-barang-keluar') }}"
                         class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
                         style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; width: 300px; white-space: nowrap; font-weight: 400;">
+                                text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
                             Barang Keluar
                         </a>
                         <a href="{{ route('dashboard-kendaraan-dinas') }}"
+                         id="switch-kendaraan-dinas"
                         class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
                         style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; border-left: 1px solid #ccc; width: 300px; white-space: nowrap; font-weight: 400;">
+                                text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
                             Penggunaan Kendaraan Dinas
                         </a>
                     </div>
@@ -23,7 +24,7 @@
                     <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
                 @endif
 
-                    <div class="d-flex align-items-center w-100 justify-content-end">
+                <div class="d-flex align-items-center w-100 justify-content-end">
                         <!-- Input Tanggal -->
                         <div class="row g-3">
                         <!-- Input "Range Date FlatPicker" -->
@@ -41,7 +42,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3 class="jumlah-pengajuan">{{ $pengeluaranBarangs->count() ?? 0 }}</h3>
+                                    <h3 class="jumlah-pengajuan">{{ $suratKendaraanDinas->count() ?? 0 }}</h3>
                                     <p>Jumlah Pengajuan</p>
                                 </div>
                                 <div class="icon">
@@ -56,7 +57,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3  class="jumlah-disetujui">{{ $pengeluaranBarangsDisetujui ?? 0 }}</h3>
+                                    <h3  class="jumlah-disetujui">{{ $kendaraanDisetujui ?? 0 }}</h3>
                                     <p>Jumlah Disetujui</p>
                                 </div>
                                 <div class="icon">
@@ -71,7 +72,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3  class="jumlah-menunggu">{{ $pengeluaranBarangsMenunggu ?? 0 }}</h3>
+                                    <h3  class="jumlah-menunggu">{{ $kendaraanMenunggu ?? 0 }}</h3>
                                     <p>Jumlah Menunggu</p>
                                 </div>
                                 <div class="icon">
@@ -86,7 +87,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3 class="jumlah-ditolak">{{ $pengeluaranBarangsDitolak ?? 0 }}</h3>
+                                    <h3 class="jumlah-ditolak">{{ $kendaraanDitolak ?? 0 }}</h3>
                                     <p>Jumlah Ditolak</p>
                                 </div>
                                 <div class="icon">
@@ -97,7 +98,6 @@
                             </div>
                         </div>
                         <!-- ./col -->
-
                          <!-- Modal -->
                          <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl" role="document">
@@ -114,7 +114,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>NO</th>
-                                                    <th>Nomor Pengeluaran Barang</th>
+                                                    <th>Nomor Surat Kendaraan Dinas</th>
                                                     <th>Tujuan</th>
                                                     <th>Jenis Kendaraan</th>
                                                     <th>Status</th>
@@ -123,47 +123,60 @@
                                             </thead>
                                             <tbody>
                                                 <?php $i = 0; ?>
-                                                @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                                                    <tr>
-                                                        <td>{{ ++$i }}</td>
-                                                        <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
-                                                        <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
-                                                        <td>{{ $pengeluaranBarang->jenis_kendaraan }}</td>
-                                                        <td>
-                                                            @if ($pengeluaranBarang->status == 'Level 1')
+                                                @foreach ($suratKendaraanDinas as $a)
+                                                <tr>
+                                                    <td>{{ ++$i }}</td>
+                                                    <td>{{ $a->surat_kendaraan_dinas_id }}</td>
+                                                    <td>
+                                                        {{ $a->tujuan_penggunaan_1 ?? '-' }} > 
+                                                        {{ $a->tujuan_penggunaan_2 ?? '-' }} > 
+                                                        {{ $a->tujuan_penggunaan_3 ?? '-' }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $a->jenis_kendaraan }}
+                                                    </td>
+                                                    <td>
+                                                        @switch($a->status)
+                                                            @case('Level 1')
                                                                 Menunggu Persetujuan PIC/Ka.Sie
-                                                            @elseif ($pengeluaranBarang->status == 'Level 2')
+                                                                @break
+                                                            @case('Level 2')
                                                                 PIC/Ka.Sie Sudah Menyetujui
-                                                            @elseif ($pengeluaranBarang->status == 'Level 3')
+                                                                @break
+                                                            @case('Level 3')
                                                                 Menunggu Persetujuan Ka.Dept GA
-                                                            @elseif ($pengeluaranBarang->status == 'Level 4')
-                                                                @if ($pengeluaranBarang->kategori_pengeluaran == 1)
-                                                                Menunggu Persetujuan Finance
+                                                                @break
+                                                            @case('Level 4')
+                                                                @if ($a->kategori_pengeluaran == 1)
+                                                                    Menunggu Persetujuan Finance
                                                                 @else
-                                                                Menunggu Persetujuan Security
+                                                                    Menunggu Persetujuan Security
                                                                 @endif
-                                                            @elseif ($pengeluaranBarang->status == 'Level 5')
+                                                                @break
+                                                            @case('Level 5')
                                                                 Menunggu Persetujuan Security
-                                                            @elseif ($pengeluaranBarang->status == 'Level 6')
+                                                                @break
+                                                            @case('Level 6')
                                                                 Sudah Disetujui
-                                                            @elseif ($pengeluaranBarang->status == 'Level 0')
+                                                                @break
+                                                            @case('Level 0')
                                                                 Ditolak
-                                                            @else
-                                                                {{ $pengeluaranBarang->status }}
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button detail -->
-                                                            <button 
-                                                                type="button" 
-                                                                class="btn btn-primary btn-sm" 
-                                                                data-toggle="modal" 
-                                                                data-target="#detailModal" 
-                                                                data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                                <i class="fa-solid fa-circle-info"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                                @break
+                                                            @default
+                                                                {{ $a->status }}
+                                                        @endswitch
+                                                    </td>
+                                                    <td>
+                                                        <button 
+                                                            type="button" 
+                                                            class="btn btn-primary btn-sm" 
+                                                            data-toggle="modal" 
+                                                            data-target="#detailModal" 
+                                                            data-nomor="{{ $a->surat_kendaraan_dinas_id }}">
+                                                            <i class="fa-solid fa-circle-info"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -177,34 +190,49 @@
                             <div class="modal-dialog modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                                        <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                                            <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                                            <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
-                                        </div>  
+                                        <!-- Card untuk Tabel Informasi Kendaraan -->
+                                        <div class="card mb-4">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">Informasi Kendaraan</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>No Kendaraan</th>
+                                                            <th>Keterangan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="kendaraanInfoBody">
+                                                        <!-- Data akan diisi secara dinamis -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
                                         <!-- Card untuk Tabel Barang Keluar -->
                                         <div class="card">
                                             <div class="card-header bg-primary text-white">
-                                                <h6 class="mb-0">Informasi Barang Keluar</h6>
+                                                <h6 class="mb-0">Informasi Peserta</h6>
                                             </div>
                                             <div class="card-body">
                                                 <table id="detaildataTableModal" class="table table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
-                                                            <th>Nomor Pengeluaran Barang</th>
-                                                            <th>Nama Barang</th>
-                                                            <th>Jumlah</th>
-                                                            <th>Satuan</th>
-                                                            <th>Keterangan</th>
+                                                            <th>Nrp Peserta</th>
+                                                            <th>Nama Peserta</th>
+                                                            <th>Departemen</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="detailBody">
@@ -219,10 +247,10 @@
                                         <!-- Card untuk Tabel Informasi Tambahan -->
                                         <div class="card mt-4">
                                             <div class="card-header bg-secondary text-white">
-                                                <h6 class="mb-0">Informasi Tambahan</h6>
+                                                <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                                             </div>
                                             <div class="card-body">
-                                                <table class="table table-bordered">
+                                                <table id="additionalInfoTable" class="table table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
@@ -243,43 +271,90 @@
                             </div>
                         </div>
                     </div>
-                   <!-- Row kedua -->
+
+                    <!-- Row kedua -->
                     <div class="row">
-                        <!-- Kotak besar 1 -->
-                        <div class="col-lg-6 col-12">
-                            <div class="small-box" style="background-color: #2CB3B3; color: white;">
-                                <div class="inner">
-                                    <h3>10</h3>
-                                    <p>Kendaraan Dinas</p>
+                    <!-- Kotak besar 1 -->
+                    <div class="col-lg-6 col-12">
+                        <div class="small-box" style="background-color: #2CB3B3; color: white;">
+                            <div class="inner">
+                            <h3  class="jumlah-menunggu">{{ $kendaraanMenunggu ?? 0 }}</h3>
+                                <p>Kendaraan Dinas</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-car-side"></i>
+                            </div>
+                            <a href="#" class="small-box-footer text-white" data-status="ready" data-toggle="modal" data-target="#modalKendaraan">
+                                Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Kotak besar 2 -->
+                    <div class="col-lg-6 col-12">
+                        <div class="small-box" style="background-color: #2C7DC3; color: white;">
+                            <div class="inner">
+                                <h3>15</h3>
+                                <p>Kendaraan Dinas Digunakan</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <a href="#" class="small-box-footer text-white" data-status="ocuppied" data-toggle="modal" data-target="#modalKendaraan">
+                                Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Modal Kendaraan --}}
+                    <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title">Data Kendaraan</h5>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-car-side"></i>
+                                <div class="modal-body">
+                                   <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>NO</th>
+                                                <th>Jenis Kendaraan</th>
+                                                <th>Nomor Kendaraan</th>
+                                                <th>Kapasitas Penumpang</th>
+                                                <th>Status</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataKendaraanBody">
+                                            <!-- Data akan diisi secara dinamis -->
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <a href="#" class="small-box-footer text-white">
-                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
-                                </a>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Kotak besar 2 -->
-                        <div class="col-lg-6 col-12">
-                            <div class="small-box" style="background-color: #2C7DC3; color: white;">
-                                <div class="inner">
-                                    <h3>15</h3>
-                                    <p>Kendaraan Dinas Digunakan</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-route"></i>
-                                </div>
-                                <a href="#" class="small-box-footer text-white">
-                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
-                                </a>
+                    {{-- Detail Modal Kendaraan --}}
+                    <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span>&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                            <!-- Placeholder untuk kalender -->
+                            <div class="mb-3">
+                                <label for="monthPicker">Pilih Bulan:</label>
+                                <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
+                            </div>
+                            <div id="calendarBooking"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
             <div>
             <div class="row">
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
@@ -424,66 +499,170 @@
                 });
             });
 
-            document.addEventListener('DOMContentLoaded', () => {
-                var table = $('#dataTable').DataTable({
-                    columnDefs: [
-                        {className: 'dt-body-center', targets: 0},
-                        {className: 'dt-head-center', targets: 0},
-                        {className: 'dt-body-center', targets: 5},
-                        {className: 'dt-head-center', targets: 5}
-                    ],
-                    scrollX: false,
-                    responsive: true
+                document.addEventListener('DOMContentLoaded', () => {
+                    var table = $('#dataTable').DataTable({
+                        columnDefs: [
+                            {className: 'dt-body-center', targets: 0},
+                            {className: 'dt-head-center', targets: 0},
+                            {className: 'dt-body-center', targets: 5},
+                            {className: 'dt-head-center', targets: 5}
+                        ],
+                        scrollX: false,
+                        responsive: true
+                    });
+
+                    $('#modalKendaraan').on('show.bs.modal', function (event) {
+
+                    let table = $('#dataTable').DataTable();
+                    table.clear();
+
+                    $.ajax({
+                        url: "/kendaraan/getDataTersedia", // Pastikan route ini sesuai
+                        method: "GET", // Gunakan GET jika tidak kirim data
+                        success: function (response) {
+                        const tbody = $('#dataKendaraanBody');
+                        tbody.empty();
+                            if (response.length > 0) {
+                                response.forEach((item, index) => {
+                                    console.log("ITEM:", item); // <-- Ini penting juga
+                                    const row = `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${item.merk_kendaraan}</td>
+                                            <td>${item.jenis_kendaraan}</td>
+                                            <td>${item.kapasitas_kendaraan}</td>
+                                            <td>
+                                                <span class="badge badge-success">Tersedia</span>
+                                            </td>
+                                            <td>
+                                               <button class="btn btn-sm btn-primary" data-id="${item.kendaraan_dinas_id}" title="Pilih Kendaraan">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>`;
+                                    tbody.append(row);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="6" class="text-center">Tidak ada data kendaraan</td></tr>');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Gagal mengambil data kendaraan:', error);
+                            $('#dataKendaraan').html('<tr><td colspan="6" class="text-center text-danger">Gagal memuat data</td></tr>');
+                        }
+                    });
+                    
+                    
+                    // Fungsi tambahan untuk memberi warna badge status
+                    function getStatusBadgeClass(status) {
+                    switch (status.toLowerCase()) {
+                        case 'tersedia': return 'bg-success';
+                        case 'dipakai': return 'bg-warning text-dark';
+                        case 'servis': return 'bg-danger';
+                        default: return 'bg-secondary';
+                    }
+                }
+
+                let calendar;
+                $('#detailModalKendaraan').on('show.bs.modal', function (event) {
+                    const button = $(event.relatedTarget);
+                    const kendaraanId = button.data('id');
+
+                    $.get(`/kendaraan/${kendaraanId}/booking-dates`, function (dates) {
+                        const events = dates.map(date => ({
+                            title: 'Digunakan',
+                            start: date,
+                            allDay: true,
+                            backgroundColor: '#dc3545',
+                            borderColor: '#dc3545'
+                        }));
+
+                        if (calendar) calendar.destroy();
+
+                        const calendarEl = document.getElementById('calendarBooking');
+                        calendar = new FullCalendar.Calendar(calendarEl, {
+                            initialView: 'dayGridMonth',
+                            height: 400,
+                            events: events,
+                            headerToolbar: {
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek,listMonth'
+                            }
+                        });
+
+                        calendar.render();
+
+                        // Saat bulan dipilih dari input
+                        $('#monthPicker').on('change', function () {
+                            const selected = this.value; // format: "2025-04"
+                            if (selected) {
+                                const newDate = selected + "-01"; // format ke tanggal
+                                calendar.gotoDate(newDate);
+                            }
+                        });
+
+                        // Set bulan input ke bulan saat ini saat modal dibuka
+                        const currentDate = calendar.getDate();
+                        $('#monthPicker').val(currentDate.toISOString().slice(0, 7));
+                    });
                 });
 
                 $('#detailModal').on('show.bs.modal', function (event) {
                     const button = $(event.relatedTarget); // Button yang diklik
                     const nomor = button.data('nomor'); // Nomor pengeluaran barang
-                    document.getElementById('nomorPengeluaranCard').innerText = nomor;
+                    document.getElementById('nomorSuratCard').innerText = nomor;
+
                     $.ajax({
-                        url: "/pengeluaran/detail",
+                        url: "/pengajuan/detailSurat",
                         method: "POST",
-                        data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                        data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
                         success: function (data) {
-                            // console.log("Response dari server:", data); // Debugging
-                            document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
-                            document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
-                            const tbody = document.getElementById('detailBody');
-                            const additionalInfoBody = document.getElementById('additionalInfoBody');
+                            const detailTable = $('#detaildataTableModal').DataTable();
 
-                            tbody.innerHTML = '';
-                            additionalInfoBody.innerHTML = '';
+                            const jenisKendraan = {
+                                1 : "Mengeluarkan"
+                            };
 
-                            // Hapus DataTable sebelum menambahkan data baru
-                            if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
-                                $('#detaildataTableModal').DataTable().clear().destroy();
-                            }
-
-                            // Validasi data barang_keluar
-                            if (data.barang_keluar && data.barang_keluar.length > 0) {
-                                tbody.innerHTML = data.barang_keluar.map((item, index) => `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${nomor}</td>
-                                        <td>${item.nama_barang}</td>
-                                        <td>${item.jumlah_barang}</td>
-                                        <td>${item.satuan_barang}</td>
-                                        <td>${item.keterangan_barang}</td>
-                                    </tr>
-                                `).join('');
+                            // Kosongkan data lama kendaraan
+                            document.getElementById('kendaraanInfoBody').innerHTML = "";
+                            
+                            // Validasi dan tampilkan data kendaraan
+                            if (data.data_kendaraan && data.data_kendaraan.length > 0) {
+                                data.data_kendaraan.forEach((item, index) => {
+                                    let row = `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${item.nomor_kendaraan}</td>
+                                            <td>${item.keterangan}</td>
+                                            </tr>
+                                            `;
+                                    document.getElementById('kendaraanInfoBody').innerHTML += row;
+                                });
                             } else {
-                                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                                document.getElementById('kendaraanInfoBody').innerHTML = `
+                                    <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
+                                `;
                             }
 
-                            // Inisialisasi ulang DataTable
-                            $('#detaildataTableModal').DataTable({
-                                responsive: true,
-                                scrollX: false,
-                                pageLength: 5,
-                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                                destroy: true
-                            });
+                            // Kosongkan data lama
+                            detailTable.clear();
+                            document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
 
+                            // Validasi data userDinas
+                            if (data.userDinas && data.userDinas.length > 0) {
+                                let newData = data.userDinas.map((item, index) => [
+                                    index + 1,
+                                    item.nrp_karyawan,
+                                    item.name,
+                                    item.departemen
+                                ]);
+                                detailTable.rows.add(newData).draw();
+                            } else {
+                                detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
+                            }
+
+                            // Mapping tingkatan dan status persetujuan
                             const tingkatMapping = {
                                 "Level 1": "Civitas",
                                 "Level 2": "PIC/Ka.Sie",
@@ -493,30 +672,37 @@
                                 "Level 6": "Security"
                             };
                             const approvMapping = {
-                                "Level 1": "Mengeluarkan",
-                                "Level 2": "Membawa",
-                                "Level 3": "Menyetujui",
-                                "Level 4": "Mengetahui",
-                                "Level 5": "Menerima",
-                                "Level 6": "Memeriksa"
+                                "Level 0": "Menolak",
+                                "Level 1": "Mengajukan",
+                                "Level 2": "Menyetujui",
+                                "Level 3": "Mengetahui",
+                                "Level 4": "Memeriksa"
                             };
-
-
+                            
                             // Validasi data informasi_tambahan
+                            const additionalInfoBody = document.getElementById('additionalInfoBody');
+                            
                             if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                                additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-                                    <tr>
+                                data.informasi_tambahan.forEach((info, index) => {
+                                    let row = `
+                                        <tr>
                                         <td>${index + 1}</td>
                                         <td>${info.nama}</td>
-                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                        <td>${info.departemen}</td>
-                                        <td>${approvMapping[info.status] || info.status}</td>
-                                    </tr>
-                                `).join('');
+                                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                            <td>${info.departemen}</td>
+                                            <td>${approvMapping[info.status] || info.status}</td>
+                                            </tr>
+                                    `;
+                                    additionalInfoBody.innerHTML += row;
+                                });
                             } else {
-                                additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                                additionalInfoBody.innerHTML = `
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                                    </tr>
+                                `;
                             }
-
+                            
                             // Pastikan modal terbuka setelah data dimuat
                             $('#detailModal').modal('show');
                         },
@@ -525,8 +711,8 @@
                             alert("Terjadi kesalahan saat mengambil data.");
                         }
                     });
-                });
-
+                });    
+            });
 
                 $(document).ready(function () {
                     // Fungsi untuk mendapatkan tanggal hari ini
@@ -562,7 +748,7 @@
 
                         // AJAX request untuk mengambil count data
                         $.ajax({
-                            url: `/dashboard/get-data-card`,
+                            url: `/dashboard-kendaraan-dinas/get-data-card`,
                             method: 'GET',
                             dataType: 'json',
                             data: {
@@ -578,10 +764,10 @@
 
                                     // Pastikan semua data yang diperlukan ada
                                     const counts = {
-                                        pengajuan: data.pengeluaranBarangs?.count ?? 0,
-                                        disetujui: data.pengeluaranBarangsDisetujui?.count ?? 0,
-                                        menunggu: data.pengeluaranBarangsMenunggu?.count ?? 0,
-                                        ditolak: data.pengeluaranBarangsDitolak?.count ?? 0,
+                                        pengajuan: data.suratKendaraan?.count ?? 0,
+                                        disetujui: data.suratKendaraanDisetujui?.count ?? 0,
+                                        menunggu: data.suratKendaraanMenunggu?.count ?? 0,
+                                        ditolak: data.suratKendaraanDitolak?.count ?? 0,
                                     };
 
                                     console.log('Counts calculated:', counts); // Debugging: Lihat hasil perhitungan
@@ -645,7 +831,7 @@
 
                         // AJAX request untuk mengambil data tabel
                         $.ajax({
-                            url: `/dashboard/get-data-card`,
+                            url: `/dashboard-kendaraan-dinas/get-data-card`,
                             method: 'GET',
                             dataType: 'json',
                             data: {
@@ -657,13 +843,13 @@
                                     // Pilih data berdasarkan status yang diminta
                                     let filteredData = [];
                                     if (statusFilter === 'approved') {
-                                        filteredData = response.data.pengeluaranBarangsDisetujui.data || [];
+                                        filteredData = response.data.suratKendaraanDisetujui.data || [];
                                     } else if (statusFilter === 'pending') {
-                                        filteredData = response.data.pengeluaranBarangsMenunggu.data || [];
+                                        filteredData = response.data.suratKendaraanMenunggu.data || [];
                                     } else if (statusFilter === 'rejected') {
-                                        filteredData = response.data.pengeluaranBarangsDitolak.data || [];
+                                        filteredData = response.data.suratKendaraanDitolak.data || [];
                                     } else {
-                                        filteredData = response.data.pengeluaranBarangs.data || []; // Tampilkan semua data jika statusFilter kosong
+                                        filteredData = response.data.suratKendaraan.data || []; // Tampilkan semua data jika statusFilter kosong
                                     }
 
                                     // Mapping status level ke tampilan
@@ -681,20 +867,22 @@
                                     if (filteredData.length > 0) {
                                         filteredData.forEach(function (item, index) {
                                             const mappedStatus = statusMapping[item.status] || item.status; // Gunakan mapping jika status dikenali
-
                                             table.row.add([
-                                                index + 1, // Kolom 1: No Urut
-                                                item.pengeluaran_barang_id, // Kolom 2: Nomor Pengeluaran Barang
-                                                item.tujuan_pengeluaran_barang, // Kolom 3: Tujuan
-                                                item.jenis_kendaraan, // Kolom 4: Jenis Kendaraan
-                                                mappedStatus, // Kolom 5: Status (dengan mapping)
+                                                index + 1,
+                                                item.surat_kendaraan_dinas_id,
+                                                `${item.tujuan_penggunaan_1 || '-'} > ${item.tujuan_penggunaan_2 || '-'} > ${item.tujuan_penggunaan_3 || '-'}`,
+                                                item.jenis_kendaraan == 1 ? 'Kantor' :
+                                                item.jenis_kendaraan == 2 ? 'Pribadi' :
+                                                item.jenis_kendaraan == 3 ? 'Taxi' :
+                                                item.jenis_kendaraan,
+                                                mappedStatus,
                                                 `<button type="button" 
                                                     class="btn btn-primary btn-sm" 
                                                     data-toggle="modal" 
                                                     data-target="#detailModal" 
-                                                    data-nomor="${item.pengeluaran_barang_id}">
+                                                    data-nomor="${item.surat_kendaraan_dinas_id}">
                                                     <i class="fa-solid fa-circle-info"></i>
-                                                </button>` // Kolom 6: Aksi
+                                                </button>`
                                             ]);
                                         });
                                     } else {
@@ -758,6 +946,7 @@
             });
 
             $(document).ready(function () {
+
                 const startDateInput = $('#start-date');
                 const endDateInput = $('#end-date');
 
@@ -779,16 +968,16 @@
                         const formattedEndDate = formatDateToEndOfDay(endDate);
 
                         $.ajax({
-                            url: `/dashboard/get-data-card?start_date=${formattedStartDate}&end_date=${formattedEndDate}`,
+                            url: `/dashboard-kendaraan-dinas/get-data-card?start_date=${formattedStartDate}&end_date=${formattedEndDate}`,
                             method: 'GET',
                             dataType: 'json',
                             success: function (response) {
                                 if (response.success) {
                                     // Update elemen card dengan data dari response
-                                    $('.jumlah-pengajuan').text(response.data.pengeluaranBarangs.length || 0);
-                                    $('.jumlah-disetujui').text(response.data.pengeluaranBarangsDisetujui || 0);
-                                    $('.jumlah-menunggu').text(response.data.pengeluaranBarangsMenunggu || 0);
-                                    $('.jumlah-ditolak').text(response.data.pengeluaranBarangsDitolak || 0);
+                                    $('.jumlah-pengajuan').text(response.data.suratKendaraan.length || 0);
+                                    $('.jumlah-disetujui').text(response.data.suratKendaraanDisetujui || 0);
+                                    $('.jumlah-menunggu').text(response.data.suratKendaraanMenunggu || 0);
+                                    $('.jumlah-ditolak').text(response.data.suratKendaraanDitolak || 0);
                                 }
                             },
                             error: function (xhr) {
@@ -835,8 +1024,9 @@
                 },
             });
 
+            
+
         </script>
-        
         </body>
     </div>
 </div>

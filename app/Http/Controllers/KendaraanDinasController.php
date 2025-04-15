@@ -15,6 +15,53 @@ class KendaraanDinasController extends Controller
      * Store a newly created resource in storage.
      */
 
+    public function getDataTersedia(Request $request)
+    {
+        try {
+            $kendaraan = DB::table('tb_kendaraan_dinas')
+                ->select(
+                    'kendaraan_dinas_id',
+                    'merk_kendaraan',
+                    'jenis_kendaraan',
+                    'nomor_kendaraan',
+                    'kapasitas_kendaraan',
+                    'status_kendaraan'
+                )
+                ->get();
+    
+            return response()->json($kendaraan);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data kendaraan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+     
+    public function getDataDigunakan(Request $request)
+    {
+        try {
+            $kendaraan = DB::table('tb_kendaraan_dinas')
+                ->select(
+                    'kendaraan_dinas_id',
+                    'merk_kendaraan',
+                    'jenis_kendaraan',
+                    'nomor_kendaraan',
+                    'kapasitas_kendaraan',
+                    'status_kendaraan'
+                )
+                ->where('status_kendaraan', 2) // hanya ambil yang status = 2
+                ->get();
+    
+            return response()->json($kendaraan);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data kendaraan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
 
     public function store(Request $request)
     {

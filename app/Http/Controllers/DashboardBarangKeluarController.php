@@ -43,7 +43,7 @@ class DashboardBarangKeluarController extends Controller
                 $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            } elseif (in_array($user->level, ['Ka.Dept', 'Security'])) {
+            } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
                 $pengeluaranBarangs = $query->get();
             } else {
                 $pengeluaranBarangs = collect(); // Jika level tidak dikenali, kembalikan data kosong

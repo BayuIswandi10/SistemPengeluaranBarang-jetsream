@@ -50,7 +50,7 @@ class DashboardKendaraanDinasController extends Controller
                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            } elseif (in_array($user->level, ['Ka.Dept', 'Security'])) {
+            } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
                 $suratKendaraan = $query->get();
             } else {
                 $suratKendaraan = collect(); // Jika level tidak dikenali, kembalikan data kosong
@@ -84,15 +84,15 @@ class DashboardKendaraanDinasController extends Controller
                         'count' => $suratKendaraan->count(),
                         'data' => $suratKendaraan
                     ],
-                    'kendaraanDisetujui' => [
+                    'suratKendaraanDisetujui' => [
                         'count' => $kendaraanDisetujui->count(),
                         'data' => $kendaraanDisetujui
                     ],
-                    'kendaraanMenunggu' => [
+                    'suratKendaraanMenunggu' => [
                         'count' => $kendaraanMenunggu->count(),
                         'data' => $kendaraanMenunggu
                     ],
-                    'kendaraanDitolak' => [
+                    'suratKendaraanDitolak' => [
                         'count' => $kendaraanDitolak->count(),
                         'data' => $kendaraanDitolak
                     ],

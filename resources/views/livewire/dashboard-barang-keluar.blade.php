@@ -4,24 +4,26 @@
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
 
-                @if ($user->level === 'Ka.Dept')
-                    <div class="d-flex border rounded overflow-hidden" style="width: fit-content;">
+                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin')
+                    <div class="d-flex border rounded overflow-hidden w-100" style="max-width: 600px;">
                         <a href="{{ route('dashboard-barang-keluar') }}"
                         class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
                         style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; width: 300px; white-space: nowrap; font-weight: 400;">
+                                text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
                             Barang Keluar
                         </a>
                         <a href="{{ route('dashboard-kendaraan-dinas') }}"
+                         id="switch-kendaraan-dinas"
                         class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
                         style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; border-left: 1px solid #ccc; width: 300px; white-space: nowrap; font-weight: 400;">
+                                text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
                             Penggunaan Kendaraan Dinas
                         </a>
                     </div>
                 @else
                     <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
                 @endif
+
 
                     <div class="d-flex align-items-center w-100 justify-content-end">
                         <!-- Input Tanggal -->
@@ -514,6 +516,23 @@
                         return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
                     }
 
+                    // Fungsi memindahkan value rentang tanggal yang dipilih date picker
+                    document.getElementById("switch-kendaraan-dinas").addEventListener("click", function (e) {
+                        e.preventDefault();
+
+                        const selectedDate = document.getElementById("date-range-picker").value;
+                        const baseUrl = this.getAttribute("href");
+
+                        if (selectedDate) {
+                            // Encode value supaya aman di URL
+                            const encodedDate = encodeURIComponent(selectedDate);
+                            window.location.href = `${baseUrl}?date_range=${encodedDate}`;
+                        } else {
+                            window.location.href = baseUrl; // kalau kosong, tetap jalan
+                        }
+                    });
+
+
                     // Fungsi untuk memuat jumlah data
                     function loadCounts(startDate, endDate) {
                         const today = getTodayDate();
@@ -528,7 +547,7 @@
 
                         // AJAX request untuk mengambil count data
                         $.ajax({
-                            url: `/dashboard/get-data-card`,
+                            url: `/dashboard-barang-keluar/get-data-card`,
                             method: 'GET',
                             dataType: 'json',
                             data: {
@@ -611,7 +630,7 @@
 
                         // AJAX request untuk mengambil data tabel
                         $.ajax({
-                            url: `/dashboard/get-data-card`,
+                            url: `/dashboard-barang-keluar/get-data-card`,
                             method: 'GET',
                             dataType: 'json',
                             data: {
@@ -745,7 +764,7 @@
                         const formattedEndDate = formatDateToEndOfDay(endDate);
 
                         $.ajax({
-                            url: `/dashboard/get-data-card?start_date=${formattedStartDate}&end_date=${formattedEndDate}`,
+                            url: `/dashboard-barang-keluar/get-data-card?start_date=${formattedStartDate}&end_date=${formattedEndDate}`,
                             method: 'GET',
                             dataType: 'json',
                             success: function (response) {

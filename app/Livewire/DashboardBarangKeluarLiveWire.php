@@ -13,10 +13,9 @@ class DashboardBarangKeluarLiveWire extends Component
     public function render()
     {
         $user = Auth::user();
+        $user->level = trim($user->level);
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
-        ->whereDate('created_date', Carbon::today()); // Hanya ambil data hari ini
-
-        
+        ->whereDate('created_date', Carbon::today()); // Hanya ambil data hari ini        
 
         if ($user->level === 'Staff') {
             $pengeluaranBarangs = $query->where(function ($q) use ($user) {
@@ -28,7 +27,7 @@ class DashboardBarangKeluarLiveWire extends Component
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' ) {
+        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' || $user->level === 'SuperAdmin'  ) {
             $pengeluaranBarangs = $query->get();
         } else {
             $pengeluaranBarangs = collect();
