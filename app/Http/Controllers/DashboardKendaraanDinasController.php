@@ -52,6 +52,7 @@ class DashboardKendaraanDinasController extends Controller
                 })->get();
             } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
                 $suratKendaraan = $query->get();
+                $kendaraanDinas = $query->get();
             } else {
                 $suratKendaraan = collect(); // Jika level tidak dikenali, kembalikan data kosong
             }
@@ -72,6 +73,16 @@ class DashboardKendaraanDinasController extends Controller
             $kendaraanDitolak = $suratKendaraan->filter(fn ($item) =>
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
             )->values();
+
+            $kendaraanDinasTersedia = $kendaraanDinas->filter(fn($item) => 
+                $item->status_kendaraan == 1
+            )->values();
+
+            $kendaraanDinasSedangDigunakan = $kendaraanDinas->filter(fn($item) =>
+                 $item->status_kendaraan == 2
+            )->values();
+
+            
 
             // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([
@@ -95,6 +106,14 @@ class DashboardKendaraanDinasController extends Controller
                     'suratKendaraanDitolak' => [
                         'count' => $kendaraanDitolak->count(),
                         'data' => $kendaraanDitolak
+                    ],
+                    'kendaraanDinasTersedia' => [
+                        'count' => $kendaraanDinasTersedia->count(),
+                        'data' => $kendaraanDinasTersedia
+                    ],
+                    'kendaraanDinasSedangDigunakan' => [
+                        'count' => $kendaraanDinasSedangDigunakan->count(),
+                        'data' => $kendaraanDinasSedangDigunakan
                     ],
                 ]
             ]);

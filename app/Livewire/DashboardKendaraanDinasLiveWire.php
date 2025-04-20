@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\SuratKendaraanDinas;
+use App\Models\KendaraanDinas;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -17,6 +18,8 @@ class DashboardKendaraanDinasLiveWire extends Component
         $user->level = trim($user->level);
         $query = SuratKendaraanDinas::with(['user', 'approval'])
             ->whereDate('created_date', Carbon::today());
+        
+        $kendaraanDinas = collect();
 
         if ($user->level === 'Staff') {
             $suratKendaraanDinasList = $query->where(function ($q) use ($user) {
@@ -30,6 +33,7 @@ class DashboardKendaraanDinasLiveWire extends Component
             })->get();
         } elseif (in_array($user->level, ['Security', 'Ka.Dept', 'Super Admin'])) {
             $suratKendaraanDinasList = $query->get();
+            $kendaraanDinas = KendaraanDinas::all();
         } else {
             $suratKendaraanDinasList = collect();
         }
@@ -48,6 +52,10 @@ class DashboardKendaraanDinasLiveWire extends Component
         $suratDitolak = $suratKendaraanDinasList->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
         )->count();
+
+        $kendaraanDinasTersedia = $kendaraanDinas->filter(fn($item) => $item->status_kendaraan == 1)->count();
+
+        $kendaraanDinasSedangDigunakan = $kendaraanDinas->filter(fn($item) => $item->status_kendaraan == 2)->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();
@@ -110,6 +118,8 @@ class DashboardKendaraanDinasLiveWire extends Component
             'suratDisetujui' => $suratDisetujui,
             'suratMenunggu' => $suratMenunggu,
             'suratDitolak' => $suratDitolak,
+            'kendaraanDinasSedangDigunakan' => $kendaraanDinasSedangDigunakan,
+            'kendaraanDinasTersedia' => $kendaraanDinasTersedia,
             'dailyData' => json_encode($dailyData),
             'monthlyData' => json_encode($monthlyData),
             'yearlyData' => json_encode($yearlyData),

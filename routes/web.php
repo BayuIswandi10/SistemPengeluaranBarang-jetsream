@@ -43,7 +43,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/approval', ApprovalBarangKeluarLiveWire::class)->name('approval');
     Route::get('/approval-dinas', ApprovalKendaraanDinasLivewire::class)->name('approval-dinas');
 
-
     Route::get('/dashboard-barang-keluar/get-data-card', [DashboardBarangKeluarController::class, 'getData']);
     Route::get('/dashboard-kendaraan-dinas/get-data-card', [DashboardKendaraanDinasController::class, 'getData']);
     

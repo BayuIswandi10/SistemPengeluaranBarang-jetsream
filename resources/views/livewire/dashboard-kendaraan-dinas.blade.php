@@ -278,7 +278,7 @@
                     <div class="col-lg-6 col-12">
                         <div class="small-box" style="background-color: #2CB3B3; color: white;">
                             <div class="inner">
-                            <h3  class="jumlah-menunggu">{{ $kendaraanMenunggu ?? 0 }}</h3>
+                            <h3  class="jumlah-menunggu">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
                                 <p>Kendaraan Dinas</p>
                             </div>
                             <div class="icon">
@@ -294,7 +294,7 @@
                     <div class="col-lg-6 col-12">
                         <div class="small-box" style="background-color: #2C7DC3; color: white;">
                             <div class="inner">
-                                <h3>15</h3>
+                                <h3  class="jumlah-menunggu">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
                                 <p>Kendaraan Dinas Digunakan</p>
                             </div>
                             <div class="icon">
