@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\SuratKendaraanDinas;
+use App\Models\SuratKendaraanDinasDetail;
 use App\Models\KendaraanDinas;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -53,9 +54,27 @@ class DashboardKendaraanDinasLiveWire extends Component
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
         )->count();
 
-        $kendaraanDinasTersedia = $kendaraanDinas->filter(fn($item) => $item->status_kendaraan == 1)->count();
+        $start = Carbon::today()->startOfDay();
+        $end = Carbon::today()->endOfDay();
 
-        $kendaraanDinasSedangDigunakan = $kendaraanDinas->filter(fn($item) => $item->status_kendaraan == 2)->count();
+        // 1. Ambil semua surat kendaraan dinas dalam rentang tanggal
+        $suratIds = SuratKendaraanDinas::whereBetween('created_date', [$start, $end])
+            ->pluck('surat_kendaraan_dinas_id');
+
+        // 2. Ambil detail surat berdasarkan ID surat
+        $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)->get();
+
+        // 3. Ambil kendaraan_dinas_id yang terlibat
+        $kendaraanDigunakanIds = $detailSurat->pluck('kendaraan_dinas_id')->unique();
+
+        // 4. Ambil semua kendaraan dinas
+        $kendaraanDinasAll = KendaraanDinas::all();
+
+        // 5. Ambil kendaraan yang digunakan
+        $kendaraanDinasSedangDigunakan = $kendaraanDinasAll->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->count();
+
+        // 6. Ambil kendaraan yang tidak digunakan
+        $kendaraanDinasTersedia = $kendaraanDinasAll->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();
@@ -110,7 +129,7 @@ class DashboardKendaraanDinasLiveWire extends Component
         $pieQuery = SuratKendaraanDinas::pluck('surat_kendaraan_dinas_id');
         $pieData = $pieQuery->map(function ($item) {
             $parts = explode(' / ', $item);
-            return $parts[1] ?? null;
+            return $parts[0] ?? null;
         })->filter()->countBy()->toArray();
 
         return view('livewire.dashboard-kendaraan-dinas', [

@@ -277,7 +277,7 @@
                         <div class="col-lg-6 col-12">
                             <div class="small-box" style="background-color: #2CB3B3; color: white;">
                                 <div class="inner">
-                                <h3  class="jumlah-menunggu">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
+                                <h3  class="jumlah-kendaraan-tersedia">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
                                     <p>Kendaraan Dinas Tersedia</p>
                                 </div>
                                 <div class="icon">
@@ -293,7 +293,7 @@
                         <div class="col-lg-6 col-12">
                             <div class="small-box" style="background-color: #2C7DC3; color: white;">
                                 <div class="inner">
-                                    <h3  class="jumlah-menunggu">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
+                                    <h3  class="jumlah-kendaraan-digunakan">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
                                     <p>Kendaraan Dinas Digunakan</p>
                                 </div>
                                 <div class="icon">
@@ -383,7 +383,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                        <h5 class="card-title text-center">Distribusi Pengeluaran Barang Berdasarkan Departemen</h5>
+                        <h5 class="card-title text-center">Penggunaan Kendaraan Dinas Berdasarkan Kategori</h5>
                     </div>
                     <div class="card-body">
                         <div class="chart">
@@ -748,6 +748,9 @@
                         $('.jumlah-disetujui').text('...');
                         $('.jumlah-menunggu').text('...');
                         $('.jumlah-ditolak').text('...');
+                        $('.jumlah-kendaraan-tersedia').text('...');
+                        $('.jumlah-kendaraan-digunakan').text('...');
+                        
 
                         // AJAX request untuk mengambil count data
                         $.ajax({
@@ -771,6 +774,8 @@
                                         disetujui: data.suratKendaraanDisetujui?.count ?? 0,
                                         menunggu: data.suratKendaraanMenunggu?.count ?? 0,
                                         ditolak: data.suratKendaraanDitolak?.count ?? 0,
+                                        kendaraanTersedia: data.kendaraanDinasTersedia.count ?? 0,
+                                        kendaraanDigunakan: data.kendaraanDinasSedangDigunakan.count ?? 0
                                     };
 
                                     console.log('Counts calculated:', counts); // Debugging: Lihat hasil perhitungan
@@ -780,6 +785,8 @@
                                     $('.jumlah-disetujui').text(counts.disetujui);
                                     $('.jumlah-menunggu').text(counts.menunggu);
                                     $('.jumlah-ditolak').text(counts.ditolak);
+                                    $('.jumlah-kendaraan-tersedia').text(counts.kendaraanTersedia);
+                                    $('.jumlah-kendaraan-digunakan').text(counts.kendaraanDigunakan);
                                 } else {
                                     console.error('Invalid response format:', response); // Debugging: Log jika format respons tidak valid
                                     // Jika tidak ada data ditemukan atau format tidak valid, tampilkan 0
@@ -787,6 +794,8 @@
                                     $('.jumlah-disetujui').text(0);
                                     $('.jumlah-menunggu').text(0);
                                     $('.jumlah-ditolak').text(0);
+                                    $('.jumlah-kendaraan-tersedia').text(0);
+                                    $('.jumlah-kendaraan-digunakan').text(0);
                                 }
                             },
                             error: function (xhr, status, error) {

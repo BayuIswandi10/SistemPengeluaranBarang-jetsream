@@ -75,16 +75,28 @@ class DashboardKendaraanDinasController extends Controller
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
             )->values();
 
-            $kendaraanDinasTersedia = $kendaraanDinas->filter(fn($item) => 
-                $item->status_kendaraan == 1
-            )->values();
-
-            $kendaraanDinasSedangDigunakan = $kendaraanDinas->filter(fn($item) =>
-                 $item->status_kendaraan == 2
-            )->values();
-
-            
-
+            $start = \Carbon\Carbon::parse($startDate);
+            $end = \Carbon\Carbon::parse($endDate);
+    
+            // 1. Ambil semua surat kendaraan dinas dalam rentang tanggal
+            $suratIds = SuratKendaraanDinas::whereBetween('created_date', [$startDate, $endDate])
+                ->pluck('surat_kendaraan_dinas_id');
+    
+            // 2. Ambil detail surat berdasarkan ID surat
+            $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)->get();
+    
+            // 3. Ambil kendaraan_dinas_id yang terlibat
+            $kendaraanDigunakanIds = $detailSurat->pluck('kendaraan_dinas_id')->unique();
+    
+            // 4. Ambil semua kendaraan dinas
+            $kendaraanDinasAll = KendaraanDinas::all();
+    
+            // 5. Ambil kendaraan yang digunakan
+            $kendaraanDinasSedangDigunakan = $kendaraanDinasAll->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->values();
+    
+            // 6. Ambil kendaraan yang tidak digunakan
+            $kendaraanDinasTersedia = $kendaraanDinasAll->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->values();
+    
             // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([
                 'success' => true,
@@ -108,13 +120,13 @@ class DashboardKendaraanDinasController extends Controller
                         'count' => $kendaraanDitolak->count(),
                         'data' => $kendaraanDitolak
                     ],
-                    'kendaraanDinasTersedia' => [
-                        'count' => $kendaraanDinasTersedia->count(),
-                        'data' => $kendaraanDinasTersedia
-                    ],
                     'kendaraanDinasSedangDigunakan' => [
                         'count' => $kendaraanDinasSedangDigunakan->count(),
                         'data' => $kendaraanDinasSedangDigunakan
+                    ],
+                    'kendaraanDinasTersedia' => [
+                        'count' => $kendaraanDinasTersedia->count(),
+                        'data' => $kendaraanDinasTersedia
                     ],
                 ]
             ]);
