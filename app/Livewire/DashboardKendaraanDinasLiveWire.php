@@ -126,11 +126,22 @@ class DashboardKendaraanDinasLiveWire extends Component
         ];
 
         // 📊 Pie Chart Berdasarkan Departemen
-        $pieQuery = SuratKendaraanDinas::pluck('surat_kendaraan_dinas_id');
-        $pieData = $pieQuery->map(function ($item) {
-            $parts = explode(' / ', $item);
-            return $parts[0] ?? null;
-        })->filter()->countBy()->toArray();
+        $labelMap = [
+            'KN' => 'Kantor',
+            'PR' => 'Pribadi',
+            'TX' => 'Taxi',
+        ];
+        
+        $pieData = SuratKendaraanDinas::pluck('surat_kendaraan_dinas_id')
+            ->map(fn($id) => explode('/', $id)[0] ?? null)
+            ->filter()
+            ->countBy()
+            ->mapWithKeys(function ($count, $key) use ($labelMap) {
+                $label = $labelMap[$key] ?? $key; // fallback ke key asli kalau gak ada di map
+                return [$label => $count];
+            })
+            ->toArray();
+        
 
         return view('livewire.dashboard-kendaraan-dinas', [
             'suratKendaraanDinas' => $suratKendaraanDinasList,

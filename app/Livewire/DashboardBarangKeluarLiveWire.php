@@ -106,7 +106,7 @@ class DashboardBarangKeluarLiveWire extends Component
         // 📊 Data Pie Chart berdasarkan Departemen
         $pieQuery = PengeluaranBarang::pluck('pengeluaran_barang_id'); // Ambil hanya kolom ID
         $pieData = $pieQuery->map(function ($item) {
-            $parts = explode(' / ', $item);
+            $parts = explode('/', $item);
             return $parts[1] ?? null; // Ambil bagian kedua (Departemen)
         })->filter()->countBy()->toArray();
 
