@@ -271,94 +271,96 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Row kedua -->
                     <div class="row">
-                    <!-- Kotak besar 1 -->
-                    <div class="col-lg-6 col-12">
-                        <div class="small-box" style="background-color: #2CB3B3; color: white;">
-                            <div class="inner">
-                            <h3  class="jumlah-menunggu">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
-                                <p>Kendaraan Dinas</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-car-side"></i>
-                            </div>
-                            <a href="#" class="small-box-footer text-white" data-status="ready" data-toggle="modal" data-target="#modalKendaraan">
-                                Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Kotak besar 2 -->
-                    <div class="col-lg-6 col-12">
-                        <div class="small-box" style="background-color: #2C7DC3; color: white;">
-                            <div class="inner">
-                                <h3  class="jumlah-menunggu">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
-                                <p>Kendaraan Dinas Digunakan</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-route"></i>
-                            </div>
-                            <a href="#" class="small-box-footer text-white" data-status="ocuppied" data-toggle="modal" data-target="#modalKendaraan">
-                                Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    {{-- Modal Kendaraan --}}
-                    <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-xl" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title">Data Kendaraan</h5>
+                        <!-- Kotak besar 1 -->
+                        <div class="col-lg-6 col-12">
+                            <div class="small-box" style="background-color: #2CB3B3; color: white;">
+                                <div class="inner">
+                                <h3  class="jumlah-menunggu">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
+                                    <p>Kendaraan Dinas Tersedia</p>
                                 </div>
-                                <div class="modal-body">
-                                   <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>NO</th>
-                                                <th>Jenis Kendaraan</th>
-                                                <th>Nomor Kendaraan</th>
-                                                <th>Kapasitas Penumpang</th>
-                                                <th>Status</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="dataKendaraanBody">
-                                            <!-- Data akan diisi secara dinamis -->
-                                        </tbody>
-                                    </table>
+                                <div class="icon">
+                                    <i class="fas fa-car-side"></i>
                                 </div>
+                                <a href="#" class="small-box-footer text-white" data-status="ready" data-toggle="modal" data-target="#modalKendaraan">
+                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                                </a>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- Detail Modal Kendaraan --}}
-                    <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span>&times;</span>
-                            </button>
-                            </div>
-                            <div class="modal-body">
-                            <!-- Placeholder untuk kalender -->
-                            <div class="mb-3">
-                                <label for="monthPicker">Pilih Bulan:</label>
-                                <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
-                            </div>
-                            <div id="calendarBooking"></div>
+                        <!-- Kotak besar 2 -->
+                        <div class="col-lg-6 col-12">
+                            <div class="small-box" style="background-color: #2C7DC3; color: white;">
+                                <div class="inner">
+                                    <h3  class="jumlah-menunggu">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
+                                    <p>Kendaraan Dinas Digunakan</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <a href="#" class="small-box-footer text-white" data-status="ocuppied" data-toggle="modal" data-target="#modalKendaraan">
+                                    Lebih Banyak <i class="fas fa-arrow-circle-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            <div>
-            <div class="row">
+            </div>
+
+            {{-- Modal Kendaraan --}}
+            <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title">Data Kendaraan</h5>
+                        </div>
+                        <div class="modal-body">
+                            <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>NO</th>
+                                        <th>Jenis Kendaraan</th>
+                                        <th>Nomor Kendaraan</th>
+                                        <th>Kapasitas Penumpang</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataKendaraanBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Detail Modal Kendaraan --}}
+            <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <!-- Placeholder untuk kalender -->
+                        <div class="mb-3">
+                            <label for="monthPicker">Pilih Bulan:</label>
+                            <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
+                        </div>
+                        <div id="calendarBooking"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="row">
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
-            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security'])) col-md-6 @else col-md-12 @endif">
+            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security','Super Admin'])) col-md-6 @else col-md-12 @endif">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
                         <div class="btn-group" role="group" style="margin-left: 0;">
@@ -377,7 +379,7 @@
 
 
             <!-- Bagian Kanan - Diagram Pie -->
-            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security']))
+            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security', 'Super Admin']))
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
@@ -391,7 +393,6 @@
                 </div>
             </div>
             @endif
-        </div>
 
 
         </body>

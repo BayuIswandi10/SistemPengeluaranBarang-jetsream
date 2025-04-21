@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SuratKendaraanDinas;
 use App\Models\KendaraanDinas;
+use App\Models\SuratKendaraanDinasDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 

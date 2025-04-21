@@ -248,10 +248,9 @@
                 </div>
             </div>
 
-            <div>
             <div class="row">
             <!-- Bagian Kiri - Diagram Batang dengan Filter -->
-            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security'])) col-md-6 @else col-md-12 @endif">
+            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security', 'Super Admin'])) col-md-6 @else col-md-12 @endif">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
                         <div class="btn-group" role="group" style="margin-left: 0;">
@@ -270,7 +269,7 @@
 
 
             <!-- Bagian Kanan - Diagram Pie -->
-            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security']))
+            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security','Super Admin']))
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
