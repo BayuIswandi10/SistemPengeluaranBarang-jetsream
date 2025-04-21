@@ -171,7 +171,7 @@
                                                             type="button" 
                                                             class="btn btn-primary btn-sm" 
                                                             data-toggle="modal" 
-                                                            data-target="#detailModal" 
+                                                            data-target="#detailModalPenggunaan" 
                                                             data-nomor="{{ $a->surat_kendaraan_dinas_id }}">
                                                             <i class="fa-solid fa-circle-info"></i>
                                                         </button>
@@ -185,8 +185,8 @@
                             </div>
                         </div>
 
-                        {{-- Detail Modal --}}
-                        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+                        {{-- Detail Modal Penggunaan Kendaraan --}}
+                        <div class="modal fade" id="detailModalPenggunaan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -220,7 +220,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Card untuk Tabel Barang Keluar -->
+                                        <!-- Card untuk Peserta Kendaraan Dinas -->
                                         <div class="card">
                                             <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Peserta</h6>
@@ -607,115 +607,117 @@
                         const currentDate = calendar.getDate();
                         $('#monthPicker').val(currentDate.toISOString().slice(0, 7));
                     });
-                });
-
-                $('#detailModal').on('show.bs.modal', function (event) {
-                    const button = $(event.relatedTarget); // Button yang diklik
-                    const nomor = button.data('nomor'); // Nomor pengeluaran barang
-                    document.getElementById('nomorSuratCard').innerText = nomor;
-
-                    $.ajax({
-                        url: "/pengajuan/detailSurat",
-                        method: "POST",
-                        data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
-                        success: function (data) {
-                            const detailTable = $('#detaildataTableModal').DataTable();
-
-                            const jenisKendraan = {
-                                1 : "Mengeluarkan"
-                            };
-
-                            // Kosongkan data lama kendaraan
-                            document.getElementById('kendaraanInfoBody').innerHTML = "";
-                            
-                            // Validasi dan tampilkan data kendaraan
-                            if (data.data_kendaraan && data.data_kendaraan.length > 0) {
-                                data.data_kendaraan.forEach((item, index) => {
-                                    let row = `
-                                        <tr>
-                                            <td>${index + 1}</td>
-                                            <td>${item.nomor_kendaraan}</td>
-                                            <td>${item.keterangan}</td>
-                                            </tr>
-                                            `;
-                                    document.getElementById('kendaraanInfoBody').innerHTML += row;
-                                });
-                            } else {
-                                document.getElementById('kendaraanInfoBody').innerHTML = `
-                                    <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
-                                `;
-                            }
-
-                            // Kosongkan data lama
-                            detailTable.clear();
-                            document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
-
-                            // Validasi data userDinas
-                            if (data.userDinas && data.userDinas.length > 0) {
-                                let newData = data.userDinas.map((item, index) => [
-                                    index + 1,
-                                    item.nrp_karyawan,
-                                    item.name,
-                                    item.departemen
-                                ]);
-                                detailTable.rows.add(newData).draw();
-                            } else {
-                                detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
-                            }
-
-                            // Mapping tingkatan dan status persetujuan
-                            const tingkatMapping = {
-                                "Level 1": "Civitas",
-                                "Level 2": "PIC/Ka.Sie",
-                                "Level 3": "Ka.Dept.Ybs",
-                                "Level 4": "Ka.Dept.GA",
-                                "Level 5": "Finance",
-                                "Level 6": "Security"
-                            };
-                            const approvMapping = {
-                                "Level 0": "Menolak",
-                                "Level 1": "Mengajukan",
-                                "Level 2": "Menyetujui",
-                                "Level 3": "Mengetahui",
-                                "Level 4": "Memeriksa"
-                            };
-                            
-                            // Validasi data informasi_tambahan
-                            const additionalInfoBody = document.getElementById('additionalInfoBody');
-                            
-                            if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                                data.informasi_tambahan.forEach((info, index) => {
-                                    let row = `
-                                        <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${info.nama}</td>
-                                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                            <td>${info.departemen}</td>
-                                            <td>${approvMapping[info.status] || info.status}</td>
-                                            </tr>
-                                    `;
-                                    additionalInfoBody.innerHTML += row;
-                                });
-                            } else {
-                                additionalInfoBody.innerHTML = `
-                                    <tr>
-                                        <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
-                                    </tr>
-                                `;
-                            }
-                            
-                            // Pastikan modal terbuka setelah data dimuat
-                            $('#detailModal').modal('show');
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Error fetching data:", error);
-                            alert("Terjadi kesalahan saat mengambil data.");
-                        }
-                    });
-                });    
+                });  
             });
 
                 $(document).ready(function () {
+                    $('#detailModalPenggunaan').on('show.bs.modal', function (event) {
+                        const button = $(event.relatedTarget); // Tombol yang diklik
+                        const nomor = button.data('nomor'); // Nomor pengeluaran barang
+                        document.getElementById('nomorSuratCard').innerText = nomor;
+
+                        $.ajax({
+                            url: "/pengajuan/detailSurat",
+                            method: "POST",
+                            data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
+                            success: function (data) {
+                                const detailTable = $('#detaildataTableModal').DataTable();
+
+                                const jenisKendraan = {
+                                    1 : "Mengeluarkan"
+                                };
+
+                                // Kosongkan data lama kendaraan
+                                document.getElementById('kendaraanInfoBody').innerHTML = "";
+                                
+                                // Validasi dan tampilkan data kendaraan
+                                if (data.data_kendaraan && data.data_kendaraan.length > 0) {
+                                    data.data_kendaraan.forEach((item, index) => {
+                                        let row = `
+                                            <tr>
+                                                <td>${index + 1}</td>
+                                                <td>${item.nomor_kendaraan}</td>
+                                                <td>${item.keterangan}</td>
+                                            </tr>
+                                        `;
+                                        document.getElementById('kendaraanInfoBody').innerHTML += row;
+                                    });
+                                } else {
+                                    document.getElementById('kendaraanInfoBody').innerHTML = `
+                                        <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
+                                    `;
+                                }
+
+                                // Kosongkan data lama
+                                detailTable.clear();
+                                document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
+
+                                // Validasi data userDinas
+                                if (data.userDinas && data.userDinas.length > 0) {
+                                    let newData = data.userDinas.map((item, index) => [
+                                        index + 1,
+                                        item.nrp_karyawan,
+                                        item.name,
+                                        item.departemen
+                                    ]);
+                                    detailTable.rows.add(newData).draw();
+                                } else {
+                                    detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
+                                }
+
+                                // Mapping tingkatan dan status persetujuan
+                                const tingkatMapping = {
+                                    "Level 1": "Civitas",
+                                    "Level 2": "PIC/Ka.Sie",
+                                    "Level 3": "Ka.Dept.Ybs",
+                                    "Level 4": "Ka.Dept.GA",
+                                    "Level 5": "Finance",
+                                    "Level 6": "Security"
+                                };
+                                const approvMapping = {
+                                    "Level 0": "Menolak",
+                                    "Level 1": "Mengajukan",
+                                    "Level 2": "Menyetujui",
+                                    "Level 3": "Mengetahui",
+                                    "Level 4": "Memeriksa"
+                                };
+                                
+                                // Validasi data informasi_tambahan
+                                const additionalInfoBody = document.getElementById('additionalInfoBody');
+                                
+                                if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                                    data.informasi_tambahan.forEach((info, index) => {
+                                        let row = `
+                                            <tr>
+                                                <td>${index + 1}</td>
+                                                <td>${info.nama}</td>
+                                                <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                                <td>${info.departemen}</td>
+                                                <td>${approvMapping[info.status] || info.status}</td>
+                                            </tr>
+                                        `;
+                                        additionalInfoBody.innerHTML += row;
+                                    });
+                                } else {
+                                    additionalInfoBody.innerHTML = `
+                                        <tr>
+                                            <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                                        </tr>
+                                    `;
+                                }
+                                
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching data:", error);
+                                alert("Terjadi kesalahan saat mengambil data.");
+                            }
+                        });
+                    });
+                });
+
+
+                $(document).ready(function () {
+
                     // Fungsi untuk mendapatkan tanggal hari ini
                     function getTodayDate() {
                         const today = new Date();
@@ -880,7 +882,7 @@
                                                 `<button type="button" 
                                                     class="btn btn-primary btn-sm" 
                                                     data-toggle="modal" 
-                                                    data-target="#detailModal" 
+                                                    data-target="#detailModalPenggunaan" 
                                                     data-nomor="${item.surat_kendaraan_dinas_id}">
                                                     <i class="fa-solid fa-circle-info"></i>
                                                 </button>`
