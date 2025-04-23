@@ -652,35 +652,48 @@
                                         filteredData = response.data.pengeluaranBarangs.data || []; // Tampilkan semua data jika statusFilter kosong
                                     }
 
-                                    // Mapping status level ke tampilan
+                                   // Mapping status level ke tampilan
                                     const statusMapping = {
                                         'Level 1': 'Menunggu Persetujuan PIC/Ka.Sie',
                                         'Level 2': 'PIC/Ka.Sie Sudah Menyetujui',
                                         'Level 3': 'Menunggu Persetujuan Ka.Dept GA',
-                                        'Level 4': 'Menunggu Persetujuan Finance/Security',
+                                        'Level 4': null, // Akan ditentukan berdasarkan kategori_pengeluaran
                                         'Level 5': 'Menunggu Persetujuan Security',
                                         'Level 6': 'Sudah Disetujui',
                                         'Level 0': 'Ditolak',
                                     };
 
-                                    // Masukkan data ke dalam DataTable
+                                    // Mapping kategori_pengeluaran hanya untuk Level 4
+                                    const kategoriMapping = {
+                                        0: 'Menunggu Persetujuan Security',
+                                        1: 'Menunggu Persetujuan Finance',
+                                    };
+
                                     if (filteredData.length > 0) {
                                         filteredData.forEach(function (item, index) {
-                                            const mappedStatus = statusMapping[item.status] || item.status; // Gunakan mapping jika status dikenali
+                                            let mappedStatus;
+
+                                            if (item.status === 'Level 4') {
+                                                // Pastikan kategori_pengeluaran tersedia dan valid
+                                                const kategori = parseInt(item.kategori_pengeluaran);
+                                                mappedStatus = kategoriMapping[kategori] || 'Menunggu Persetujuan (Kategori Tidak Dikenal)';
+                                            } else {
+                                                mappedStatus = statusMapping[item.status] || item.status;
+                                            }
 
                                             table.row.add([
-                                                index + 1, // Kolom 1: No Urut
-                                                item.pengeluaran_barang_id, // Kolom 2: Nomor Pengeluaran Barang
-                                                item.tujuan_pengeluaran_barang, // Kolom 3: Tujuan
-                                                item.jenis_kendaraan, // Kolom 4: Jenis Kendaraan
-                                                mappedStatus, // Kolom 5: Status (dengan mapping)
+                                                index + 1,
+                                                item.pengeluaran_barang_id,
+                                                item.tujuan_pengeluaran_barang,
+                                                item.jenis_kendaraan,
+                                                mappedStatus,
                                                 `<button type="button" 
                                                     class="btn btn-primary btn-sm" 
                                                     data-toggle="modal" 
                                                     data-target="#detailModal" 
                                                     data-nomor="${item.pengeluaran_barang_id}">
                                                     <i class="fa-solid fa-circle-info"></i>
-                                                </button>` // Kolom 6: Aksi
+                                                </button>`
                                             ]);
                                         });
                                     } else {

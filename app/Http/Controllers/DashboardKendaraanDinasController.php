@@ -58,6 +58,7 @@ class DashboardKendaraanDinasController extends Controller
                 $suratKendaraan = collect(); // Jika level tidak dikenali, kembalikan data kosong
             }
 
+            $userLevel = null; 
             // Ekstrak angka dari level user
             if ($user->level === 'Ka.Dept') {
                 $userLevel = 2;
