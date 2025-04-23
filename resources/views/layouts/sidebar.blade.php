@@ -38,22 +38,12 @@
                         </a>
                     </li>
 
-                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
-                    <li class="nav-item {{ request()->routeIs('form') ? 'menu-open' : '' }}">
-                        <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-clipboard-list"></i>
-                            <p>Kelola Pengeluaran Barang</p>
-                        </a>
-                    </li>
-                    @endif
-                
-
-                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security','Super Admin']))    
+                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security']))    
                             <li class="nav-item {{ request()->routeIs('approval') ? 'menu-open' : '' }}">
                             <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-signature"></i>
                                 <p>
-                                    Persetujuan Surat <br>  Barang Keluar
+                                    Persetujuan Surat <br> Barang Keluar
                                     <i class="right fas"></i>
                                 </p>                            
                             </a>
@@ -65,15 +55,6 @@
                             <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 
                         <p>Scan QR-Code Persetujuan</p> </a> </li> 
-                    @endif
-
-                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
-                    <li class="nav-item {{ request()->routeIs('kendaraan') ? 'menu-open' : '' }}">
-                        <a href="{{ route('kendaraan') }}" class="nav-link {{ request()->routeIs('kendaraan') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-car-side"></i>
-                            <p>Kelola Kendaraan Dinas</p>
-                        </a>
-                    </li>
                     @endif
 
                     @if(
@@ -90,6 +71,24 @@
                                 </p>                            
                             </a>
                         </li>
+                    @endif
+
+                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
+                    <li class="nav-item {{ request()->routeIs('kendaraan') ? 'menu-open' : '' }}">
+                        <a href="{{ route('kendaraan') }}" class="nav-link {{ request()->routeIs('kendaraan') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-car-side"></i>
+                            <p>Kelola Kendaraan Dinas</p>
+                        </a>
+                    </li>
+                    @endif
+
+                    @if(Auth::check() && Auth::user()->level === 'Super Admin')
+                    <li class="nav-item {{ request()->routeIs('form') ? 'menu-open' : '' }}">
+                        <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>Kelola Pengeluaran Barang</p>
+                        </a>
+                    </li>
                     @endif
 
 
