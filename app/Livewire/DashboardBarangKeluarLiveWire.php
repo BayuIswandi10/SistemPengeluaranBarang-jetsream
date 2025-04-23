@@ -27,15 +27,29 @@ class DashboardBarangKeluarLiveWire extends Component
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' || $user->level === 'SuperAdmin'  ) {
+        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' || $user->level === 'Super Admin'  ) {
             $pengeluaranBarangs = $query->get();
         } else {
             $pengeluaranBarangs = collect();
         }
     
-       // Ekstrak angka dari level user
-        $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
-
+        // Ekstrak angka dari level user
+        if ($user->level === 'Ka.Sie') {
+            $userLevel = 2;
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+            $userLevel = 4;
+        } elseif ($user->level === 'Ka.Dept') {
+            $userLevel = 3;
+        } elseif ($user->level === 'Staff' && $user->departemen === 'Finance') {
+            $userLevel = 5;
+        } elseif ($user->level === 'Security') {
+            $userLevel = 6;
+        } elseif ($user->level === 'Super Admin') {
+            $userLevel = 7;
+        } else {
+            $userLevel = 1; // default fallback jika tidak dikenali
+        }
+        
         // Mengambil data status yang disetujui (hanya dari data hari ini)
         $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 

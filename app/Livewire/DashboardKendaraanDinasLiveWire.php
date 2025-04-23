@@ -39,7 +39,14 @@ class DashboardKendaraanDinasLiveWire extends Component
             $suratKendaraanDinasList = collect();
         }
 
-        $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
+        // Ekstrak angka dari level user
+        if ($user->level === 'Ka.Dept') {
+            $userLevel = 2;
+        } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'General Affairs') {
+            $userLevel = 3;
+        } elseif ($user->level === 'Security') {
+            $userLevel = 4;
+        }
 
         $suratDisetujui = $suratKendaraanDinasList->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel ||

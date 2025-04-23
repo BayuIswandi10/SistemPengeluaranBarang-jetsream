@@ -11,8 +11,8 @@
         <div class="user-panel mt-3 pb-3 mb-3 d-flex flex-column">
             <div class="info">
                 @if(Auth::check())
-                    <strong>{{ Auth::user()->level }}</strong>
-                    <strong>{{ Auth::user()->departemen }}</strong>
+                    <strong>{{ Auth::user()->level }}</strong><br>
+                    {{ Auth::user()->departemen }}
                 @endif
             </div>
 
@@ -53,7 +53,7 @@
                             <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-signature"></i>
                                 <p>
-                                    Data Persetujuan
+                                    Persetujuan Surat <br>  Barang Keluar
                                     <i class="right fas"></i>
                                 </p>                            
                             </a>
@@ -64,29 +64,34 @@
                         <li class="nav-item {{ request()->routeIs('security') ? 'menu-open' : '' }}"> 
                             <a href="{{ route('security') }}" class="nav-link {{ request()->routeIs('security') ? 'active' : '' }}"> 
                         <i class="nav-icon fas fa-shield-alt"></i> 
-                        <p>Pemeriksaan Barang Keluar</p> </a> </li> 
+                        <p>Scan QR-Code Persetujuan</p> </a> </li> 
                     @endif
 
                     @if(Auth::check() && Auth::user()->level === 'Super Admin')
                     <li class="nav-item {{ request()->routeIs('kendaraan') ? 'menu-open' : '' }}">
                         <a href="{{ route('kendaraan') }}" class="nav-link {{ request()->routeIs('kendaraan') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-car-side"></i>
-                            <p>Kelola Kendaraan</p>
+                            <p>Kelola Kendaraan Dinas</p>
                         </a>
                     </li>
                     @endif
 
-                    @if(Auth::check() && !in_array(Auth::user()->level, ['Security']))                       
-                     <li class="nav-item {{ request()->routeIs('approval-dinas') ? 'menu-open' : '' }}">
-                        <a href="{{ route('approval-dinas') }}" class="nav-link {{ request()->routeIs('approval-dinas') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-signature"></i>
-                            <p>
-                                Data Persetujuan Dinas
-                                <i class="right fas"></i>
-                            </p>                            
-                        </a>
-                    </li>
+                    @if(
+                        Auth::check() && 
+                        !in_array(Auth::user()->level, ['Security']) &&
+                        !(Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi !== 'General Service')
+                    )
+                        <li class="nav-item {{ request()->routeIs('approval-dinas') ? 'menu-open' : '' }}">
+                            <a href="{{ route('approval-dinas') }}" class="nav-link {{ request()->routeIs('approval-dinas') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-file-signature"></i>
+                                <p>
+                                    Persetujuan Surat <br> Kendaraan Dinas
+                                    <i class="right fas"></i>
+                                </p>                            
+                            </a>
+                        </li>
                     @endif
+
 
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">

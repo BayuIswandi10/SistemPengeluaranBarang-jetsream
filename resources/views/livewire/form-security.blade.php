@@ -1,4 +1,18 @@
 <div class="content-wrapper">
+    <style>
+        /* Pastikan modal tidak lebih besar dari layar */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                max-width: 95%;
+                margin: 1.75rem auto;
+            }
+        }
+
+        /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
+        .modal-body {
+            overflow-x: auto;
+        }
+    </style>
     <div class="container-fluid">
   
         <div class="card mt-3">

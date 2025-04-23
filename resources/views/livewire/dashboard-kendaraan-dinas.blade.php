@@ -1,41 +1,59 @@
 <div class ="content-wrapper">
+<style>
+    /* Pastikan modal tidak lebih besar dari layar */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            max-width: 95%;
+            margin: 1.75rem auto;
+        }
+    }
+
+    /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
+    .modal-body {
+        overflow-x: auto;
+    }
+</style>
     <div class="container-fluid">
         <body>
             <div class="card mt-3">
-                <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
 
-                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin')
-                    <div class="d-flex border rounded overflow-hidden w-100" style="max-width: 600px;">
-                        <a href="{{ route('dashboard-barang-keluar') }}"
-                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
-                        style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
-                            Barang Keluar
-                        </a>
-                        <a href="{{ route('dashboard-kendaraan-dinas') }}"
-                         id="switch-kendaraan-dinas"
-                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
-                        style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
-                            Penggunaan Kendaraan Dinas
-                        </a>
+            <div class="row g-2 align-items-center w-100">
+                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin' || $user->level === 'Security')
+                    <!-- Tombol Switch -->
+                    <div class="col-md-8 col-12">
+                        <div class="d-flex flex-wrap border rounded overflow-hidden w-100">
+                            <a href="{{ route('dashboard-barang-keluar') }}"
+                            class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
+                            style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
+                                    text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
+                                Barang Keluar
+                            </a>
+                            <a href="{{ route('dashboard-kendaraan-dinas') }}"
+                            id="switch-kendaraan-dinas"
+                            class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
+                            style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
+                                    text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
+                                Penggunaan Kendaraan Dinas
+                            </a>
+                        </div>
                     </div>
                 @else
-                    <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
+                    <div class="col-md-8 col-12">
+                        <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
+                    </div>
                 @endif
 
-                <div class="d-flex align-items-center w-100 justify-content-end">
-                        <!-- Input Tanggal -->
-                        <div class="row g-3">
-                        <!-- Input "Range Date FlatPicker" -->
-                        <div class="col-auto">
-                            <div class="input-group">
-                                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
-                            </div>
-                        </div>
-                        </div>
+                <!-- Input Tanggal, ditampilkan untuk semua user -->
+                <div class="col-md-4 col-12">
+                    <div class="input-group">
+                        <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
                     </div>
-                </div>                   
+                </div>
+            </div>
+
+
+            </div>             
                 <div class="card-body">
                     <div class="row">
                         <!-- Card Jumlah Pengajuan -->
@@ -98,8 +116,8 @@
                             </div>
                         </div>
                         <!-- ./col -->
-                         <!-- Modal -->
-                         <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
+                            <!-- Modal -->
+                            <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -147,18 +165,11 @@
                                                                 Menunggu Persetujuan Ka.Dept GA
                                                                 @break
                                                             @case('Level 4')
-                                                                @if ($a->kategori_pengeluaran == 1)
-                                                                    Menunggu Persetujuan Finance
-                                                                @else
-                                                                    Menunggu Persetujuan Security
-                                                                @endif
+                                                               Menunggu Persetujuan Security
                                                                 @break
                                                             @case('Level 5')
-                                                                Menunggu Persetujuan Security
-                                                                @break
-                                                            @case('Level 6')
                                                                 Sudah Disetujui
-                                                                @break
+                                                            @break
                                                             @case('Level 0')
                                                                 Ditolak
                                                                 @break
@@ -199,24 +210,27 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
                                         </div>
+
                                         <!-- Card untuk Tabel Informasi Kendaraan -->
                                         <div class="card mb-4">
                                             <div class="card-header bg-success text-white">
                                                 <h6 class="mb-0">Informasi Kendaraan</h6>
                                             </div>
                                             <div class="card-body">
-                                                <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>No Kendaraan</th>
-                                                            <th>Keterangan</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="kendaraanInfoBody">
-                                                        <!-- Data akan diisi secara dinamis -->
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>No Kendaraan</th>
+                                                                <th>Keterangan</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="kendaraanInfoBody">
+                                                            <!-- Data akan diisi secara dinamis -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -226,19 +240,21 @@
                                                 <h6 class="mb-0">Informasi Peserta</h6>
                                             </div>
                                             <div class="card-body">
-                                                <table id="detaildataTableModal" class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Nrp Peserta</th>
-                                                            <th>Nama Peserta</th>
-                                                            <th>Departemen</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="detailBody">
-                                                        <!-- Data akan diisi secara dinamis -->
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table id="detaildataTableModal" class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Nrp Peserta</th>
+                                                                <th>Nama Peserta</th>
+                                                                <th>Departemen</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="detailBody">
+                                                            <!-- Data akan diisi secara dinamis -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -250,26 +266,30 @@
                                                 <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                                             </div>
                                             <div class="card-body">
-                                                <table id="additionalInfoTable" class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Nama</th>
-                                                            <th>Tingkatan</th>
-                                                            <th>Departemen</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="additionalInfoBody">
-                                                        <!-- Data akan diisi secara dinamis -->
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table id="additionalInfoTable" class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Nama</th>
+                                                                <th>Tingkatan</th>
+                                                                <th>Departemen</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="additionalInfoBody">
+                                                            <!-- Data akan diisi secara dinamis -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        
+                                    </div> <!-- /.modal-body -->
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <!-- Row kedua -->
                     <div class="row">
@@ -306,96 +326,97 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Modal Kendaraan --}}
-            <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title">Data Kendaraan</h5>
-                        </div>
-                        <div class="modal-body">
-                            <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>NO</th>
-                                        <th>Jenis Kendaraan</th>
-                                        <th>Nomor Kendaraan</th>
-                                        <th>Kapasitas Penumpang</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataKendaraanBody">
-                                    <!-- Data akan diisi secara dinamis -->
-                                </tbody>
-                            </table>
+                {{-- Modal Kendaraan --}}
+                <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document"> <!-- Ganti dari modal-xl ke modal-lg -->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Data Kendaraan</h5>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Tambahkan wrapper table-responsive -->
+                                <div class="table-responsive">
+                                    <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>NO</th>
+                                                <th>Jenis Kendaraan</th>
+                                                <th>Nomor Kendaraan</th>
+                                                <th>Kapasitas Penumpang</th>
+                                                <th>Status</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataKendaraanBody">
+                                            <!-- Data akan diisi secara dinamis -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Detail Modal Kendaraan --}}
-            <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span>&times;</span>
-                        </button>
-                        </div>
-                        <div class="modal-body">
-                        <!-- Placeholder untuk kalender -->
-                        <div class="mb-3">
-                            <label for="monthPicker">Pilih Bulan:</label>
-                            <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
-                        </div>
-                        <div id="calendarBooking"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-        <div class="row">
-            <!-- Bagian Kiri - Diagram Batang dengan Filter -->
-            <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security','Super Admin'])) col-md-6 @else col-md-12 @endif">
-                <div class="card">
-                    <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
-                        <div class="btn-group" role="group" style="margin-left: 0;">
-                            <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
-                            <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
-                            <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                {{-- Detail Modal Kendaraan --}}
+                <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span>&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                            <!-- Placeholder untuk kalender -->
+                            <div class="mb-3">
+                                <label for="monthPicker">Pilih Bulan:</label>
+                                <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
+                            </div>
+                            <div id="calendarBooking"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-
-            <!-- Bagian Kanan - Diagram Pie -->
-            @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security', 'Super Admin']))
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                        <h5 class="card-title text-center">Penggunaan Kendaraan Dinas Berdasarkan Kategori</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                <div class="row">
+                    <!-- Bagian Kiri - Diagram Batang dengan Filter -->
+                    <div class="@if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security','Super Admin'])) col-md-6 @else col-md-12 @endif">
+                        <div class="card">
+                            <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
+                                <div class="btn-group" role="group" style="margin-left: 0;">
+                                    <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
+                                    <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
+                                    <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            @endif
 
 
-        </body>
+                    <!-- Bagian Kanan - Diagram Pie -->
+                    @if(Auth::check() && in_array(Auth::user()->level, ['Ka.Dept', 'Security', 'Super Admin']))
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
+                                <h5 class="card-title text-center">Penggunaan Kendaraan Dinas Berdasarkan Kategori</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </body>
 
         <script>
             const dailyData = {!! $dailyData !!};
@@ -866,12 +887,10 @@
 
                                     // Mapping status level ke tampilan
                                     const statusMapping = {
-                                        'Level 1': 'Menunggu Persetujuan PIC/Ka.Sie',
-                                        'Level 2': 'PIC/Ka.Sie Sudah Menyetujui',
-                                        'Level 3': 'Menunggu Persetujuan Ka.Dept GA',
-                                        'Level 4': 'Menunggu Persetujuan Finance/Security',
-                                        'Level 5': 'Menunggu Persetujuan Security',
-                                        'Level 6': 'Sudah Disetujui',
+                                        'Level 1': 'Menunggu Persetujuan Ka.Dept',
+                                        'Level 2': 'Sudah Disetujui Ka.Dept',
+                                        'Level 3': 'Sudah Disetujui Ka.Sie General Service',
+                                        'Level 4': 'Sudah Disetujui',
                                         'Level 0': 'Ditolak',
                                     };
 

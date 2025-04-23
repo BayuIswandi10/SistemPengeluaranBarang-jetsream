@@ -50,7 +50,22 @@ class DashboardBarangKeluarController extends Controller
             }
 
             // Ekstrak angka dari level user
-            $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
+            if ($user->level === 'Ka.Sie') {
+                $userLevel = 2;
+            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+                $userLevel = 4;
+            } elseif ($user->level === 'Ka.Dept') {
+                $userLevel = 3;
+            } elseif ($user->level === 'Staff' && $user->departemen === 'Finance') {
+                $userLevel = 5;
+            } elseif ($user->level === 'Security') {
+                $userLevel = 6;
+            } elseif ($user->level === 'Super Admin') {
+                $userLevel = 7;
+            } else {
+                $userLevel = 1; // default fallback jika tidak dikenali
+            }
+
 
             // Mengambil data berdasarkan status
             $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 

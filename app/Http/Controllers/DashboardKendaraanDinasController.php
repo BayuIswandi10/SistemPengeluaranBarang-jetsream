@@ -59,7 +59,13 @@ class DashboardKendaraanDinasController extends Controller
             }
 
             // Ekstrak angka dari level user
-            $userLevel = (int) filter_var($user->level, FILTER_SANITIZE_NUMBER_INT);
+            if ($user->level === 'Ka.Dept') {
+                $userLevel = 2;
+            } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'General Affairs') {
+                $userLevel = 3;
+            } elseif ($user->level === 'Security') {
+                $userLevel = 4;
+            }
 
             // Mengambil data berdasarkan status
             $kendaraanDisetujui = $suratKendaraan->filter(fn ($item) => 

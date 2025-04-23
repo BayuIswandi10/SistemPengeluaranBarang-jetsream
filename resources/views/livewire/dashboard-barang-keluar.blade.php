@@ -1,39 +1,55 @@
 <div class ="content-wrapper">
+    <style>
+        /* Pastikan modal tidak lebih besar dari layar */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                max-width: 95%;
+                margin: 1.75rem auto;
+            }
+        }
+
+        /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
+        .modal-body {
+            overflow-x: auto;
+        }
+    </style>
+    
     <div class="container-fluid">
         <body>
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
 
-                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin')
-                    <div class="d-flex border rounded overflow-hidden w-100" style="max-width: 600px;">
-                        <a href="{{ route('dashboard-barang-keluar') }}"
-                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
-                        style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
-                            Barang Keluar
-                        </a>
-                        <a href="{{ route('dashboard-kendaraan-dinas') }}"
-                         id="switch-kendaraan-dinas"
-                        class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
-                        style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
-                                text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
-                            Penggunaan Kendaraan Dinas
-                        </a>
-                    </div>
-                @else
-                    <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
-                @endif
+                <div class="row g-2 align-items-center w-100">
+                        @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin' || $user->level === 'Security')
+                            <!-- Tombol Switch -->
+                            <div class="col-md-8 col-12">
+                                <div class="d-flex flex-wrap border rounded overflow-hidden w-100">
+                                    <a href="{{ route('dashboard-barang-keluar') }}"
+                                    class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-barang-keluar') ? 'text-white' : 'text-dark bg-white' }}"
+                                    style="background-color: {{ request()->is('dashboard-barang-keluar') ? '#5A6ACF' : 'white' }};
+                                            text-decoration: none; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
+                                        Barang Keluar
+                                    </a>
+                                    <a href="{{ route('dashboard-kendaraan-dinas') }}"
+                                    id="switch-kendaraan-dinas"
+                                    class="d-flex align-items-center justify-content-center px-3 py-2 {{ request()->is('dashboard-kendaraan-dinas') ? 'text-white' : 'text-dark bg-white' }}"
+                                    style="background-color: {{ request()->is('dashboard-kendaraan-dinas') ? '#5A6ACF' : 'white' }};
+                                            text-decoration: none; border-left: 1px solid #ccc; flex: 1; white-space: normal; text-align: center; font-weight: 400;">
+                                        Penggunaan Kendaraan Dinas
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-md-8 col-12">
+                                <h5 class="m-0 font-weight-bold text-primary">Informasi Pengajuan Akumulasi Harian</h5>
+                            </div>
+                        @endif
 
-
-                    <div class="d-flex align-items-center w-100 justify-content-end">
-                        <!-- Input Tanggal -->
-                        <div class="row g-3">
-                        <!-- Input "Range Date FlatPicker" -->
-                        <div class="col-auto">
+                        <!-- Input Tanggal, ditampilkan untuk semua user -->
+                        <div class="col-md-4 col-12">
                             <div class="input-group">
                                 <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
                             </div>
-                        </div>
                         </div>
                     </div>
                 </div>                   
@@ -224,22 +240,25 @@
                                                 <h6 class="mb-0">Informasi Tambahan</h6>
                                             </div>
                                             <div class="card-body">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Nama</th>
-                                                            <th>Tingkatan</th>
-                                                            <th>Departemen</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="additionalInfoBody">
-                                                        <!-- Data akan diisi secara dinamis -->
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Nama</th>
+                                                                <th>Tingkatan</th>
+                                                                <th>Departemen</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="additionalInfoBody">
+                                                            <!-- Data akan diisi secara dinamis -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -514,23 +533,6 @@
                     function formatDateToEndOfDay(dateString) {
                         return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
                     }
-
-                    // Fungsi memindahkan value rentang tanggal yang dipilih date picker
-                    document.getElementById("switch-kendaraan-dinas").addEventListener("click", function (e) {
-                        e.preventDefault();
-
-                        const selectedDate = document.getElementById("date-range-picker").value;
-                        const baseUrl = this.getAttribute("href");
-
-                        if (selectedDate) {
-                            // Encode value supaya aman di URL
-                            const encodedDate = encodeURIComponent(selectedDate);
-                            window.location.href = `${baseUrl}?date_range=${encodedDate}`;
-                        } else {
-                            window.location.href = baseUrl; // kalau kosong, tetap jalan
-                        }
-                    });
-
 
                     // Fungsi untuk memuat jumlah data
                     function loadCounts(startDate, endDate) {
