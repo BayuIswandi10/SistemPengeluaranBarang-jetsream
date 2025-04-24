@@ -344,35 +344,12 @@
                                                     <th>Nomor Kendaraan</th>
                                                     <th>Kapasitas Penumpang</th>
                                                     <th>Status</th>
-                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <!-- Data akan diisi secara dinamis -->
                                             </tbody>
                                         </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Detail Modal Kendaraan --}}
-                    <div class="modal fade" id="detailModalKendaraan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-xl" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                                </div>
-                                <div class="modal-body">
-                                <!-- Placeholder untuk kalender -->
-                                <div class="mb-3">
-                                    <label for="monthPicker">Pilih Bulan:</label>
-                                    <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
-                                </div>
-                                <div id="calendarBooking"></div>
                                 </div>
                             </div>
                         </div>
@@ -534,9 +511,7 @@
                     var table = $('#dataTableKendaraan').DataTable({
                         columnDefs: [
                             {className: 'dt-body-center', targets: 0},
-                            {className: 'dt-head-center', targets: 0},
-                            {className: 'dt-body-center', targets: 5},
-                            {className: 'dt-head-center', targets: 5}
+                            {className: 'dt-head-center', targets: 0}
                         ],
                         scrollX: false,
                         responsive: true
@@ -810,14 +785,7 @@
                                             item.jenis_kendaraan,
                                             item.nomor_kendaraan,
                                             item.kapasitas_kendaraan,
-                                            mappedStatus,
-                                            `<button type="button" 
-                                                class="btn btn-primary btn-sm" 
-                                                data-toggle="modal" 
-                                                data-target="#detailModalKendaraan" 
-                                                data-nomor="${item. kendaraan_dinas_id}">
-                                                <i class="fa-solid fa-circle-info"></i>
-                                            </button>`
+                                            mappedStatus
                                         ]);
                                     });
 
