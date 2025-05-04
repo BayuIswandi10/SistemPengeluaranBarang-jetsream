@@ -198,15 +198,15 @@
                                 
                                 <div class="form-group">
                                     <label for="kategori_pengeluaran">Kategori Pengeluaran <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="kategori_pengeluaran" name="kategori_pengeluaran" required onchange="togglePembawaScrap()">
+                                    <select class="form-control" id="kategori_pengeluaran" name="kategori_pengeluaran" required>
                                         <option value="" disabled selected>Pilih Kategori Pengeluaran</option>
                                         <option value="0">Non Scrap</option>
                                         <option value="1">Scrap</option>
                                     </select>
                                 </div>
                                 
-                                <div class="form-group" id="pembawa_scrap_group" style="display: none;">
-                                    <label for="pembawa_scrap">Pembawa Scrap <span class="text-danger">*</span></label>
+                                <div class="form-group" id="pembawa_scrap_group">
+                                    <label for="pembawa_scrap">Pembawa <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="pembawa_scrap" name="pembawa_scrap" placeholder="Masukkan Nama Pembawa Scrap" autocomplete="off">
                                 </div>                                
             
@@ -216,10 +216,14 @@
                                         <option value="" disabled selected>Pilih Jenis Kendaraan</option>
                                         <option value="TRUCK">TRUCK</option>
                                         <option value="PICK UP">PICK UP</option>
-                                        <option value="SEDAN">SEDAN</option>
-                                        <option value="JEEP">JEEP</option>
                                         <option value="SP. MOTOR">SP. MOTOR</option>
+                                        <option value="KENDARAAN PRIBADI">KENDARAAN PRIBADI</option>
                                     </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="no_polisi">No Polisi <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="no_polisi" name="no_polisi" placeholder="Masukan No Polisi Kendaraan" required autocomplete="off">
                                 </div>
                                 
                                 <div class="form-group">
@@ -269,7 +273,7 @@
                                                             <option value="pcs">PCS</option>
                                                         </select>
                                                     </td>
-                                                    <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
+                                                    <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                                                             <i class="fas fa-trash"></i>
@@ -661,7 +665,7 @@
                         <option value="pcs">PCS</option>
                     </select>
                 </td>
-                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" required autocomplete="off"></td>
+                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                         <i class="fas fa-trash"></i>
@@ -712,58 +716,21 @@
             });
         }
 
-        function togglePembawaScrap() {
-            const kategoriPengeluaran = document.getElementById("kategori_pengeluaran").value;
-            const pembawaScrapGroup = document.getElementById("pembawa_scrap_group");
+        // function togglePembawaScrap() {
+        //     const kategoriPengeluaran = document.getElementById("kategori_pengeluaran").value;
+        //     const pembawaScrapGroup = document.getElementById("pembawa_scrap_group");
 
-            if (kategoriPengeluaran === "1") {
-                pembawaScrapGroup.style.display = "block"; // Tampilkan jika Scrap
-                document.getElementById("pembawa_scrap").setAttribute("required", "required");
-            } else {
-                pembawaScrapGroup.style.display = "none"; // Sembunyikan jika Non Scrap
-                document.getElementById("pembawa_scrap").removeAttribute("required");
-                document.getElementById("pembawa_scrap").value = "";
-            }
-        }
+        //     if (kategoriPengeluaran === "1") {
+        //         pembawaScrapGroup.style.display = "block"; // Tampilkan jika Scrap
+        //         document.getElementById("pembawa_scrap").setAttribute("required", "required");
+        //     } else {
+        //         pembawaScrapGroup.style.display = "none"; // Sembunyikan jika Non Scrap
+        //         document.getElementById("pembawa_scrap").removeAttribute("required");
+        //         document.getElementById("pembawa_scrap").value = "";
+        //     }
+        // }
 
      
-
-        // function toggleJenisKendaraan() {
-        //     const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
-        //     const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
-        //     const tabelKendaraan = document.getElementById("tabel_kendaraan_pribadi");
-        //     const kilometerAwal = document.getElementById("kilometer_awal");
-
-        //     if (jenisKendaraan === "2") { // PRIBADI
-        //         kendaraanGroup.style.display = "block";
-        //         kilometerAwal.setAttribute("required", "required");
-
-        //         tabelKendaraan.style.display = "block";
-        //     } else if (jenisKendaraan === "3") { // TAXI
-        //         kendaraanGroup.style.display = "none";
-        //         kilometerAwal.removeAttribute("required");
-        //         kilometerAwal.value = "";
-
-        //         tabelKendaraan.style.display = "block";
-        //     } else {
-        //         kendaraanGroup.style.display = "none";
-        //         kilometerAwal.removeAttribute("required");
-        //         kilometerAwal.value = "";
-
-        //         tabelKendaraan.style.display = "none";
-        //     }
-
-        //     // Reset data kendaraan saat ganti jenis
-        //     document.getElementById("kendaraanPribadiBody").innerHTML = `
-        //         <tr>
-        //             <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
-        //             <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
-        //             <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
-        //             <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
-        //                 <i class="fas fa-trash"></i></button></td>
-        //         </tr>
-        //     `;
-        // }
         function toggleJenisKendaraan() {
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
             const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");

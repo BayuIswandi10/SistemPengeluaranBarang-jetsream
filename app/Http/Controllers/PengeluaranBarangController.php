@@ -134,9 +134,10 @@ class PengeluaranBarangController extends Controller
         $request->validate([
             'created_by' => 'required',
             'kategori_pengeluaran' => 'required|in:0,1',
-            'pembawa_scrap' => $request->kategori_pengeluaran == 1 ? 'required|string|max:35' : 'nullable',
+            'pembawa_scrap',
             'tujuan_pengeluaran_barang' => 'required',
             'jenis_kendaraan' => 'required',
+            'no_polisi' => 'required',
             'lokasi_barang_keluar' => 'required',
             'barang_ids' => 'required|array',
             'barang_ids.*' => 'required',
@@ -173,9 +174,10 @@ class PengeluaranBarangController extends Controller
                 'pengeluaran_barang_id' => $pengeluaranBarangId,
                 'created_by' => $nrpKaryawan,
                 'kategori_pengeluaran' => $request->kategori_pengeluaran,
-                'pembawa_scrap' => $request->kategori_pengeluaran == 1 ? $request->pembawa_scrap : null,
+                'pembawa_scrap' => $request->input('pembawa_scrap'),
                 'tujuan_pengeluaran_barang' => $request->input('tujuan_pengeluaran_barang'),
                 'jenis_kendaraan' => $request->input('jenis_kendaraan'),
+                'no_polisi' => $request->input('no_polisi'),
                 'lokasi_barang_keluar' => $request->input('lokasi_barang_keluar'),
                 'status' => 'Level 1',
             ]);
