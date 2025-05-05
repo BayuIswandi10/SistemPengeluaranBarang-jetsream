@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\KendaraanDinas;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SuratKendaraanDinasDetail;
+use App\Mail\ApprovalDinasNotification;
+use App\Mail\ApprovalNotification;
+use Illuminate\Support\Facades\Mail;
 
 class SuratDinasController extends Controller
 {
@@ -225,6 +228,21 @@ class SuratDinasController extends Controller
                 'created_date' => now(),
                 'status_approval' => 'Level 1',
             ]);
+
+            // Kirim email ke pengaju
+            $statusText = $this->getStatusText('Level 1');
+            $userDepartment = $this->getDepartmentName($user->level);
+            $this->sendApprovalEmail($user->email, $suratDinasID, $user->name, $statusText, $userDepartment);
+
+            // Cari kepala seksi dari departemen pengaju
+            $kepalaDept = User::where('departemen', $user->departemen) // pastikan ini kolom yang sesuai
+                ->where('level', 'Ka.Dept')
+                ->first();
+
+            if ($kepalaDept) {
+                $this->sendApprovalEmail($kepalaDept->email, $suratDinasID, $user->name, $statusText, $userDepartment);
+            }
+            
     
             DB::commit();
             return redirect()->back()->with('success', 'Surat Dinas berhasil disimpan dengan ID: ' . $suratDinasID);
@@ -466,5 +484,33 @@ class SuratDinasController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment)
+    {
+        Mail::to($userEmail)->send(new ApprovalDinasNotification($suratDinasId, $approvedBy, $status, $fromDepartment));
+    }
+
+    private function getStatusText($level)
+    {
+        $statusMap = [
+            'Level 1' => 'Telah Mengajukan Sebagai Yang Membawa',
+            'Level 2' => 'Telah Menyetujui dari Ka.Dept Ybs',
+            'Level 3' => 'Telah Menyetujui dari Ka.Sie Transport GA',
+            'Level 4' => 'Telah Memeriksa oleh Security',
+        ];
+
+        return $statusMap[$level] ?? 'Ditolak';
+    }
+
+    private function getDepartmentName($departmentId)
+    {
+        $statusDepartmentMap = [
+            'Staff' => 'Staff',
+            'Ka.Sie' => 'PIC/Ka.Sie',
+            'Ka.Dept' => 'Ka.Dept',
+            'Security' => 'Security',
+        ];
+
+        return $statusDepartmentMap[$departmentId] ?? 'Tidak Diketahui';
+    }
 
 }

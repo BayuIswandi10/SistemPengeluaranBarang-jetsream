@@ -81,7 +81,8 @@
                         <h6 class="mb-0">Informasi Tambahan</h6>
                     </div>
                     <div class="card-body">
-                        <table id="additionalInfoTable" class="table table-striped table-bordered">
+                        <div class="table-responsive">
+                        <table id="additionalInfoTable" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -95,6 +96,7 @@
                                 <!-- Data akan diisi secara dinamis -->
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,6 +127,7 @@
                         <h6 class="mb-0">Informasi Kendaraan</h6>
                     </div>
                     <div class="card-body">
+                        <div class="table-responsive">
                         <table id="kendaraanInfoTable" class="table table-bordered">
                             <thead>
                                 <tr>
@@ -137,6 +140,7 @@
                                 <!-- Data akan diisi secara dinamis -->
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
 
@@ -170,6 +174,7 @@
                         <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                     </div>
                     <div class="card-body">
+                        <div class="table-responsive">
                         <table id="additionalInfoTable" class="table table-bordered">
                             <thead>
                                 <tr>
@@ -184,6 +189,7 @@
                                 <!-- Data akan diisi secara dinamis -->
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -281,15 +287,6 @@
                 } else {
                     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
                 }
-                
-                // Inisialisasi ulang DataTable
-                $('#dataTable').DataTable({
-                    responsive: true,
-                    scrollX: false,
-                    pageLength: 5,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                    destroy: true
-                });
 
                 // Mapping tingkatan dan status persetujuan
                 const tingkatMapping = {
@@ -323,6 +320,22 @@
                 } else {
                     additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
                 }
+                
+                  // Aktifkan DataTable setelah data ditambahkan
+                  $('#dataTable').DataTable({
+                        columnDefs: [
+                            { className: 'dt-body-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 0 },
+                            { className: 'dt-body-center', targets: 5 },
+                            { className: 'dt-head-center', targets: 5 }
+                        ],
+
+                        responsive: true,
+                        scrollX: false,
+                        destroy: true,
+                        pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                }); 
                 
                 $('#detailModal').modal('show');
             },
@@ -524,6 +537,10 @@
                     // Kosongkan data lama kendaraan
                     document.getElementById('kendaraanInfoBody').innerHTML = "";
 
+                    if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                            $('#detaildataTableModal').DataTable().clear().destroy();
+                    }
+
                     // Validasi dan tampilkan data kendaraan
                     if (data.data_kendaraan && data.data_kendaraan.length > 0) {
                         data.data_kendaraan.forEach((item, index) => {
@@ -599,6 +616,22 @@
                             </tr>
                         `;
                     }
+
+                    // Aktifkan DataTable setelah data ditambahkan
+                    $('#detaildataTableModal').DataTable({
+                        columnDefs: [
+                            { className: 'dt-body-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 0 },
+                            { className: 'dt-body-center', targets: 3 },
+                            { className: 'dt-head-center', targets: 3 }
+                        ],
+
+                        responsive: true,
+                        scrollX: false,
+                        destroy: true,
+                        pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                    });
 
                     // Pastikan modal terbuka setelah data dimuat
                     $('#suratDinasModal').modal('show');

@@ -15,6 +15,12 @@ use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ApprovalNotification;
+use Endroid\QrCode\QrCode as QrCodeQrCode;
+
 class PengeluaranBarangController extends Controller
 {
     public function index()
@@ -199,6 +205,20 @@ class PengeluaranBarangController extends Controller
                 'created_date' => now(),
                 'status_approval' => 'Level 1',
             ]);
+
+            // Kirim email ke pengaju
+            $statusText = $this->getStatusText('Level 1');
+            $userDepartment = $this->getDepartmentName($user->level);
+            $this->sendApprovalEmail($user->email, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+
+            // Cari kepala seksi dari departemen pengaju
+            $kepalaSeksi = User::where('departemen', $user->departemen) // pastikan ini kolom yang sesuai
+                ->where('level', 'Ka.Sie')
+                ->first();
+
+            if ($kepalaSeksi) {
+                $this->sendApprovalEmail($kepalaSeksi->email, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+            }
     
             DB::commit();
     
@@ -316,5 +336,36 @@ class PengeluaranBarangController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    private function sendApprovalEmail($userEmail, $pengeluaranBarangId, $approvedBy, $status, $fromDepartment)
+    {
+        Mail::to($userEmail)->send(new ApprovalNotification($pengeluaranBarangId, $approvedBy, $status, $fromDepartment));
+    }
+
+    private function getStatusText($level)
+    {
+        $statusMap = [
+            'Level 1' => 'Telah Mengajukan Sebagai Yang Membawa',
+            'Level 2' => 'Telah Disetujui Sebagai Yang Mengeluarkan',
+            'Level 3' => 'Telah Menyetujui dari Ka.Dept Ybs',
+            'Level 4' => 'Telah Mengetahui dari Ka.Dept GA',
+            'Level 5' => 'Telah Menerima dari Finance',
+            'Level 6' => 'Telah Memeriksa oleh Security',
+        ];
+
+        return $statusMap[$level] ?? 'Ditolak';
+    }
+
+    private function getDepartmentName($departmentId)
+    {
+        $statusDepartmentMap = [
+            'Staff' => 'Staff',
+            'Ka.Sie' => 'PIC/Ka.Sie',
+            'Ka.Dept' => 'Ka.Dept',
+            'Security' => 'Security',
+        ];
+
+        return $statusDepartmentMap[$departmentId] ?? 'Tidak Diketahui';
     }
 }

@@ -263,22 +263,47 @@ class ApprovalBarangKeluarController extends Controller
                   throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $pengeluaranBarangId);
               }
 
-            //Mencari Email Pembawa
-            $approval = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
-            ->where('status_approval', 'Level 1')
-            ->value('created_by');
-          
-              // Ambil email penerima berdasarkan created_by yang ditemukan
-              $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
-              
-              if (!$emailReceiver) {
-                  throw new \Exception('Email penerima tidak ditemukan.');
-              }
-          
-              // Kirim email ke penerima
-              $statusText = $this->getStatusText('Level 2');
-              $userDepartment = $this->getDepartmentName($levelKaryawan);
-              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+                // Mencari NRP Pembawa dari approval Level 1
+                $nrpPembawa = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaranBarangId)
+                ->where('status_approval', 'Level 1')
+                ->value('created_by');
+
+                if (!$nrpPembawa) {
+                    throw new \Exception('NRP pembawa tidak ditemukan.');
+                }
+
+                // Ambil user pembawa
+                $userPembawa = User::where('nrp_karyawan', (string) $nrpPembawa)->first();
+
+                if (!$userPembawa) {
+                    throw new \Exception('User pembawa tidak ditemukan.');
+                }
+
+                // Ambil email pembawa
+                $emailPembawa = $userPembawa->email;
+
+                if (!$emailPembawa) {
+                    throw new \Exception('Email pembawa tidak ditemukan.');
+                }
+
+                // Kirim email ke pembawa barang
+                $statusText = $this->getStatusText('Level 2');
+                $userDepartment = $this->getDepartmentName($levelKaryawan);
+                $this->sendApprovalEmail($emailPembawa, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+
+
+                // Cari kepala departemen dari pembawa
+                $kepalaDept = User::where('departemen', $userPembawa->departemen)
+                ->where('level', 'Ka.Dept')
+                ->first();
+
+                if (!$kepalaDept) {
+                    throw new \Exception('Kepala departemen tidak ditemukan untuk departemen: ' . $userPembawa->departemen);
+                }
+
+                // Kirim email ke kepala departemen
+                $this->sendApprovalEmail($kepalaDept->email, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+
 
             DB::commit();
     
@@ -344,6 +369,18 @@ class ApprovalBarangKeluarController extends Controller
              $statusText = $this->getStatusText('Level 3');
              $userDepartment = $this->getDepartmentName($levelKaryawan);
              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+
+            // Cari email Ka.Dept General Affairs
+            $emailKaDeptGA = User::where('level', 'Ka.Dept')
+            ->where('departemen', 'General Affairs')
+            ->value('email');
+
+            if (!$emailKaDeptGA) {
+                throw new \Exception('Email Ka.Dept General Affairs tidak ditemukan.');
+            }
+
+            // Kirim email ke Ka.Dept GA
+            $this->sendApprovalEmail($emailKaDeptGA, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
             DB::commit();
     
