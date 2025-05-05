@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('nama_barang', 50);
             $table->bigInteger('jumlah_barang');
             $table->string('satuan_barang', 35);
-            $table->string('keterangan_barang', 500);
+            $table->string('keterangan_barang', 500)->nullable();
 
             $table->foreign('pengeluaran_barang_id')
                 ->references('pengeluaran_barang_id')->on('tb_pencatatan_pengeluaran_barang')
