@@ -451,6 +451,24 @@ class ApprovalBarangKeluarController extends Controller
             $userDepartment = $this->getDepartmentName($levelKaryawan);
             $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
+            // Ambil ID pengeluaran_barang dari request
+            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+
+            // Ambil data lengkap pengeluaran barang
+            $pengeluaranBarang = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)->first();
+            if (!$pengeluaranBarang) {
+                throw new \Exception('Data pengeluaran barang tidak ditemukan.');
+            }
+
+            // Jika kategori = 1 (Scrap), kirim email ke user Finance
+            if ((int) $pengeluaranBarang->kategori_pengeluaran === 1) {
+                $financeUsers = User::where('departemen', 'Finance')->pluck('email');
+
+                foreach ($financeUsers as $financeEmail) {
+                    $this->sendApprovalEmail($financeEmail, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+                }
+            }
+
             DB::commit();
     
             return response()->json([
@@ -527,6 +545,8 @@ class ApprovalBarangKeluarController extends Controller
             $userDepartment = $this->getDepartmentName($levelKaryawan);
             $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
     
+          
+
             DB::commit();
     
             return response()->json([
