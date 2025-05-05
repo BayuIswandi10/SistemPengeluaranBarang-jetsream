@@ -313,27 +313,47 @@
             const yearlyData = {!! $yearlyData !!};
             const pieData = {!! $pieData !!};
 
-            // Ambil elemen canvas untuk Bar Chart
+           // Ambil elemen canvas untuk Bar Chart
             const ctxBar = document.getElementById('barChart').getContext('2d');
+            console.log(dailyData);
+            console.log(monthlyData);
+            console.log(yearlyData);
 
-            // 🔹 Inisialisasi Bar Chart
+            // Inisialisasi Bar Chart dengan 2 dataset
             let barChart = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
                     labels: dailyData.labels,
-                    datasets: [{
-                        label: 'Jumlah Surat Barang Keluar',
-                        data: dailyData.data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {
+                            label: 'Kategori Non-Scrap',
+                            data: dailyData.kategori_0, // Pastikan ini array data valid
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Kategori Scrap',
+                            data: dailyData.kategori_1, // Pastikan ini array data valid
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true }
+                        x: {
+                            stacked: false,
+                            ticks: { autoSkip: false },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: false
+                        }
                     },
                     plugins: {
                         legend: {
@@ -343,6 +363,7 @@
                     }
                 }
             });
+
 
             // 🔹 Cek apakah elemen pieChart ada sebelum membuat Pie Chart
             const pieCanvas = document.getElementById('pieChart');
@@ -403,7 +424,8 @@
 
                     // 🔄 Update Chart Data
                     barChart.data.labels = selectedData.labels;
-                    barChart.data.datasets[0].data = selectedData.data;
+                    barChart.data.datasets[0].data = selectedData.kategori_0;
+                    barChart.data.datasets[1].data = selectedData.kategori_1;
 
                     // 🔄 Update Chart
                     barChart.update();
