@@ -17,7 +17,7 @@
   
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan Barang</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan</h6>
             </div>
             <div class="card-body">
               <div class="container">
