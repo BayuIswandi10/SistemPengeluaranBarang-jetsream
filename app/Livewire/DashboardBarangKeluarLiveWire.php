@@ -69,53 +69,96 @@ class DashboardBarangKeluarLiveWire extends Component
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();
         $endDate = now()->endOfDay();
+        $period = CarbonPeriod::create($startDate, $endDate);
 
-        // Ambil data dari database
-        $dailyDataQuery = PengeluaranBarang::selectRaw("DATE(created_date) as tanggal, COUNT(*) as jumlah")
+        $dailyQuery = PengeluaranBarang::selectRaw("DATE(created_date) as tanggal, kategori_pengeluaran, COUNT(*) as jumlah")
             ->whereBetween('created_date', [$startDate, $endDate])
-            ->groupBy('tanggal')
+            ->groupBy('tanggal', 'kategori_pengeluaran')
             ->orderBy('tanggal', 'asc')
             ->get()
-            ->keyBy('tanggal'); // Index berdasarkan tanggal
+            ->groupBy('kategori_pengeluaran');
 
-        // Generate semua tanggal dari 7 hari terakhir
-        $period = CarbonPeriod::create($startDate, $endDate);
+        $dailyKategori0 = $dailyQuery[0] ?? collect();
+        $dailyKategori1 = $dailyQuery[1] ?? collect();
+
+        $dailyKategori0 = $dailyKategori0->keyBy('tanggal');
+        $dailyKategori1 = $dailyKategori1->keyBy('tanggal');
+
         $dailyData = [
             'labels' => [],
-            'data' => [],
-            'days' => []
+            'kategori_0' => [],
+            'kategori_1' => [],
         ];
 
         foreach ($period as $date) {
-            $formattedDate = $date->format('Y-m-d');
-            $dailyData['labels'][] = $formattedDate;
-            $dailyData['days'][] = $date->translatedFormat('l'); // Nama hari
-            $dailyData['data'][] = $dailyDataQuery[$formattedDate]->jumlah ?? 0; // Ambil jumlah atau set ke 0
+            $tanggal = $date->format('Y-m-d');
+            $dailyData['labels'][] = $tanggal;
+            $dailyData['kategori_0'][] = $dailyKategori0[$tanggal]->jumlah ?? 0;
+            $dailyData['kategori_1'][] = $dailyKategori1[$tanggal]->jumlah ?? 0;
         }
 
-        // 📊 Data Bulanan (12 bulan terakhir)
-        $monthlyDataQuery = PengeluaranBarang::selectRaw("DATE_FORMAT(created_date, '%Y-%m') as bulan, COUNT(*) as jumlah")
-            ->whereBetween('created_date', [now()->subMonths(11)->startOfMonth(), now()->endOfMonth()])
-            ->groupBy('bulan')
-            ->orderBy('bulan', 'asc')
-            ->get();
 
+        // 📊 Data Bulanan (12 bulan terakhir)
+        $startMonth = now()->subMonths(11)->startOfMonth();
+        $endMonth = now()->endOfMonth();
+        
+        $monthlyQuery = PengeluaranBarang::selectRaw("DATE_FORMAT(created_date, '%Y-%m') as bulan, kategori_pengeluaran, COUNT(*) as jumlah")
+            ->whereBetween('created_date', [$startMonth, $endMonth])
+            ->groupBy('bulan', 'kategori_pengeluaran')
+            ->orderBy('bulan', 'asc')
+            ->get()
+            ->groupBy('kategori_pengeluaran');
+        
+        $monthlyKategori0 = $monthlyQuery[0] ?? collect();
+        $monthlyKategori1 = $monthlyQuery[1] ?? collect();
+        
+        $monthlyKategori0 = $monthlyKategori0->keyBy('bulan');
+        $monthlyKategori1 = $monthlyKategori1->keyBy('bulan');
+        
         $monthlyData = [
-            'labels' => $monthlyDataQuery->pluck('bulan')->toArray(),
-            'data' => $monthlyDataQuery->pluck('jumlah')->toArray()
+            'labels' => [],
+            'kategori_0' => [],
+            'kategori_1' => [],
         ];
+        
+        for ($i = 0; $i < 12; $i++) {
+            $bulan = now()->subMonths(11 - $i)->format('Y-m');
+            $monthlyData['labels'][] = $bulan;
+            $monthlyData['kategori_0'][] = $monthlyKategori0[$bulan]->jumlah ?? 0;
+            $monthlyData['kategori_1'][] = $monthlyKategori1[$bulan]->jumlah ?? 0;
+        }
+        
 
         // 📊 Data Tahunan (5 tahun terakhir)
-        $yearlyDataQuery = PengeluaranBarang::selectRaw("YEAR(created_date) as tahun, COUNT(*) as jumlah")
-            ->whereBetween('created_date', [now()->subYears(4)->startOfYear(), now()->endOfYear()])
-            ->groupBy('tahun')
+        $startYear = now()->subYears(4)->startOfYear();
+        $endYear = now()->endOfYear();
+
+        $yearlyQuery = PengeluaranBarang::selectRaw("YEAR(created_date) as tahun, kategori_pengeluaran, COUNT(*) as jumlah")
+            ->whereBetween('created_date', [$startYear, $endYear])
+            ->groupBy('tahun', 'kategori_pengeluaran')
             ->orderBy('tahun', 'asc')
-            ->get();
+            ->get()
+            ->groupBy('kategori_pengeluaran');
+
+        $yearlyKategori0 = $yearlyQuery[0] ?? collect();
+        $yearlyKategori1 = $yearlyQuery[1] ?? collect();
+
+        $yearlyKategori0 = $yearlyKategori0->keyBy('tahun');
+        $yearlyKategori1 = $yearlyKategori1->keyBy('tahun');
 
         $yearlyData = [
-            'labels' => $yearlyDataQuery->pluck('tahun')->toArray(),
-            'data' => $yearlyDataQuery->pluck('jumlah')->toArray()
+            'labels' => [],
+            'kategori_0' => [],
+            'kategori_1' => [],
         ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $tahun = now()->subYears(4 - $i)->format('Y');
+            $yearlyData['labels'][] = $tahun;
+            $yearlyData['kategori_0'][] = $yearlyKategori0[$tahun]->jumlah ?? 0;
+            $yearlyData['kategori_1'][] = $yearlyKategori1[$tahun]->jumlah ?? 0;
+        }
+
 
         // 📊 Data Pie Chart berdasarkan Departemen
         $pieQuery = PengeluaranBarang::pluck('pengeluaran_barang_id'); // Ambil hanya kolom ID
