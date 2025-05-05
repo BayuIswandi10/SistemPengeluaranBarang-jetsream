@@ -338,9 +338,9 @@
                                         <input type="text" class="form-control" name="tujuan_penggunaan_1" 
                                                value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Tujuan Ke-1" required autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_2" 
-                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2" required autocomplete="off">
+                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2" autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_3" 
-                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3" required autocomplete="off">
+                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3" autocomplete="off">
                                     </div>
                                 </div>
                                 
