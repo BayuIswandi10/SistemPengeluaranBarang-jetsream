@@ -18,8 +18,10 @@ class DashboardKendaraanDinasLiveWire extends Component
         
         $user = Auth::user();
         $user->level = trim($user->level);
+        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-06 00:00:00
+        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-06 23:59:59
         $query = SuratKendaraanDinas::with(['user', 'approval'])
-            ->whereDate('created_date', Carbon::today());
+        ->whereBetween('created_date', [$startOfDay, $endOfDay]);
         
 
         if ($user->level === 'Ka.Sie') {

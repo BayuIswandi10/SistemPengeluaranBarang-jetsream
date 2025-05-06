@@ -15,9 +15,12 @@ class DashboardBarangKeluarLiveWire extends Component
     {
         $user = Auth::user();
         $user->level = trim($user->level);
-        $today = Carbon::today()->format('Y-m-d'); // Format YYYY-MM-DD
+        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-06 00:00:00
+        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-06 23:59:59
+
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
-            ->whereDate('created_date', $today);
+            ->whereBetween('created_date', [$startOfDay, $endOfDay]);
+
             
 
          // Filter data berdasarkan level user
