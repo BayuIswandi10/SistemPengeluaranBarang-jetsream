@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\PengeluaranBarang;
+use App\Models\ApprovalBarangKeluar;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -14,23 +15,23 @@ class DashboardBarangKeluarLiveWire extends Component
     {
         $user = Auth::user();
         $user->level = trim($user->level);
+        $today = Carbon::today()->format('Y-m-d'); // Format YYYY-MM-DD
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
-        ->whereDate('created_date', Carbon::today()); // Hanya ambil data hari ini        
+            ->whereDate('created_date', $today);
+            
 
-        if ($user->level === 'Staff') {
-            $pengeluaranBarangs = $query->where(function ($q) use ($user) {
-                $q->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen);
-                })->orWhere('created_by', $user->nrp_karyawan);
-            })->get();
+         // Filter data berdasarkan level user
+         if ($user->level === 'Staff' && $user->departemen === 'FIN') {
+            $pengeluaranBarangs = $query->get();
         } elseif ($user->level === 'Ka.Sie') {
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif ($user->level === 'Security' || $user->level === 'Ka.Dept' || $user->level === 'Super Admin'  ) {
+        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
             $pengeluaranBarangs = $query->get();
-        } else {
-            $pengeluaranBarangs = collect();
+        } 
+        else {
+            $pengeluaranBarangs = collect(); // Jika level tidak dikenali, kembalikan data kosong
         }
     
         // Ekstrak angka dari level user
@@ -51,10 +52,16 @@ class DashboardBarangKeluarLiveWire extends Component
         }
         
         // Mengambil data status yang disetujui (hanya dari data hari ini)
-        $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
-        )->count();
+        $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+        ->where('status_approval', '!=', 'Level 0')
+        ->pluck('pengeluaran_barang_id')
+        ->toArray();
+
+        $pengeluaranBarangsDisetujui = $pengeluaranBarangs
+            ->filter(fn ($item) =>
+                in_array($item->pengeluaran_barang_id, $approvedIdsByUser)
+            )
+            ->count();
 
         // Mengambil data status yang menunggu (hanya dari data hari ini)
         $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
@@ -62,9 +69,16 @@ class DashboardBarangKeluarLiveWire extends Component
         )->count();
 
         // Mengambil data status yang ditolak (hanya dari data hari ini)
-        $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) =>
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
-        )->count();
+        $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+        ->where('status_approval', 'Level 0')
+        ->pluck('pengeluaran_barang_id')
+        ->toArray();
+
+        $pengeluaranBarangsDitolak = $pengeluaranBarangs
+            ->filter(fn ($item) =>
+                in_array($item->pengeluaran_barang_id, $rejectedIdsByUser)
+            )
+            ->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();

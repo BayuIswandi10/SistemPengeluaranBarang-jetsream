@@ -408,7 +408,7 @@
                 data: {
                     labels: dailyData.labels,
                     datasets: [{
-                        label: 'Jumlah Surat Barang Keluar',
+                        label: 'Jumlah Surat Penggunaan Kendaraan Dinas',
                         data: dailyData.data,
                         backgroundColor: 'rgba(75, 192, 192, 0.6)',
                         borderColor: 'rgba(75, 192, 192, 1)',

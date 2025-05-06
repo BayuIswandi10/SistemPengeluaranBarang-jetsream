@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SuratKendaraanDinas;
 use App\Models\KendaraanDinas;
+use App\Models\ApprovalKendaraanDinas;
 use App\Models\SuratKendaraanDinasDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -41,19 +42,12 @@ class DashboardKendaraanDinasController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Staff') {
-                $suratKendaraan = $query->where(function ($q) use ($user) {
-                    $q->whereHas('user', function ($query) use ($user) {
-                        $query->where('departemen', $user->departemen);
-                    })->orWhere('created_by', $user->nrp_karyawan);
-                })->get();
-            } elseif ($user->level === 'Ka.Sie') {
+            if ($user->level === 'Ka.Sie') {
                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
             } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
                 $suratKendaraan = $query->get();
-                $kendaraanDinas = $query->get();
             } else {
                 $suratKendaraan = collect(); // Jika level tidak dikenali, kembalikan data kosong
             }
@@ -69,21 +63,25 @@ class DashboardKendaraanDinasController extends Controller
             }
 
             // Mengambil data berdasarkan status
-            $kendaraanDisetujui = $suratKendaraan->filter(fn ($item) => 
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
-            )->values();
+            $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+            ->where('status_approval', '!=', 'Level 0')
+            ->pluck('surat_kendaraan_dinas_id')
+            ->toArray();
+            $kendaraanDisetujui = $suratKendaraan->filter(function ($item) use ($approvedIdsByUser) {
+                return in_array($item->surat_kendaraan_dinas_id, $approvedIdsByUser);
+            })->values();
 
             $kendaraanMenunggu = $suratKendaraan->filter(fn ($item) =>
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
             )->values();
 
-            $kendaraanDitolak = $suratKendaraan->filter(fn ($item) =>
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
-            )->values();
-
-            $start = \Carbon\Carbon::parse($startDate);
-            $end = \Carbon\Carbon::parse($endDate);
+            $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+            ->where('status_approval', 'Level 0')
+            ->pluck('surat_kendaraan_dinas_id')
+            ->toArray();
+            $kendaraanDitolak = $suratKendaraan->filter(function ($item) use ($rejectedIdsByUser) {
+                return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
+            })->values();
     
             // 1. Ambil semua surat kendaraan dinas dalam rentang tanggal
             $suratIds = SuratKendaraanDinas::whereBetween('created_date', [$startDate, $endDate])

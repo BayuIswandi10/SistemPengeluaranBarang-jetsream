@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use App\Models\ApprovalBarangKeluar;
 use App\Models\PengeluaranBarang;
 
 use Illuminate\Support\Facades\Auth;
@@ -33,19 +34,16 @@ class DashboardBarangKeluarController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Staff') {
-                $pengeluaranBarangs = $query->where(function ($q) use ($user) {
-                    $q->whereHas('user', function ($query) use ($user) {
-                        $query->where('departemen', $user->departemen);
-                    })->orWhere('created_by', $user->nrp_karyawan);
-                })->get();
+            if ($user->level === 'Staff' && $user->departemen === 'FIN') {
+                $pengeluaranBarangs = $query->get();
             } elseif ($user->level === 'Ka.Sie') {
                 $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
             } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
                 $pengeluaranBarangs = $query->get();
-            } else {
+            } 
+            else {
                 $pengeluaranBarangs = collect(); // Jika level tidak dikenali, kembalikan data kosong
             }
 
@@ -67,19 +65,28 @@ class DashboardBarangKeluarController extends Controller
             }
 
 
-            // Mengambil data berdasarkan status
-            $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(fn ($item) => 
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel || 
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
-            )->values();
+            //Mengambil NRP yang login dan untuk mengambil persetujuan
+            $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+            ->where('status_approval', '!=', 'Level 0')
+            ->pluck('pengeluaran_barang_id')
+            ->toArray();
+            $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(function ($item) use ($approvedIdsByUser) {
+                return in_array($item->pengeluaran_barang_id, $approvedIdsByUser);
+            })->values();
 
             $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
             )->values();
 
-            $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(fn ($item) =>
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
-            )->values();
+            //Mengambil NRP yang login dan untuk mengambil penolakan
+            $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+            ->where('status_approval', 'Level 0')
+            ->pluck('pengeluaran_barang_id')
+            ->toArray();
+            $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(function ($item) use ($rejectedIdsByUser) {
+                return in_array($item->pengeluaran_barang_id, $rejectedIdsByUser);
+            })->values();
+            
 
             // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([

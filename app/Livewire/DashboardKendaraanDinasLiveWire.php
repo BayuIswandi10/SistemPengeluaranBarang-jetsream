@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\SuratKendaraanDinas;
 use App\Models\SuratKendaraanDinasDetail;
+use App\Models\ApprovalKendaraanDinas;
 use App\Models\KendaraanDinas;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -20,23 +21,15 @@ class DashboardKendaraanDinasLiveWire extends Component
         $query = SuratKendaraanDinas::with(['user', 'approval'])
             ->whereDate('created_date', Carbon::today());
         
-        $kendaraanDinas = collect();
 
-        if ($user->level === 'Staff') {
-            $suratKendaraanDinasList = $query->where(function ($q) use ($user) {
-                $q->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen);
-                })->orWhere('created_by', $user->nrp_karyawan);
-            })->get();
-        } elseif ($user->level === 'Ka.Sie') {
+        if ($user->level === 'Ka.Sie') {
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif (in_array($user->level, ['Security', 'Ka.Dept', 'Super Admin'])) {
+        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
             $suratKendaraanDinasList = $query->get();
-            $kendaraanDinas = KendaraanDinas::all();
         } else {
-            $suratKendaraanDinasList = collect();
+            $suratKendaraanDinasList = collect(); 
         }
 
         // Ekstrak angka dari level user
@@ -48,18 +41,25 @@ class DashboardKendaraanDinasLiveWire extends Component
             $userLevel = 4;
         }
 
-        $suratDisetujui = $suratKendaraanDinasList->filter(fn ($item) =>
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === $userLevel ||
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) > $userLevel
-        )->count();
+        $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+        ->where('status_approval', '!=', 'Level 0')
+        ->pluck('surat_kendaraan_dinas_id')
+        ->toArray();
+        $suratDisetujui = $suratKendaraanDinasList->filter(function ($item) use ($approvedIdsByUser) {
+            return in_array($item->surat_kendaraan_dinas_id, $approvedIdsByUser);
+        })->count();
 
         $suratMenunggu = $suratKendaraanDinasList->filter(fn ($item) =>
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
         )->count();
 
-        $suratDitolak = $suratKendaraanDinasList->filter(fn ($item) =>
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === 0
-        )->count();
+        $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+        ->where('status_approval', 'Level 0')
+        ->pluck('surat_kendaraan_dinas_id')
+        ->toArray();
+        $suratDitolak = $suratKendaraanDinasList->filter(function ($item) use ($rejectedIdsByUser) {
+            return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
+        })->count();
 
         $start = Carbon::today()->startOfDay();
         $end = Carbon::today()->endOfDay();
