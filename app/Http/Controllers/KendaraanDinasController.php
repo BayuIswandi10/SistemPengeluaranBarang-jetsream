@@ -222,20 +222,45 @@ class KendaraanDinasController extends Controller
         }
     }
     
-    public function getBookingDates($id)
+    public function getRiwayatSurat($id)
     {
         try {
-            $dates = DB::table('tb_surat_kendaraan_dinas_detail')
-                ->join('tb_surat_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id')
-                ->where('tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', $id)
-                ->pluck('tanggal_penggunaan');
+            $surats = DB::table('tb_surat_kendaraan_dinas_detail as detail')
+                ->join('tb_surat_kendaraan_dinas as surat', 'detail.surat_kendaraan_dinas_id', '=', 'surat.surat_kendaraan_dinas_id')
+                ->where('detail.kendaraan_dinas_id', $id)
+                ->orderBy('surat.tanggal_penggunaan', 'desc')
+                ->select(
+                    'surat.surat_kendaraan_dinas_id',
+                    DB::raw("CONCAT_WS(' - ', surat.tujuan_penggunaan_1, surat.tujuan_penggunaan_2, surat.tujuan_penggunaan_3) as tujuan_penggunaan"),
+                    'surat.tanggal_penggunaan',
+                    'surat.waktu_keluar',
+                    'surat.waktu_kembali',
+                    'surat.status'
+                )
+                ->get();
     
-            return response()->json($dates);
+            return response()->json($surats);
         } catch (\Exception $e) {
-            \Log::error('BookingDates Error: ' . $e->getMessage());
+            \Log::error('RiwayatSurat Error: ' . $e->getMessage());
+            return response()->json([], 500);
+        }
+    }    
+
+    public function getAllBookingDates()
+    {
+        try {
+            $data = DB::table('tb_surat_kendaraan_dinas_detail')
+                ->join('tb_surat_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id')
+                ->join('tb_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', '=', 'tb_kendaraan_dinas.kendaraan_dinas_id')
+                ->select('tb_kendaraan_dinas.merk_kendaraan', 'tb_kendaraan_dinas.nomor_kendaraan', 'tb_surat_kendaraan_dinas.tanggal_penggunaan')
+                ->get();
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            \Log::error('AllBookingDates Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan di server'], 500);
         }
     }
-    
+
     
 }

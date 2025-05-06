@@ -178,7 +178,7 @@
             
             {{-- Tambah Pengeluaran Barang Modal --}}
             <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="tambahDataModalLabel">Ajukan Pengeluaran Barang</h5>
@@ -300,7 +300,7 @@
 
             {{-- Tambah Penggunaan Kendaraan Dinas Modal --}}
             <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="tambahDinasModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="tambahDinasModalLabel">Ajukan Penggunaan Kendaraan Dinas</h5>
@@ -509,7 +509,7 @@
 
         <!-- Modal -->
         <div class="modal fade" id="modalPengajuan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
-            <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
@@ -544,7 +544,7 @@
 
         <!-- Modal Approval -->
         <div class="modal fade" id="editApprovalModal" tabindex="-1" aria-labelledby="editApprovalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
                     <div class="modal-header bg-light">
                         <h5 class="modal-title" id="editApprovalLabel">Pemeriksaan</h5>

@@ -19,7 +19,10 @@
             <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
                 <button class="btn btn-primary btn-md float-left" data-toggle="modal" data-target="#tambahDataModal">
                     <i class="fa fa-plus mr-1"></i> Tambah Data
-                </button>            
+                </button>
+                <button class="btn btn-secondary btn-md ml-2" data-toggle="modal" data-target="#calendarModal">
+                    <i class="fa fa-calendar mr-1"></i> Kalender
+                </button>                      
             </div>
             <div class="card-body">
                 @if (session('success'))
@@ -110,6 +113,30 @@
             </div>
         </div>
     </div>
+    
+
+    <!-- Modal Kalender Umum -->
+    <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document" style="max-width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="calendarModalLabel">Kalender Booking Seluruh Kendaraan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <div class="mb-3">
+                <label for="monthPickerGlobal">Pilih Bulan:</label>
+                <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
+            </div>
+            <div id="calendarAllKendaraan"></div>
+            </div>
+        </div>
+        </div>
+    </div>
+  
+      
 
     {{-- Tambah Modal --}}
     <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
@@ -217,72 +244,148 @@
     <!-- Modal Detail -->
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel">
         <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title">Detail Kendaraan & Kalender Booking</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span>&times;</span>
-            </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Riwayat Penggunaan Kendaraan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="tableRiwayat">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>ID Surat</th>
+                                <th>Tujuan Penggunaan</th>
+                                <th>Tanggal Penggunaan</th>
+                                <th>Waktu Keluar</th>
+                                <th>Waktu Kembali</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data akan dimasukkan lewat JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="modal-body">
-            <!-- Placeholder untuk kalender -->
-            <div class="mb-3">
-                <label for="monthPicker">Pilih Bulan:</label>
-                <input type="month" id="monthPicker" class="form-control" style="max-width: 250px;">
-            </div>
-            <div id="calendarBooking"></div>
-            </div>
-        </div>
         </div>
     </div>
-  
+
 </div>
 <script>
-    let calendar;
+    let globalCalendar;
+    
+    $('#calendarModal').on('show.bs.modal', function () {
+      $.get(`/kendaraan/booking-dates-all`, function (data) {
+        const events = data.map(item => ({
+          title: item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+          start: item.tanggal_penggunaan,
+          allDay: true,
+          backgroundColor: '#28a745',
+          borderColor: '#28a745'
+        }));
+    
+        if (globalCalendar) globalCalendar.destroy();
+    
+        const calendarEl = document.getElementById('calendarAllKendaraan');
+        globalCalendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          height: 450,
+          events: events,
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listMonth'
+          }
+        });
+    
+        globalCalendar.render();
+    
+        // Inisialisasi input bulan
+        const currentDate = globalCalendar.getDate();
+        $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
+    
+        $('#monthPickerGlobal').on('change', function () {
+          const selected = this.value;
+          if (selected) {
+            const newDate = selected + "-01";
+            globalCalendar.gotoDate(newDate);
+          }
+        });
+      });
+    });
+</script>
+    
+<script>
 
     $('#detailModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         const kendaraanId = button.data('id');
 
-        $.get(`/kendaraan/${kendaraanId}/booking-dates`, function (dates) {
-            const events = dates.map(date => ({
-                title: 'Digunakan',
-                start: date,
-                allDay: true,
-                backgroundColor: '#dc3545',
-                borderColor: '#dc3545'
-            }));
+        // Hancurkan instance DataTable sebelumnya (jika ada)
+        if ($.fn.DataTable.isDataTable('#tableRiwayat')) {
+            $('#tableRiwayat').DataTable().clear().destroy();
+        }
 
-            if (calendar) calendar.destroy();
+        $.get(`/kendaraan/${kendaraanId}/riwayat-surat`, function (data) {
+            const tbody = $('#tableRiwayat tbody');
+            tbody.empty();
 
-            const calendarEl = document.getElementById('calendarBooking');
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 400,
-                events: events,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listMonth'
-                }
-            });
+            if (data.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">Tidak ada riwayat penggunaan.</td></tr>');
+                // Jika data kosong, tidak perlu menginisialisasi DataTable
+            } else {
+                data.forEach((item, index) => { 
+                    let statusLabel = '';
 
-            calendar.render();
+                    if (item.status === 'Level 1') {
+                        statusLabel = 'Menunggu Persetujuan Ka.Dept';
+                    } else if (item.status === 'Level 2') {
+                        statusLabel = 'Menunggu Persetujuan Ka.Sie Transportasi';
+                    } else if (item.status === 'Level 3') {
+                        statusLabel = 'Menunggu Persetujuan Security';
+                    } else if (item.status === 'Level 4') {
+                        statusLabel = 'Sudah Disetujui';
+                    } else if (item.status === 'Level 0') {
+                        statusLabel = 'Ditolak';
+                    } else {
+                        statusLabel = item.status;
+                    }
 
-            // Saat bulan dipilih dari input
-            $('#monthPicker').on('change', function () {
-                const selected = this.value; // format: "2025-04"
-                if (selected) {
-                    const newDate = selected + "-01"; // format ke tanggal
-                    calendar.gotoDate(newDate);
-                }
-            });
-
-            // Set bulan input ke bulan saat ini saat modal dibuka
-            const currentDate = calendar.getDate();
-            $('#monthPicker').val(currentDate.toISOString().slice(0, 7));
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.surat_kendaraan_dinas_id}</td>
+                            <td>${item.tujuan_penggunaan}</td>
+                            <td>${item.tanggal_penggunaan}</td>
+                            <td>${item.waktu_keluar ?? '-'}</td>
+                            <td>${item.waktu_kembali ?? '-'}</td>
+                            <td>${statusLabel}</td>
+                        </tr>
+                    `);
+                });
+                
+                // Inisialisasi DataTable hanya jika ada data
+                $('#tableRiwayat').DataTable({
+                    columnDefs: [
+                        { className: 'dt-body-center', targets: 0 },
+                        { className: 'dt-head-center', targets: 0 },
+                        { className: 'dt-body-center', targets: 6 },
+                        { className: 'dt-head-center', targets: 6 }
+                    ],
+                    responsive: true,
+                    scrollX: false,
+                    destroy: true,
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                });
+            }
         });
     });
+
+
 
 
     $('#editDataModal').on('show.bs.modal', function (event) {
