@@ -15,6 +15,7 @@ use App\Models\SuratKendaraanDinasDetail;
 use App\Mail\ApprovalDinasNotification;
 use App\Mail\ApprovalNotification;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class SuratDinasController extends Controller
 {
@@ -353,54 +354,215 @@ class SuratDinasController extends Controller
         ], 200);
     }
     
+    // public function edit(Request $request)
+    // {
+    //     $suratDinasId = $request->surat_kendaraan_dinas_id;
+    
+    //     // Mengambil data surat dinas beserta pencatatan kendaraan dinas
+    //     $suratDinas = SuratKendaraanDinas::with([
+    //         'pencatatanKendaraanDinas.user',
+    //         'suratDetail.kendaraan'
+    //     ])->findOrFail($suratDinasId);
+
+    
+    //     // Mapping data user dinas dengan nama & departemen
+    //     $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+    //         return [
+    //             'nrp_karyawan' => $user->nrp_karyawan,
+    //             'name' => $user->user->name ?? 'Tidak Diketahui',
+    //             'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+    //         ];
+    //     });
+
+    //     // Ambil data kendaraan dinas
+    //     $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+    //         return [
+    //             'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
+    //             'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+    //             'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+    //         ];
+    //     });
+
+    //     // Ambil semua kendaraan dinas aktif dari database
+    //     $daftarKendaraan = KendaraanDinas::all(['kendaraan_dinas_id', 'nomor_kendaraan', 'merk_kendaraan', 'jenis_kendaraan']);
+    
+    //     return response()->json([
+    //         'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+    //         'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
+    //         'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
+    //         'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
+    //         'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
+    //         'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
+    //         'waktu_keluar' => $suratDinas->waktu_keluar,
+    //         'waktu_kembali' => $suratDinas->waktu_kembali,
+    //         'userDinas' => $userDinasData,
+    //         'data_kendaraan' => $kendaraanData,
+    //         'daftar_kendaraan' => $daftarKendaraan,
+    //         'status' => $suratDinas->status ?? 'Tidak Diketahui',
+    //     ], 200);
+    // }
+
+    // public function edit(Request $request)
+    // {
+    //     $suratDinasId = $request->surat_kendaraan_dinas_id;
+        
+    //     // Mengambil data surat dinas beserta pencatatan kendaraan dinas
+    //     $suratDinas = SuratKendaraanDinas::with([
+    //         'pencatatanKendaraanDinas.user',
+    //         'suratDetail.kendaraan'
+    //     ])->findOrFail($suratDinasId);
+
+    //     // Mapping data user dinas dengan nama & departemen
+    //     $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+    //         return [
+    //             'nrp_karyawan' => $user->nrp_karyawan,
+    //             'name' => $user->user->name ?? 'Tidak Diketahui',
+    //             'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+    //         ];
+    //     });
+
+    //     // Ambil data kendaraan dinas
+    //     $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+    //         return [
+    //             'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
+    //             'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+    //             'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+    //         ];
+    //     });
+
+    //     // Mengambil waktu dan tanggal surat
+    //     $tanggalPenggunaan = $suratDinas->tanggal_penggunaan;
+    //     $waktuKeluar = $suratDinas->waktu_keluar;
+    //     $waktuKembali = $suratDinas->waktu_kembali;
+
+    //     // Ambil kendaraan yang tersedia berdasarkan waktu dan tanggal yang tidak berelasi dengan surat lainnya
+    //     $kendaraanTersedia = KendaraanDinas::whereNotExists(function ($query) use ($tanggalPenggunaan, $waktuKeluar, $waktuKembali, $suratDinasId) {
+    //         $query->select(DB::raw(1))
+    //             ->from('tb_surat_kendaraan_dinas_detail as dskd')
+    //             ->join('tb_surat_kendaraan_dinas as skd', 'dskd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
+    //             ->whereRaw('dskd.kendaraan_dinas_id = tb_kendaraan_dinas.kendaraan_dinas_id')
+    //             ->where('skd.tanggal_penggunaan', $tanggalPenggunaan)
+    //             ->where('skd.surat_kendaraan_dinas_id', '!=', $suratDinasId)
+    //             ->where(function ($q) use ($waktuKeluar, $waktuKembali) {
+    //                 $q->whereBetween(DB::raw("'$waktuKeluar'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
+    //                 ->orWhereBetween(DB::raw("'$waktuKembali'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
+    //                 ->orWhereBetween('skd.waktu_keluar', [$waktuKeluar, $waktuKembali])
+    //                 ->orWhereBetween('skd.waktu_kembali', [$waktuKeluar, $waktuKembali]);
+    //             });
+    //     })
+        
+    //     ->get(['kendaraan_dinas_id', 'nomor_kendaraan', 'merk_kendaraan', 'jenis_kendaraan']);
+
+    //     // Gabungkan kendaraan yang tersedia dan yang sudah dipilih
+    //     $daftarKendaraan = $kendaraanTersedia->merge($kendaraanData)->unique('kendaraan_dinas_id');
+
+    //     return response()->json([
+    //         'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+    //         'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
+    //         'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
+    //         'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
+    //         'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
+    //         'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
+    //         'waktu_keluar' => $suratDinas->waktu_keluar,
+    //         'waktu_kembali' => $suratDinas->waktu_kembali,
+    //         'userDinas' => $userDinasData,
+    //         'data_kendaraan' => $kendaraanData,
+    //         'daftar_kendaraan' => $daftarKendaraan,
+    //         'status' => $suratDinas->status ?? 'Tidak Diketahui',
+    //     ], 200);
+    // }
+
     public function edit(Request $request)
     {
-        $suratDinasId = $request->surat_kendaraan_dinas_id;
+        try {
+            $suratDinasId = $request->surat_kendaraan_dinas_id;
     
-        // Mengambil data surat dinas beserta pencatatan kendaraan dinas
-        $suratDinas = SuratKendaraanDinas::with([
-            'pencatatanKendaraanDinas.user',
-            'suratDetail.kendaraan'
-        ])->findOrFail($suratDinasId);
-
+            // Ambil data surat dinas dan relasinya
+            $suratDinas = SuratKendaraanDinas::with([
+                'pencatatanKendaraanDinas.user',
+                'suratDetail.kendaraan'
+            ])->findOrFail($suratDinasId);
     
-        // Mapping data user dinas dengan nama & departemen
-        $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
-            return [
-                'nrp_karyawan' => $user->nrp_karyawan,
-                'name' => $user->user->name ?? 'Tidak Diketahui',
-                'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
-            ];
-        });
-
-        // Ambil data kendaraan dinas
-        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
-            return [
-                'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
-                'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
-                'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
-            ];
-        });
-
-        // Ambil semua kendaraan dinas aktif dari database
-        $daftarKendaraan = KendaraanDinas::all(['kendaraan_dinas_id', 'nomor_kendaraan', 'merk_kendaraan', 'jenis_kendaraan']);
+            // Mapping data user dinas
+            $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+                return [
+                    'nrp_karyawan' => $user->nrp_karyawan,
+                    'name' => $user->user->name ?? 'Tidak Diketahui',
+                    'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                ];
+            });
     
-        return response()->json([
-            'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
-            'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
-            'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
-            'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
-            'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
-            'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
-            'waktu_keluar' => $suratDinas->waktu_keluar,
-            'waktu_kembali' => $suratDinas->waktu_kembali,
-            'userDinas' => $userDinasData,
-            'data_kendaraan' => $kendaraanData,
-            'daftar_kendaraan' => $daftarKendaraan,
-            'status' => $suratDinas->status ?? 'Tidak Diketahui',
-        ], 200);
+            // Data kendaraan yang sudah dipilih di surat
+            $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+                $kendaraan = $detail->kendaraan;
+                return [
+                    'id_kendaraan' => $kendaraan->kendaraan_dinas_id ?? null,
+                    'nomor_kendaraan' => $kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+                    'keterangan' => ($kendaraan->merk_kendaraan ?? '') . ' - ' . ($kendaraan->jenis_kendaraan ?? ''),
+                    'merk_kendaraan' => $kendaraan->merk_kendaraan ?? '',
+                    'jenis_kendaraan' => $kendaraan->jenis_kendaraan ?? '',
+                ];
+            });
+    
+            // Waktu dan tanggal dari surat
+            $tanggalPenggunaan = $suratDinas->tanggal_penggunaan;
+            $waktuKeluar = $suratDinas->waktu_keluar;
+            $waktuKembali = $suratDinas->waktu_kembali;
+    
+            // Kendaraan yang tidak digunakan oleh surat lain pada waktu yang sama
+            $kendaraanTersedia = KendaraanDinas::whereNotExists(function ($query) use ($tanggalPenggunaan, $waktuKeluar, $waktuKembali, $suratDinasId) {
+                $query->select(DB::raw(1))
+                    ->from('tb_surat_kendaraan_dinas_detail as dskd')
+                    ->join('tb_surat_kendaraan_dinas as skd', 'dskd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
+                    ->whereRaw('dskd.kendaraan_dinas_id = tb_kendaraan_dinas.kendaraan_dinas_id')
+                    ->where('skd.tanggal_penggunaan', $tanggalPenggunaan)
+                    ->where('skd.surat_kendaraan_dinas_id', '!=', $suratDinasId)
+                    ->where(function ($q) use ($waktuKeluar, $waktuKembali) {
+                        $q->whereBetween(DB::raw("'$waktuKeluar'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
+                            ->orWhereBetween(DB::raw("'$waktuKembali'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
+                            ->orWhereBetween('skd.waktu_keluar', [$waktuKeluar, $waktuKembali])
+                            ->orWhereBetween('skd.waktu_kembali', [$waktuKeluar, $waktuKembali]);
+                    });
+            })->get();
+    
+            // Ubah kendaraan tersedia ke format array
+            $kendaraanTersediaData = $kendaraanTersedia->map(function ($kendaraan) {
+                return [
+                    'id_kendaraan' => $kendaraan->kendaraan_dinas_id,
+                    'nomor_kendaraan' => $kendaraan->nomor_kendaraan,
+                    'keterangan' => $kendaraan->merk_kendaraan . ' - ' . $kendaraan->jenis_kendaraan,
+                    'merk_kendaraan' => $kendaraan->merk_kendaraan,
+                    'jenis_kendaraan' => $kendaraan->jenis_kendaraan,
+                ];
+            });
+    
+            // Gabungkan kendaraan yang tersedia dan yang sudah dipilih, lalu hilangkan duplikat
+            $daftarKendaraan = $kendaraanTersediaData->merge($kendaraanData)->unique('id_kendaraan')->values();
+    
+            return response()->json([
+                'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
+                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
+                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
+                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
+                'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
+                'waktu_keluar' => $suratDinas->waktu_keluar,
+                'waktu_kembali' => $suratDinas->waktu_kembali,
+                'userDinas' => $userDinasData,
+                'data_kendaraan' => $kendaraanData,
+                'daftar_kendaraan' => $daftarKendaraan,
+                'status' => $suratDinas->status ?? 'Tidak Diketahui',
+            ], 200);
+    
+        } catch (\Throwable $e) {
+            // \Log::error('Edit Surat Kendaraan Dinas Error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memuat data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-
+    
 
     public function update(Request $request)
     {

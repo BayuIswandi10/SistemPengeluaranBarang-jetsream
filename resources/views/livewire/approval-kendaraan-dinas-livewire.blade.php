@@ -581,16 +581,16 @@
                                 <td>
                                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
                                         ${window.daftarKendaraanGlobal.map(k => `
-                                        <option value="${k.kendaraan_dinas_id}" 
-                                            data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
-                                            ${k.kendaraan_dinas_id === item.id_kendaraan ? 'selected' : ''}>
-                                            ${k.nomor_kendaraan}
-                                        </option>`).join('')}
+                                            <option value="${k.id_kendaraan}" 
+                                                    data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
+                                                    ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
+                                                ${k.nomor_kendaraan}
+                                            </option>
+                                        `).join('')}
                                     </select>
-                                    <input type="hidden" name="kendaraan_ids[]" value="${item.id_kendaraan}">
                                 </td>
                                 <td class="keterangan-kendaraan">${item.keterangan}</td>
-                                <td>                
+                                <td>
                                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -598,6 +598,7 @@
                             </tr>
                         `);
                     });
+
 
                     // Render Peserta
                     const tbodyPeserta = $("#pesertaList tbody");
@@ -625,7 +626,7 @@
         const index = tbody.children().length + 1;
 
         const kendaraanOptions = window.daftarKendaraanGlobal.map(k => `
-            <option value="${k.kendaraan_dinas_id}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
+            <option value="${k.id_kendaraan}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
                 ${k.nomor_kendaraan}
             </option>
         `).join('');
@@ -637,7 +638,6 @@
                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
                         ${kendaraanOptions}
                     </select>
-                    <input type="hidden" name="kendaraan_ids[]" value="">
                 </td>
                 <td class="keterangan-kendaraan"></td>
                 <td>
@@ -659,10 +659,10 @@
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const keterangan = selectedOption.getAttribute("data-ket") || '';
         
-        // Cari kolom 'keterangan-kendaraan' di baris yang sama dan ganti isinya
         const row = $(selectElement).closest("tr");
         row.find(".keterangan-kendaraan").text(keterangan);
     }
+
 
 
 
