@@ -13,11 +13,30 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
+use Illuminate\Support\Facades\Auth;
+
 class BarangKeluarExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
 {
+
     public function collection()
     {
-        return PengeluaranBarang::all();
+        $user = Auth::user(); // Ambil user yang sedang login
+        $query = PengeluaranBarang::query(); // Mulai query builder
+
+        // Filter berdasarkan level user
+        if ($user->level === 'Staff' && $user->departemen === 'FIN') {
+            $pengeluaranBarangs = $query->get();
+        } elseif ($user->level === 'Ka.Sie') {
+            $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })->get();
+        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
+            $pengeluaranBarangs = $query->get();
+        } else {
+            $pengeluaranBarangs = collect(); // Kosong jika tidak dikenali
+        }
+
+        return $pengeluaranBarangs;
     }
 
     public function map($row): array
