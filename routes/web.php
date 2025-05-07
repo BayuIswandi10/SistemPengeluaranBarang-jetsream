@@ -40,6 +40,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/kendaraan', KendaraanDinasLiveWire::class)->name('kendaraan');
     });
 
+    Route::get('/data-barang-keluar/export', [PengeluaranBarangController::class, 'export'])->name('data-barang-keluar.export');
+
     Route::get('/approval', ApprovalBarangKeluarLiveWire::class)->name('approval');
     Route::get('/approval-dinas', ApprovalKendaraanDinasLivewire::class)->name('approval-dinas');
 

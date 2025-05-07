@@ -19,6 +19,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ApprovalNotification;
+use App\Exports\BarangKeluarExport;
 use Endroid\QrCode\QrCode as QrCodeQrCode;
 
 class PengeluaranBarangController extends Controller
@@ -27,6 +28,11 @@ class PengeluaranBarangController extends Controller
     {
         $pengeluaranBarangs = PengeluaranBarang::with('approval')->get(); 
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
+    }
+
+    public function export()
+    {
+        return Excel::download(new BarangKeluarExport, 'data_barang_keluar.xlsx');
     }
 
     public function getDataLevel4()
