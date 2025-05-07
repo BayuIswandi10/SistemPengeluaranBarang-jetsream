@@ -3,27 +3,26 @@
 namespace App\Exports;
 
 use App\Models\PengeluaranBarang;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Models\ApprovalBarangKeluar;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
-class BarangKeluarExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
+class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, WithEvents
 {
-
-    public function collection()
+    public function array(): array
     {
-        $user = Auth::user(); // Ambil user yang sedang login
-        $query = PengeluaranBarang::query(); // Mulai query builder
+        $result = [];
+        $user = Auth::user();
+        $query = PengeluaranBarang::query();
 
-        // Filter berdasarkan level user
         if ($user->level === 'Staff' && $user->departemen === 'FIN') {
             $pengeluaranBarangs = $query->get();
         } elseif ($user->level === 'Ka.Sie') {
@@ -33,34 +32,83 @@ class BarangKeluarExport implements FromCollection, WithHeadings, WithMapping, S
         } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
             $pengeluaranBarangs = $query->get();
         } else {
-            $pengeluaranBarangs = collect(); // Kosong jika tidak dikenali
+            $pengeluaranBarangs = collect();
         }
 
-        return $pengeluaranBarangs;
+        foreach ($pengeluaranBarangs as $pengeluaran) {
+            $result[] = [
+                $pengeluaran->pengeluaran_barang_id,
+                '', // Barang
+                '', // Approval
+                $pengeluaran->kategori_pengeluaran == 1 ? 'Scrap' : 'Non Scrap',
+                $pengeluaran->pembawa_scrap ?? '-',
+                $pengeluaran->created_by ?? '-',
+                Carbon::parse($pengeluaran->created_date)->format('d-m-Y H:i'),
+                $pengeluaran->lokasi_barang_keluar ?? '-',
+                $pengeluaran->tujuan_pengeluaran_barang ?? '-',
+                $pengeluaran->jenis_kendaraan ?? '-',
+                $pengeluaran->no_polisi ?? '-',
+                $pengeluaran->status ?? '-',
+                $pengeluaran->updated_by ?? '-',
+                Carbon::parse($pengeluaran->updated_date)->format('d-m-Y H:i'),
+            ];
+
+            foreach ($pengeluaran->barangKeluar as $barang) {
+                $result[] = [
+                    '',
+                    $barang->nama_barang ?? '-',
+                    '',
+                    '', '', '', '', '', '', '', '', '', '', ''
+                ];
+            }
+
+            $approvals = ApprovalBarangKeluar::with('user')
+                ->where('pengeluaran_barang_id', $pengeluaran->pengeluaran_barang_id)
+                ->get();
+
+            foreach ($approvals as $approval) {
+                $translatedStatus = $this->translateApprovalStatus($approval->status_approval ?? '-', $pengeluaran->kategori_pengeluaran);
+                $result[] = [
+                    '',
+                    '',
+                    ($approval->user->name ?? 'Tidak Diketahui') . ' (' . $translatedStatus . ')',
+                    '', '', '', '', '', '', '', '', '', '', ''
+                ];
+            }                
+        }
+
+        return $result;
     }
 
-    public function map($row): array
+    private function translateApprovalStatus($status, $kategori)
     {
-        return [
-            $row->pengeluaran_barang_id,
-            $row->kategori_pengeluaran == 1 ? 'Scrap' : 'Non Scrap',
-            $row->pembawa_scrap,
-            $row->created_by,
-            $row->created_date,
-            $row->lokasi_barang_keluar,
-            $row->tujuan_pengeluaran_barang,
-            $row->jenis_kendaraan,
-            $row->no_polisi,
-            $row->status,
-            $row->updated_by,
-            $row->updated_date,
-        ];
+        switch ($status) {
+            case 'Level 1':
+                return 'Mengajukan';
+            case 'Level 2':
+                return 'PIC/Ka.Sie Sudah Menyetujui';
+            case 'Level 3':
+                return 'Ka.Dept Ybs Sudah Menyutujui';
+            case 'Level 4':
+                return 'Ka Dept GA Sudah Menyetujui';
+            case 'Level 5':
+                return 'Finance Sudah Menyetujui';
+            case 'Level 6':
+                return 'Security Sudah Menyetujui';
+            case 'Level 0':
+                return 'Ditolak';
+            default:
+                return '-';
+        }
     }
+
 
     public function headings(): array
     {
         return [
             'No Surat Pengeluaran Barang',
+            'Barang Keluar',
+            'Approval',
             'Kategori Pengeluaran',
             'Pembawa Scrap',
             'Dibuat Oleh',
@@ -80,20 +128,23 @@ class BarangKeluarExport implements FromCollection, WithHeadings, WithMapping, S
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-
-                // Hitung kolom terakhir (L = 12 kolom)
-                $lastColumn = 'L';
+                $lastColumn = 'N';
                 $lastRow = $sheet->getHighestRow();
 
-                // Apply autofilter
-                $sheet->setAutoFilter("A1:{$lastColumn}1");
-
-                // Apply table style (dengan border dan fill di header)
-                $headerStyle = [
-                    'font' => ['bold' => true],
+                // Style untuk header
+                $sheet->getStyle("A1:{$lastColumn}1")->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                        'color' => ['rgb' => 'FFFFFF'],
+                    ],
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'FFEEEEEE']
+                        'startColor' => ['rgb' => '4F81BD'],
+                    ],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                        'wrapText' => true,
                     ],
                     'borders' => [
                         'allBorders' => [
@@ -101,10 +152,26 @@ class BarangKeluarExport implements FromCollection, WithHeadings, WithMapping, S
                             'color' => ['argb' => 'FF000000'],
                         ],
                     ],
-                ];
+                ]);
 
-                $sheet->getStyle("A1:{$lastColumn}1")->applyFromArray($headerStyle);
-                $sheet->getStyle("A1:{$lastColumn}{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                // Style seluruh tabel
+                $sheet->getStyle("A2:{$lastColumn}{$lastRow}")->applyFromArray([
+                    'alignment' => [
+                        'vertical' => Alignment::VERTICAL_TOP,
+                        'wrapText' => true,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+
+                // Atur tinggi baris otomatis
+                for ($i = 1; $i <= $lastRow; $i++) {
+                    $sheet->getRowDimension($i)->setRowHeight(-1);
+                }
             }
         ];
     }
