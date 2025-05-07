@@ -17,6 +17,8 @@ use Carbon\Carbon;
 
 class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, WithEvents
 {
+    private $totalCount = 0;
+
     public function array(): array
     {
         $result = [];
@@ -34,6 +36,8 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
         } else {
             $pengeluaranBarangs = collect();
         }
+
+        $this->totalCount = $pengeluaranBarangs->count();
 
         foreach ($pengeluaranBarangs as $pengeluaran) {
             $result[] = [
@@ -77,31 +81,28 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
             }                
         }
 
+        // Tambahkan baris kosong dan jumlah total
+        $result[] = array_fill(0, 14, ''); // baris kosong
+        $result[] = [
+            'TOTAL DATA', '', '', '', '', '', '', '', '', '', '', '', '', $this->totalCount
+        ];
+
         return $result;
     }
 
     private function translateApprovalStatus($status, $kategori)
     {
-        switch ($status) {
-            case 'Level 1':
-                return 'Mengajukan';
-            case 'Level 2':
-                return 'PIC/Ka.Sie Sudah Menyetujui';
-            case 'Level 3':
-                return 'Ka.Dept Ybs Sudah Menyutujui';
-            case 'Level 4':
-                return 'Ka Dept GA Sudah Menyetujui';
-            case 'Level 5':
-                return 'Finance Sudah Menyetujui';
-            case 'Level 6':
-                return 'Security Sudah Menyetujui';
-            case 'Level 0':
-                return 'Ditolak';
-            default:
-                return '-';
-        }
+        return match ($status) {
+            'Level 1' => 'Mengajukan',
+            'Level 2' => 'PIC/Ka.Sie Sudah Menyetujui',
+            'Level 3' => 'Ka.Dept Ybs Sudah Menyutujui',
+            'Level 4' => 'Ka Dept GA Sudah Menyetujui',
+            'Level 5' => 'Finance Sudah Menyetujui',
+            'Level 6' => 'Security Sudah Menyetujui',
+            'Level 0' => 'Ditolak',
+            default => '-',
+        };
     }
-
 
     public function headings(): array
     {
@@ -131,48 +132,80 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
                 $lastColumn = 'N';
                 $lastRow = $sheet->getHighestRow();
 
-                // Style untuk header
+                // Header styling
                 $sheet->getStyle("A1:{$lastColumn}1")->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'color' => ['rgb' => 'FFFFFF'],
-                    ],
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => '4F81BD'],
-                    ],
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_CENTER,
-                        'vertical' => Alignment::VERTICAL_CENTER,
-                        'wrapText' => true,
-                    ],
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => 'FF000000'],
-                        ],
-                    ],
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
                 ]);
 
-                // Style seluruh tabel
+                // Table styling
                 $sheet->getStyle("A2:{$lastColumn}{$lastRow}")->applyFromArray([
-                    'alignment' => [
-                        'vertical' => Alignment::VERTICAL_TOP,
-                        'wrapText' => true,
-                    ],
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => 'FF000000'],
-                        ],
-                    ],
+                    'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
                 ]);
 
-                // Atur tinggi baris otomatis
-                for ($i = 1; $i <= $lastRow; $i++) {
-                    $sheet->getRowDimension($i)->setRowHeight(-1);
+                // Total row styling
+                $sheet->getStyle("A{$lastRow}:{$lastColumn}{$lastRow}")->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9D9D9']],
+                ]);
+
+                // Data Rekap
+                $pengeluaran = PengeluaranBarang::all();
+                $scrap7Hari = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subDays(7))->count();
+                $scrap1Bulan = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subMonth())->count();
+                $scrap1Tahun = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subYear())->count();
+
+                $nonScrap7Hari = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subDays(7))->count();
+                $nonScrap1Bulan = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subMonth())->count();
+                $nonScrap1Tahun = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subYear())->count();
+
+                $startColumn = 'P'; // kolom tambahan di kanan
+                $sheet->setCellValue("{$startColumn}1", 'Kategori');
+                $sheet->setCellValue("Q1", '7 Hari Terakhir');
+                $sheet->setCellValue("R1", '1 Bulan Terakhir');
+                $sheet->setCellValue("S1", '1 Tahun Terakhir');
+
+                // Scrap Row
+                $sheet->setCellValue("{$startColumn}2", 'Scrap');
+                $sheet->setCellValue("Q2", $scrap7Hari);
+                $sheet->setCellValue("R2", $scrap1Bulan);
+                $sheet->setCellValue("S2", $scrap1Tahun);
+
+                // Non Scrap Row
+                $sheet->setCellValue("{$startColumn}4", 'Non Scrap');
+                $sheet->setCellValue("Q4", $nonScrap7Hari);
+                $sheet->setCellValue("R4", $nonScrap1Bulan);
+                $sheet->setCellValue("S4", $nonScrap1Tahun);
+
+                // Styling
+                $rekapRange = ["{$startColumn}1:S2", "{$startColumn}4:S4"];
+                foreach ($rekapRange as $range) {
+                    $sheet->getStyle($range)->applyFromArray([
+                        'alignment' => [
+                            'horizontal' => Alignment::HORIZONTAL_CENTER,
+                            'vertical' => Alignment::VERTICAL_CENTER,
+                            'wrapText' => true,
+                        ],
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => 'FF000000'],
+                            ],
+                        ],
+                    ]);
+                    $sheet->getStyle(explode(':', $range)[0])->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => 'BDD7EE'],
+                        ],
+                    ]);
                 }
-            }
-        ];
+            }];
+        }
     }
-}
+
+
