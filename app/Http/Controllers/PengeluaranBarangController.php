@@ -20,6 +20,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ApprovalNotification;
 use App\Exports\BarangKeluarExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Endroid\QrCode\QrCode as QrCodeQrCode;
 
 class PengeluaranBarangController extends Controller
