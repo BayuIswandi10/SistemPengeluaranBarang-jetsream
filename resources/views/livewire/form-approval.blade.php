@@ -129,7 +129,12 @@
                                         @endif
                 
                                         <!-- Button for Level 3 (Ka.Dept GA) -->
-                                        @if($pengeluaranBarang->status === 'Level 3' && $user->level === 'Ka.Dept' && $user->departemen == 'General Affairs')
+                                        @if(
+                                            $pengeluaranBarang->status === 'Level 3' &&
+                                            $user->level === 'Ka.Dept' &&
+                                            $user->departemen === 'General Affairs' &&
+                                            $pengeluaranBarang->user->departemen !== 'General Affairs'
+                                        )
                                             <button 
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
@@ -145,6 +150,30 @@
                                                 <i class="fa-solid fa-times-circle"></i>
                                             </button>
                                         @endif
+
+                                        <!-- Tambahan: Jika yang mengajukan adalah dari General Affairs sendiri -->
+                                        @if(
+                                            $pengeluaranBarang->status === 'Level 2' &&
+                                            $pengeluaranBarang->user->departemen === 'General Affairs' &&
+                                            $user->level === 'Ka.Dept' &&
+                                            $user->departemen === 'General Affairs'
+                                        )
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+
+                                            <!-- Button reject -->
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm mr-2 reject-status" 
+                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                <i class="fa-solid fa-times-circle"></i>
+                                            </button>
+                                        @endif
+
 
                                         <!-- Button for finance approval -->
                                         @if($pengeluaranBarang->status === 'Level 4' && $user->departemen === 'Finance' && $pengeluaranBarang->kategori_pengeluaran == 1)

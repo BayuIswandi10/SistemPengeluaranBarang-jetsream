@@ -1171,7 +1171,7 @@
                 let nrp = $(this).val();
                 let row = $(this).closest("tr");
 
-                if (nrp.length >= 3) {
+                if (nrp.length >= 6) {
                     $.ajax({
                         url: "{{ route('pengajuan_dinas.getUserDetails') }}",
                         type: "GET",
