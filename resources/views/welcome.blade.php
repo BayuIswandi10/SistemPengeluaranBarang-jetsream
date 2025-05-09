@@ -271,6 +271,9 @@
                                                             <option value="" disabled selected>Pilih Satuan</option>
                                                             <option value="unit">Unit</option>
                                                             <option value="pcs">PCS</option>
+                                                            <option value="kg">KG</option>
+                                                            <option value="jumbo bag">JUMBO BAG</option>
+                                                            <option value="drum">DRUM</option>
                                                         </select>
                                                     </td>
                                                     <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
@@ -293,6 +296,11 @@
                                     <button type="submit" class="btn btn-primary">Simpan</button>
                                 </div>
                             </form>
+                            @if(session('clear_local_storage'))
+                            <script>
+                                localStorage.removeItem('barang_keluar_data');
+                            </script>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -655,12 +663,23 @@
         }
         let counter = 1;
 
+        function saveToLocalStorage() {
+            const rows = document.querySelectorAll('#barangTableTambah tbody tr');
+            const data = Array.from(rows).map(row => ({
+                barang_id: row.querySelector('[name="barang_ids[]"]').value,
+                jumlah: row.querySelector('[name="jumlah[]"]').value,
+                satuan: row.querySelector('[name="satuan[]"]').value,
+                keterangan: row.querySelector('[name="keterangan[]"]').value
+            }));
+            localStorage.setItem('barang_keluar_data', JSON.stringify(data));
+        }
+
         function tambahComboBox() {
-            const container = document.getElementById('barangTableTambah');
+            const tbody = document.querySelector('#barangTableTambah tbody');
             const newRow = document.createElement('tr');
 
             newRow.innerHTML = `
-                <td class="nomor">${counter += 1}</td>
+                <td class="nomor">${++counter}</td>
                 <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
                 <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
                 <td>
@@ -668,6 +687,9 @@
                         <option value="" disabled selected>Pilih Satuan</option>
                         <option value="unit">Unit</option>
                         <option value="pcs">PCS</option>
+                        <option value="kg">KG</option>
+                        <option value="jumbo bag">JUMBO BAG</option>
+                        <option value="drum">DRUM</option>
                     </select>
                 </td>
                 <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
@@ -678,17 +700,17 @@
                 </td>
             `;
 
-            container.appendChild(newRow);
+            tbody.appendChild(newRow);
             updateNomor();
+            saveToLocalStorage(); // simpan setelah tambah
         }
 
         function hapusComboBox(button) {
-            const container = document.getElementById('barangTableTambah');
-            const rows = container.getElementsByTagName('tr');
+            const tbody = document.querySelector('#barangTableTambah tbody');
+            const row = button.closest('tr');
+            const rows = tbody.querySelectorAll('tr');
+
             if (rows.length > 1) {
-                const row = button.closest('tr');
-                
-                // SweetAlert konfirmasi untuk baris selain baris terakhir
                 Swal.fire({
                     icon: 'warning',
                     title: 'Apakah Anda yakin?',
@@ -701,10 +723,10 @@
                     if (result.isConfirmed) {
                         row.remove();
                         updateNomor();
+                        saveToLocalStorage(); // simpan setelah hapus
                     }
                 });
             } else {
-                // Ganti alert dengan SweetAlert untuk baris terakhir
                 Swal.fire({
                     icon: 'info',
                     title: 'Tidak bisa menghapus baris terakhir.',
@@ -715,11 +737,61 @@
         }
 
         function updateNomor() {
-        const rows = document.querySelectorAll('#barangTableTambah .nomor');
+            const rows = document.querySelectorAll('#barangTableTambah .nomor');
             rows.forEach((cell, index) => {
                 cell.textContent = index + 1;
             });
         }
+
+        // Auto simpan ketika input berubah
+        document.addEventListener('input', function (event) {
+            if (event.target.closest('#barangTableTambah')) {
+                saveToLocalStorage();
+            }
+        });
+
+        function loadBarangDataFromLocalStorage() {
+            const stored = localStorage.getItem('barang_keluar_data');
+            if (!stored) return;
+
+            const data = JSON.parse(stored);
+            const tbody = document.querySelector('#barangTableTambah tbody');
+            tbody.innerHTML = ''; // kosongkan isi sebelumnya
+            counter = 0;
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="nomor">${++counter}</td>
+                    <td><input type="text" name="barang_ids[]" class="form-control" value="${item.barang_id}" placeholder="Nama Barang" required autocomplete="off"></td>
+                    <td><input type="number" name="jumlah[]" class="form-control" value="${item.jumlah}" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                    <td>
+                        <select name="satuan[]" class="form-control" required>
+                            <option value="" disabled ${item.satuan === '' ? 'selected' : ''}>Pilih Satuan</option>
+                            <option value="unit" ${item.satuan === 'unit' ? 'selected' : ''}>Unit</option>
+                            <option value="pcs" ${item.satuan === 'pcs' ? 'selected' : ''}>PCS</option>
+                            <option value="kg" ${item.satuan === 'kg' ? 'selected' : ''}>KG</option>
+                            <option value="jumbo bag" ${item.satuan === 'jumbo bag' ? 'selected' : ''}>JUMBO BAG</option>
+                            <option value="drum" ${item.satuan === 'drum' ? 'selected' : ''}>DRUM</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="keterangan[]" class="form-control" value="${item.keterangan}" placeholder="Keterangan" autocomplete="off"></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateNomor();
+        }
+
+        // Load saat modal dibuka
+        $('#tambahDataModal').on('shown.bs.modal', function () {
+            loadBarangDataFromLocalStorage();
+        });
         
 
         // function togglePembawaScrap() {

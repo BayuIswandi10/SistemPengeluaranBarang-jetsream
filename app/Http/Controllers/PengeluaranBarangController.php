@@ -9,6 +9,7 @@ use App\Models\ApprovalBarangKeluar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
@@ -144,13 +145,16 @@ class PengeluaranBarangController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'created_by' => 'required',
             'kategori_pengeluaran' => 'required|in:0,1',
-            'pembawa_scrap',
+            'pembawa_scrap' => 'nullable|string',
             'tujuan_pengeluaran_barang' => 'required',
             'jenis_kendaraan' => 'required',
-            'no_polisi' => 'required',
+            'no_polisi' => [
+                'required',
+                'regex:/^[A-Z]{1,2} \d{1,4} [A-Z]{1,3}$/'
+            ],
             'lokasi_barang_keluar' => 'required',
             'barang_ids' => 'required|array',
             'barang_ids.*' => 'required',
@@ -159,8 +163,32 @@ class PengeluaranBarangController extends Controller
             'satuan' => 'required|array',
             'satuan.*' => 'required',
             'keterangan' => 'nullable|array',
+        ], [
+            'created_by.required' => 'NRP wajib diisi.',
+            'kategori_pengeluaran.required' => 'Kategori pengeluaran wajib dipilih.',
+            'kategori_pengeluaran.in' => 'Kategori pengeluaran tidak valid.',
+            'pembawa_scrap.string' => 'Pembawa scrap harus berupa teks.',
+            'tujuan_pengeluaran_barang.required' => 'Tujuan pengeluaran barang wajib diisi.',
+            'jenis_kendaraan.required' => 'Jenis kendaraan wajib dipilih.',
+            'no_polisi.required' => 'No polisi wajib diisi.',
+            'no_polisi.regex' => 'Format no polisi tidak valid. Contoh: B 1234 ABC',
+            'lokasi_barang_keluar.required' => 'Lokasi barang keluar wajib diisi.',
+            'barang_ids.required' => 'Minimal satu barang harus ditambahkan.',
+            'barang_ids.*.required' => 'Nama barang tidak boleh kosong.',
+            'jumlah.required' => 'Jumlah barang wajib diisi.',
+            'jumlah.*.required' => 'Jumlah barang tidak boleh kosong.',
+            'jumlah.*.numeric' => 'Jumlah harus berupa angka.',
+            'jumlah.*.min' => 'Jumlah minimal 1.',
+            'satuan.required' => 'Satuan barang wajib diisi.',
+            'satuan.*.required' => 'Satuan tidak boleh kosong.',
         ]);
-    
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->with('error', implode('<br>', $validator->errors()->all()))
+                ->withInput();
+        }
+
         $lokasiBarangKeluar = strtoupper($request->input('lokasi_barang_keluar'));
         $tujuanPengeluaran = strtoupper($request->input('tujuan_pengeluaran_barang'));
     

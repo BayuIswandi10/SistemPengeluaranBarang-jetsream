@@ -476,7 +476,7 @@
                                         <td>${item.nama_barang}</td>
                                         <td>${item.jumlah_barang}</td>
                                         <td>${item.satuan_barang}</td>
-                                        <td>${item.keterangan_barang}</td>
+                                        <td>${item.keterangan_barang ?? ""}</td>
                                     </tr>
                                 `).join('');
                             } else {

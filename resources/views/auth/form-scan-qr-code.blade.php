@@ -283,7 +283,11 @@
                     method: "POST",
                     data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                     success: function (data) {
-                        document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                        document.getElementById('kategoriBarangCard').innerHTML = 
+                        data.kategori_pengeluaran === 1 
+                        ? '<span class="badge bg-danger">Scrap</span>' 
+                        : '<span class="badge bg-info text-dark">Non Scrap</span>';
+
                         document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                         const tbody = document.getElementById('detailBody');
                         const additionalInfoBody = document.getElementById('additionalInfoBody');
@@ -303,7 +307,7 @@
                                     <td>${item.nama_barang}</td>
                                     <td>${item.jumlah_barang}</td>
                                     <td>${item.satuan_barang}</td>
-                                    <td>${item.keterangan_barang}</td>
+                                    <td>${item.keterangan_barang ?? ""}</td>
                                 </tr>
                             `).join('');
                         } else {
