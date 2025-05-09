@@ -229,7 +229,8 @@ class PengeluaranBarangController extends Controller
     
             DB::commit();
     
-            return redirect()->back()->with('success', 'Data berhasil disimpan!');
+            return redirect()->back()->with('success', 'Data berhasil disimpan!')
+            ->with('clear_local_storage', true);
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

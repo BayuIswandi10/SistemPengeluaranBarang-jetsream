@@ -177,7 +177,7 @@
             </div>
             
             {{-- Tambah Pengeluaran Barang Modal --}}
-            <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
+            <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -230,7 +230,7 @@
                                     <label for="lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" placeholder="Masukkan lokasi barang keluar" required autocomplete="off"> --}}
                                     <select class="form-control" id="lokasi_barang_keluar" name="lokasi_barang_keluar" required autocomplete="off">
-                                        <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
+                                        <option value="" disabled selected>Pilih atau ketik Lokasi Barang Keluar</option>
                                         <option value="P1">P1</option>
                                         <option value="P2">P2</option>
                                     </select>
@@ -240,7 +240,7 @@
                                     <label for="tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" placeholder="Masukkan Tujuan Pengeluaran" required autocomplete="off"> --}}
                                     <select class="form-control" id="tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
-                                        <option value="" disabled selected>Pilih Lokasi Barang Keluar</option>
+                                        <option value="" disabled selected>Pilih atau ketik Tujuan Barang Keluar</option>
                                         <option value="P1">P1</option>
                                         <option value="P2">P2</option>
                                     </select>
@@ -299,7 +299,7 @@
             </div>
 
             {{-- Tambah Penggunaan Kendaraan Dinas Modal --}}
-            <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="tambahDinasModalLabel" aria-hidden="true">
+            <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -425,6 +425,11 @@
                                     <button type="submit" class="btn btn-primary">Simpan</button>
                                 </div>
                             </form>
+                            @if(session('clear_local_storage'))
+                            <script>
+                                localStorage.removeItem('nrp_karyawan_list');
+                            </script>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -715,6 +720,7 @@
                 cell.textContent = index + 1;
             });
         }
+        
 
         // function togglePembawaScrap() {
         //     const kategoriPengeluaran = document.getElementById("kategori_pengeluaran").value;
@@ -1196,6 +1202,35 @@
                 }
             });
         });
+
+        $(document).on('input', '.nrp_karyawan', function () {
+            let allNRP = [];
+            $('.nrp_karyawan').each(function () {
+                allNRP.push($(this).val());
+            });
+            localStorage.setItem('nrp_karyawan_list', JSON.stringify(allNRP));
+        });
+
+        $(document).ready(function () {
+            const storedList = localStorage.getItem('nrp_karyawan_list');
+            if (storedList) {
+                const nrpList = JSON.parse(storedList);
+
+                // Tambah baris jika jumlah data lebih banyak dari field yang tersedia
+                while ($('#pesertaTableTambah .nrp_karyawan').length < nrpList.length) {
+                    tambahComboBoxPeserta(); // Panggil fungsi Anda yang sudah ada
+                }
+
+                // Set value dari array ke input
+                $('#pesertaTableTambah .nrp_karyawan').each(function (idx) {
+                    if (nrpList[idx]) {
+                        $(this).val(nrpList[idx]).trigger('keyup'); // Trigger agar nama & departemen juga ikut terisi
+                    }
+                });
+            }
+        });
+
+
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

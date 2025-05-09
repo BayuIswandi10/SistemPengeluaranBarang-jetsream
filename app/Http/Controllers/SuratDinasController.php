@@ -23,22 +23,22 @@ class SuratDinasController extends Controller
      * Generate Surat Dinas ID
      */
 
-     public function getUserDetails(Request $request)
-     {
-         $user = User::where('nrp_karyawan', $request->nrp_karyawan)->first();
-     
-         if ($user) {
-             return response()->json([
-                 'success' => true,
-                 'data' => [
-                     'name' => $user->name,
-                     'departemen' => $user->departemen
-                 ]
-             ]);
-         } else {
-             return response()->json(['success' => false]);
-         }
-     }
+    public function getUserDetails(Request $request)
+    {
+        $user = User::where('nrp_karyawan', $request->nrp_karyawan)->first();
+    
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'name' => $user->name,
+                    'departemen' => $user->departemen
+                ]
+            ]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+    }
     private function generateSuratDinasID($jenisKendaraan, $tanggalPenggunaan)
     {
         // Mapping jenis kendaraan
@@ -246,7 +246,8 @@ class SuratDinasController extends Controller
             
     
             DB::commit();
-            return redirect()->back()->with('success', 'Surat Dinas berhasil disimpan dengan ID: ' . $suratDinasID);
+            return redirect()->back()->with('success', 'Surat Dinas berhasil disimpan dengan ID: ' . $suratDinasID)
+            ->with('clear_local_storage', true);
     
         } catch (\Exception $e) {
             DB::rollback();

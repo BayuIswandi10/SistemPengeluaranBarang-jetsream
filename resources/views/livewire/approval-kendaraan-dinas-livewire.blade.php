@@ -273,7 +273,7 @@
     </div>
 
     <!-- Modal Edit Order Kendaraan Dinas -->
-    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -383,7 +383,7 @@
     </div>
 
     <!-- Modal Pindah Peserta -->
-    <div class="modal fade" id="modalPindahPeserta" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modalPindahPeserta" tabindex="-1" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
