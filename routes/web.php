@@ -18,6 +18,7 @@ use App\Http\Controllers\KendaraanDinasController;
 use App\Http\Controllers\QRCodeController;
 use App\Http\Controllers\SuratDinasController;
 use App\Http\Controllers\ApprovalKendaraanDinasController;
+use App\Http\Controllers\UserController;
 
 use App\Http\Middleware\CheckLevel; 
     
@@ -100,3 +101,5 @@ Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getD
 
 Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 Route::get('/kendaraan/get-by-jenis', [KendaraanDinasController::class, 'getKendaraanByJenis'])->name('get-by-jenis');
+
+Route::get('/user/getAllUser', [UserController::class, 'getAllUser']);

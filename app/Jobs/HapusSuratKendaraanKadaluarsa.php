@@ -22,14 +22,15 @@ class HapusSuratKendaraanKadaluarsa implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+   public function handle(): void
     {
         $threshold = now()->subHours(2);
-        $deleted = SuratKendaraanDinas::where('status', '!=', 'Level 2')
-            ->where('created_date', '<=', $threshold)
+
+        $deleted = SuratKendaraanDinas::where('status', 'Level 1') // hanya status awal
+            ->where('created_date', '<=', $threshold) // lebih dari 2 jam
             ->delete();
 
         logger("Auto delete: {$deleted} surat kendaraan dinas kadaluarsa.");
-
     }
+
 }

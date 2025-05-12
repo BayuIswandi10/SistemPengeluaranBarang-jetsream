@@ -207,9 +207,12 @@
                                 @csrf
             
                                 <!-- Input Fields -->
-                                <div class="form-group">
+                               <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
+                                    {{-- <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off"> --}}
+                                    <select class="form-control" id="created_by" name="created_by" required>
+                                        <option value="" disabled selected>Pilih Karyawan</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="form-group">
@@ -362,7 +365,10 @@
                                 <!-- Input Fields -->
                                 <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
+                                    {{-- <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off"> --}}
+                                    <select class="form-control" id="created_by" name="created_by" required>
+                                        <option value="" disabled selected>Pilih Karyawan</option>
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
@@ -691,6 +697,30 @@
         </div>
     </body>
     <script>
+        $(document).ready(function () {
+         console.log('Dokumen siap, cari select:', $('#created_by'));
+            $.ajax({
+                url: '/user/getAllUser',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                        console.log('Data diterima:', data);
+                    const $select = $('#created_by');
+                    // Kosongkan opsi lama (jaga-jaga jika dipanggil ulang)
+                    $select.empty();
+                    $select.append('<option value="" disabled selected>Pilih Karyawan</option>');
+                    // Tambahkan opsi user
+                    $.each(data, function (index, user) {
+                        $select.append(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Gagal memuat data karyawan:', error);
+                }
+            });
+        });
+
+
         let globalCalendar;
     
         $('#calendarModal').on('show.bs.modal', function () {

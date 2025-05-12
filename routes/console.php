@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::job(new HapusSuratKendaraanKadaluarsa)->everyMinute();
+
