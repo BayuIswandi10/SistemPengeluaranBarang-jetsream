@@ -128,6 +128,22 @@
         .modal-body {
             overflow-x: auto;
         }
+
+        /* Modal benar-benar lebar, hampir penuh, tetap menyamping */
+        .modal-slide-side {
+            width: calc(90% - 2rem); /* Menyisakan 1rem di kiri dan kanan */
+            margin: 4rem auto;
+        }
+
+        .modal-slide-side .modal-content {
+            height: 90vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+
+
     </style>
 
     <body>
@@ -169,7 +185,7 @@
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="modal" data-target="#tambahDataModal">Pengajuan Pengeluaran Barang</a></li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="modal" data-target="#tambahDinasModal">Pengajuan Kendaraan Dinas</a></li>
+                            <a class="nav-link" data-toggle="modal" data-target="#calendarModal">Pengajuan Kendaraan Dinas</a></li>
                         <li class="nav-item">
                             <a class="nav-link" href={{ route('login') }}>Masuk</a></li>
                 </ul>
@@ -306,6 +322,29 @@
                 </div>
             </div>
 
+            <!-- Modal Kalender Umum -->
+            <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-slide-side" role="document" style="max-width: 100%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button class="btn btn-primary btn-md float-left" data-toggle="modal" data-target="#tambahDinasModal">
+                        <i class="fa fa-plus mr-1"></i> Tambah Data
+                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="monthPickerGlobal">Pilih Bulan:</label>
+                        <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
+                    </div>
+                    <div id="calendarAllKendaraan"></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
             {{-- Tambah Penggunaan Kendaraan Dinas Modal --}}
             <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
@@ -324,6 +363,49 @@
                                 <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off" required onchange="toggleJenisKendaraan()">
+                                        <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                        <option value="1">KANTOR</option>
+                                        <option value="2">PRIBADI</option>
+                                        <option value="3">TAXI</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="kendaraan_kantor_group" style="display: none;">
+                                    <label for="kendaraan_dinas_id">Pilih Kendaraan <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="kendaraan_dinas_id" name="kendaraan_dinas_id" required>
+                                        <option value="" disabled selected>Pilih Kendaraan</option>
+                                        <!-- Data kendaraan akan ditambahkan lewat JavaScript -->
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="tabel_kendaraan_pribadi" style="display: none;">
+                                    <label>Kendaraan <span class="text-danger">*</span></label>
+                                    <table class="table table-bordered">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th>No Polisi</th>
+                                                <th>Merk Kendaraan</th>
+                                                <th>Kapasitas</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="kendaraanPribadiBody">
+                                            <tr>
+                                                <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
+                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
+                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
+                                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKendaraanPribadi()">
+                                        <i class="fas fa-plus"></i> Tambah Kendaraan
+                                    </button>
                                 </div>
                                 
                                 <div class="form-group">
@@ -351,48 +433,11 @@
                                                value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3" autocomplete="off">
                                     </div>
                                 </div>
-                                
-            
-                                <div class="form-group">
-                                    <label for="jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off" required onchange="toggleJenisKendaraan()">
-                                        <option value="" disabled selected>Pilih Jenis Kendaraan</option>
-                                        <option value="1">KANTOR</option>
-                                        <option value="2">PRIBADI</option>
-                                        <option value="3">TAXI</option>
-                                    </select>
-                                </div>
 
                                 <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
                                     <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
-                                </div>   
-                                
-                                <div class="form-group" id="tabel_kendaraan_pribadi" style="display: none;">
-                                    <label>Kendaraan <span class="text-danger">*</span></label>
-                                    <table class="table table-bordered">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th>No Polisi</th>
-                                                <th>Merk Kendaraan</th>
-                                                <th>Kapasitas</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="kendaraanPribadiBody">
-                                            <tr>
-                                                <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
-                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
-                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
-                                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKendaraanPribadi()">
-                                        <i class="fas fa-plus"></i> Tambah Kendaraan
-                                    </button>
-                                </div>
-                                
+                                </div>    
             
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
@@ -442,6 +487,8 @@
                     </div>
                 </div>
             </div>
+
+        
         </div>
 
        <!-- Grafis Section -->
@@ -644,6 +691,47 @@
         </div>
     </body>
     <script>
+        let globalCalendar;
+    
+        $('#calendarModal').on('show.bs.modal', function () {
+            $.get(`/kendaraan/booking-dates-all`, function (data) {
+                const events = data.map(item => ({
+                title: item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+                start: item.tanggal_penggunaan,
+                allDay: true,
+                backgroundColor: '#28a745',
+                borderColor: '#28a745'
+                }));
+            
+                if (globalCalendar) globalCalendar.destroy();
+            
+                const calendarEl = document.getElementById('calendarAllKendaraan');
+                globalCalendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 450,
+                events: events,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listMonth'
+                }
+                });
+            
+                globalCalendar.render();
+            
+                // Inisialisasi input bulan
+                const currentDate = globalCalendar.getDate();
+                $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
+            
+                $('#monthPickerGlobal').on('change', function () {
+                const selected = this.value;
+                if (selected) {
+                    const newDate = selected + "-01";
+                    globalCalendar.gotoDate(newDate);
+                }
+                });
+            });
+        });
         function printIframe() {
             var iframe = document.getElementById('qrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
@@ -813,13 +901,16 @@
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
             const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
             const tabelKendaraan = document.getElementById("tabel_kendaraan_pribadi");
+            const kendaraanKantorGroup = document.getElementById("kendaraan_kantor_group");
             const kilometerAwal = document.getElementById("kilometer_awal");
             const kendaraanBody = document.getElementById("kendaraanPribadiBody");
+            const kendaraanSelect = document.getElementById("kendaraan_dinas_id");
 
             if (jenisKendaraan === "2") { // PRIBADI
                 kendaraanGroup.style.display = "block";
-                kilometerAwal.setAttribute("required", "required");
                 tabelKendaraan.style.display = "block";
+                kendaraanKantorGroup.style.display = "none";
+                kilometerAwal.setAttribute("required", "required");
 
                 kendaraanBody.innerHTML = `
                     <tr>
@@ -833,9 +924,10 @@
 
             } else if (jenisKendaraan === "3") { // TAXI
                 kendaraanGroup.style.display = "none";
+                tabelKendaraan.style.display = "block";
+                kendaraanKantorGroup.style.display = "none";
                 kilometerAwal.removeAttribute("required");
                 kilometerAwal.value = "";
-                tabelKendaraan.style.display = "block";
 
                 kendaraanBody.innerHTML = `
                     <tr>
@@ -847,14 +939,43 @@
                     </tr>
                 `;
 
-            } else { // KANTOR
+            } else if (jenisKendaraan === "1") { // KANTOR
                 kendaraanGroup.style.display = "none";
                 tabelKendaraan.style.display = "none";
+                kendaraanKantorGroup.style.display = "block";
                 kilometerAwal.removeAttribute("required");
                 kilometerAwal.value = "";
-                kendaraanBody.innerHTML = ""; // ❗ Kosongkan agar tidak ada field required tersembunyi
+                kendaraanBody.innerHTML = "";
+
+                // Ambil data kendaraan via AJAX
+                fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        kendaraanSelect.innerHTML = `<option value="" disabled selected>Pilih Kendaraan</option>`;
+                        if (data.length > 0) {
+                            data.forEach(k => {
+                                kendaraanSelect.innerHTML += `
+                                    <option value="${k.kendaraan_dinas_id}">
+                                        ${k.nomor_kendaraan} - ${k.merk_kendaraan} (Kapasitas: ${k.kapasitas_kendaraan})
+                                    </option>`;
+                            });
+                        } else {
+                            kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
+                        }
+                    }).catch(error => {
+                        console.error('Gagal mengambil data kendaraan:', error);
+                        kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                    });
+            } else {
+                kendaraanGroup.style.display = "none";
+                tabelKendaraan.style.display = "none";
+                kendaraanKantorGroup.style.display = "none";
+                kilometerAwal.removeAttribute("required");
+                kilometerAwal.value = "";
+                kendaraanBody.innerHTML = "";
             }
         }
+
 
 
 

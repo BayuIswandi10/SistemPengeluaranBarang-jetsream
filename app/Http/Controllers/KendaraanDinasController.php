@@ -241,7 +241,7 @@ class KendaraanDinasController extends Controller
     
             return response()->json($surats);
         } catch (\Exception $e) {
-            \Log::error('RiwayatSurat Error: ' . $e->getMessage());
+            // \Log::error('RiwayatSurat Error: ' . $e->getMessage());
             return response()->json([], 500);
         }
     }    
@@ -257,9 +257,27 @@ class KendaraanDinasController extends Controller
 
             return response()->json($data);
         } catch (\Exception $e) {
-            \Log::error('AllBookingDates Error: ' . $e->getMessage());
+            // \Log::error('AllBookingDates Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan di server'], 500);
         }
+    }
+
+    public function getKendaraanByJenis(Request $request)
+    {
+        $jenis = $request->jenis_kendaraan;
+
+        // Validasi jenis kendaraan
+        if (!$jenis) {
+            return response()->json(['message' => 'Jenis kendaraan tidak ditemukan'], 400);
+        }
+
+        // Ambil data kendaraan berdasarkan jenis
+        $kendaraan = KendaraanDinas::where('jenis_kendaraan', $jenis)
+                        ->select('kendaraan_dinas_id', 'nomor_kendaraan', 'merk_kendaraan', 'kapasitas_kendaraan')
+                        ->orderBy('nomor_kendaraan')
+                        ->get();
+
+        return response()->json($kendaraan);
     }
 
     

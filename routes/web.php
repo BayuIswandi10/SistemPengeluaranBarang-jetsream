@@ -68,7 +68,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
     Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    
     Route::get('/kendaraan/{id}/riwayat-surat', [KendaraanDinasController::class, 'getRiwayatSurat']);
-    Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
+    // Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 
     Route::post('/pengajuan/detailSurat', [SuratDinasController::class, 'getDetailSurat']);
     Route::post('/pengajuan/edit', [SuratDinasController::class, 'edit'])->name('pengajuan.edit');
@@ -97,3 +97,6 @@ Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('p
 Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');
 
 Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);
+
+Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
+Route::get('/kendaraan/get-by-jenis', [KendaraanDinasController::class, 'getKendaraanByJenis'])->name('get-by-jenis');
