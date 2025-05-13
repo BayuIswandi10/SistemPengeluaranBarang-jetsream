@@ -173,6 +173,8 @@ class SuratDinasController extends Controller
                 'jenis_kendaraan' => $request->jenis_kendaraan,
                 'created_by' => $nrpKaryawan,
                 'created_date' => \Carbon\Carbon::now('Asia/Jakarta'),
+                'expired_date' => \Carbon\Carbon::now('Asia/Jakarta')->addHours(2),
+                'expired_status' => 'Aktif',
                 'status' => 'Level 1',
                 'waktu_keluar' => $request->waktu_keluar,
                 'waktu_kembali' => $request->waktu_kembali,

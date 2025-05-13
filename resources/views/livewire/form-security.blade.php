@@ -106,95 +106,95 @@
 
     {{-- Detail Dinas --}}
     <div class="modal fade" id="suratDinasModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
-                    <button type="button" class="btn btn-success" id="approveButtonDinas" data-id="">Setuju</button>
-
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
+                        <button type="button" class="btn btn-success" id="approveButtonDinas" data-id="">Setuju</button>
 
-                <!-- Card untuk Tabel Informasi Kendaraan -->
-                <div class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="mb-0">Informasi Kendaraan</h6>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                        <table id="kendaraanInfoTable" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>No Kendaraan</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="kendaraanInfoBody">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
+
+                    <!-- Card untuk Tabel Informasi Kendaraan -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">Informasi Kendaraan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                            <table id="kendaraanInfoTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No Kendaraan</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kendaraanInfoBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card untuk Tabel Barang Keluar -->
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h6 class="mb-0">Informasi Peserta</h6>
+                    <!-- Card untuk Tabel Barang Keluar -->
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Informasi Peserta</h6>
+                        </div>
+                        <div class="card-body">
+                            <table id="detaildataTableModal" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nrp Peserta</th>
+                                        <th>Nama Peserta</th>
+                                        <th>Departemen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table id="detaildataTableModal" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nrp Peserta</th>
-                                    <th>Nama Peserta</th>
-                                    <th>Departemen</th>
-                                </tr>
-                            </thead>
-                            <tbody id="detailBody">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-                <hr>
+                    <hr>
 
-                <!-- Card untuk Tabel Informasi Tambahan -->
-                <div class="card mt-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h6 class="mb-0">Informasi Historis Persetujuan</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                        <table id="additionalInfoTable" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Tingkatan</th>
-                                    <th>Departemen</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="addhistory">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
+                    <!-- Card untuk Tabel Informasi Tambahan -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Informasi Historis Persetujuan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                            <table id="additionalInfoTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addhistory">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
   <audio id="beep" src="{{ asset('assets/sound/beep-sound-8333.mp3') }}" autostart="false" ></audio>

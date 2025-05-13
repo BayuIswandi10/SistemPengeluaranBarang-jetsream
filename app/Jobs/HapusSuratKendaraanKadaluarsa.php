@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\SuratKendaraanDinas;
 use Carbon\Carbon;
+use Illuminate\Console\Scheduling\Schedule; // tambahkan import ini di atas
 
 class HapusSuratKendaraanKadaluarsa implements ShouldQueue
 {
@@ -22,15 +23,32 @@ class HapusSuratKendaraanKadaluarsa implements ShouldQueue
     /**
      * Execute the job.
      */
-   public function handle(): void
+
+    // public function handle(): void
+    // {
+    //     $threshold = now()->subHours(2);
+
+    //     $updated = SuratKendaraanDinas::where('status', 'Level 1') // hanya status awal
+    //         ->where('created_date', '<=', $threshold) // lebih dari 2 jam
+    //         ->update(['status' => 'Expired']);
+
+    //     logger("Auto update: {$updated} surat kendaraan dinas menjadi expired.");
+    // }
+    public function handle(): void
     {
-        $threshold = now()->subHours(2);
+        $updated = SuratKendaraanDinas::where('status', 'Level 1') // hanya status awal
+            ->where('expired_date', '<=', now()) // jika sudah melewati expired_date
+            ->update([
+                'status' => 'Expired',
+                'expired_status' => 'Expired',
+            ]);
 
-        $deleted = SuratKendaraanDinas::where('status', 'Level 1') // hanya status awal
-            ->where('created_date', '<=', $threshold) // lebih dari 2 jam
-            ->delete();
+        logger("Auto update: {$updated} surat kendaraan dinas menjadi expired.");
+    }
 
-        logger("Auto delete: {$deleted} surat kendaraan dinas kadaluarsa.");
+    public function schedule(Schedule $schedule): void
+    {
+        $schedule->everyTenMinutes(); // atau everyHour(), daily(), dll
     }
 
 }

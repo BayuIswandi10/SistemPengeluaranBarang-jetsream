@@ -21,6 +21,8 @@ class SuratKendaraanDinas extends Model
         'jenis_kendaraan',
         'created_by',
         'created_date',
+        'expired_date',
+        'expired_status',
         'status',
         'waktu_keluar',
         'waktu_kembali',

@@ -210,7 +210,7 @@
                                <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off"> --}}
-                                    <select class="form-control" id="created_by" name="created_by" required>
+                                    <select class="form-control selectize" id="created_by_barang" name="created_by" required>
                                         <option value="" disabled selected>Pilih Karyawan</option>
                                     </select>
                                 </div>
@@ -366,7 +366,7 @@
                                 <div class="form-group">
                                     <label for="created_by">No Karyawan <span class="text-danger">*</span></label>
                                     {{-- <input type="text" class="form-control" id="created_by" name="created_by" value="{{ old('created_by') }}" placeholder="Masukan NRP Anda" required autocomplete="off"> --}}
-                                    <select class="form-control" id="created_by" name="created_by" required>
+                                    <select class="form-control selectize" id="created_by_dinas" name="created_by" required>
                                         <option value="" disabled selected>Pilih Karyawan</option>
                                     </select>
                                 </div>
@@ -697,21 +697,56 @@
         </div>
     </body>
     <script>
+        // $(document).ready(function () {
+        //     // Inisialisasi DataTable
+        //     $.ajax({
+        //         url: '/user/getAllUser',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function (data) {
+        //             const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
+        //             $.each(data, function (index, user) {
+        //                 userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
+        //             });
+
+        //             $('#created_by_barang').html(userOptions.join(''));
+        //             $('#created_by_dinas').html(userOptions.join(''));
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error('Gagal memuat data karyawan:', error);
+        //         }
+        //     });
+        // });
         $(document).ready(function () {
-         console.log('Dokumen siap, cari select:', $('#created_by'));
+            // khk
             $.ajax({
                 url: '/user/getAllUser',
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
-                        console.log('Data diterima:', data);
-                    const $select = $('#created_by');
-                    // Kosongkan opsi lama (jaga-jaga jika dipanggil ulang)
-                    $select.empty();
-                    $select.append('<option value="" disabled selected>Pilih Karyawan</option>');
-                    // Tambahkan opsi user
-                    $.each(data, function (index, user) {
-                        $select.append(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
+                    // Urutkan data berdasarkan name
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+
+                                        const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
+$.each(data, function (index, user) {
+                        userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
+                    });
+
+                    $('#created_by_barang').html(userOptions.join(''));
+                    $('#created_by_dinas').html(userOptions.join(''));
+
+                    // Inisialisasi Selectize setelah isi dropdown selesai dimuat
+                    $('.selectize').selectize({
+                        sortField: 'text', // Mengurutkan berdasarkan teks (yang ditampilkan)
+                        searchField: ['text'], // Mendukung pencarian pada label
+                        placeholder: 'Pilih Karyawan',
+                        score: function (search) {
+                        return function (item) {
+                        let text = item.text.toLowerCase();
+                        search = search.toLowerCase();
+                        return text.includes(search) ? 1 : 0; // Biar bisa cari di tengah
+                        };
+                    },
                     });
                 },
                 error: function (xhr, status, error) {
@@ -719,8 +754,7 @@
                 }
             });
         });
-
-
+//kbk
         let globalCalendar;
     
         $('#calendarModal').on('show.bs.modal', function () {
@@ -820,7 +854,7 @@
 
             tbody.appendChild(newRow);
             updateNomor();
-            saveToLocalStorage(); // simpan setelah tambah
+            saveToLocalStorage(); 
         }
 
         function hapusComboBox(button) {
