@@ -96,7 +96,7 @@ Route::get('/unauthorized', Unauthorized::class)->name('unauthorized.show');
 
 Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('pengajuan_dinas.store');
 Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');
-
+Route::get('/pengajuan/get-data-level3', [SuratDinasController::class, 'getDataLevel3']);
 Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);
 
 Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);

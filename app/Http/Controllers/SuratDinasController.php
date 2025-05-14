@@ -70,6 +70,16 @@ class SuratDinasController extends Controller
         return sprintf("%s/%s/%04d", $jenisKendaraanCode, $tanggalFormat, $nextNumber);
     }
 
+    public function getDataLevel3()
+    {
+        $suratKendaraan = SuratKendaraanDinas::where('status', 'Level 3')->get();
+
+        return response()->json([
+            'surat_kendaraan_dinas' => $suratKendaraan
+        ]);
+    }
+
+
     /**
      * Store Surat Dinas
      */

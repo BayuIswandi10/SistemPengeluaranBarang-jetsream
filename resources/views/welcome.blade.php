@@ -559,7 +559,7 @@
                                 </div>
                             </div>
                             <!-- Card 2: Penggunaan Kendaraan Dinas -->
-                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center">
+                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalSuratKendaraanTrigger">
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
                                         <i class="fas fa-car-side text-primary h1"></i>
@@ -573,7 +573,7 @@
             </div>
         </section>
 
-        <!-- Modal -->
+        <!-- Modal pengajuan pengeluaaran barang -->
         <div class="modal fade" id="modalPengajuan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
@@ -695,28 +695,41 @@
                 </div>
             </div>
         </div>
+
+         <!-- Modal penggunaan kendaraan dinas -->
+        <div class="modal fade" id="modalSuratKendaraan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalSuratKendaraanLabel">Detail Jumlah Pengajuan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+        
+                        <table id="suratKendaraanTable" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>ID Surat</th>
+                                    <th>Dibuat Oleh</th>
+                                    <th>Tanggal Dibuat</th>
+                                    <th>Tujuan</th>
+                                    <th>Jenis Kendaraan</th>
+                                    <th>Tanggal Penggunaan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suratKendaraanBody"></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
     <script>
-        // $(document).ready(function () {
-        //     // Inisialisasi DataTable
-        //     $.ajax({
-        //         url: '/user/getAllUser',
-        //         type: 'GET',
-        //         dataType: 'json',
-        //         success: function (data) {
-        //             const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
-        //             $.each(data, function (index, user) {
-        //                 userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
-        //             });
-
-        //             $('#created_by_barang').html(userOptions.join(''));
-        //             $('#created_by_dinas').html(userOptions.join(''));
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error('Gagal memuat data karyawan:', error);
-        //         }
-        //     });
-        // });
         $(document).ready(function () {
             // khk
             $.ajax({
@@ -727,8 +740,8 @@
                     // Urutkan data berdasarkan name
                     data.sort((a, b) => a.name.localeCompare(b.name));
 
-                                        const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
-$.each(data, function (index, user) {
+                        const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
+                        $.each(data, function (index, user) {
                         userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
                     });
 
@@ -946,19 +959,6 @@ $.each(data, function (index, user) {
         });
         
 
-        // function togglePembawaScrap() {
-        //     const kategoriPengeluaran = document.getElementById("kategori_pengeluaran").value;
-        //     const pembawaScrapGroup = document.getElementById("pembawa_scrap_group");
-
-        //     if (kategoriPengeluaran === "1") {
-        //         pembawaScrapGroup.style.display = "block"; // Tampilkan jika Scrap
-        //         document.getElementById("pembawa_scrap").setAttribute("required", "required");
-        //     } else {
-        //         pembawaScrapGroup.style.display = "none"; // Sembunyikan jika Non Scrap
-        //         document.getElementById("pembawa_scrap").removeAttribute("required");
-        //         document.getElementById("pembawa_scrap").value = "";
-        //     }
-        // }
 
      
         function toggleJenisKendaraan() {
@@ -1361,6 +1361,62 @@ $.each(data, function (index, user) {
                 }
             });
         }
+
+        $(document).ready(function () {
+
+    // Event untuk membuka modal surat kendaraan dinas
+    $('#modalSuratKendaraanTrigger').on('click', function () {
+        $('#modalSuratKendaraan').modal('show');
+        loadSuratKendaraanData();
+    });
+
+    function loadSuratKendaraanData() {
+            $.ajax({
+                url: "/pengajuan/get-data-level3", // Ubah sesuai route Anda
+                method: "GET",
+                success: function (data) {
+                    console.log(data.surat_kendaraan_dinas);
+                    const suratData = data.surat_kendaraan_dinas;
+
+                    const tbody = document.getElementById('suratKendaraanBody');
+                    tbody.innerHTML = '';
+
+                    tbody.innerHTML = suratData.map((item, index) => {
+                        return `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.surat_kendaraan_dinas_id}</td>
+                                <td>${item.created_by}</td>
+                                <td>${item.created_date}</td>
+                                <td>${item.tujuan_penggunaan_1 || '-'} ${item.tujuan_penggunaan_2 || ''} ${item.tujuan_penggunaan_3 || ''}</td>
+                                <td>${item.jenis_kendaraan}</td>
+                                <td>${item.tanggal_penggunaan}</td>
+                                <td>
+                                    <button type="button" class="btn btn-info btn-sm" onclick="editSurat('${item.surat_kendaraan_dinas_id}')">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    if ($.fn.DataTable.isDataTable('#suratKendaraanTable')) {
+                        $('#suratKendaraanTable').DataTable().destroy();
+                    }
+
+                    $('#suratKendaraanTable').DataTable({
+                        scrollX: false,
+                        responsive: true
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Gagal mengambil data surat kendaraan:', error);
+                }
+            });
+        }
+
+    });
+
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
