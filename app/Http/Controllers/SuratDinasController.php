@@ -478,6 +478,44 @@ class SuratDinasController extends Controller
             ], 500);
         }
     }
+
+    public function editNonAuth(Request $request)
+    {
+        try {
+            $suratDinasId = $request->surat_kendaraan_dinas_id;
+
+            // Ambil data surat dinas dan relasinya
+            $suratDinas = SuratKendaraanDinas::with([
+                'pencatatanKendaraanDinas.user'
+            ])->findOrFail($suratDinasId);
+
+            // Mapping data user dinas (peserta)
+            $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+                return [
+                    'nrp_karyawan' => $user->nrp_karyawan,
+                    'name' => $user->user->name ?? 'Tidak Diketahui',
+                    'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                ];
+            });
+
+            // Return hanya data yang diminta
+            return response()->json([
+                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
+                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
+                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
+                'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
+                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
+                'userDinas' => $userDinasData,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memuat data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     
 
     public function update(Request $request)

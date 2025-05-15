@@ -330,9 +330,6 @@
                 <div class="modal-dialog modal-slide-side" role="document" style="max-width: 100%;">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <button class="btn btn-primary btn-md float-left" data-toggle="modal" data-target="#tambahDinasModal">
-                        <i class="fa fa-plus mr-1"></i> Tambah Data
-                    </button>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -416,16 +413,7 @@
                                 
                                 <div class="form-group">
                                     <label for="tanggal_penggunaan">Tanggal Penggunaan <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="waktu_keluar">Waktu Keluar <span class="text-danger">*</span></label>
-                                    <input type="time" class="form-control" name="waktu_keluar" value="{{ old('waktu_keluar') }}" required autocomplete="off">
-                                </div>
-                                <div class="form-group">
-                                    <label for="waktu_kembali">Waktu Kembali <span class="text-danger">*</span></label>
-                                    <input type="time" class="form-control" name="waktu_kembali" value="{{ old('waktu_kembali') }}" required autocomplete="off">
+                                    <input type="date" class="form-control" id="tanggal_penggunaan" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off">
                                 </div>
                                 
                                 <div class="form-group">
@@ -494,7 +482,93 @@
                 </div>
             </div>
 
+            {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal --}}
+            <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="editDataModalLabel">Ikut Serta Kendaraan Dinas</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Informasi Nomor Surat -->
+                            <label for="nomorSurat" class="mt-2">Nomor Surat <span class="text-danger">*</span></label>
+                            <input type="text" id="nomorSurat" name="nomor_surat" class="form-control" disabled>
+
+
+                            <!-- Form Edit -->
+                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.update')}}" enctype="multipart/form-data" >
+                                @csrf
+                                @method('PUT')
+
+                                <label class="mt-3">Tujuan <span class="text-danger">*</span></label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="-">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="-">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="-">
+                                    </div>
+                                </div>
+
+
+                                <!-- Jenis Mobil -->
+                                <label for="jenisMobil" class="mt-2">Jenis Mobil <span class="text-danger">*</span></label>
+                                <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control">
+
+                                <!-- Digunakan Pada -->
+                                <label for="tanggalPakai" class="mt-2">Digunakan Pada <span class="text-danger">*</span></label>
+                                <input type="text" name="tanggal_penggunaan" id="tanggalPakai" class="form-control">
+
+                                <!-- Peserta Dinas Table -->
+                                <div class="form-group mt-2">
+                                    <label>Peserta Dinas <span class="text-danger">*</span></label>
+                                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>NRP</th>
+                                                <th>Nama</th>
+                                                <th>Departemen</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="nomor">1</td>
+                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahComboBoxPeserta()">
+                                        <i class="fas fa-plus"></i> Tambah Peserta
+                                    </button>
+                                </div>
         
+                                <!-- Submit Button -->
+                                <div class="form-group d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
        <!-- Grafis Section -->
@@ -769,46 +843,154 @@
         });
 //kbk
         let globalCalendar;
-    
+
         $('#calendarModal').on('show.bs.modal', function () {
             $.get(`/kendaraan/booking-dates-all`, function (data) {
-                const events = data.map(item => ({
-                title: item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
-                start: item.tanggal_penggunaan,
-                allDay: true,
-                backgroundColor: '#28a745',
-                borderColor: '#28a745'
+                const events = 
+                data
+                .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
+                .map(item => ({
+                    title: item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+                    start: item.tanggal_penggunaan,
+                    allDay: true,
+                    backgroundColor: '#28a745',
+                    borderColor: '#28a745',
+                    extendedProps: {
+                        merk: item.merk_kendaraan,
+                        nopol: item.nomor_kendaraan,
+                        tanggal: item.tanggal_penggunaan,
+                        id: item.surat_kendaraan_dinas_id,
+                        status: item.status
+                    }
                 }));
-            
+
                 if (globalCalendar) globalCalendar.destroy();
-            
+
                 const calendarEl = document.getElementById('calendarAllKendaraan');
+
                 globalCalendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 450,
-                events: events,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listMonth'
-                }
+                    initialView: 'dayGridMonth',
+                    height: 450,
+                    locale: 'id', // Bahasa Indonesia
+                    events: events,
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                    },
+                    eventClick: function(info) {
+                        const event = info.event;
+                        const suratId = event.extendedProps.id;
+                        const statusSurat = event.extendedProps.status;
+                        const today = new Date();
+
+                        $('#eventTitle').text(event.title);
+                        $('#eventDate').text(event.startStr);
+
+                        $.ajax({
+                            url: "/pengajuan/infoSuratKendaraanDinasNonAuth",
+                            type: "POST",
+                            data: {
+                                surat_kendaraan_dinas_id: suratId,
+                                "_token": "{{ csrf_token() }}"
+                            },
+                            dataType: "json",
+                            success: function (response) {
+                                if (response) {
+                                    window.daftarKendaraanGlobal = response.daftar_kendaraan;
+
+                                    $("#nomorSurat").val(suratId);
+                                    const jenisMapping = {
+                                        1: 'KANTOR',
+                                        2: 'PRIBADI',
+                                        3: 'TAXI'
+                                    };
+                                    $("#jenisMobil").val(jenisMapping[response.jenis_kendaraan] || 'TIDAK DIKETAHUI');
+
+                                    $("#tanggalPakai").val(response.tanggal_penggunaan);
+                                    $("#tujuan_1").val(response.tujuan_penggunaan_1);
+                                    $("#tujuan_2").val(response.tujuan_penggunaan_2);
+                                    $("#tujuan_3").val(response.tujuan_penggunaan_3);
+
+                                    const pesertaTable = $("#pesertaTableTambahPeserta tbody");
+                                    pesertaTable.empty();
+
+                                    // Tambahkan baris peserta
+                                    response.userDinas.forEach((user, index) => {
+                                        pesertaTable.append(`
+                                            <tr>
+                                                <td class="nomor">${index + 1}</td>
+                                                <td><input type="text" class="form-control" value="${user.nrp_karyawan}" readonly></td>
+                                                <td><input type="text" class="form-control" value="${user.name}" readonly></td>
+                                                <td><input type="text" class="form-control" value="${user.departemen}" readonly></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm trash-btn" disabled>
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `);
+                                    });
+
+                                    // Handle form enable/disable berdasarkan status
+                                    const form = $("#editOrderForm");
+
+                                    if (statusSurat === 'Level 1') {
+                                        form.find("input, select, textarea").prop("disabled", true);
+                                        $("#tambahPesertaBtn").prop("disabled", false);
+                                    } else {
+                                        form.find("input, select, textarea").prop("disabled", true);
+                                        $("#tambahPesertaBtn").prop("disabled", true);
+                                    }
+                                    $(".trash-btn").prop("disabled", true);
+                                    $('#ikutSertaDinasModal').modal('show');
+                                }
+                            },
+                            error: function () {
+                                alert("Gagal mengambil data. Coba lagi.");
+                            },
+                        });
+                    },
+                    dateClick: function(info) {
+                        const clickedDate = new Date(info.dateStr);
+                        const today = new Date();
+                        // Set jam, menit, detik, ms hari ini ke 0 supaya perbandingan tanggal tepat
+                        today.setHours(0, 0, 0, 0);
+                        clickedDate.setHours(0, 0, 0, 0);
+
+                        if (clickedDate <= today) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Tanggal tidak valid',
+                                text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
+                                confirmButtonText: 'Oke'
+                            });
+                            return; // batalkan aksi buka modal
+                        }
+
+                        // Jika tanggal valid, isi input dan tampilkan modal
+                        $('#tanggal_penggunaan').val(info.dateStr);
+                        $('#tambahDinasModal').modal('show');
+                    }
                 });
-            
+
                 globalCalendar.render();
-            
-                // Inisialisasi input bulan
+
                 const currentDate = globalCalendar.getDate();
                 $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
-            
-                $('#monthPickerGlobal').on('change', function () {
-                const selected = this.value;
-                if (selected) {
-                    const newDate = selected + "-01";
-                    globalCalendar.gotoDate(newDate);
-                }
+
+                $('#monthPickerGlobal').off('change').on('change', function () {
+                    const selected = this.value;
+                    if (selected) {
+                        const newDate = selected + "-01";
+                        globalCalendar.gotoDate(newDate);
+                    }
                 });
             });
         });
+        
+
+
         function printIframe() {
             var iframe = document.getElementById('qrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
@@ -1423,15 +1605,27 @@
 
         function tambahComboBoxPeserta() {
             const container = document.getElementById('pesertaTableTambah');
+            const rows = container.getElementsByTagName('tr');
+
+            if (rows.length > 5) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Maksimal 5 Peserta',
+                    text: 'Anda hanya bisa menambahkan hingga 5 peserta saja.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const newRow = document.createElement('tr');
 
             newRow.innerHTML = `
                 <td class="nomor">${counter += 1}</td>
                 <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td><input type="text" name="peserta[${counter}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counter}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1441,37 +1635,48 @@
             updateNomorPeserta();
         }
 
+
         function hapusComboBoxPeserta(button) {
-            const container = document.getElementById('pesertaTableTambah');
-            const rows = container.getElementsByTagName('tr');
-            if (rows.length > 1) {
-                const row = button.closest('tr');
-                
-                // SweetAlert konfirmasi untuk baris selain baris terakhir
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Apakah Anda yakin?',
-                    text: 'Baris ini akan dihapus.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        row.remove();
-                        updateNomor();
-                    }
-                });
-            } else {
-                // Ganti alert dengan SweetAlert untuk baris terakhir
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tidak bisa menghapus baris terakhir.',
-                    text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
-                });
-            }
+        const container = document.getElementById('pesertaTableTambah');
+        const rows = container.getElementsByTagName('tr');
+
+        if (rows.length > 1) {
+            const row = button.closest('tr');
+            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // ambil NRP dari baris
+
+            // SweetAlert konfirmasi
+            Swal.fire({
+                icon: 'warning',
+                title: 'Apakah Anda yakin?',
+                text: 'Baris ini akan dihapus.',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    row.remove();
+                    updateNomor();
+
+                    // Hapus NRP dari localStorage
+                    let storedNRPs = JSON.parse(localStorage.getItem('nrp_karyawan_list')) || [];
+
+                    // Hapus elemen yang sesuai (pakai filter)
+                    storedNRPs = storedNRPs.filter(nrp => nrp !== nrpToDelete);
+
+                    localStorage.setItem('nrp_karyawan_list', JSON.stringify(storedNRPs));
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Tidak bisa menghapus baris terakhir.',
+                text: 'Harap tambahkan baris baru jika perlu.',
+                confirmButtonText: 'OK'
+            });
         }
+    }
+
 
         function updateNomorPeserta() {
             const rows = document.querySelectorAll('#pesertaTableTambah .nomor');

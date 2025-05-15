@@ -252,7 +252,8 @@ class KendaraanDinasController extends Controller
             $data = DB::table('tb_surat_kendaraan_dinas_detail')
                 ->join('tb_surat_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id')
                 ->join('tb_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', '=', 'tb_kendaraan_dinas.kendaraan_dinas_id')
-                ->select('tb_kendaraan_dinas.merk_kendaraan', 'tb_kendaraan_dinas.nomor_kendaraan', 'tb_surat_kendaraan_dinas.tanggal_penggunaan')
+                ->select('tb_kendaraan_dinas.merk_kendaraan', 'tb_kendaraan_dinas.nomor_kendaraan', 'tb_surat_kendaraan_dinas.tanggal_penggunaan',
+                'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id','tb_surat_kendaraan_dinas.status')
                 ->get();
 
             return response()->json($data);
