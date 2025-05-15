@@ -265,8 +265,7 @@ class PengeluaranBarangController extends Controller
         }
     }
     
-
-    public function edit(Request $request)
+    public function generateQrCodeBarang(Request $request)
     {
         $pengeluaranId = $request->pengeluaran_barang_id;
         $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
@@ -287,7 +286,23 @@ class PengeluaranBarangController extends Controller
             'lokasi_barang_keluar'       => $pengeluaranBarang->lokasi_barang_keluar,
             'tujuan_pengeluaran_barang'  => $pengeluaranBarang->tujuan_pengeluaran_barang,
             'barangKeluar'               => $pengeluaranBarang->barangKeluar,
-            'qr_code'                    => $qrCode
+            'qr_code_barang'                    => $qrCode
+        ]);
+    }
+
+    public function edit(Request $request)
+    {
+        $pengeluaranId = $request->pengeluaran_barang_id;
+        $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
+
+        return response()->json([
+            'pengeluaran_barang_id'      => $pengeluaranBarang->pengeluaran_barang_id,
+            'jenis_kendaraan'            => $pengeluaranBarang->jenis_kendaraan,
+            'no_polisi'                  => $pengeluaranBarang->no_polisi,
+            'status'                  => $pengeluaranBarang->status,
+            'lokasi_barang_keluar'       => $pengeluaranBarang->lokasi_barang_keluar,
+            'tujuan_pengeluaran_barang'  => $pengeluaranBarang->tujuan_pengeluaran_barang,
+            'barangKeluar'               => $pengeluaranBarang->barangKeluar,
         ]);
     }
 

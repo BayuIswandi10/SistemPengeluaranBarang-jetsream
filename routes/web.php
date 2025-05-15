@@ -87,6 +87,7 @@ Route::post('/pengeluaran_barang', [PengeluaranBarangController::class, 'store']
 Route::post('/pengeluaran/edit', [PengeluaranBarangController::class, 'edit'])->name('pengeluaran.edit');
 Route::post('/pengeluaran/detailNonAuth', [PengeluaranBarangController::class, 'getDetailNonAuth']);
 Route::get('/pengeluaran/get-data-level4', [PengeluaranBarangController::class, 'getDataLevel4']);
+Route::post('/pengeluaran/generateQrCodeBarang', [PengeluaranBarangController::class, 'generateQrCodeBarang'])->name('pengeluaran.generateQrCodeBarang');
 
 Route::post('/approval/update-nopolisi', [ApprovalBarangKeluarController::class, 'updateNopolisi'])->name('approval.updateNopolisi');
 
@@ -99,6 +100,7 @@ Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->
 Route::get('/pengajuan/get-data-level3', [SuratDinasController::class, 'getDataLevel3']);
 Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);
 Route::post('/pengajuan/infoSuratKendaraanDinasNonAuth', [SuratDinasController::class, 'editNonAuth'])->name('pengajuan.infoSuratKendaraanDinasNonAuth');
+Route::post('/pengajuan/generateQrCodeSuratKendaraan', [SuratDinasController::class, 'generateQrCodeSuratKendaraan'])->name('pengajuan.generateQrCodeSuratKendaraan');
 
 Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 Route::get('/kendaraan/get-by-jenis', [KendaraanDinasController::class, 'getKendaraanByJenis'])->name('get-by-jenis');

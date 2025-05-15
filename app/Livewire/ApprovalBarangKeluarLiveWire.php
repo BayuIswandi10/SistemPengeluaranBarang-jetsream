@@ -18,6 +18,7 @@ class ApprovalBarangKeluarLiveWire extends Component
             $pengeluaranBarangs = (clone $query)
                 // ->where('status', 'Level 4')
                 ->where('kategori_pengeluaran', 1)
+                ->orderByRaw("FIELD(status, 'Level 4') DESC")
                 ->orderBy('status', 'asc')
                 ->get();
         } elseif ($user->level === 'Staff') {
@@ -32,6 +33,7 @@ class ApprovalBarangKeluarLiveWire extends Component
             $pengeluaranBarangs = (clone $query)->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })
+            ->orderByRaw("FIELD(status, 'Level 1') DESC")
             ->orderBy('status', 'asc')
             ->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
@@ -39,6 +41,7 @@ class ApprovalBarangKeluarLiveWire extends Component
             $pengeluaranBarangs = (clone $query)->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })
+            ->orderByRaw("FIELD(status, 'Level 2') DESC")
             ->orderBy('status', 'asc') // Level 1 paling atas
             ->get();
     
@@ -47,10 +50,28 @@ class ApprovalBarangKeluarLiveWire extends Component
                 $pengeluaranBarangs = (clone $query)->get(); // Lihat semua departemen
             }
         } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
-            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
-            $pengeluaranBarangs = (clone $query)
-            ->orderBy('status', 'asc')
-            ->get();
+            // Level 2 untuk pengajuan dari GA sendiri
+            $level2FromGA = (clone $query)
+                ->where('status', 'Level 2')
+                ->whereHas('user', function ($q) {
+                    $q->where('departemen', 'General Affairs');
+                })
+                ->get();
+
+            // Semua data lain, Level 3 diprioritaskan
+            $others = (clone $query)
+                ->where(function ($q) {
+                    $q->where('status', '!=', 'Level 2')
+                    ->orWhereHas('user', function ($q2) {
+                        $q2->where('departemen', '!=', 'General Affairs');
+                    });
+                })
+                ->orderByRaw("FIELD(status, 'Level 3') DESC")
+                ->orderBy('status', 'asc')
+                ->get();
+
+            // Gabungkan koleksi
+            $pengeluaranBarangs = $level2FromGA->concat($others);
         } else {
             // Jika level tidak dikenali, tampilkan data kosong
             $pengeluaranBarangs = collect();
