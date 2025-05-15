@@ -321,7 +321,7 @@ $(document).ready(function() {
     function confirmUpdate(pengeluaranBarangId, url) {
         Swal.fire({
             title: 'Konfirmasi Persetujuan',
-            text: 'Apakah anda menyetujui No Pengeluaran Barang ' + pengeluaranBarangId + '?',
+            text: 'Apakah Anda menyetujui penngeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
@@ -331,6 +331,15 @@ $(document).ready(function() {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Tampilkan loading SweetAlert saat proses berlangsung
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang menyimpan persetujuan Anda.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 updateStatus(pengeluaranBarangId, url);
             }
         });
@@ -494,7 +503,7 @@ $(document).ready(function() {
                 // Konfirmasi menggunakan SweetAlert
                 Swal.fire({
                     title: 'Tolak Pengajuan',
-                    text: 'Apakah anda menolak No Pengeluaran Barang ' + pengeluaranBarangId + '?',
+                    text: 'Apakah Anda yakin ingin menolak pengeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
                     icon: 'error',
                     showCancelButton: true,
                     reverseButtons: true,
@@ -504,6 +513,16 @@ $(document).ready(function() {
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Tampilkan loading modal setelah klik "Ya, tolak!"
+                        Swal.fire({
+                            title: 'Menolak Pengajuan...',
+                            html: 'Mohon tunggu, sedang memproses penolakan.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
                         fetch("{{ route('approval.rejectStatus') }}", {
                             method: "POST",
                             headers: {

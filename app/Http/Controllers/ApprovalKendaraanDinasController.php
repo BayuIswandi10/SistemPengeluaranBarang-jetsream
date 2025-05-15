@@ -67,7 +67,7 @@ class ApprovalKendaraanDinasController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan penggunaan kendaraan dinas telah disetujui. Data persetujuan berhasil dicatat.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -132,7 +132,7 @@ class ApprovalKendaraanDinasController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan penggunaan kendaraan dinas telah disetujui. Data persetujuan berhasil dicatat.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -197,7 +197,7 @@ class ApprovalKendaraanDinasController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan penggunaan kendaraan dinas telah ditolak. Data penolakan berhasil disimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -262,7 +262,7 @@ class ApprovalKendaraanDinasController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan penggunaan kendaraan dinas telah disetujui. Data persetujuan berhasil dicatat.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

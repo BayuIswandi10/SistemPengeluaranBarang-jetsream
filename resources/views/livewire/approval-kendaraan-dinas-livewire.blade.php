@@ -683,17 +683,17 @@ $(document).ready(function() {
         confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
     });
 
-    $(document).on('click', '.reject-status', function() {
-        var dataKDId = $(this).data('id');
-        confirmUpdate(dataKDId, '/pengajuanDinas/reject-status');
-    });
+    // $(document).on('click', '.reject-status', function() {
+    //     var dataKDId = $(this).data('id');
+    //     confirmUpdate(dataKDId, '/pengajuanDinas/reject-status');
+    // });
 
 
     // Common function to show confirmation and then update status
     function confirmUpdate(dataKDId, url) {
         Swal.fire({
             title: 'Konfirmasi Persetujuan',
-            text: 'Apakah anda menyetujui No Surat Dinas ' + dataKDId + '?',
+            text: 'Apakah Anda menyetujui penggunaan kendaraan dinas dengan nomor ' + dataKDId + '?',
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
@@ -703,6 +703,15 @@ $(document).ready(function() {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Tampilkan loading modal setelah klik "Ya, tolak!"
+                Swal.fire({
+                    title: 'Memproses...',
+                    html: 'sedang menyimpan persetujuan anda.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 updateStatus(dataKDId, url);
             }
         });
@@ -886,7 +895,7 @@ $(document).ready(function() {
                 // Konfirmasi menggunakan SweetAlert
                 Swal.fire({
                     title: 'Tolak Pengajuan',
-                    text: 'Apakah anda menolak No Surat Dinas ' + dataKDId + '?',
+                    text: 'Apakah Anda yakin ingin menolak pengajuan Penggunaan Kendaraan Dinas dengan nomor ' + dataKDId + '?',
                     icon: 'error',
                     showCancelButton: true,
                     reverseButtons: true,
@@ -896,6 +905,15 @@ $(document).ready(function() {
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Tampilkan loading modal setelah klik "Ya, tolak!"
+                        Swal.fire({
+                            title: 'Menolak Pengajuan...',
+                            html: 'Mohon tunggu, sedang memproses penolakan.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                         fetch("{{ route('pengajuanDinas.rejectStatus') }}", {
                             method: "POST",
                             headers: {
@@ -909,7 +927,7 @@ $(document).ready(function() {
                             if (data.success) {
                                 // Tampilkan notifikasi berhasil
                                 Swal.fire({
-                                    title: 'Berhasil!',
+                                    title: 'Penolakan Berhasil!',
                                     text: data.message,
                                     icon: 'success',
                                     confirmButtonText: 'OK'

@@ -419,7 +419,7 @@
 
           Swal.fire({
               title: 'Konfirmasi Persetujuan',
-              text: 'Apakah anda menyetujui No Pengeluaran Barang ' + pengeluaranBarangId + '?',
+              text: 'Apakah Anda menyetujui penngeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
               icon: 'info',
               showCancelButton: true,
               reverseButtons: true,
@@ -429,6 +429,14 @@
               cancelButtonText: 'Batal'
           }).then((result) => {
               if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        html: 'sedang menyimpan persetujuan anda.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
                   $.ajax({
                       url: "/approval/update-status-security",
                       method: "POST",
@@ -475,7 +483,7 @@
 
           Swal.fire({
               title: 'Konfirmasi Persetujuan',
-              text: 'Apakah anda menyetujui No Pengeluaran Barang ' + suratDinasId + '?',
+              text: 'Apakah Anda menyetujui penggunaan kendaraan dinas dengan nomor ' + suratDinasId + '?',
               icon: 'info',
               showCancelButton: true,
               reverseButtons: true,
@@ -485,6 +493,14 @@
               cancelButtonText: 'Batal'
           }).then((result) => {
               if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        html: 'sedang menyimpan persetujuan anda.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
                   $.ajax({
                       url: "/approval-dinas/update-status-security",
                       method: "POST",

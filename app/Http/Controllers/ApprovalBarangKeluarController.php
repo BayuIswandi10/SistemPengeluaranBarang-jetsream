@@ -105,7 +105,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -219,7 +219,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -309,7 +309,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -386,7 +386,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -473,7 +473,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -551,7 +551,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan data approval ditambahkan!',
+                'message' => 'Pengajuan pengeluaran barang telah disetujui. Data persetujuan berhasil tersimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -616,7 +616,7 @@ class ApprovalBarangKeluarController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Status berhasil diperbarui dan email telah dikirim!',
+                'message' => 'Pengajuan pengeluaran barang telah ditolak. Data penolakan berhasil disimpan.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

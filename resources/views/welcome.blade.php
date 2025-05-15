@@ -346,7 +346,7 @@
             </div>
 
             {{-- Tambah Penggunaan Kendaraan Dinas Modal --}}
-            <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+            <div class="modal fade" id="tambahDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">

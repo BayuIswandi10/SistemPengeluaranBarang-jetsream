@@ -92,6 +92,45 @@
             {{ $slot }}
         </div>
 
+        <!-- Loading Overlay -->
+        <div id="globalLoadingOverlay" style="
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        ">
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const forms = document.querySelectorAll("form");
+
+                forms.forEach(form => {
+                    form.addEventListener("submit", function (e) {
+                        const submitButtons = form.querySelectorAll('[type="submit"]');
+                        submitButtons.forEach(btn => {
+                            btn.disabled = true;
+                        });
+
+                        // Ganti overlay dengan SweetAlert
+                        Swal.fire({
+                            title: 'Mohon tunggu',
+                            text: 'Proses sedang berlangsung...',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    });
+                });
+            });
+
+        </script>
+
+
         @livewireScripts
 
         <script src="{{ asset('assets/js/qr-scanner.umd.min.js') }}"></script>        
