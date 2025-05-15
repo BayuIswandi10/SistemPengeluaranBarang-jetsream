@@ -608,18 +608,18 @@
             </div>
         </div>
 
-        <!-- Modal Approval -->
-        <div class="modal fade" id="editApprovalModal" tabindex="-1" aria-labelledby="editApprovalLabel" aria-hidden="true">
+        <!-- Modal Detail Barang Keluar -->
+        <div class="modal fade" id="modalPengajuanBarangDetail" tabindex="-1" aria-labelledby="modalPengajuanBarangDetailLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
                     <div class="modal-header bg-light">
-                        <h5 class="modal-title" id="editApprovalLabel">Pemeriksaan</h5>
+                        <h5 class="modal-title" id="modalPengajuanBarangDetailLabel">Pemeriksaan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="editApprovalForm">
+                        {{-- <form id="editApprovalForm">
                             <div class="row mb-3">
                                 <div class="col-md-8">
                                     <div class="row mb-3">
@@ -654,21 +654,21 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 text-end">
-                                    <div id="qrcodeContainer" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                                    <div id="qrcodePengeluaranBarang" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
                                         <!-- QR Code akan diisi oleh JavaScript -->
                                         <img src="path/to/qrcode.png" alt="QR Code" id="qrcode" style="width: 100%;">
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form> --}}
 
-                        <iframe hidden id="qrFrame" width="500" height="400" srcdoc="">
+                        <iframe hidden id="barangKeluarQrFrame" width="500" height="400" srcdoc="">
                             Browser Anda tidak mendukung iframe.
                         </iframe>
                         
                         
                         <h6 class="mt-4">Detail Barang</h6>
-                        <table id="barangTableApproval" class="table table-striped table-bordered">
+                        <table id="barangKeluarTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>NO</th>
@@ -684,13 +684,13 @@
                         </table>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <form action="{{ route('approval.updateNopolisi') }}" method="POST" id="approvalForm">
+                        {{-- <form action="{{ route('approval.updateNopolisi') }}" method="POST" id="approvalForm">
                             @csrf
                             @method('POST')
                             <button type="button" class="btn btn-success" onclick="saveApproval()">Simpan</button>
-                        </form>
+                        </form> --}}
                         <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary" id="btnPrintQR" onclick="printIframe()">Cetak QR Code</button>
+                        <button type="button" class="btn btn-primary" id="btnPrintQR" onclick="printIframePengeluaranBarang()">Cetak QR Code</button>
                     </div>
                 </div>
             </div>
@@ -724,6 +724,46 @@
                             <tbody id="suratKendaraanBody"></tbody>
                         </table>
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Peserta -->
+        <div class="modal fade" id="modalPenggunaanKendaraanDinasDetail" tabindex="-1" aria-labelledby="modalPenggunaanKendaraanDinasDetailLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title" id="modalPenggunaanKendaraanDinasDetailLabel">Pemeriksaan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <iframe hidden id="pesertaDinasQrFrame" width="500" height="400" srcdoc="">
+                            Browser Anda tidak mendukung iframe.
+                        </iframe>
+                        
+                        
+                        <h6 class="mt-4">Peserta Dinas</h6>
+                        <table id="pesertaTableDinas" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>NRP</th>
+                                    <th>Nama</th>
+                                    <th>Departemen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan diisi melalui JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary" id="btnPrintQR" onclick="printIframeSuratDinas()">Cetak QR Code</button>
                     </div>
                 </div>
             </div>
@@ -767,7 +807,7 @@
                 }
             });
         });
-//kbk
+
         let globalCalendar;
     
         $('#calendarModal').on('show.bs.modal', function () {
@@ -809,23 +849,39 @@
                 });
             });
         });
-        function printIframe() {
-            var iframe = document.getElementById('qrFrame');
+        function printIframePengeluaranBarang() {
+            var iframe = document.getElementById('barangKeluarQrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
 
-        function printQRCode() {
-            var originalContent = document.body.innerHTML;
-            var qrCodeContent = document.getElementById("qrcodeContainer").innerHTML;
+        // function printQRCode() {
+        //     var originalContent = document.body.innerHTML;
+        //     var qrCodeContent = document.getElementById("qrcodePengeluaranBarang").innerHTML;
 
-            // Tampilkan hanya QR Code
-            document.body.innerHTML = qrCodeContent;
+        //     // Tampilkan hanya QR Code
+        //     document.body.innerHTML = qrCodeContent;
 
-            window.print();
+        //     window.print();
 
-            // Kembalikan tampilan asli setelah pencetakan
-            document.body.innerHTML = originalContent;
+        //     // Kembalikan tampilan asli setelah pencetakan
+        //     document.body.innerHTML = originalContent;
+        // }
+         function printIframeSuratDinas() {
+            var iframe = document.getElementById('pesertaDinasQrFrame');
+            iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
+        // function printQRCodeDinas() {
+        //     var originalContent = document.body.innerHTML;
+        //     var qrCodeContent = document.getElementById("qrcodeDinasContainer").innerHTML;
+
+        //     // Tampilkan hanya QR Code
+        //     document.body.innerHTML = qrCodeContent;
+
+        //     window.print();
+
+        //     // Kembalikan tampilan asli setelah pencetakan
+        //     document.body.innerHTML = originalContent;
+        // }
         let counter = 1;
 
         function saveToLocalStorage() {
@@ -958,9 +1014,6 @@
             loadBarangDataFromLocalStorage();
         });
         
-
-
-     
         function toggleJenisKendaraan() {
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
             const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
@@ -1040,9 +1093,6 @@
             }
         }
 
-
-
-
         function tambahKendaraanPribadi() {
             const tableBody = document.getElementById("kendaraanPribadiBody");
             const index = tableBody.rows.length;
@@ -1106,7 +1156,7 @@
                                     <td>${item.tujuan_pengeluaran_barang}</td>
                                     <td>${item.jenis_kendaraan}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="editApproval('${item.pengeluaran_barang_id}')">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="getQrCodeBarangKeluar('${item.pengeluaran_barang_id}')">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
                                     </td>
@@ -1134,9 +1184,9 @@
         });
 
         // Fungsi untuk menampilkan modal edit approval
-        function editApproval(pengeluaranBarangId) {
+        function getQrCodeBarangKeluar(pengeluaranBarangId) {
             $.ajax({
-                url: "{{ route('pengeluaran.edit') }}",
+                url: "{{ route('pengeluaran.generateQrCodeBarang') }}",
                 method: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
@@ -1165,15 +1215,15 @@
                     $('#pengeluaranBarangId, #tujuan, #jenisKendaraan').prop('disabled', true);
 
                     // Inisialisasi DataTable
-                    let table = $('#barangTableApproval').DataTable();
+                    let table = $('#barangKeluarTable').DataTable();
                     
                     // Hancurkan DataTable jika sudah ada agar tidak menumpuk data lama
-                    if ($.fn.DataTable.isDataTable('#barangTableApproval')) {
+                    if ($.fn.DataTable.isDataTable('#barangKeluarTable')) {
                         table.destroy();
                     }
 
                     // Kosongkan isi tabel
-                    let tbody = $('#barangTableApproval tbody');
+                    let tbody = $('#barangKeluarTable tbody');
                     tbody.empty();
 
                     // Tambahkan data ke tabel
@@ -1194,7 +1244,7 @@
                     }
 
                     // Inisialisasi ulang DataTable setelah data diisi
-                    $('#barangTableApproval').DataTable({
+                    $('#barangKeluarTable').DataTable({
                         responsive: true,
                         autoWidth: false,
                         scrollX: false,
@@ -1205,7 +1255,7 @@
                     });
 
                     // Update container QR Code dengan output dari BaconQrCode
-                    $('#qrcodeContainer').html(response.qr_code);
+                    $('#qrcodePengeluaranBarang').html(response.qr_code_barang);
 
                     // Buat konten barang keluar untuk ditampilkan di dalam iframe
                     let barangContent = '';
@@ -1232,7 +1282,7 @@
                         barangContent = '<p>Tidak ada data barang keluar.</p>';
                     }
                     // Perbarui isi srcdoc pada iframe dengan data terbaru
-                    let iframeContent = `
+                    let iframePengeluaranBarang = `
                         <!DOCTYPE html>
                         <html lang="id">
                         <head>
@@ -1259,7 +1309,7 @@
                                         <div class="box">${response.pengeluaran_barang_id}</div>
                                     </div>
                                     <div class="column-right">
-                                        <div class="box">${response.qr_code}</div>
+                                        <div class="box">${response.qrcodePengeluaranBarang_barang}</div>
                                     </div>
                                 </div>
 
@@ -1282,10 +1332,10 @@
                         </body>
                         </html>
                     `;
-                    $('#qrFrame').attr('srcdoc', iframeContent).prop('hidden', true);
+                    $('#barangKeluarQrFrame').attr('srcdoc', iframePengeluaranBarang).prop('hidden', true);
 
                     // Tampilkan modal edit approval
-                    $('#editApprovalModal').modal('show');
+                    $('#modalPengajuanBarangDetail').modal('show');
                 },
                 error: function(xhr, status, error) {
                     Swal.fire({
@@ -1299,124 +1349,262 @@
             });
         }
 
-        function saveApproval() {
-            var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
-            var noPolisi = document.getElementById('noPolisi').value;
+        // function saveApproval() {
+        //     var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
+        //     var noPolisi = document.getElementById('noPolisi').value;
 
-            // Konfirmasi dengan Swal sebelum melakukan update
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: 'Setujui pengeluaran ini?',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Setuju!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
-                    $.ajax({
-                        url: "{{ route('approval.updateNopolisi') }}",  // Ganti dengan route yang sesuai
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
-                            pengeluaran_barang_id: pengeluaranBarangId,
-                            no_polisi: noPolisi
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                // Tampilkan pesan sukses
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Sukses!',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    // Reload halaman setelah sukses
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Gagal!',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan!',
-                                text: 'Error: ' + error,
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        }
-                    });
-                }
-            });
-        }
+        //     // Konfirmasi dengan Swal sebelum melakukan update
+        //     Swal.fire({
+        //         title: 'Apakah Anda yakin?',
+        //         text: 'Setujui pengeluaran ini?',
+        //         icon: 'info',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#d33',
+        //         confirmButtonText: 'Ya, Setuju!',
+        //         cancelButtonText: 'Batal',
+        //         reverseButtons: true
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
+        //             $.ajax({
+        //                 url: "{{ route('approval.updateNopolisi') }}",  // Ganti dengan route yang sesuai
+        //                 method: "POST",
+        //                 data: {
+        //                     _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
+        //                     pengeluaran_barang_id: pengeluaranBarangId,
+        //                     no_polisi: noPolisi
+        //                 },
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         // Tampilkan pesan sukses
+        //                         Swal.fire({
+        //                             icon: 'success',
+        //                             title: 'Sukses!',
+        //                             text: response.message,
+        //                             showConfirmButton: false,
+        //                             timer: 2000
+        //                         }).then(() => {
+        //                             // Reload halaman setelah sukses
+        //                             location.reload();
+        //                         });
+        //                     } else {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: 'Gagal!',
+        //                             text: response.message,
+        //                             showConfirmButton: false,
+        //                             timer: 2000
+        //                         });
+        //                     }
+        //                 },
+        //                 error: function(xhr, status, error) {
+        //                     Swal.fire({
+        //                         icon: 'error',
+        //                         title: 'Terjadi Kesalahan!',
+        //                         text: 'Error: ' + error,
+        //                         showConfirmButton: false,
+        //                         timer: 2000
+        //                     });
+        //                 }
+        //             });
+        //         }
+        //     });
+        // }
 
         $(document).ready(function () {
 
-    // Event untuk membuka modal surat kendaraan dinas
-    $('#modalSuratKendaraanTrigger').on('click', function () {
-        $('#modalSuratKendaraan').modal('show');
-        loadSuratKendaraanData();
-    });
+            // Event untuk membuka modal surat kendaraan dinas
+            $('#modalSuratKendaraanTrigger').on('click', function () {
+                $('#modalSuratKendaraan').modal('show');
+                loadSuratKendaraanData();
+            });
 
-    function loadSuratKendaraanData() {
+            function loadSuratKendaraanData() {
+                $.ajax({
+                    url: "/pengajuan/get-data-level3", // Ubah sesuai route Anda
+                    method: "GET",
+                    success: function (data) {
+                        console.log(data.surat_kendaraan_dinas);
+                        const suratData = data.surat_kendaraan_dinas;
+
+                        const tbody = document.getElementById('suratKendaraanBody');
+                        tbody.innerHTML = '';
+
+                        tbody.innerHTML = suratData.map((item, index) => {
+                            return `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.surat_kendaraan_dinas_id}</td>
+                                    <td>${item.created_by}</td>
+                                    <td>${item.created_date}</td>
+                                    <td>${item.tujuan_penggunaan_1 || '-'} ${item.tujuan_penggunaan_2 || ''} ${item.tujuan_penggunaan_3 || ''}</td>
+                                    <td>${item.jenis_kendaraan}</td>
+                                    <td>${item.tanggal_penggunaan}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm" onclick="getQrCodePenggunaanKendaraanDinas('${item.surat_kendaraan_dinas_id}')">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+
+                        if ($.fn.DataTable.isDataTable('#suratKendaraanTable')) {
+                            $('#suratKendaraanTable').DataTable().destroy();
+                        }
+
+                        $('#suratKendaraanTable').DataTable({
+                            scrollX: false,
+                            responsive: true
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Gagal mengambil data surat kendaraan:', error);
+                    }
+                });
+            }
+
+        });
+
+        function getQrCodePenggunaanKendaraanDinas(suratKendaraanId) {
             $.ajax({
-                url: "/pengajuan/get-data-level3", // Ubah sesuai route Anda
-                method: "GET",
-                success: function (data) {
-                    console.log(data.surat_kendaraan_dinas);
-                    const suratData = data.surat_kendaraan_dinas;
-
-                    const tbody = document.getElementById('suratKendaraanBody');
-                    tbody.innerHTML = '';
-
-                    tbody.innerHTML = suratData.map((item, index) => {
-                        return `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${item.surat_kendaraan_dinas_id}</td>
-                                <td>${item.created_by}</td>
-                                <td>${item.created_date}</td>
-                                <td>${item.tujuan_penggunaan_1 || '-'} ${item.tujuan_penggunaan_2 || ''} ${item.tujuan_penggunaan_3 || ''}</td>
-                                <td>${item.jenis_kendaraan}</td>
-                                <td>${item.tanggal_penggunaan}</td>
-                                <td>
-                                    <button type="button" class="btn btn-info btn-sm" onclick="editSurat('${item.surat_kendaraan_dinas_id}')">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-
-                    if ($.fn.DataTable.isDataTable('#suratKendaraanTable')) {
-                        $('#suratKendaraanTable').DataTable().destroy();
+                url: "{{ route('pengajuan.generateQrCodeSuratKendaraan') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    surat_kendaraan_dinas_id: suratKendaraanId
+                },
+                success: function(response) {
+            
+                    // Inisialisasi DataTable
+                    let table = $('#pesertaTableDinas').DataTable();
+                    
+                    if ($.fn.DataTable.isDataTable('#pesertaTableDinas')) {
+                        table.destroy();
                     }
 
-                    $('#suratKendaraanTable').DataTable({
+                    // Kosongkan isi tabel
+                    let tbody = $('#pesertaTableDinas tbody');
+                    tbody.empty();
+
+                    if (response.userDinas && response.userDinas.length > 0) {
+                        $.each(response.userDinas, function(index, userInfo) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${userInfo.user?.nrp_karyawan}</td>
+                                    <td>${userInfo.user?.name}</td>
+                                    <td>${userInfo.user?.departemen}</td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta dinas</td></tr>');
+                    }
+
+                    // Inisialisasi ulang DataTable setelah data diisi
+                    $('#pesertaTableDinas').DataTable({
+                        responsive: true,
+                        autoWidth: false,
                         scrollX: false,
-                        responsive: true
+                        destroy: true,
+                        retrieve: true,
+                        pageLength: 5, // Menampilkan 5 data per halaman
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] // Pilihan jumlah data per halaman
                     });
+
+                    // Update container QR Code dengan output dari BaconQrCode
+                    $('#qrcodeDinasContainer').html(response.qrcodePengeluaranBarang_dinas);
+
+                    let userDinasContent = '';
+                    if (response.userDinas && response.userDinas.length > 0) {
+                        userDinasContent += '<table style="width:100%; border-collapse: collapse;" border="1">';
+                        userDinasContent += '<thead><tr>';
+                        userDinasContent += '<th>No</th>';
+                        userDinasContent += '<th>NRP</th>';
+                        userDinasContent += '<th>Nama</th>';
+                        userDinasContent += '<th>Departemen</th>';
+                        userDinasContent += '</tr></thead><tbody>';
+                        response.userDinas.forEach((userItem, index) => {
+                            userDinasContent += `<tr>
+                                <td>${index + 1}</td>
+                                <td>${userItem.nrp_karyawan}</td>
+                                <td>${userItem.user?.name}</td>
+                                <td>${userItem.user?.departemen}</td>
+                            </tr>`;
+                        });
+                        userDinasContent += '</tbody></table>';
+                    } else {
+                        userDinasContent = '<p>Tidak ada data peserta dinas.</p>';
+                    }
+                    // Perbarui isi srcdoc pada iframe dengan data terbaru
+                    let iframePenggunaanKendaraanDinas = `
+                        <!DOCTYPE html>
+                        <html lang="id">
+                        <head>
+                            <meta charset="UTF-8">
+                            <style>
+                                body { font-family: Arial, sans-serif; text-align: center; }
+                                .container { width: 420px; border: 2px solid black; padding: 10px; margin: auto; }
+                                .row { display: flex; justify-content: space-between; align-items: center; }
+                                .column-left { width: 60%; }
+                                .column-right { width: 38%; text-align: center; }
+                                .box { border: 1px solid black; padding: 10px; margin: 5px 0; text-align: center; }
+                                .content { min-height: 100px; margin-top: 10px; }
+                                .footer { font-size: 12px; text-align: left; margin-top: 10px; }
+                                .qrcode { padding: 10px; display: flex; justify-content: center; align-items: center; }
+                                .qrcode img { width: 120px; height: 120px; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="column-left">
+                                        <div class="box"><img src="{{ asset('assets/img/Logo B YMI - 2017.png') }}" style="height: 50px;"></div>
+                                        <div class="box"><strong>SURAT PENGGUNAAN KENDARAAN DINAS</strong></div>
+                                        <div class="box">${response.surat_kendaraan_dinas_id}</div>
+                                    </div>
+                                    <div class="column-right">
+                                        <div class="box">${response.qrcodePengeluaranBarang_dinas}</div>
+                                    </div>
+                                </div>
+
+                                <div class="box content">${userDinasContent}</div>
+
+                                <div class="footer">
+                                    <div class="row">
+                                        <div class="column-left">
+                                            MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520
+                                        </div>
+
+                                        <div class="column-right">
+                                            Phone: +62 21 8980769 
+                                            <br> 
+                                            Fax: +62 21 8980770
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+                    $('#pesertaDinasQrFrame').attr('srcdoc', iframePenggunaanKendaraanDinas).prop('hidden', true);
+
+                    // Tampilkan modal edit approval
+                    $('#modalPenggunaanKendaraanDinasDetail').modal('show');
                 },
-                error: function (xhr, status, error) {
-                    console.error('Gagal mengambil data surat kendaraan:', error);
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Tidak dapat mengambil data. Error: ' + error,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 }
             });
         }
-
-    });
-
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

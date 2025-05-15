@@ -16,6 +16,10 @@ use App\Mail\ApprovalDinasNotification;
 use App\Mail\ApprovalNotification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Writer;
 
 class SuratDinasController extends Controller
 {
@@ -79,6 +83,36 @@ class SuratDinasController extends Controller
         ]);
     }
 
+    public function generateQrCodeSuratKendaraan(Request $request)
+    {
+        $suratId = $request->surat_kendaraan_dinas_id;
+        $surat = SuratKendaraanDinas::with(['user', 'pencatatanKendaraanDinas.user'])->findOrFail($suratId);
+
+        // Generate QR Code menggunakan BaconQrCode
+        $renderer = new ImageRenderer(
+            new RendererStyle(140), // Ukuran QR Code
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qrCode = $writer->writeString($surat->surat_kendaraan_dinas_id);
+
+        return response()->json([
+            'surat_kendaraan_dinas_id' => $surat->surat_kendaraan_dinas_id,
+            'jenis_kendaraan'          => $surat->jenis_kendaraan,
+            'tujuan_penggunaan_1'      => $surat->tujuan_penggunaan_1,
+            'tujuan_penggunaan_2'      => $surat->tujuan_penggunaan_2,
+            'tujuan_penggunaan_3'      => $surat->tujuan_penggunaan_3,
+            'tanggal_penggunaan'       => $surat->tanggal_penggunaan,
+            'status'                   => $surat->status,
+            'waktu_keluar'             => $surat->waktu_keluar,
+            'waktu_kembali'            => $surat->waktu_kembali,
+            'kilometer_awal'           => $surat->kilometer_awal,
+            'kilometer_akhir'          => $surat->kilometer_akhir,
+            'created_by'               => $surat->user ? $surat->user->name : null,
+            'userDinas'               => $surat->pencatatanKendaraanDinas,
+            'qr_code_dinas'                  => $qrCode
+        ]);
+    }
 
     /**
      * Store Surat Dinas
