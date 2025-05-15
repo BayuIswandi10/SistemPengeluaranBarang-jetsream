@@ -1437,7 +1437,7 @@
                     $('#qrcodePengeluaranBarang').html(response.qr_code_barang);
 
                     // Buat konten barang keluar untuk ditampilkan di dalam iframe
-                    let barangContent = '';
+                   let barangContent = '';
                     if (response.barangKeluar && response.barangKeluar.length > 0) {
                         barangContent += '<table style="width:100%; border-collapse: collapse;" border="1">';
                         barangContent += '<thead><tr>';
@@ -1445,21 +1445,27 @@
                         barangContent += '<th>Nama Barang</th>';
                         barangContent += '<th>Jumlah</th>';
                         barangContent += '<th>Satuan</th>';
-                        barangContent += '<th>Keterangan</th>';
                         barangContent += '</tr></thead><tbody>';
+
                         response.barangKeluar.forEach((barang, index) => {
-                            barangContent += `<tr>
-                                <td>${index + 1}</td>
-                                <td>${barang.nama_barang}</td>
-                                <td>${barang.jumlah_barang}</td>
-                                <td>${barang.satuan_barang}</td>
-                                <td>${barang.keterangan_barang}</td>
-                            </tr>`;
+                            barangContent += `
+                                <tr>
+                                    <td rowspan="2">${index + 1}</td>
+                                    <td>${barang.nama_barang}</td>
+                                    <td>${barang.jumlah_barang}</td>
+                                    <td>${barang.satuan_barang}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"> ${barang.keterangan_barang}</td>
+                                </tr>
+                            `;
                         });
+
                         barangContent += '</tbody></table>';
                     } else {
                         barangContent = '<p>Tidak ada data barang keluar.</p>';
                     }
+
                     // Perbarui isi srcdoc pada iframe dengan data terbaru
                     let iframePengeluaranBarang = `
                         <!DOCTYPE html>
@@ -1488,7 +1494,7 @@
                                         <div class="box">${response.pengeluaran_barang_id}</div>
                                     </div>
                                     <div class="column-right">
-                                        <div class="box">${response.qrcodePengeluaranBarang_barang}</div>
+                                        <div class="box">${response.qr_code_barang}</div>
                                     </div>
                                 </div>
 
@@ -1694,7 +1700,7 @@
                     });
 
                     // Update container QR Code dengan output dari BaconQrCode
-                    $('#qrcodeDinasContainer').html(response.qrcodePengeluaranBarang_dinas);
+                    $('#qrcodeDinasContainer').html(response.qr_code_dinas);
 
                     let userDinasContent = '';
                     if (response.userDinas && response.userDinas.length > 0) {
@@ -1745,7 +1751,7 @@
                                         <div class="box">${response.surat_kendaraan_dinas_id}</div>
                                     </div>
                                     <div class="column-right">
-                                        <div class="box">${response.qrcodePengeluaranBarang_dinas}</div>
+                                        <div class="box">${response.qr_code_dinas}</div>
                                     </div>
                                 </div>
 
