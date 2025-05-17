@@ -87,6 +87,7 @@ class KendaraanDinasController extends Controller
             'nomor_kendaraan.required' => 'Nomor kendaraan harus diisi.',
             'nomor_kendaraan.string' => 'Nomor kendaraan harus berupa teks.',
             'nomor_kendaraan.max' => 'Nomor kendaraan tidak boleh lebih dari 15 karakter.',
+            'nomor_kendaraan.regex' => 'Format nomor kendaraan tidak valid. Contoh: B 1234 ABC',
             'nomor_kendaraan.unique' => 'Nomor kendaraan sudah terdaftar.',
             'kapasitas_kendaraan.required' => 'Kapasitas kendaraan harus diisi.',
             'kapasitas_kendaraan.integer' => 'Kapasitas kendaraan harus berupa angka.',

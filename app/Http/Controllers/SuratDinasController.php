@@ -128,6 +128,12 @@ class SuratDinasController extends Controller
             'created_by' => 'required|string',
             'peserta' => 'nullable|array', // Memastikan peserta dikirim dalam bentuk array
             'peserta.*.nrp_karyawan' => 'required|string', // Validasi setiap peserta harus memiliki nrp_karyawan
+
+            'kendaraan' => 'nullable|array',
+            'kendaraan.*.nomor_kendaraan' => ['required', 'regex:/^[A-Z]{1,2} \d{1,4} [A-Z]{1,3}$/'],
+            'kendaraan.*.merk_kendaraan' => 'required|string|max:50',
+            'kendaraan.*.kapasitas_kendaraan' => 'required|integer|min:1|max:100',
+
         ], [
             'tujuan_penggunaan_1.required' => 'Tujuan penggunaan utama wajib diisi.',
             'tujuan_penggunaan_1.string' => 'Tujuan penggunaan harus berupa teks.',
@@ -152,6 +158,11 @@ class SuratDinasController extends Controller
             'peserta.array' => 'Data peserta harus dalam format array.',
             'peserta.*.nrp_karyawan.required' => 'NRP peserta wajib diisi.',
             'peserta.*.nrp_karyawan.string' => 'NRP peserta harus berupa teks.',
+
+            'kendaraan.*.nomor_kendaraan.required' => 'Nomor kendaraan wajib diisi.',
+            'kendaraan.*.nomor_kendaraan.regex' => 'Format nomor kendaraan tidak valid. Contoh: B 1234 ABC.',
+            'kendaraan.*.merk_kendaraan.required' => 'Merk kendaraan wajib diisi.',
+            'kendaraan.*.kapasitas_kendaraan.required' => 'Kapasitas kendaraan wajib diisi.',
         ]);
 
         if ($validator->fails()) {

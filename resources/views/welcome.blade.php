@@ -1230,13 +1230,10 @@
                             document.getElementById('kendaraan_dinas_id').removeAttribute('required');
                             document.getElementById('kendaraan_dinas_id').disabled = true;
                         }else {
-                            // TAXI
                             kilometerAwal.removeAttribute("required");
-                            kilometerAwal.setAttribute("disabled", "disabled");
-                            kilometerAwal.value = '';
-                            kendaraanGroup.style.display = "none";
+                            document.getElementById('kendaraan_dinas_id').removeAttribute('required');
+                            document.getElementById('kendaraan_dinas_id').disabled = true;
                         }
-
 
                         tabelKendaraan.style.display = "block";
 
