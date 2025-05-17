@@ -126,8 +126,6 @@ class SuratDinasController extends Controller
             'tanggal_penggunaan' => 'required|date|after_or_equal:today',
             'jenis_kendaraan' => 'required|in:1,2,3',
             'created_by' => 'required|string',
-            'waktu_keluar' => 'required|date_format:H:i',
-            'waktu_kembali' => 'required|date_format:H:i|after:waktu_keluar',
             'peserta' => 'nullable|array', // Memastikan peserta dikirim dalam bentuk array
             'peserta.*.nrp_karyawan' => 'required|string', // Validasi setiap peserta harus memiliki nrp_karyawan
         ], [
@@ -150,13 +148,6 @@ class SuratDinasController extends Controller
         
             'created_by.required' => 'NRP pembuat wajib diisi.',
             'created_by.string' => 'NRP pembuat harus berupa teks.',
-        
-            'waktu_keluar.required' => 'Waktu keluar wajib diisi.',
-            'waktu_keluar.date_format' => 'Format waktu keluar harus HH:MM (jam:menit).',
-        
-            'waktu_kembali.required' => 'Waktu kembali wajib diisi.',
-            'waktu_kembali.date_format' => 'Format waktu kembali harus HH:MM (jam:menit).',
-            'waktu_kembali.after' => 'Waktu kembali harus setelah waktu keluar.',
         
             'peserta.array' => 'Data peserta harus dalam format array.',
             'peserta.*.nrp_karyawan.required' => 'NRP peserta wajib diisi.',
@@ -265,27 +256,34 @@ class SuratDinasController extends Controller
                 ]);
             } 
 
-            // Jika jenis kendaraan adalah PRIBADI atau TAXI (jenis_kendaraan = 2 atau 3), simpan ke tb_kendaraan_dinas dan tb_surat_kendaraan_dinas_detail
             elseif (in_array($request->jenis_kendaraan, [2, 3]) && $request->has('kendaraan')) {
                 foreach ($request->kendaraan as $kendaraan) {
-                    // Simpan kendaraan ke tb_kendaraan_dinas
-                    $kendaraanBaru = KendaraanDinas::create([
-                        'jenis_kendaraan' => $request->jenis_kendaraan,
-                        'nomor_kendaraan' => $kendaraan['nomor_kendaraan'],
-                        'merk_kendaraan' => $kendaraan['merk_kendaraan'],
-                        'kapasitas_kendaraan' => $kendaraan['kapasitas_kendaraan'],
-                        'status_kendaraan' => 1,
-                        'created_by' => $nrpKaryawan,
-                        'created_date' => \Carbon\Carbon::now('Asia/Jakarta'),
-                    ]);
 
-                    // Simpan kendaraan yang baru dibuat ke tb_surat_kendaraan_dinas_detail
+                    // Jika kendaraan lama (sudah memiliki ID dari master)
+                    if (isset($kendaraan['kendaraan_dinas_id']) && is_numeric($kendaraan['kendaraan_dinas_id'])) {
+                        $kendaraanDinasId = $kendaraan['kendaraan_dinas_id'];
+                    } else {
+                        // Kendaraan baru (hasil add dari Selectize)
+                        $kendaraanBaru = KendaraanDinas::create([
+                            'jenis_kendaraan' => $request->jenis_kendaraan,
+                            'nomor_kendaraan' => $kendaraan['nomor_kendaraan'],
+                            'merk_kendaraan' => $kendaraan['merk_kendaraan'],
+                            'kapasitas_kendaraan' => $kendaraan['kapasitas_kendaraan'],
+                            'status_kendaraan' => 1,
+                            'created_by' => $nrpKaryawan,
+                            'created_date' => \Carbon\Carbon::now('Asia/Jakarta'),
+                        ]);
+                        $kendaraanDinasId = $kendaraanBaru->kendaraan_dinas_id;
+                    }
+
+                    // Simpan ke tabel detail surat kendaraan dinas
                     SuratKendaraanDinasDetail::create([
-                        'kendaraan_dinas_id' => $kendaraanBaru->kendaraan_dinas_id,
+                        'kendaraan_dinas_id' => $kendaraanDinasId,
                         'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
                     ]);
                 }
             }
+
 
 
             // Insert ke tabel tb_approval_barang_keluar
@@ -312,12 +310,12 @@ class SuratDinasController extends Controller
             
     
             DB::commit();
-            return redirect()->back()->with('success', 'Surat Dinas berhasil disimpan dengan ID: ' . $suratDinasID)
+            return redirect()->back()->with('success', 'Pengajuan Penggunaan Kendaraan Dinas berhasil disimpan dengan Nomor: ' . $suratDinasID)
             ->with('clear_local_storage', true);
     
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Gagal menyimpan surat dinas: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyimpan Pengajuan Penggunaan Kendaraan Dinas ' . $e->getMessage());
         }
     }
 

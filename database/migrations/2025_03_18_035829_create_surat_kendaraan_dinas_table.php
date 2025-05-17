@@ -23,8 +23,6 @@ return new class extends Migration
             $table->timestamp('created_date')->useCurrent();
             $table->dateTime('expired_date')->useCurrent();
             $table->string('expired_status', 15);
-            $table->time('waktu_keluar');
-            $table->time('waktu_kembali');
             $table->string('kilometer_awal', 35)->nullable();
             $table->string('kilometer_akhir', 35)->nullable();
 

@@ -257,11 +257,11 @@ class PengeluaranBarangController extends Controller
     
             DB::commit();
     
-            return redirect()->back()->with('success', 'Data berhasil disimpan!')
+            return redirect()->back()->with('success', 'Pengajuan Pengeluaran Barang berhasil disimpan dengan Nomor: ' . $pengeluaranBarangId)
             ->with('clear_local_storage', true);
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal Menyimpan Pengajuan Pengeluaran Barang! ' . $e->getMessage());
         }
     }
     

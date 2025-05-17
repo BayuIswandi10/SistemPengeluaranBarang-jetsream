@@ -24,8 +24,6 @@ class SuratKendaraanDinas extends Model
         'expired_date',
         'expired_status',
         'status',
-        'waktu_keluar',
-        'waktu_kembali',
         'kilometer_awal',
         'kilometer_akhir',
     ];

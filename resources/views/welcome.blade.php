@@ -356,7 +356,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
+                            <form method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data" id="tambah_penggunaan_kendaraan_dinas">
                                 @csrf
             
                                 <!-- Input Fields -->
@@ -399,9 +399,12 @@
                                         </thead>
                                         <tbody id="kendaraanPribadiBody">
                                             <tr>
-                                                <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
-                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
-                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
+                                                <td>
+                                                    <input type="hidden" name="kendaraan[0][kendaraan_dinas_id]" class="kendaraan_dinas_id">
+                                                    <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
+                                                </td>
+                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" required></td>
+                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" required></td>
                                                 <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
                                         </tbody>
@@ -866,7 +869,7 @@
                     $('.selectize').selectize({
                         sortField: 'text', // Mengurutkan berdasarkan teks (yang ditampilkan)
                         searchField: ['text'], // Mendukung pencarian pada label
-                        placeholder: 'Pilih Karyawan',
+                        placeholder: 'Pilih atau cari Karyawan',
                         score: function (search) {
                         return function (item) {
                         let text = item.text.toLowerCase();
@@ -1202,51 +1205,70 @@
             const kendaraanBody = document.getElementById("kendaraanPribadiBody");
             const kendaraanSelect = document.getElementById("kendaraan_dinas_id");
 
-            if (jenisKendaraan === "2") { // PRIBADI
-                kendaraanGroup.style.display = "block";
-                tabelKendaraan.style.display = "block";
-                kendaraanKantorGroup.style.display = "none";
-                kilometerAwal.setAttribute("required", "required");
+            // Reset tampilan terlebih dahulu
+            kendaraanGroup.style.display = "none";
+            tabelKendaraan.style.display = "none";
+            kendaraanKantorGroup.style.display = "none";
+            kilometerAwal.removeAttribute("required");
+            kilometerAwal.value = "";
+            kendaraanBody.innerHTML = "";
+            kendaraanSelect.innerHTML = "";
 
-                kendaraanBody.innerHTML = `
-                    <tr>
-                        <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
-                        <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
-                        <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
-                        <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
-                            <i class="fas fa-trash"></i></button></td>
-                    </tr>
-                `;
+            // AJAX hanya satu kali
+            fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
+                .then(res => res.json())
+                .then(data => {
+                    kendaraanList = data;
 
-            } else if (jenisKendaraan === "3") { // TAXI
-                kendaraanGroup.style.display = "none";
-                tabelKendaraan.style.display = "block";
-                kendaraanKantorGroup.style.display = "none";
-                kilometerAwal.removeAttribute("required");
-                kilometerAwal.value = "";
+                    if (jenisKendaraan === "2" || jenisKendaraan === "3") {
+                        // Untuk PRIBADI dan TAXI
+                        const isPribadi = jenisKendaraan === "2";
 
-                kendaraanBody.innerHTML = `
-                    <tr>
-                        <td><input type="text" name="kendaraan[0][nomor_kendaraan]" class="form-control" required></td>
-                        <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control" required></td>
-                        <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control" required></td>
-                        <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
-                            <i class="fas fa-trash"></i></button></td>
-                    </tr>
-                `;
+                        if (isPribadi) {
+                            kendaraanGroup.style.display = "block";
+                            kilometerAwal.setAttribute("required", "required");
+                            document.getElementById('kendaraan_dinas_id').removeAttribute('required');
+                            document.getElementById('kendaraan_dinas_id').disabled = true;
+                        }else {
+                            // TAXI
+                            kilometerAwal.removeAttribute("required");
+                            kilometerAwal.setAttribute("disabled", "disabled");
+                            kilometerAwal.value = '';
+                            kendaraanGroup.style.display = "none";
+                        }
 
-            } else if (jenisKendaraan === "1") { // KANTOR
-                kendaraanGroup.style.display = "none";
-                tabelKendaraan.style.display = "none";
-                kendaraanKantorGroup.style.display = "block";
-                kilometerAwal.removeAttribute("required");
-                kilometerAwal.value = "";
-                kendaraanBody.innerHTML = "";
 
-                // Ambil data kendaraan via AJAX
-                fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
-                    .then(res => res.json())
-                    .then(data => {
+                        tabelKendaraan.style.display = "block";
+
+                        kendaraanBody.innerHTML = `
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="kendaraan[0][kendaraan_dinas_id]" class="kendaraan_dinas_id">
+                                    <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
+                                </td>
+                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
+                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" readonly required></td>
+                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
+                                    <i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+
+                        initSelectize(0, jenisKendaraan, true, 'Pilih, cari atau tambahkan Kendaraan');
+                        const selectizeControl = $(`#select_nopol_0`)[0].selectize;
+                        selectizeControl.clearOptions();
+                        data.forEach(k => {
+                            selectizeControl.addOption({
+                                nomor_kendaraan: k.nomor_kendaraan,
+                                merk_kendaraan: k.merk_kendaraan,
+                                kapasitas_kendaraan: k.kapasitas_kendaraan
+                            });
+                        });
+                        selectizeControl.refreshOptions(false);
+
+                    } else if (jenisKendaraan === "1") {
+                        // Untuk KANTOR
+                        kendaraanKantorGroup.style.display = "block";
                         kendaraanSelect.innerHTML = `<option value="" disabled selected>Pilih Kendaraan</option>`;
                         if (data.length > 0) {
                             data.forEach(k => {
@@ -1258,18 +1280,104 @@
                         } else {
                             kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
                         }
-                    }).catch(error => {
-                        console.error('Gagal mengambil data kendaraan:', error);
-                        kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                        // Init selectize tanpa add untuk select kantor
+                        $('#kendaraan_dinas_id').selectize({
+                            create: false, // disable fitur add
+                            sortField: 'text',
+                            valueField: 'value',
+                            labelField: 'text',
+                            searchField: ['text'],
+                            placeholder: 'Pilih atau cari Kendaraan'
+                        });
+
+                    }
+                })
+            .catch(error => {
+                console.error('Gagal mengambil data kendaraan:', error);
+                if (jenisKendaraan === "1") {
+                    kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                }
+            });
+        }
+
+
+        let kendaraanList = [];
+
+        function initSelectize(index, jenis, allowAdd = false, placeholderText = '') {
+            const selectEl = $(`#select_nopol_${index}`);
+            selectEl.selectize({
+                valueField: 'nomor_kendaraan',
+                labelField: 'nomor_kendaraan',
+                searchField: ['nomor_kendaraan', 'merk_kendaraan'],
+               create: allowAdd ? function (input) {
+                    // Tambahkan item baru
+                    const newData = {
+                        nomor_kendaraan: input,
+                        merk_kendaraan: '',
+                        kapasitas_kendaraan: '',
+                        isNew: true
+                    };
+
+                    // Tambahkan ke kendaraanList agar dikenali di onChange
+                    kendaraanList.push(newData);
+
+                    // Trigger onChange manual (karena Selectize tidak otomatis trigger)
+                    setTimeout(() => {
+                        selectEl[0].selectize.setValue(input); // ini akan memicu onChange
+                    }, 10);
+
+                    return newData;
+                } : false,
+
+                placeholder: placeholderText,
+                onChange: function (value) {
+                    const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
+                    const merkField = $(`input[name="kendaraan[${index}][merk_kendaraan]"]`);
+                    const kapasitasField = $(`input[name="kendaraan[${index}][kapasitas_kendaraan]"]`);
+
+                   if (selected) {
+                        merkField.val(selected.merk_kendaraan).prop('readonly', !selected.isNew);
+                        kapasitasField.val(selected.kapasitas_kendaraan).prop('readonly', !selected.isNew);
+
+                        if (selected.kendaraan_dinas_id) {
+                            $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val(selected.kendaraan_dinas_id);
+                        } else {
+                            $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val('');
+                        }
+
+                    } else {
+                        merkField.val('').prop('readonly', false);
+                        kapasitasField.val('').prop('readonly', false);
+                        $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val('');
+                    }
+
+                }
+            });
+        }
+
+
+        function fetchKendaraanByJenis(jenisKendaraan, index) {
+            fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
+                .then(res => res.json())
+                .then(data => {
+                    kendaraanList = data;
+
+                    const selectizeControl = $(`#select_nopol_${index}`)[0].selectize;
+                    selectizeControl.clearOptions();
+
+                    data.forEach(k => {
+                        selectizeControl.addOption({
+                            nomor_kendaraan: k.nomor_kendaraan,
+                            merk_kendaraan: k.merk_kendaraan,
+                            kapasitas_kendaraan: k.kapasitas_kendaraan
+                        });
                     });
-            } else {
-                kendaraanGroup.style.display = "none";
-                tabelKendaraan.style.display = "none";
-                kendaraanKantorGroup.style.display = "none";
-                kilometerAwal.removeAttribute("required");
-                kilometerAwal.value = "";
-                kendaraanBody.innerHTML = "";
-            }
+
+                    selectizeControl.refreshOptions(false);
+                })
+                .catch(error => {
+                    console.error(`Gagal mengambil data kendaraan untuk jenis ${jenisKendaraan}:`, error);
+                });
         }
 
         function tambahKendaraanPribadi() {
@@ -1278,14 +1386,39 @@
 
             const row = `
                 <tr>
-                    <td><input type="text" name="kendaraan[${index}][nomor_kendaraan]" class="form-control" required></td>
-                    <td><input type="text" name="kendaraan[${index}][merk_kendaraan]" class="form-control" required></td>
-                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control" required></td>
-                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
+                    <td>
+                        <select id="select_nopol_${index}" name="kendaraan[${index}][nomor_kendaraan]" class="form-control select-nopol" data-index="${index}" required></select>
+                    </td>
+                    <td><input type="text" name="kendaraan[${index}][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
+                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" readonly required></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
+                        <i class="fas fa-trash"></i></button>
+                    </td>
                 </tr>
             `;
             tableBody.insertAdjacentHTML("beforeend", row);
+
+            const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
+
+            // Tentukan placeholder berdasarkan jenis kendaraan
+            let placeholderText = '';
+            let allowAdd = false;
+            if (jenisKendaraan === "2" || jenisKendaraan === "3") {
+                placeholderText = 'Pilih, cari atau tambahkan Kendaraan';
+                allowAdd = true;
+            } else {
+                placeholderText = 'Pilih atau cari Kendaraan';
+                allowAdd = false;
+            }
+
+            // Inisialisasi Selectize
+            initSelectize(index, jenisKendaraan, allowAdd, placeholderText);
+
+            // Ambil data kendaraan dari server dan isi Selectize
+            fetchKendaraanByJenis(jenisKendaraan, index);
         }
+
+
 
         function hapusKendaraanPribadi(button) {
             button.closest("tr").remove();
