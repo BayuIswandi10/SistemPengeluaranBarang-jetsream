@@ -20,6 +20,8 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Writer;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KendaraanDinasExport;
 
 class SuratDinasController extends Controller
 {
@@ -43,6 +45,12 @@ class SuratDinasController extends Controller
             return response()->json(['success' => false]);
         }
     }
+
+    public function export()
+    {
+        return Excel::download(new KendaraanDinasExport, 'data_kendaraan_dinas.xlsx');
+    }
+
     private function generateSuratDinasID($jenisKendaraan, $tanggalPenggunaan)
     {
         // Mapping jenis kendaraan

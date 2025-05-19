@@ -42,14 +42,22 @@ class DashboardKendaraanDinasController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Ka.Sie') {
+            if ($user->level === 'Ka.Sie' && $user->seksi !== 'General Service') {
+                // Ka.Sie biasa → hanya data dari departemen yang sama
                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
+
+            } elseif (
+                in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+                ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
+            ) {
+                // Ka.Sie dengan seksi General Service → dapat semua data
                 $suratKendaraan = $query->get();
+
             } else {
-                $suratKendaraan = collect(); // Jika level tidak dikenali, kembalikan data kosong
+                // Selain itu, kosong
+                $suratKendaraan = collect();
             }
 
             $userLevel = null; 
@@ -96,12 +104,19 @@ class DashboardKendaraanDinasController extends Controller
             // 4. Ambil semua kendaraan dinas
             $kendaraanDinasAll = KendaraanDinas::all();
     
-            // 5. Ambil kendaraan yang digunakan
-            $kendaraanDinasSedangDigunakan = $kendaraanDinasAll->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->values();
-    
-            // 6. Ambil kendaraan yang tidak digunakan
-            $kendaraanDinasTersedia = $kendaraanDinasAll->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->values();
-    
+           // Filter kendaraan jenis_kendaraan == 1
+            $filteredKendaraanDinas = $kendaraanDinasAll->where('jenis_kendaraan', 1);
+
+            // Kendaraan yang sedang digunakan dan jenis_kendaraan == 1
+            $kendaraanDinasSedangDigunakan = $filteredKendaraanDinas
+                ->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+                ->values();
+
+            // Kendaraan yang tersedia dan jenis_kendaraan == 1
+            $kendaraanDinasTersedia = $filteredKendaraanDinas
+                ->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+                ->values();
+
             // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([
                 'success' => true,

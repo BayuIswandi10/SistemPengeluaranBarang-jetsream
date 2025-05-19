@@ -4,7 +4,7 @@
 
         <ul class="mt-3 list-disc list-inside text-sm text-red-600">
             @foreach ($errors->all() as $error)
-                <li>{{ __('Gagal mengirim tautan reset password. Silakan coba lagi atau periksa email Anda.') }}</li>
+                <li>{{ __('Gagal mendapatkan akun yang sesuai, harap coba lagi.') }}</li>
             @endforeach
         </ul>
     </div>

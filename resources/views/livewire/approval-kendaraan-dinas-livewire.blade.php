@@ -16,8 +16,11 @@
     <div class="container-fluid">
 
         <div class="card mt-3">
-            <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                <h6 class="m-0 font-weight-bold text-primary">Data Persetujuan</h6>
+           <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
+            <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
+            <a href="{{ route('data-kendaraan-dinas.export') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-file-export me-1"></i> Export Excel
+            </a>
             </div>
             <div class="card-body">
                 @if (session('success'))

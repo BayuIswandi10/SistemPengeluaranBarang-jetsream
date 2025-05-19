@@ -7,15 +7,10 @@ use App\Models\ApprovalBarangKeluar;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
-class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, WithEvents
+class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize
 {
     private $totalCount = 0;
 
@@ -40,7 +35,7 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
         $this->totalCount = $pengeluaranBarangs->count();
 
         foreach ($pengeluaranBarangs as $pengeluaran) {
-            $result[] = [
+            $baseRow = [
                 $pengeluaran->pengeluaran_barang_id,
                 '', // Barang
                 '', // Approval
@@ -57,35 +52,24 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
                 Carbon::parse($pengeluaran->updated_date)->format('d-m-Y H:i'),
             ];
 
-            foreach ($pengeluaran->barangKeluar as $barang) {
-                $result[] = [
-                    '',
-                    $barang->nama_barang ?? '-',
-                    '',
-                    '', '', '', '', '', '', '', '', '', '', ''
-                ];
-            }
-
+            $barangs = $pengeluaran->barangKeluar;
             $approvals = ApprovalBarangKeluar::with('user')
                 ->where('pengeluaran_barang_id', $pengeluaran->pengeluaran_barang_id)
-                ->get();
+                ->get()
+                ->map(function ($approval) use ($pengeluaran) {
+                    return ($approval->user->name ?? 'Tidak Diketahui') . ' (' .
+                        $this->translateApprovalStatus($approval->status_approval ?? '-', $pengeluaran->kategori_pengeluaran) . ')';
+                });
 
-            foreach ($approvals as $approval) {
-                $translatedStatus = $this->translateApprovalStatus($approval->status_approval ?? '-', $pengeluaran->kategori_pengeluaran);
-                $result[] = [
-                    '',
-                    '',
-                    ($approval->user->name ?? 'Tidak Diketahui') . ' (' . $translatedStatus . ')',
-                    '', '', '', '', '', '', '', '', '', '', ''
-                ];
-            }                
+            $max = max($barangs->count(), $approvals->count());
+
+            for ($i = 0; $i < $max; $i++) {
+                $row = $baseRow;
+                $row[1] = $barangs[$i]->nama_barang ?? '';
+                $row[2] = $approvals[$i] ?? '';
+                $result[] = $row;
+            }
         }
-
-        // Tambahkan baris kosong dan jumlah total
-        $result[] = array_fill(0, 14, ''); // baris kosong
-        $result[] = [
-            'TOTAL DATA', '', '', '', '', '', '', '', '', '', '', '', '', $this->totalCount
-        ];
 
         return $result;
     }
@@ -95,7 +79,7 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
         return match ($status) {
             'Level 1' => 'Mengajukan',
             'Level 2' => 'PIC/Ka.Sie Sudah Menyetujui',
-            'Level 3' => 'Ka.Dept Ybs Sudah Menyutujui',
+            'Level 3' => 'Ka.Dept Ybs Sudah Menyetujui',
             'Level 4' => 'Ka Dept GA Sudah Menyetujui',
             'Level 5' => 'Finance Sudah Menyetujui',
             'Level 6' => 'Security Sudah Menyetujui',
@@ -123,89 +107,4 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
             'Tanggal Diperbarui',
         ];
     }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function(AfterSheet $event) {
-                $sheet = $event->sheet->getDelegate();
-                $lastColumn = 'N';
-                $lastRow = $sheet->getHighestRow();
-
-                // Header styling
-                $sheet->getStyle("A1:{$lastColumn}1")->applyFromArray([
-                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F81BD']],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
-                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-                ]);
-
-                // Table styling
-                $sheet->getStyle("A2:{$lastColumn}{$lastRow}")->applyFromArray([
-                    'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
-                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-                ]);
-
-                // Total row styling
-                $sheet->getStyle("A{$lastRow}:{$lastColumn}{$lastRow}")->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9D9D9']],
-                ]);
-
-                // Data Rekap
-                $pengeluaran = PengeluaranBarang::all();
-                $scrap7Hari = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subDays(7))->count();
-                $scrap1Bulan = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subMonth())->count();
-                $scrap1Tahun = $pengeluaran->where('kategori_pengeluaran', 1)->where('created_date', '>=', now()->subYear())->count();
-
-                $nonScrap7Hari = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subDays(7))->count();
-                $nonScrap1Bulan = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subMonth())->count();
-                $nonScrap1Tahun = $pengeluaran->where('kategori_pengeluaran', 0)->where('created_date', '>=', now()->subYear())->count();
-
-                $startColumn = 'P'; // kolom tambahan di kanan
-                $sheet->setCellValue("{$startColumn}1", 'Kategori');
-                $sheet->setCellValue("Q1", '7 Hari Terakhir');
-                $sheet->setCellValue("R1", '1 Bulan Terakhir');
-                $sheet->setCellValue("S1", '1 Tahun Terakhir');
-
-                // Scrap Row
-                $sheet->setCellValue("{$startColumn}2", 'Scrap');
-                $sheet->setCellValue("Q2", $scrap7Hari);
-                $sheet->setCellValue("R2", $scrap1Bulan);
-                $sheet->setCellValue("S2", $scrap1Tahun);
-
-                // Non Scrap Row
-                $sheet->setCellValue("{$startColumn}4", 'Non Scrap');
-                $sheet->setCellValue("Q4", $nonScrap7Hari);
-                $sheet->setCellValue("R4", $nonScrap1Bulan);
-                $sheet->setCellValue("S4", $nonScrap1Tahun);
-
-                // Styling
-                $rekapRange = ["{$startColumn}1:S2", "{$startColumn}4:S4"];
-                foreach ($rekapRange as $range) {
-                    $sheet->getStyle($range)->applyFromArray([
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER,
-                            'wrapText' => true,
-                        ],
-                        'borders' => [
-                            'allBorders' => [
-                                'borderStyle' => Border::BORDER_THIN,
-                                'color' => ['argb' => 'FF000000'],
-                            ],
-                        ],
-                    ]);
-                    $sheet->getStyle(explode(':', $range)[0])->applyFromArray([
-                        'font' => ['bold' => true],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'BDD7EE'],
-                        ],
-                    ]);
-                }
-            }];
-        }
-    }
-
-
+}

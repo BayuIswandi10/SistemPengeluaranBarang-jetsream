@@ -19,7 +19,7 @@
             <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
 
             <div class="row g-2 align-items-center w-100">
-                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin' || $user->level === 'Security')
+                @if ($user->level === 'Ka.Dept' || $user->level === 'Super Admin' || $user->level === 'Security' || $user->seksi==='General Service')
                     <!-- Tombol Switch -->
                     <div class="col-md-8 col-12">
                         <div class="d-flex flex-wrap border rounded overflow-hidden w-100">

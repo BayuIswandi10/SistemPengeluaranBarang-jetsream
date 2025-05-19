@@ -24,14 +24,23 @@ class DashboardKendaraanDinasLiveWire extends Component
         ->whereBetween('created_date', [$startOfDay, $endOfDay]);
         
 
-        if ($user->level === 'Ka.Sie') {
+        // Filter data berdasarkan level user
+        if ($user->level === 'Ka.Sie' && $user->seksi !== 'General Service') {
+            // Ka.Sie biasa → hanya data dari departemen yang sama
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
+
+        } elseif (
+            in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+            ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
+        ) {
+            // Ka.Sie dengan seksi General Service → dapat semua data
             $suratKendaraanDinasList = $query->get();
+
         } else {
-            $suratKendaraanDinasList = collect(); 
+            // Selain itu, kosong
+            $suratKendaraanDinasList = collect();
         }
 
         // Ekstrak angka dari level user
@@ -79,11 +88,18 @@ class DashboardKendaraanDinasLiveWire extends Component
         // 4. Ambil semua kendaraan dinas
         $kendaraanDinasAll = KendaraanDinas::all();
 
-        // 5. Ambil kendaraan yang digunakan
-        $kendaraanDinasSedangDigunakan = $kendaraanDinasAll->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->count();
+        // Filter kendaraan jenis_kendaraan == 1
+        $filteredKendaraanDinas = $kendaraanDinasAll->where('jenis_kendaraan', 1);
 
-        // 6. Ambil kendaraan yang tidak digunakan
-        $kendaraanDinasTersedia = $kendaraanDinasAll->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)->count();
+        // Kendaraan yang sedang digunakan dan jenis_kendaraan == 1
+        $kendaraanDinasSedangDigunakan = $filteredKendaraanDinas
+            ->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+            ->count();
+
+        // Kendaraan yang tersedia dan jenis_kendaraan == 1
+        $kendaraanDinasTersedia = $filteredKendaraanDinas
+            ->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+            ->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();

@@ -20,8 +20,9 @@ use App\Http\Controllers\SuratDinasController;
 use App\Http\Controllers\ApprovalKendaraanDinasController;
 use App\Http\Controllers\UserController;
 
-use App\Http\Middleware\CheckLevel; 
-    
+use App\Http\Middleware\CheckLevel;
+use App\Models\SuratKendaraanDinas;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -30,6 +31,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard-barang-keluar', DashboardBarangKeluarLiveWire::class)->name('dashboard-barang-keluar');
     Route::get('/dashboard-kendaraan-dinas', DashboardKendaraanDinasLiveWire::class)->name('dashboard-kendaraan-dinas');
     Route::get('/data-barang-keluar/export', [PengeluaranBarangController::class, 'export'])->name('data-barang-keluar.export');
+     Route::get('/data-kendaraan-dinas/export', [SuratDinasController::class, 'export'])->name('data-kendaraan-dinas.export');
 
     Route::middleware([CheckLevel::class . ':Security'])->group(function () {
         Route::get('/security', SecurityLiveWire::class)->name('security');

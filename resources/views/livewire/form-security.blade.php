@@ -40,10 +40,15 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="d-flex justify-content-between align-items-center">
+                <!-- Badge Status Persetujuan -->
+                <div id="approvalStatusBadge" class="mb-3 text-center"></div>
+
+                <!-- Info Nomor Pengeluaran dan Kategori -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
                     <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                    <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                    <div id="kategoriBarangCard"></div>
                 </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
                     <button type="button" class="btn btn-success" id="approveButton" data-id="">Setuju</button>
@@ -115,6 +120,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <!-- Badge Status Persetujuan -->
+                    <div id="approvalStatusBadgeDinas" class="mb-3 text-center"></div>
+
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
                         <button type="button" class="btn btn-success" id="approveButtonDinas" data-id="">Setuju</button>
@@ -244,10 +252,16 @@
             method: "POST",
             data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
             success: function (data) {
-                document.getElementById('kategoriBarangCard').innerHTML = 
-                        data.kategori_pengeluaran === 1 
-                        ? '<span class="badge bg-danger">Scrap</span>' 
-                        : '<span class="badge bg-info text-dark">Non Scrap</span>';
+                 document.getElementById('kategoriBarangCard').innerHTML = 
+                            data.kategori_pengeluaran === 1 
+                            ? '<span class="badge badge-danger fs-5 px-4 py-2">Scrap</span>' 
+                            : '<span class="badge badge-info fs-5 px-4 py-2">Non Scrap</span>';
+
+                // Badge besar status persetujuan
+                const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                document.getElementById('approvalStatusBadge').innerHTML = maxLevel >= 5 
+                    ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>' 
+                    : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
         
                 document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                 const tbody = document.getElementById('detailBody');
@@ -545,6 +559,12 @@
                     const jenisKendraan = {
                         1 : "Mengeluarkan"
                     };
+
+                     // Badge besar status persetujuan
+                    const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                    document.getElementById('approvalStatusBadgeDinas').innerHTML = maxLevel >= 5 
+                        ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>' 
+                        : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
 
                     let statusPengeluaran = data.status; // Pastikan API mengembalikan status
 
