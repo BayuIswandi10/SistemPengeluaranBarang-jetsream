@@ -101,8 +101,10 @@ Route::post('/pengajuan_dinas', [SuratDinasController::class, 'store'])->name('p
 Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->name('pengajuan_dinas.getUserDetails');
 Route::get('/pengajuan/get-data-level3', [SuratDinasController::class, 'getDataLevel3']);
 Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);
-Route::post('/pengajuan/infoSuratKendaraanDinasNonAuth', [SuratDinasController::class, 'editNonAuth'])->name('pengajuan.infoSuratKendaraanDinasNonAuth');
 Route::post('/pengajuan/generateQrCodeSuratKendaraan', [SuratDinasController::class, 'generateQrCodeSuratKendaraan'])->name('pengajuan.generateQrCodeSuratKendaraan');
+Route::put('/pengajuan/updateNonAuth', [SuratDinasController::class, 'updateNonAuth'])->name('pengajuan.updateNonAuth');
+Route::post('/pengajuan/infoSuratKendaraanDinasNonAuth', [SuratDinasController::class, 'editNonAuth'])->name('pengajuan.infoSuratKendaraanDinasNonAuth');
+
 
 Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 Route::get('/kendaraan/get-by-jenis', [KendaraanDinasController::class, 'getKendaraanByJenis'])->name('get-by-jenis');

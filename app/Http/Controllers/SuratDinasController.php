@@ -567,6 +567,38 @@ class SuratDinasController extends Controller
         }
     }
 
+    public function updateNonAuth(Request $request)
+    {
+        $request->validate([
+            'surat_kendaraan_dinas_id' => 'required|exists:tb_surat_kendaraan_dinas,surat_kendaraan_dinas_id',
+            'peserta' => 'required|array',
+            'peserta.*.nrp_karyawan' => 'required|string|distinct',
+        ]);
+
+        $suratId = $request->surat_kendaraan_dinas_id;
+        $pesertaBaru = collect($request->peserta)->pluck('nrp_karyawan')->unique();
+
+        // Ambil peserta yang sudah tersimpan sebelumnya
+        $pesertaLama = DB::table('tb_pencatatan_kendaraan_dinas')
+            ->where('surat_kendaraan_dinas_id', $suratId)
+            ->pluck('nrp_karyawan');
+
+        // Cari peserta yang baru (belum ada di DB)
+        $pesertaUntukDisimpan = $pesertaBaru->diff($pesertaLama);
+
+        // Masukkan ke DB
+        foreach ($pesertaUntukDisimpan as $nrp) {
+            DB::table('tb_pencatatan_kendaraan_dinas')->insert([
+                'surat_kendaraan_dinas_id' => $suratId,
+                'nrp_karyawan' => $nrp,
+                'update_date' => Carbon::now(),
+                'status' => null,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Peserta berhasil ditambahkan.');
+    }
+
     
 
     public function update(Request $request)

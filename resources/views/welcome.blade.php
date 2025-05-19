@@ -486,7 +486,7 @@
             </div>
 
             {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal --}}
-            <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+            <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -502,9 +502,11 @@
 
 
                             <!-- Form Edit -->
-                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.update')}}" enctype="multipart/form-data" >
+                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.updateNonAuth')}}" enctype="multipart/form-data" >
                                 @csrf
                                 @method('PUT')
+                                
+                                <input type="hidden" name="surat_kendaraan_dinas_id" id="hiddenSuratId">
 
                                 <label class="mt-3">Tujuan <span class="text-danger">*</span></label>
                                 <div class="row">
@@ -930,6 +932,13 @@
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
 
+                            $('#jenisMobil').val('');
+                            $('#tanggalPakai').val('');
+                            $('#tujuan_1').val('');
+                            $('#tujuan_2').val('');
+                            $('#tujuan_3').val('');
+                            $('#pesertaTableTambahPeserta tbody').empty();
+
                         $.ajax({
                             url: "/pengajuan/infoSuratKendaraanDinasNonAuth",
                             type: "POST",
@@ -941,6 +950,8 @@
                             success: function (response) {
                                 if (response) {
                                     window.daftarKendaraanGlobal = response.daftar_kendaraan;
+
+                                    $("#hiddenSuratId").val(suratId);
 
                                     $("#nomorSurat").val(suratId);
                                     const jenisMapping = {
@@ -956,16 +967,15 @@
                                     $("#tujuan_3").val(response.tujuan_penggunaan_3);
 
                                     const pesertaTable = $("#pesertaTableTambahPeserta tbody");
-                                    pesertaTable.empty();
 
                                     // Tambahkan baris peserta
                                     response.userDinas.forEach((user, index) => {
                                         pesertaTable.append(`
                                             <tr>
                                                 <td class="nomor">${index + 1}</td>
-                                                <td><input type="text" class="form-control" value="${user.nrp_karyawan}" readonly></td>
-                                                <td><input type="text" class="form-control" value="${user.name}" readonly></td>
-                                                <td><input type="text" class="form-control" value="${user.departemen}" readonly></td>
+                                                <td><input type="text" name="peserta[${index}][nrp_karyawan]" class="form-control" value="${user.nrp_karyawan}" readonly></td>
+                                                <td><input type="text" name="peserta[${index}][nama]" class="form-control" value="${user.name}" readonly></td>
+                                                <td><input type="text" name="peserta[${index}][departemen]" class="form-control" value="${user.departemen}" readonly></td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger btn-sm trash-btn" disabled>
                                                         <i class="fas fa-trash"></i>
