@@ -454,7 +454,7 @@
 
                         // Badge besar status persetujuan
                         const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
-                        document.getElementById('approvalStatusBadgeDinas').innerHTML = maxLevel >= 5 
+                        document.getElementById('approvalStatusBadgeDinas').innerHTML = maxLevel >= 3 
                             ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>' 
                             : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
 
