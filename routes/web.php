@@ -102,7 +102,7 @@ Route::get('/getUserDetails', [SuratDinasController::class, 'getUserDetails'])->
 Route::get('/pengajuan/get-data-level3', [SuratDinasController::class, 'getDataLevel3']);
 Route::post('/pengajuan/detailSuratNonAuth', [SuratDinasController::class, 'getDetailSuratNonAuth']);
 Route::post('/pengajuan/generateQrCodeSuratKendaraan', [SuratDinasController::class, 'generateQrCodeSuratKendaraan'])->name('pengajuan.generateQrCodeSuratKendaraan');
-Route::put('/pengajuan/updateNonAuth', [SuratDinasController::class, 'updateNonAuth'])->name('pengajuan.updateNonAuth');
+Route::post('/pengajuan/updateNonAuth', [SuratDinasController::class, 'updateNonAuth'])->name('pengajuan.updateNonAuth');
 Route::post('/pengajuan/infoSuratKendaraanDinasNonAuth', [SuratDinasController::class, 'editNonAuth'])->name('pengajuan.infoSuratKendaraanDinasNonAuth');
 
 

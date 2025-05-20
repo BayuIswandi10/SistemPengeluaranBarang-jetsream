@@ -504,7 +504,6 @@
                             <!-- Form Edit -->
                             <form id="editOrderForm" method="POST" action="{{route('pengajuan.updateNonAuth')}}" enctype="multipart/form-data" >
                                 @csrf
-                                @method('PUT')
                                 
                                 <input type="hidden" name="surat_kendaraan_dinas_id" id="hiddenSuratId">
 
@@ -558,7 +557,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahComboBoxPeserta()">
+                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
                                         <i class="fas fa-plus"></i> Tambah Peserta
                                     </button>
                                 </div>
@@ -989,10 +988,11 @@
                                     const form = $("#editOrderForm");
 
                                     if (statusSurat === 'Level 1') {
-                                        form.find("input, select, textarea").prop("disabled", true);
+                                        form.find("input, select, textarea").not("[name='_token']").prop("readonly", true);
+                                        form.find("select").prop("disabled", true);
                                         $("#tambahPesertaBtn").prop("disabled", false);
                                     } else {
-                                        form.find("input, select, textarea").prop("disabled", true);
+                                        form.find("input, select, textarea").not("[name='_token']").prop("disabled", true);
                                         $("#tambahPesertaBtn").prop("disabled", true);
                                     }
                                     $(".trash-btn").prop("disabled", true);
@@ -1968,45 +1968,45 @@
 
 
         function hapusComboBoxPeserta(button) {
-        const container = document.getElementById('pesertaTableTambah');
-        const rows = container.getElementsByTagName('tr');
+            const container = document.getElementById('pesertaTableTambah');
+            const rows = container.getElementsByTagName('tr');
 
-        if (rows.length > 1) {
-            const row = button.closest('tr');
-            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // ambil NRP dari baris
+            if (rows.length > 1) {
+                const row = button.closest('tr');
+                const nrpToDelete = $(row).find('.nrp_karyawan').val(); // ambil NRP dari baris
 
-            // SweetAlert konfirmasi
-            Swal.fire({
-                icon: 'warning',
-                title: 'Apakah Anda yakin?',
-                text: 'Baris ini akan dihapus.',
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    row.remove();
-                    updateNomor();
+                // SweetAlert konfirmasi
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Apakah Anda yakin?',
+                    text: 'Baris ini akan dihapus.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        row.remove();
+                        updateNomor();
 
-                    // Hapus NRP dari localStorage
-                    let storedNRPs = JSON.parse(localStorage.getItem('nrp_karyawan_list')) || [];
+                        // Hapus NRP dari localStorage
+                        let storedNRPs = JSON.parse(localStorage.getItem('nrp_karyawan_list')) || [];
 
-                    // Hapus elemen yang sesuai (pakai filter)
-                    storedNRPs = storedNRPs.filter(nrp => nrp !== nrpToDelete);
+                        // Hapus elemen yang sesuai (pakai filter)
+                        storedNRPs = storedNRPs.filter(nrp => nrp !== nrpToDelete);
 
-                    localStorage.setItem('nrp_karyawan_list', JSON.stringify(storedNRPs));
-                }
-            });
-        } else {
-            Swal.fire({
-                icon: 'info',
-                title: 'Tidak bisa menghapus baris terakhir.',
-                text: 'Harap tambahkan baris baru jika perlu.',
-                confirmButtonText: 'OK'
-            });
+                        localStorage.setItem('nrp_karyawan_list', JSON.stringify(storedNRPs));
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak bisa menghapus baris terakhir.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
-    }
 
 
         function updateNomorPeserta() {
@@ -2079,6 +2079,50 @@
             }
         });
 
+
+        function tambahPesertaIkutSerta() {
+            const container = document.getElementById('pesertaTableTambahPeserta').getElementsByTagName('tbody')[0];
+            const rows = container.getElementsByTagName('tr');
+            const index = rows.length;
+
+            if (index >= 5) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Maksimal 5 Peserta',
+                    text: 'Anda hanya bisa menambahkan hingga 5 peserta saja.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="nomor">${index + 1}</td>
+                <td><input type="text" name="peserta[${index}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${index}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${index}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            container.appendChild(newRow);
+            updateNomorIkutPeserta();
+        }
+
+        function updateNomorIkutPeserta() {
+            const rows = document.querySelectorAll('#pesertaTableTambahPeserta tbody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.nomor').textContent = index + 1;
+
+                // Update name attribute sesuai urutan index
+                row.querySelector(".nrp_karyawan").setAttribute("name", `peserta[${index}][nrp_karyawan]`);
+                row.querySelector(".nama").setAttribute("name", `peserta[${index}][nama]`);
+                row.querySelector(".departemen").setAttribute("name", `peserta[${index}][departemen]`);
+            });
+        }
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

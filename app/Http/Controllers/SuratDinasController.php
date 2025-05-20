@@ -17,6 +17,7 @@ use App\Mail\ApprovalNotification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use BaconQrCode\Renderer\ImageRenderer;
+use Carbon\Carbon;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Writer;
@@ -230,8 +231,6 @@ class SuratDinasController extends Controller
                 'expired_date' => \Carbon\Carbon::now('Asia/Jakarta')->addHours(2),
                 'expired_status' => 'Aktif',
                 'status' => 'Level 1',
-                'waktu_keluar' => $request->waktu_keluar,
-                'waktu_kembali' => $request->waktu_kembali,
                 'kilometer_awal' => $request->kilometer_awal,
             ]);
     
@@ -614,8 +613,6 @@ class SuratDinasController extends Controller
                 'tujuan_penggunaan_3' => $request->tujuan_penggunaan_3,
                 'tanggal_penggunaan'  => $request->tanggal_penggunaan,
                 'jenis_kendaraan'     => $request->jenis_kendaraan,
-                'waktu_keluar'        => $request->waktu_keluar,
-                'waktu_kembali'       => $request->waktu_kembali,
             ]);
     
             // 2. Sinkronisasi kendaraan dinas
