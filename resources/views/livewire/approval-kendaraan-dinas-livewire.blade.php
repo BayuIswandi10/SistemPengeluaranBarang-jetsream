@@ -296,21 +296,14 @@
                         @csrf
                         @method('PUT')
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <!-- Yang Memesan -->
                                 <label for="pemesan">Yang Memesan *</label>
                                 <input type="hidden" name="surat_kendaraan_dinas_id" id="surat_kendaraan_dinas_id">
                                 <input type="text" name="nrp_karyawan" id="pemesan" class="form-control" disabled>
-
-                                <!-- Rencana Pakai -->
-                                <label for="jamMulai" class="mt-2">Rencana Pakai *</label>
-                                <div class="d-flex">
-                                    <input type="time" name="waktu_keluar" id="jamMulai" class="form-control mr-2">
-                                    <input type="time" name="waktu_kembali" id="jamSelesai" class="form-control">
-                                </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-12 mt-3">
                                 <!-- Kendaraan Info -->
                                 <label for="kendaraan" class="mt-2">Kendaraan *</label>
                                 <div class="border p-2 table-responsive">
@@ -457,16 +450,25 @@
         });
 
         if (pesertaDipindahkan.length === 0) {
-            alert('Pilih peserta yang ingin dipindahkan!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak ada peserta dipilih',
+                text: 'Silakan pilih peserta yang ingin dipindahkan.',
+            });
             return;
         }
 
-        // Load surat dinas tujuan
+        const tanggal = $('#tanggalPakai').val();
+        const currentSuratId = $('#surat_kendaraan_dinas_id').val();
+
         $.ajax({
-            url: "/pengajuan/surat-tujuan", // Buat route ini
+            url: "/pengajuan/surat-tujuan",
             type: "GET",
+            data: {
+                tanggal_penggunaan: tanggal,
+                current_surat_id: currentSuratId
+            },
             success: function (data) {
-                // Ambil data peserta dari tabel utama
                 const pesertaList = [];
                 $('#pesertaList input[type="checkbox"]:checked').each(function () {
                     const row = $(this).closest('tr');
@@ -476,7 +478,6 @@
                     pesertaList.push({ nrp, nama, dept });
                 });
 
-                // Render Tabel Peserta yang Dipindah
                 const tbodyPeserta = $("#tabelPesertaDipindah tbody");
                 tbodyPeserta.empty();
                 pesertaList.forEach(p => {
@@ -488,7 +489,7 @@
                         </tr>
                     `);
                 });
-                
+
                 let tbody = $("#tabelTujuanSurat tbody");
                 tbody.empty();
 
@@ -516,7 +517,11 @@
     $('#btnSimpanPindah').click(function () {
         const suratTujuan = $('input[name="surat_tujuan"]:checked').val();
         if (!suratTujuan) {
-            alert('Pilih surat tujuan!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Surat tujuan belum dipilih',
+                text: 'Silakan pilih salah satu surat tujuan terlebih dahulu.',
+            });
             return;
         }
 
@@ -529,11 +534,23 @@
                 surat_tujuan: suratTujuan
             },
             success: function () {
-                alert("Peserta berhasil dipindahkan!");
-                location.reload();
+                let pesan = pesertaDipindahkan.map(nrp => `• Peserta dengan NRP ${nrp} berhasil dipindahkan ke surat dinas ${suratTujuan}.`).join('<br>');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pemindahan Berhasil',
+                    html: pesan,
+                    confirmButtonText: 'Tutup'
+                }).then(() => {
+                    location.reload();
+                });
             },
             error: function () {
-                alert("Gagal memindahkan peserta.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan saat memindahkan peserta. Silakan coba lagi.',
+                });
             }
         });
     });

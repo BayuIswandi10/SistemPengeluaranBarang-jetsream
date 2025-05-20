@@ -284,7 +284,7 @@
                                                 <tr>
                                                     <td class="nomor">1</td>
                                                     <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                                                    <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                                                    <td><input type="text" name="jumlah[]" class="form-control jumlah-input" placeholder="Jumlah"required autocomplete="off"></td>
                                                     <td>
                                                         <select name="satuan[]" class="form-control" required>
                                                             <option value="" disabled selected>Pilih Satuan</option>
@@ -404,7 +404,7 @@
                                                     <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
                                                 </td>
                                                 <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" required></td>
-                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" required></td>
+                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" required></td>
                                                 <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
                                         </tbody>
@@ -433,7 +433,7 @@
 
                                 <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
                                     <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
+                                    <input type="number" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
                                 </div>    
             
                                 <!-- Peserta Dinas Table -->
@@ -1094,7 +1094,7 @@
             newRow.innerHTML = `
                 <td class="nomor">${++counter}</td>
                 <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                <td><input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                <td><input type="text" name="jumlah[]" class="form-control jumlah-input" placeholder="Jumlah" required autocomplete="off"></td>
                 <td>
                     <select name="satuan[]" class="form-control" required>
                         <option value="" disabled selected>Pilih Satuan</option>
@@ -1177,7 +1177,7 @@
                 row.innerHTML = `
                     <td class="nomor">${++counter}</td>
                     <td><input type="text" name="barang_ids[]" class="form-control" value="${item.barang_id}" placeholder="Nama Barang" required autocomplete="off"></td>
-                    <td><input type="number" name="jumlah[]" class="form-control" value="${item.jumlah}" placeholder="Jumlah" min="1" required autocomplete="off"></td>
+                    <td><input type="text" name="jumlah[]" class="form-control jumlah-input" value="${item.jumlah}" placeholder="Jumlah" required autocomplete="off"></td>
                     <td>
                         <select name="satuan[]" class="form-control" required>
                             <option value="" disabled ${item.satuan === '' ? 'selected' : ''}>Pilih Satuan</option>
@@ -1254,7 +1254,7 @@
                                     <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
                                 </td>
                                 <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
-                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" readonly required></td>
+                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas input-kapasitas" min="1" readonly required></td>
                                 <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
                                     <i class="fas fa-trash"></i></button>
                                 </td>
@@ -1397,7 +1397,7 @@
                         <select id="select_nopol_${index}" name="kendaraan[${index}][nomor_kendaraan]" class="form-control select-nopol" data-index="${index}" required></select>
                     </td>
                     <td><input type="text" name="kendaraan[${index}][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
-                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan" readonly required></td>
+                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
                         <i class="fas fa-trash"></i></button>
                     </td>
@@ -2123,6 +2123,56 @@
                 row.querySelector(".departemen").setAttribute("name", `peserta[${index}][departemen]`);
             });
         }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputKm = document.getElementById("kilometer_awal");
+
+            inputKm.addEventListener("input", function (e) {
+                let value = this.value.replace(/\D/g, ''); // hanya angka
+                this.value = formatRibuan(value);
+            });
+
+            function formatRibuan(angka) {
+                return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+        });
+
+        document.addEventListener('input', function (e) {
+            if (e.target.classList.contains('jumlah-input')) {
+            // Ambil angka, hapus karakter non-digit
+            let val = e.target.value.replace(/\D/g, '');
+
+            // Hapus semua 0 di depan, tapi tetap izinkan angka '0' tunggal
+            if (val.length > 1) {
+                val = val.replace(/^0+/, '');
+            }
+
+            // Jika hanya 0 saja, kosongkan (tidak valid)
+            if (val === '0') val = '';
+
+            // Maksimal 6 digit
+            e.target.value = val.slice(0, 6);
+            }
+        });
+
+        document.addEventListener('input', function (e) {
+            if (e.target.classList.contains('input-kapasitas')) {
+                // Ambil angka, hapus karakter non-digit
+                let val = e.target.value.replace(/\D/g, '');
+
+                // Hapus semua 0 di depan, tapi tetap izinkan angka '0' tunggal
+                if (val.length > 1) {
+                val = val.replace(/^0+/, '');
+                }
+
+                // Jika hanya 0 saja, kosongkan (tidak valid)
+                if (val === '0') val = '';
+
+                // Maksimal 2 digit
+                e.target.value = val.slice(0, 2);
+            }
+        });
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

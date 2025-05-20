@@ -472,23 +472,15 @@ class SuratDinasController extends Controller
     
             // Waktu dan tanggal dari surat
             $tanggalPenggunaan = $suratDinas->tanggal_penggunaan;
-            $waktuKeluar = $suratDinas->waktu_keluar;
-            $waktuKembali = $suratDinas->waktu_kembali;
-    
-            // Kendaraan yang tidak digunakan oleh surat lain pada waktu yang sama
-            $kendaraanTersedia = KendaraanDinas::whereNotExists(function ($query) use ($tanggalPenggunaan, $waktuKeluar, $waktuKembali, $suratDinasId) {
+
+            // Kendaraan yang tidak digunakan oleh surat lain pada tanggal yang sama
+            $kendaraanTersedia = KendaraanDinas::whereNotExists(function ($query) use ($tanggalPenggunaan, $suratDinasId) {
                 $query->select(DB::raw(1))
                     ->from('tb_surat_kendaraan_dinas_detail as dskd')
                     ->join('tb_surat_kendaraan_dinas as skd', 'dskd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
                     ->whereRaw('dskd.kendaraan_dinas_id = tb_kendaraan_dinas.kendaraan_dinas_id')
                     ->where('skd.tanggal_penggunaan', $tanggalPenggunaan)
-                    ->where('skd.surat_kendaraan_dinas_id', '!=', $suratDinasId)
-                    ->where(function ($q) use ($waktuKeluar, $waktuKembali) {
-                        $q->whereBetween(DB::raw("'$waktuKeluar'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
-                            ->orWhereBetween(DB::raw("'$waktuKembali'"), ['skd.waktu_keluar', 'skd.waktu_kembali'])
-                            ->orWhereBetween('skd.waktu_keluar', [$waktuKeluar, $waktuKembali])
-                            ->orWhereBetween('skd.waktu_kembali', [$waktuKeluar, $waktuKembali]);
-                    });
+                    ->where('skd.surat_kendaraan_dinas_id', '!=', $suratDinasId);
             })->get();
     
             // Ubah kendaraan tersedia ke format array
@@ -535,8 +527,16 @@ class SuratDinasController extends Controller
             $suratDinasId = $request->surat_kendaraan_dinas_id;
 
             // Ambil data surat dinas dan relasinya
+            // $suratDinas = SuratKendaraanDinas::with([
+            //     'pencatatanKendaraanDinas.user'
+            // ])->findOrFail($suratDinasId);
+
             $suratDinas = SuratKendaraanDinas::with([
-                'pencatatanKendaraanDinas.user'
+                'pencatatanKendaraanDinas' => function($query) {
+                    $query->where('status', '!=', 'Dipindahkan');
+                },
+                'pencatatanKendaraanDinas.user',
+                'suratDetail.kendaraan'
             ])->findOrFail($suratDinasId);
 
             // Mapping data user dinas (peserta)
@@ -656,29 +656,58 @@ class SuratDinasController extends Controller
     }
     
 
-    public function getSuratTujuan()
+    public function getSuratTujuan(Request $request)
     {
-        $list = SuratKendaraanDinas::where('status', '!=', 'Sudah Dibatalkan')->get();
+        $tanggal = $request->input('tanggal_penggunaan');
+        $currentSuratId = $request->input('current_surat_id');
+
+        $list = SuratKendaraanDinas::where('status', 'Level 2')
+            ->where('tanggal_penggunaan', $tanggal)
+            ->where('surat_kendaraan_dinas_id', '!=', $currentSuratId)
+            ->get();
 
         return response()->json($list);
     }
 
+
     public function pindahkanPeserta(Request $request)
     {
-        $peserta = $request->peserta; // array of NRP
+        $peserta = $request->peserta; // array NRP peserta
         $suratBaru = $request->surat_tujuan;
 
         foreach ($peserta as $nrp) {
-            // Ubah surat pada pencatatan kendaraan dinas
-            PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
-                ->update([
-                    'surat_kendaraan_dinas_id' => $suratBaru,
+            // Ambil data surat lama dari pencatatan
+            $pencatatanLama = PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
+                ->where('status', '!=', 'Dipindahkan')
+                ->first();
+
+            if ($pencatatanLama) {
+                // Update status pencatatan di surat lama
+                $pencatatanLama->update([
                     'status' => 'Dipindahkan'
                 ]);
+            }
+
+            // Cek apakah sudah ada di surat baru
+            $existsInNewSurat = PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
+                ->where('surat_kendaraan_dinas_id', $suratBaru)
+                ->exists();
+
+            if (!$existsInNewSurat) {
+                // Tambahkan ke surat tujuan
+                PencatatanKendaraanDinas::create([
+                    'surat_kendaraan_dinas_id' => $suratBaru,
+                    'nrp_karyawan' => $nrp,
+                    'update_date' => now(),
+                    'status' => 'Aktif',
+                ]);
+            }
         }
 
         return response()->json(['status' => 'success']);
     }
+
+
 
     private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment)
     {
