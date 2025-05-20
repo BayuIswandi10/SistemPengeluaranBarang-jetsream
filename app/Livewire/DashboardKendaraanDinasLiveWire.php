@@ -25,14 +25,14 @@ class DashboardKendaraanDinasLiveWire extends Component
         
 
         // Filter data berdasarkan level user
-        if ($user->level === 'Ka.Sie' && $user->seksi !== 'General Service') {
-            // Ka.Sie biasa → hanya data dari departemen yang sama
+        if (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'General Service') {
+            // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-
-        } elseif (
-            in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+        }
+        elseif (
+            in_array($user->level, ['Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
         ) {
             // Ka.Sie dengan seksi General Service → dapat semua data

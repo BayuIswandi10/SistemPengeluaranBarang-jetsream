@@ -13,32 +13,24 @@ class ApprovalKendaraanDinasLivewire extends Component
         $user = Auth::user(); // Dapatkan user yang sedang login
         $query = SuratKendaraanDinas::with(['user', 'approval', 'pencatatanKendaraanDinas']); // Relasi
 
-        if ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
-            // Data default: Pengeluaran dari departemennya sendiri
-            $kendaraanDinas = (clone $query)->whereHas('user', function ($query) use ($user) {
-                $query->where('departemen', $user->departemen);
-            })
-            ->orderBy('status', 'asc') // Level 1 paling atas
-            ->get();
-        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
-            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
-            $kendaraanDinas = (clone $query)
-            ->orderBy('status', 'asc')
-            ->get();
-        }elseif ($user->level === 'Ka.Sie' && $user->departemen === 'General Affairs') {
-            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
-            $kendaraanDinas = (clone $query)
-            ->orderBy('status', 'asc')
-            ->get();
-        }elseif ($user->level === 'Super Admin' && $user->departemen === 'General Affairs') {
-            // Data yang dapat dilihat: Semua pengeluaran dari seluruh departemen
-            $kendaraanDinas = (clone $query)
-            ->orderBy('status', 'asc')
-            ->get();
+       // Filter data berdasarkan level user
+       if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'General Service') {
+                // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
+                $kendaraanDinas = $query->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen);
+                })->get();
+            }
+        elseif (
+            in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+            ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
+        ) {
+            // Ka.Sie dengan seksi General Service → dapat semua data
+            $kendaraanDinas = $query->get();
+
         } else {
-            // Jika level tidak dikenali, tampilkan data kosong
+            // Selain itu, kosong
             $kendaraanDinas = collect();
-        }  
+        }
 
         return view('livewire.approval-kendaraan-dinas-livewire', compact('kendaraanDinas', 'user'));
     }
