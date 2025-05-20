@@ -31,7 +31,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard-barang-keluar', DashboardBarangKeluarLiveWire::class)->name('dashboard-barang-keluar');
     Route::get('/dashboard-kendaraan-dinas', DashboardKendaraanDinasLiveWire::class)->name('dashboard-kendaraan-dinas');
     Route::get('/data-barang-keluar/export', [PengeluaranBarangController::class, 'export'])->name('data-barang-keluar.export');
-     Route::get('/data-kendaraan-dinas/export', [SuratDinasController::class, 'export'])->name('data-kendaraan-dinas.export');
+    Route::get('/data-kendaraan-dinas/export', [SuratDinasController::class, 'export'])->name('data-kendaraan-dinas.export');
 
     Route::middleware([CheckLevel::class . ':Security'])->group(function () {
         Route::get('/security', SecurityLiveWire::class)->name('security');

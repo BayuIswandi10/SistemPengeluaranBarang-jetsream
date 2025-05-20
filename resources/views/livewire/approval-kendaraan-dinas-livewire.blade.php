@@ -131,14 +131,16 @@
                                             </button>
 
                                             <!-- Button Edit -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-warning btn-sm mr-2" 
-                                                data-toggle="modal" 
-                                                data-target="#editDataModal" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+                                            @if ($dataKD->jenis_kendaraan == 1)
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-warning btn-sm mr-2" 
+                                                    data-toggle="modal" 
+                                                    data-target="#editDataModal" 
+                                                    data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            @endif
 
                                             <!-- Button reject -->
                                             <button 
@@ -158,14 +160,16 @@
                                             </button>
 
                                             <!-- Button Edit -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-warning btn-sm mr-2" 
-                                                data-toggle="modal" 
-                                                data-target="#editDataModal" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+                                            @if ($dataKD->jenis_kendaraan == 1)
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-warning btn-sm mr-2" 
+                                                    data-toggle="modal" 
+                                                    data-target="#editDataModal" 
+                                                    data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            @endif
 
                                             <!-- Button reject -->
                                             <button 

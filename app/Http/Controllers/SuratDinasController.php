@@ -95,7 +95,13 @@ class SuratDinasController extends Controller
     public function generateQrCodeSuratKendaraan(Request $request)
     {
         $suratId = $request->surat_kendaraan_dinas_id;
-        $surat = SuratKendaraanDinas::with(['user', 'pencatatanKendaraanDinas.user'])->findOrFail($suratId);
+        $surat = SuratKendaraanDinas::with([
+            'user',
+            'pencatatanKendaraanDinas' => function($query) {
+                $query->where('status', 'Aktif');
+            },
+            'pencatatanKendaraanDinas.user'
+        ])->findOrFail($suratId);
 
         // Generate QR Code menggunakan BaconQrCode
         $renderer = new ImageRenderer(
@@ -251,6 +257,7 @@ class SuratDinasController extends Controller
                         PencatatanKendaraanDinas::create([
                             'nrp_karyawan' => $peserta['nrp_karyawan'],
                             'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+                            'status' => 'Aktif',
                             'update_date' => now(),
                         ]);
                     }
@@ -343,6 +350,9 @@ class SuratDinasController extends Controller
     
         // Mengambil data surat dinas beserta pencatatan kendaraan dinas
         $suratDinas = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas' => function($query) {
+                $query->where('status', 'Aktif');
+            },
             'pencatatanKendaraanDinas.user',
             'suratDetail.kendaraan'
         ])->findOrFail($suratDinasId);
@@ -393,6 +403,9 @@ class SuratDinasController extends Controller
     
         // Mengambil data surat dinas beserta pencatatan kendaraan dinas
         $suratDinas = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas' => function($query) {
+                $query->where('status', 'Aktif');
+            },
             'pencatatanKendaraanDinas.user',
             'suratDetail.kendaraan'
         ])->findOrFail($suratDinasId);
@@ -443,12 +456,13 @@ class SuratDinasController extends Controller
         try {
             $suratDinasId = $request->surat_kendaraan_dinas_id;
     
-            // Ambil data surat dinas dan relasinya
             $suratDinas = SuratKendaraanDinas::with([
+                'pencatatanKendaraanDinas' => function($query) {
+                    $query->where('status', 'Aktif');
+                },
                 'pencatatanKendaraanDinas.user',
                 'suratDetail.kendaraan'
             ])->findOrFail($suratDinasId);
-    
             // Mapping data user dinas
             $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
                 return [
@@ -474,14 +488,17 @@ class SuratDinasController extends Controller
             $tanggalPenggunaan = $suratDinas->tanggal_penggunaan;
 
             // Kendaraan yang tidak digunakan oleh surat lain pada tanggal yang sama
-            $kendaraanTersedia = KendaraanDinas::whereNotExists(function ($query) use ($tanggalPenggunaan, $suratDinasId) {
+            $kendaraanTersedia = KendaraanDinas::where('jenis_kendaraan', 1)
+            ->whereNotExists(function ($query) use ($tanggalPenggunaan, $suratDinasId) {
                 $query->select(DB::raw(1))
                     ->from('tb_surat_kendaraan_dinas_detail as dskd')
                     ->join('tb_surat_kendaraan_dinas as skd', 'dskd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
                     ->whereRaw('dskd.kendaraan_dinas_id = tb_kendaraan_dinas.kendaraan_dinas_id')
                     ->where('skd.tanggal_penggunaan', $tanggalPenggunaan)
                     ->where('skd.surat_kendaraan_dinas_id', '!=', $suratDinasId);
-            })->get();
+            })
+            ->get();
+
     
             // Ubah kendaraan tersedia ke format array
             $kendaraanTersediaData = $kendaraanTersedia->map(function ($kendaraan) {
@@ -526,14 +543,9 @@ class SuratDinasController extends Controller
         try {
             $suratDinasId = $request->surat_kendaraan_dinas_id;
 
-            // Ambil data surat dinas dan relasinya
-            // $suratDinas = SuratKendaraanDinas::with([
-            //     'pencatatanKendaraanDinas.user'
-            // ])->findOrFail($suratDinasId);
-
             $suratDinas = SuratKendaraanDinas::with([
                 'pencatatanKendaraanDinas' => function($query) {
-                    $query->where('status', '!=', 'Dipindahkan');
+                    $query->where('status', 'Aktif');
                 },
                 'pencatatanKendaraanDinas.user',
                 'suratDetail.kendaraan'
@@ -591,7 +603,7 @@ class SuratDinasController extends Controller
                 'surat_kendaraan_dinas_id' => $suratId,
                 'nrp_karyawan' => $nrp,
                 'update_date' => Carbon::now(),
-                'status' => null,
+                'status' => 'Aktif',
             ]);
         }
 
@@ -627,10 +639,6 @@ class SuratDinasController extends Controller
             $hapus = array_diff($kendaraanLama, $kendaraanBaru);
             $tambah = array_diff($kendaraanBaru, $kendaraanLama);
     
-            // Hapus yang tidak dipilih lagi
-            // SuratKendaraanDinasDetail::where('surat_kendaraan_dinas_id', $suratId)
-            //     ->whereIn('kendaraan_dinas_id', $hapus)
-            //     ->delete();
 
             // Hapus kendaraan yang tidak dipilih lagi
             if (!empty($hapus)) {
@@ -664,6 +672,7 @@ class SuratDinasController extends Controller
         $list = SuratKendaraanDinas::where('status', 'Level 2')
             ->where('tanggal_penggunaan', $tanggal)
             ->where('surat_kendaraan_dinas_id', '!=', $currentSuratId)
+            ->where('jenis_kendaraan', 1)
             ->get();
 
         return response()->json($list);
@@ -675,20 +684,25 @@ class SuratDinasController extends Controller
         $peserta = $request->peserta; // array NRP peserta
         $suratBaru = $request->surat_tujuan;
 
-        foreach ($peserta as $nrp) {
-            // Ambil data surat lama dari pencatatan
-            $pencatatanLama = PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
-                ->where('status', '!=', 'Dipindahkan')
-                ->first();
 
-            if ($pencatatanLama) {
-                // Update status pencatatan di surat lama
+        foreach ($peserta as $nrp) {
+            // Ambil semua pencatatan lama peserta yang belum dipindahkan
+            $pencatatanLamaList = PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
+                ->where('surat_kendaraan_dinas_id', '!=', $suratBaru)
+                ->where(function ($query) {
+                    $query->where('status', '!=', 'Dipindahkan')
+                        ->orWhereNull('status');
+                })
+                ->get();
+
+            // Update semua pencatatan lama menjadi Dipindahkan
+            foreach ($pencatatanLamaList as $pencatatanLama) {
                 $pencatatanLama->update([
                     'status' => 'Dipindahkan'
                 ]);
             }
 
-            // Cek apakah sudah ada di surat baru
+            // Cek apakah peserta sudah ada di surat baru
             $existsInNewSurat = PencatatanKendaraanDinas::where('nrp_karyawan', $nrp)
                 ->where('surat_kendaraan_dinas_id', $suratBaru)
                 ->exists();
@@ -706,6 +720,7 @@ class SuratDinasController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
 
 
 
