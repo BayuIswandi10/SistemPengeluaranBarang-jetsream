@@ -36,11 +36,13 @@ class DashboardBarangKeluarController extends Controller
             // Filter data berdasarkan level user
             if ($user->level === 'Staff' && $user->departemen === 'FIN') {
                 $pengeluaranBarangs = $query->get();
-            } elseif ($user->level === 'Ka.Sie') {
+            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+                $pengeluaranBarangs = $query->get();
+            }elseif (in_array($user->level,['Ka.Sie','Ka.Dept'])) {
                 $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
+            } elseif (in_array($user->level, ['Security', 'Super Admin'])) {
                 $pengeluaranBarangs = $query->get();
             } 
             else {
@@ -48,8 +50,8 @@ class DashboardBarangKeluarController extends Controller
             }
 
             // Ekstrak angka dari level user
-            if ($user->level === 'Ka.Sie') {
-                $userLevel = 2;
+            if ($user->level === 'Super Admin') {
+                $userLevel = 6;
             } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
                 $userLevel = 4;
             } elseif ($user->level === 'Ka.Dept') {
@@ -58,8 +60,8 @@ class DashboardBarangKeluarController extends Controller
                 $userLevel = 5;
             } elseif ($user->level === 'Security') {
                 $userLevel = 6;
-            } elseif ($user->level === 'Super Admin') {
-                $userLevel = 7;
+            } elseif ($user->level === 'Ka.Sie') {
+                $userLevel = 2;
             } else {
                 $userLevel = 1; // default fallback jika tidak dikenali
             }

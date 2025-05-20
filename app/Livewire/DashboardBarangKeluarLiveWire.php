@@ -21,16 +21,16 @@ class DashboardBarangKeluarLiveWire extends Component
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
             ->whereBetween('created_date', [$startOfDay, $endOfDay]);
 
-            
-
          // Filter data berdasarkan level user
          if ($user->level === 'Staff' && $user->departemen === 'FIN') {
             $pengeluaranBarangs = $query->get();
-        } elseif ($user->level === 'Ka.Sie') {
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+            $pengeluaranBarangs = $query->get();
+        } elseif (in_array($user->level, ['Ka.Sie','Ka.Dept'])) {
             $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
+        } elseif (in_array($user->level, ['Security', 'Super Admin'])) {
             $pengeluaranBarangs = $query->get();
         } 
         else {
