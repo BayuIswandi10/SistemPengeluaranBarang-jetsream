@@ -38,7 +38,7 @@ class ApprovalBarangKeluarLiveWire extends Component
             ->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
             // Ambil semua data terlebih dahulu
-            $pengeluaranBarangs = (clone $query)->with('user')->get();
+            $pengeluaranBarangs = (clone $query)->with('user')->orderByRaw("FIELD(status, 'Level 2') DESC")->get();
         
             // Sorting lokal: departemen user tampil di atas
             $pengeluaranBarangs = $pengeluaranBarangs->sortByDesc(function ($item) use ($user) {

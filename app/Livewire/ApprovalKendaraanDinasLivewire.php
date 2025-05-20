@@ -25,7 +25,7 @@ class ApprovalKendaraanDinasLivewire extends Component
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
         ) {
             // Ka.Sie dengan seksi General Service → dapat semua data
-            $kendaraanDinas = $query->get();
+            $kendaraanDinas = $query->orderByRaw("FIELD(status, 'Level 2') DESC")->get();
 
         } else {
             // Selain itu, kosong
