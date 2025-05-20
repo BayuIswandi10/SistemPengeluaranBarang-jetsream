@@ -719,25 +719,31 @@
                             });
                         }
 
-                    // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
+                        // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
                         flatpickr("#date-range-picker", {
-                            mode: "range", // Mode range date picker
-                            dateFormat: "Y-m-d", // Format tanggal
-                            locale: "id", // Opsional: Locale Indonesia
+                            mode: "range",
+                            dateFormat: "Y-m-d",
+                            locale: "id",
                             onChange: function (selectedDates, dateStr, instance) {
-                                // Hanya jalankan jika kedua tanggal (range) sudah dipilih
                                 if (selectedDates.length === 2) {
-                                    const startDate = selectedDates[0].toISOString().split('T')[0]; // Format start date ke YYYY-MM-DD
-                                    const endDate = selectedDates[1].toISOString().split('T')[0];   // Format end date ke YYYY-MM-DD
+                                    const startDate = selectedDates[0].toISOString().split('T')[0];
+                                    const endDate = selectedDates[1].toISOString().split('T')[0];
 
-                                    console.log("Start Date:", startDate); // Debug tanggal mulai
-                                    console.log("End Date:", endDate);   // Debug tanggal akhir
+                                    console.log("Start Date:", startDate);
+                                    console.log("End Date:", endDate);
 
-                                    // Panggil fungsi untuk memuat count data
+                                    // Simpan ke localStorage
+                                    localStorage.setItem("selectedDateRange", JSON.stringify({
+                                        start: startDate,
+                                        end: endDate
+                                    }));
+
+                                    // Panggil fungsi untuk memuat data
                                     loadCounts(startDate, endDate);
                                 }
                             },
                         });
+
 
                         // Fungsi untuk memuat data tabel kendaraan dinas
                         function loadTableDataKendaraan(statusFilter, startDate, endDate) {
@@ -972,6 +978,57 @@
 
                     const startDateInput = $('#start-date');
                     const endDateInput = $('#end-date');
+
+                    const savedRange = localStorage.getItem("selectedDateRange");
+
+                    if (savedRange) {
+                        const { start, end } = JSON.parse(savedRange);
+
+                        flatpickr("#date-range-picker", {
+                            mode: "range",
+                            dateFormat: "Y-m-d",
+                            locale: "id",
+                            defaultDate: [start, end],
+                            onChange: function (selectedDates, dateStr, instance) {
+                                if (selectedDates.length === 2) {
+                                    const startDate = selectedDates[0].toISOString().split('T')[0];
+                                    const endDate = selectedDates[1].toISOString().split('T')[0];
+
+                                    // Simpan ke localStorage
+                                    localStorage.setItem("selectedDateRange", JSON.stringify({
+                                        start: startDate,
+                                        end: endDate
+                                    }));
+
+                                    // Panggil fungsi untuk memuat data
+                                    loadCounts(startDate, endDate);
+                                }
+                            },
+                        });
+
+                        // Jalankan fungsi saat load awal (opsional)
+                        loadCounts(start, end);
+                    } else {
+                        // Inisialisasi Flatpickr biasa jika belum ada data tersimpan
+                        flatpickr("#date-range-picker", {
+                            mode: "range",
+                            dateFormat: "Y-m-d",
+                            locale: "id",
+                            onChange: function (selectedDates, dateStr, instance) {
+                                if (selectedDates.length === 2) {
+                                    const startDate = selectedDates[0].toISOString().split('T')[0];
+                                    const endDate = selectedDates[1].toISOString().split('T')[0];
+
+                                    localStorage.setItem("selectedDateRange", JSON.stringify({
+                                        start: startDate,
+                                        end: endDate
+                                    }));
+
+                                    loadCounts(startDate, endDate);
+                                }
+                            },
+                        });
+                    }
 
                     function formatDateToStartOfDay(dateString) {
                         return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
