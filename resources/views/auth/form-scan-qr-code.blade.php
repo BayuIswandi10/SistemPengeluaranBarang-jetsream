@@ -291,7 +291,7 @@
                     method: "POST",
                     data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                     success: function (data) {
-                         // Badge besar kategori pengeluaran
+                         // Tampilkan badge kategori
                         document.getElementById('kategoriBarangCard').innerHTML = 
                             data.kategori_pengeluaran === 1 
                             ? '<span class="badge badge-danger fs-5 px-4 py-2">Scrap</span>' 
@@ -299,8 +299,21 @@
 
                         // Badge besar status persetujuan
                         const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
-                        document.getElementById('approvalStatusBadge').innerHTML = maxLevel >= 5 
-                            ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>' 
+
+                        let isApproved = false;
+
+                        // Logika berbeda berdasarkan kategori pengeluaran
+                        if (data.kategori_pengeluaran === 1) {
+                            // Scrap -> cukup sampai level 4
+                            isApproved = maxLevel >= 4;
+                        } else {
+                            // Non Scrap -> harus sampai level 5
+                            isApproved = maxLevel >= 5;
+                        }
+
+                        // Tampilkan badge persetujuan
+                        document.getElementById('approvalStatusBadge').innerHTML = isApproved
+                            ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>'
                             : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
 
                         document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
