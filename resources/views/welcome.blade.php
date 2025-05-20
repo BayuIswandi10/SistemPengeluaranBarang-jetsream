@@ -1206,6 +1206,9 @@
             loadBarangDataFromLocalStorage();
         });
         
+        let selectedVehicleCapacity = null; // Global variable to store the selected vehicle's capacity
+
+        // Update toggleJenisKendaraan to set selectedVehicleCapacity
         function toggleJenisKendaraan() {
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
             const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
@@ -1215,7 +1218,7 @@
             const kendaraanBody = document.getElementById("kendaraanPribadiBody");
             const kendaraanSelect = document.getElementById("kendaraan_dinas_id");
 
-            // Reset tampilan terlebih dahulu
+            // Reset tampilan dan kapasitas
             kendaraanGroup.style.display = "none";
             tabelKendaraan.style.display = "none";
             kendaraanKantorGroup.style.display = "none";
@@ -1223,8 +1226,9 @@
             kilometerAwal.value = "";
             kendaraanBody.innerHTML = "";
             kendaraanSelect.innerHTML = "";
+            selectedVehicleCapacity = null; // Reset capacity
 
-            // AJAX hanya satu kali
+            // AJAX untuk mengambil data kendaraan
             fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
                 .then(res => res.json())
                 .then(data => {
@@ -1239,7 +1243,7 @@
                             kilometerAwal.setAttribute("required", "required");
                             document.getElementById('kendaraan_dinas_id').removeAttribute('required');
                             document.getElementById('kendaraan_dinas_id').disabled = true;
-                        }else {
+                        } else {
                             kilometerAwal.removeAttribute("required");
                             document.getElementById('kendaraan_dinas_id').removeAttribute('required');
                             document.getElementById('kendaraan_dinas_id').disabled = true;
@@ -1254,7 +1258,7 @@
                                     <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
                                 </td>
                                 <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
-                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas input-kapasitas" min="1" readonly required></td>
+                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
                                 <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
                                     <i class="fas fa-trash"></i></button>
                                 </td>
@@ -1280,7 +1284,7 @@
                         if (data.length > 0) {
                             data.forEach(k => {
                                 kendaraanSelect.innerHTML += `
-                                    <option value="${k.kendaraan_dinas_id}">
+                                    <option value="${k.kendaraan_dinas_id}" data-kapasitas="${k.kapasitas_kendaraan}">
                                         ${k.nomor_kendaraan} - ${k.merk_kendaraan} (Kapasitas: ${k.kapasitas_kendaraan})
                                     </option>`;
                             });
@@ -1289,22 +1293,26 @@
                         }
                         // Init selectize tanpa add untuk select kantor
                         $('#kendaraan_dinas_id').selectize({
-                            create: false, // disable fitur add
+                            create: false,
                             sortField: 'text',
                             valueField: 'value',
                             labelField: 'text',
                             searchField: ['text'],
-                            placeholder: 'Pilih atau cari Kendaraan'
+                            placeholder: 'Pilih atau cari Kendaraan',
+                            onChange: function(value) {
+                                const selectedOption = kendaraanList.find(k => k.kendaraan_dinas_id == value);
+                                selectedVehicleCapacity = selectedOption ? parseInt(selectedOption.kapasitas_kendaraan) : null;
+                                validatePesertaCount(); // Validate participant count on vehicle change
+                            }
                         });
-
                     }
                 })
-            .catch(error => {
-                console.error('Gagal mengambil data kendaraan:', error);
-                if (jenisKendaraan === "1") {
-                    kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
-                }
-            });
+                .catch(error => {
+                    console.error('Gagal mengambil data kendaraan:', error);
+                    if (jenisKendaraan === "1") {
+                        kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                    }
+                });
         }
 
 
@@ -1316,48 +1324,41 @@
                 valueField: 'nomor_kendaraan',
                 labelField: 'nomor_kendaraan',
                 searchField: ['nomor_kendaraan', 'merk_kendaraan'],
-               create: allowAdd ? function (input) {
-                    // Tambahkan item baru
+                create: allowAdd ? function(input) {
                     const newData = {
                         nomor_kendaraan: input,
                         merk_kendaraan: '',
                         kapasitas_kendaraan: '',
                         isNew: true
                     };
-
-                    // Tambahkan ke kendaraanList agar dikenali di onChange
                     kendaraanList.push(newData);
-
-                    // Trigger onChange manual (karena Selectize tidak otomatis trigger)
                     setTimeout(() => {
-                        selectEl[0].selectize.setValue(input); // ini akan memicu onChange
+                        selectEl[0].selectize.setValue(input);
                     }, 10);
-
                     return newData;
                 } : false,
-
                 placeholder: placeholderText,
-                onChange: function (value) {
+                onChange: function(value) {
                     const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
                     const merkField = $(`input[name="kendaraan[${index}][merk_kendaraan]"]`);
                     const kapasitasField = $(`input[name="kendaraan[${index}][kapasitas_kendaraan]"]`);
 
-                   if (selected) {
+                    if (selected) {
                         merkField.val(selected.merk_kendaraan).prop('readonly', !selected.isNew);
                         kapasitasField.val(selected.kapasitas_kendaraan).prop('readonly', !selected.isNew);
-
+                        selectedVehicleCapacity = selected.kapasitas_kendaraan ? parseInt(selected.kapasitas_kendaraan) : null;
                         if (selected.kendaraan_dinas_id) {
                             $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val(selected.kendaraan_dinas_id);
                         } else {
                             $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val('');
                         }
-
                     } else {
                         merkField.val('').prop('readonly', false);
                         kapasitasField.val('').prop('readonly', false);
+                        selectedVehicleCapacity = null;
                         $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val('');
                     }
-
+                    validatePesertaCount(); // Validate participant count on vehicle change
                 }
             });
         }
@@ -1934,24 +1935,57 @@
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        function tambahComboBoxPeserta() {
-            const container = document.getElementById('pesertaTableTambah');
-            const rows = container.getElementsByTagName('tr');
-
-            if (rows.length > 5) {
+        // Function to validate participant count against vehicle capacity
+        function validatePesertaCount() {
+            const pesertaTable = document.getElementById('pesertaTableTambah').getElementsByTagName('tbody')[0];
+            const pesertaCount = pesertaTable.getElementsByTagName('tr').length;
+            
+            if (selectedVehicleCapacity && pesertaCount > selectedVehicleCapacity - 1) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Maksimal 5 Peserta',
-                    text: 'Anda hanya bisa menambahkan hingga 5 peserta saja.',
+                    title: 'Jumlah Peserta Melebihi Kapasitas',
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}, hanya ${selectedVehicleCapacity - 1} peserta yang diperbolehkan (termasuk sopir).`,
+                    confirmButtonText: 'OK'
+                });
+                // Remove excess rows
+                while (pesertaTable.getElementsByTagName('tr').length > selectedVehicleCapacity - 1) {
+                    pesertaTable.deleteRow(-1);
+                }
+                updateNomorPeserta();
+            }
+        }
+
+        // Update tambahComboBoxPeserta to check vehicle capacity
+        function tambahComboBoxPeserta() {
+            const container = document.getElementById('pesertaTableTambah').getElementsByTagName('tbody')[0];
+            const rows = container.getElementsByTagName('tr');
+            let counter = rows.length; // Use row count for numbering
+
+            // Check if vehicle is selected and capacity is defined
+            if (!selectedVehicleCapacity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Kendaraan Terlebih Dahulu',
+                    text: 'Silakan pilih kendaraan untuk menentukan kapasitas maksimal peserta.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Check if adding a new participant exceeds capacity (minus 1 for driver)
+            if (rows.length >= selectedVehicleCapacity - 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kapasitas Penuh',
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}, hanya ${selectedVehicleCapacity - 1} peserta yang diperbolehkan (termasuk sopir).`,
                     confirmButtonText: 'OK'
                 });
                 return;
             }
 
             const newRow = document.createElement('tr');
-
             newRow.innerHTML = `
-                <td class="nomor">${counter += 1}</td>
+                <td class="nomor">${counter + 1}</td>
                 <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
                 <td><input type="text" name="peserta[${counter}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                 <td><input type="text" name="peserta[${counter}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
