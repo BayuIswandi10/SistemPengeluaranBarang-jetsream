@@ -9,16 +9,31 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class KendaraanDinasExport implements FromArray, WithHeadings, ShouldAutoSize
 {
+    protected $startDate;
+    protected $endDate;
+
+    public function __construct($startDate = null, $endDate = null)
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+    }
+
     public function array(): array
     {
-        $data = [];
-        $no = 1;
-
-        $surats = SuratKendaraanDinas::with([
+        $query = SuratKendaraanDinas::with([
             'suratDetail.kendaraan',
             'pencatatanKendaraanDinas.user',
             'approval.user',
-        ])->get();
+        ]);
+
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('created_date', [$this->startDate, $this->endDate]);
+        }
+
+        $surats = $query->get();
+
+        $data = [];
+        $no = 1;
 
         foreach ($surats as $surat) {
             $noSurat = $surat->surat_kendaraan_dinas_id ?? '-';

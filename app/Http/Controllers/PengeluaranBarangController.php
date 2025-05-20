@@ -32,10 +32,14 @@ class PengeluaranBarangController extends Controller
         return view('livewire.form-pengeluaran', compact('pengeluaranBarangs'));
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new BarangKeluarExport, 'data_barang_keluar.xlsx');
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        return Excel::download(new BarangKeluarExport($start, $end), 'data_barang_keluar.xlsx');
     }
+
 
     public function getDataLevel4()
     {

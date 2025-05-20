@@ -13,12 +13,25 @@ use Carbon\Carbon;
 class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize
 {
     private $totalCount = 0;
+    private $start;
+    private $end;
+
+    public function __construct($start = null, $end = null)
+    {
+        $this->start = $start;
+        $this->end = $end;
+    }
 
     public function array(): array
     {
         $result = [];
         $user = Auth::user();
         $query = PengeluaranBarang::query();
+
+        // Filter tanggal jika tersedia
+        if ($this->start && $this->end) {
+            $query->whereBetween('created_date', [$this->start . ' 00:00:00', $this->end . ' 23:59:59']);
+        }
 
         if ($user->level === 'Staff' && $user->departemen === 'FIN') {
             $pengeluaranBarangs = $query->get();

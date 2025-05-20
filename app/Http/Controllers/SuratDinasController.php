@@ -47,9 +47,12 @@ class SuratDinasController extends Controller
         }
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new KendaraanDinasExport, 'data_kendaraan_dinas.xlsx');
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        return Excel::download(new KendaraanDinasExport($start, $end), 'data_kendaraan_dinas.xlsx');
     }
 
     private function generateSuratDinasID($jenisKendaraan, $tanggalPenggunaan)

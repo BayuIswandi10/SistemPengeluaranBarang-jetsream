@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <a href="{{ route('data-kendaraan-dinas.export') }}" class="btn btn-success btn-sm">
+            <a href="#" id="exportExcel" class="btn btn-success btn-sm">
                 <i class="fas fa-file-export me-1"></i> Export Excel
             </a>
             </div>
@@ -524,70 +524,101 @@
         });
     });
 
-     // Local Storage Retrive
-     const savedRange = localStorage.getItem("selectedDateRange");
-    if (savedRange) {
-        const { start, end } = JSON.parse(savedRange);
+    document.addEventListener('DOMContentLoaded', function () {
+        const exportBtn = document.getElementById('exportExcel');
+        const savedRange = localStorage.getItem("selectedDateRange");
 
+        // Atur URL export jika sudah ada range
+        if (savedRange) {
+            const { start, end } = JSON.parse(savedRange);
+            exportBtn.href = `/data-kendaraan-dinas/export?start=${start}&end=${end}`;
+        }
+
+        // Inisialisasi Flatpickr
         flatpickr("#date-range-picker", {
             mode: "range",
             dateFormat: "Y-m-d",
             locale: "id",
-            defaultDate: [start, end],
-            onChange: function (selectedDates, dateStr, instance) {
+            defaultDate: savedRange ? [JSON.parse(savedRange).start, JSON.parse(savedRange).end] : null,
+            onChange: function (selectedDates) {
                 if (selectedDates.length === 2) {
-                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                    const endDate = selectedDates[1].toISOString().split('T')[0];
+                    const start = selectedDates[0].toISOString().split('T')[0];
+                    const end = selectedDates[1].toISOString().split('T')[0];
 
                     // Simpan ke localStorage
-                    localStorage.setItem("selectedDateRange", JSON.stringify({
-                        start: startDate,
-                        end: endDate
-                    }));
+                    localStorage.setItem("selectedDateRange", JSON.stringify({ start, end }));
 
-                    // Panggil fungsi untuk memuat data
-                    loadCounts(startDate, endDate);
+                    // Update href tombol export
+                    exportBtn.href = `/data-kendaraan-dinas/export?start=${start}&end=${end}`;
                 }
-            },
-        });
-
-    } else {
-        // Inisialisasi Flatpickr biasa jika belum ada data tersimpan
-        flatpickr("#date-range-picker", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            locale: "id",
-            onChange: function (selectedDates, dateStr, instance) {
-                if (selectedDates.length === 2) {
-                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                    const endDate = selectedDates[1].toISOString().split('T')[0];
-
-                    localStorage.setItem("selectedDateRange", JSON.stringify({
-                        start: startDate,
-                        end: endDate
-                    }));
-
-                }
-            },
-        });
-    }
-
-    // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
-    flatpickr("#date-range-picker", {
-        mode: "range", // Mode range date picker
-        dateFormat: "Y-m-d", // Format tanggal
-        locale: "id", // Opsional: Locale Indonesia
-        onChange: function (selectedDates, dateStr, instance) {
-            // Hanya jalankan jika kedua tanggal (range) sudah dipilih
-            if (selectedDates.length === 2) {
-                const startDate = selectedDates[0].toISOString().split('T')[0]; // Format start date ke YYYY-MM-DD
-                const endDate = selectedDates[1].toISOString().split('T')[0];   // Format end date ke YYYY-MM-DD
-
-                console.log("Start Date:", startDate); // Debug tanggal mulai
-                console.log("End Date:", endDate);   // Debug tanggal akhir
             }
-        },
+        });
     });
+
+    //  // Local Storage Retrive
+    //  const savedRange = localStorage.getItem("selectedDateRange");
+    // if (savedRange) {
+    //     const { start, end } = JSON.parse(savedRange);
+
+    //     flatpickr("#date-range-picker", {
+    //         mode: "range",
+    //         dateFormat: "Y-m-d",
+    //         locale: "id",
+    //         defaultDate: [start, end],
+    //         onChange: function (selectedDates, dateStr, instance) {
+    //             if (selectedDates.length === 2) {
+    //                 const startDate = selectedDates[0].toISOString().split('T')[0];
+    //                 const endDate = selectedDates[1].toISOString().split('T')[0];
+
+    //                 // Simpan ke localStorage
+    //                 localStorage.setItem("selectedDateRange", JSON.stringify({
+    //                     start: startDate,
+    //                     end: endDate
+    //                 }));
+
+    //                 // Panggil fungsi untuk memuat data
+    //                 loadCounts(startDate, endDate);
+    //             }
+    //         },
+    //     });
+
+    // } else {
+    //     // Inisialisasi Flatpickr biasa jika belum ada data tersimpan
+    //     flatpickr("#date-range-picker", {
+    //         mode: "range",
+    //         dateFormat: "Y-m-d",
+    //         locale: "id",
+    //         onChange: function (selectedDates, dateStr, instance) {
+    //             if (selectedDates.length === 2) {
+    //                 const startDate = selectedDates[0].toISOString().split('T')[0];
+    //                 const endDate = selectedDates[1].toISOString().split('T')[0];
+
+    //                 localStorage.setItem("selectedDateRange", JSON.stringify({
+    //                     start: startDate,
+    //                     end: endDate
+    //                 }));
+
+    //             }
+    //         },
+    //     });
+    // }
+
+    // // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
+    // flatpickr("#date-range-picker", {
+    //     mode: "range", // Mode range date picker
+    //     dateFormat: "Y-m-d", // Format tanggal
+    //     locale: "id", // Opsional: Locale Indonesia
+    //     onChange: function (selectedDates, dateStr, instance) {
+    //         // Hanya jalankan jika kedua tanggal (range) sudah dipilih
+    //         if (selectedDates.length === 2) {
+    //             const startDate = selectedDates[0].toISOString().split('T')[0]; // Format start date ke YYYY-MM-DD
+    //             const endDate = selectedDates[1].toISOString().split('T')[0];   // Format end date ke YYYY-MM-DD
+
+    //             console.log("Start Date:", startDate); // Debug tanggal mulai
+    //             console.log("End Date:", endDate);   // Debug tanggal akhir
+    //         }
+    //     },
+    // });
 
     // SIMPAN PINDAH
     $('#btnSimpanPindah').click(function () {
