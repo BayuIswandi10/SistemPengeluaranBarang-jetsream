@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
     Route::post('/generate-qrcode', [PengeluaranBarangController::class, 'generateQRCode']);
     Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
+    Route::get('/pengeluaran/dataRange', [PengeluaranBarangController::class, 'getDataRange']);
     
     Route::post('/approve/{approval}', [ApprovalBarangKeluarController::class, 'approve'])->name('approval.update');
     Route::post('/pengeluaran/update-status-kasie', [ApprovalBarangKeluarController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');

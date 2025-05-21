@@ -18,14 +18,9 @@
         <div class="card mt-3">
         <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
             <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
-            
-            <div class="col-md-4 col-12">
-                <div class="input-group">
-                    <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
-                </div>
-            </div>
                 
-            <a id="exportExcel" href="#" class="btn btn-success btn-sm">
+            <!-- Untuk Bootstrap 4 -->
+            <a id="exportExcel" href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#eksporModal">
                 <i class="fas fa-file-export me-1"></i> Export Excel
             </a>
 
@@ -226,6 +221,49 @@
             </div>
         </div>
     </div>
+
+    {{-- Export Excel Modal--}}
+    <div class="modal fade" id="eksporModal" tabindex="-1" role="dialog" aria-labelledby="eksporModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Ekspor Barang Keluar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-4 col-12">
+                        <div class="input-group">
+                            <input type="text" id="date-range-picker" class="form-control flatpickr-input" placeholder="Pilih Rentang Tanggal">
+                            
+                            <a href="{{ route('data-barang-keluar.export') }}" id="exportExcel" class="btn btn-success btn-sm">
+                                <i class="fas fa-download me-1"></i> Simpan
+                            </a>
+                        </div>
+                        
+                    </div>
+                    <div class="card-body">
+                        <table id="previewDataEksporModal" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                <th>NO</th>
+                                <th>Nomor Pengeluaran Barang</th>
+                                <th>Tujuan</th>
+                                <th>Jenis Kendaraan</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eksporBody">
+                                <!-- Data akan diisi secara dinamis -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         
     {{-- Detail Modal --}}
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
@@ -297,9 +335,6 @@
             </div>
         </div>
     </div>
-
-
-
 </div>
 
 
@@ -339,45 +374,69 @@ $(document).ready(function() {
         responsive: true
     });
 
+    $('#eksporModal').on('shown.bs.modal', function () {
+        // Inisialisasi flatpickr setiap kali modal ditampilkan (tanpa validasi sekali)
+        flatpickr("#date-range-picker", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "id",
+            defaultDate: null,
+            onChange: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    const startDate = selectedDates[0].toISOString().split('T')[0];
+                    const endDate = selectedDates[1].toISOString().split('T')[0];
+                    console.log("Rentang:", startDate, "hingga", endDate);
 
+                    $.ajax({
+                        url: '/pengeluaran/dataRange',
+                        method: 'GET',
+                        data: {
+                            start: startDate,
+                            end: endDate,
+                        },
+                        success: function (response) {
+                            const table = $('#previewDataEksporModal').DataTable();
 
-    // Event Listener tombol Export
-    document.getElementById("exportExcel").addEventListener("click", function (e) {
-        e.preventDefault();
-        const savedRange = localStorage.getItem("selectedDateRange");
+                            // Hapus semua data di DataTable
+                            table.clear();
 
-        if (savedRange) {
-            const { start, end } = JSON.parse(savedRange);
-            const exportUrl = `{{ route('data-barang-keluar.export') }}?start=${start}&end=${end}`;
-            window.location.href = exportUrl;
-        } else {
-            alert("Silakan pilih rentang tanggal terlebih dahulu.");
+                            if (response.barang_keluar && response.barang_keluar.length > 0) {
+                                response.barang_keluar.forEach(function (item, index) {
+                                    table.row.add([
+                                        index + 1,
+                                        item.pengeluaran_barang_id || '-',
+                                        item.tujuan_pengeluaran_barang || '-',
+                                        item.jenis_kendaraan || '-',
+                                        item.status || '-',
+                                        item.keterangan || '-'
+                                    ]);
+                                });
+                            } else {
+                                table.row.add([
+                                    '', '', '', '', '', 'Data tidak ditemukan'
+                                ]);
+                            }
+
+                            table.draw();
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Gagal mengambil data: ' + error);
+                        }
+                    });
+                }
+            },
+        });
+
+        // Inisialisasi DataTable (cek hanya sekali)
+        if (!$.fn.DataTable.isDataTable('#previewDataEksporModal')) {
+            $('#previewDataEksporModal').DataTable({
+                responsive: true,
+                autoWidth: false,
+                scrollX: false,
+                destroy: true, // Optional jika re-init
+                retrieve: true // Biarkan reuse jika sudah ada
+            });
         }
-    });
-
-    // Ambil tanggal tersimpan dari localStorage jika ada
-    const savedRange = localStorage.getItem("selectedDateRange");
-    let defaultDates = null;
-
-    if (savedRange) {
-        const { start, end } = JSON.parse(savedRange);
-        defaultDates = [start, end];
-        loadCounts(start, end); // Opsional: langsung load data saat halaman dibuka
-    }
-
-    // Inisialisasi flatpickr
-    flatpickr("#date-range-picker", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        locale: "id",
-        defaultDate: defaultDates,
-        onChange: function (selectedDates) {
-            if (selectedDates.length === 2) {
-                const startDate = selectedDates[0].toISOString().split('T')[0];
-                const endDate = selectedDates[1].toISOString().split('T')[0];
-    
-            }
-        },
     });
 
     // Tangani event search

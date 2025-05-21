@@ -40,6 +40,18 @@ class PengeluaranBarangController extends Controller
         return Excel::download(new BarangKeluarExport($start, $end), 'data_barang_keluar.xlsx');
     }
 
+    public function getDataRange(Request $request){
+        $start = $request->query('start');
+        $end = $request->query('end');
+    
+        $pengeluaranBarangs = PengeluaranBarang::when($start && $end, function($query) use ($start, $end) {
+            return $query->whereBetween('created_date', [$start, $end]);
+        })
+        ->get();
+    
+        return response()->json(['barang_keluar' => $pengeluaranBarangs]);
+    }
+    
 
     public function getDataLevel4()
     {
