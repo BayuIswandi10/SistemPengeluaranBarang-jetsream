@@ -233,16 +233,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="col-md-4 col-12">
-                        <div class="input-group">
-                            <input type="text" id="date-range-picker" class="form-control flatpickr-input" placeholder="Pilih Rentang Tanggal">
-                            
-                            <a href="{{ route('data-barang-keluar.export') }}" id="exportExcel" class="btn btn-success btn-sm">
+                    <div class="col-md-12">
+                        <div class="d-flex mb-3">
+                            <input type="text" id="date-range-picker" class="form-control me-2" placeholder="Pilih Rentang Tanggal">
+
+                            <a href="#" id="downloadExcel" class="btn btn-success btn-sm d-flex align-items-center px-3" target="_blank" style="height: 38px;">
                                 <i class="fas fa-download me-1"></i> Simpan
                             </a>
                         </div>
-                        
                     </div>
+
                     <div class="card-body">
                         <table id="previewDataEksporModal" class="table table-bordered">
                             <thead>
@@ -374,6 +374,30 @@ $(document).ready(function() {
         responsive: true
     });
 
+     $('#downloadExcel').on('click', function (e) {
+        e.preventDefault();
+
+        if (startDate && endDate) {
+            const url = `/data-barang-keluar/export?start=${startDate}&end=${endDate}`;
+            window.open(url, '_blank');
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Rentang tanggal belum dipilih',
+                text: 'Silakan pilih rentang tanggal terlebih dahulu sebelum mengekspor data.',
+                confirmButtonText: 'Oke',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+            });
+        }
+    });
+
+    
+    let startDate = null;
+    let endDate = null;
+
     $('#eksporModal').on('shown.bs.modal', function () {
         // Inisialisasi flatpickr setiap kali modal ditampilkan (tanpa validasi sekali)
         flatpickr("#date-range-picker", {
@@ -383,8 +407,8 @@ $(document).ready(function() {
             defaultDate: null,
             onChange: function (selectedDates) {
                 if (selectedDates.length === 2) {
-                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                    const endDate = selectedDates[1].toISOString().split('T')[0];
+                    startDate = selectedDates[0].toISOString().split('T')[0];
+                    endDate = selectedDates[1].toISOString().split('T')[0];
                     console.log("Rentang:", startDate, "hingga", endDate);
 
                     $.ajax({
@@ -402,16 +426,56 @@ $(document).ready(function() {
 
                             if (response.barang_keluar && response.barang_keluar.length > 0) {
                                 response.barang_keluar.forEach(function (item, index) {
+                                    // Interpretasi status
+                                    let statusText = '-';
+                                    switch (item.status) {
+                                        case 'Level 1':
+                                            statusText = 'Menunggu Persetujuan PIC/Ka.Sie';
+                                            break;
+                                        case 'Level 2':
+                                            statusText = 'PIC/Ka.Sie Sudah Menyetujui';
+                                            break;
+                                        case 'Level 3':
+                                            statusText = 'Menunggu Persetujuan Ka.Dept GA';
+                                            break;
+                                        case 'Level 4':
+                                            if (item.kategori_pengeluaran == 1) {
+                                                statusText = 'Menunggu Persetujuan Finance';
+                                            } else {
+                                                statusText = 'Menunggu Persetujuan Security';
+                                            }
+                                            break;
+                                        case 'Level 5':
+                                            statusText = 'Menunggu Persetujuan Security';
+                                            break;
+                                        case 'Level 6':
+                                            statusText = 'Sudah Disetujui';
+                                            break;
+                                        case 'Level 0':
+                                            statusText = 'Ditolak';
+                                            break;
+                                        default:
+                                            statusText = item.status || '-';
+                                    }
+
                                     table.row.add([
                                         index + 1,
                                         item.pengeluaran_barang_id || '-',
                                         item.tujuan_pengeluaran_barang || '-',
                                         item.jenis_kendaraan || '-',
-                                        item.status || '-',
-                                        item.keterangan || '-'
+                                        statusText,
+                                        `<button 
+                                            type="button" 
+                                            class="btn btn-primary btn-sm" 
+                                            data-toggle="modal" 
+                                            data-target="#detailModal" 
+                                            data-nomor="${item.pengeluaran_barang_id}">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </button>`
                                     ]);
                                 });
-                            } else {
+                            }
+                            else {
                                 table.row.add([
                                     '', '', '', '', '', 'Data tidak ditemukan'
                                 ]);
@@ -588,6 +652,7 @@ $(document).ready(function() {
                         "Level 6": "Security"
                     };
                     const approvMapping = {
+                        "Level 0":"Menolak",
                         "Level 1": "Mengeluarkan",
                         "Level 2": "Membawa",
                         "Level 3": "Menyetujui",

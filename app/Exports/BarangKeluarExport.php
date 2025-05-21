@@ -33,17 +33,7 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize
             $query->whereBetween('created_date', [$this->start . ' 00:00:00', $this->end . ' 23:59:59']);
         }
 
-        if ($user->level === 'Staff' && $user->departemen === 'FIN') {
-            $pengeluaranBarangs = $query->get();
-        } elseif ($user->level === 'Ka.Sie') {
-            $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
-                $query->where('departemen', $user->departemen);
-            })->get();
-        } elseif (in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin'])) {
-            $pengeluaranBarangs = $query->get();
-        } else {
-            $pengeluaranBarangs = collect();
-        }
+        $pengeluaranBarangs = $query->get();
 
         $this->totalCount = $pengeluaranBarangs->count();
 
