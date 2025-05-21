@@ -67,7 +67,10 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($kendaraanDinas as $dataKD)
-                            <tr>
+                            @php
+                                $visible = !($dataKD->user && $dataKD->user->departemen !== $user->departemen);
+                            @endphp
+                            <tr @if(!$visible) style="display: none;" data-search="true" @endif>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
                                 <td>
@@ -435,6 +438,32 @@
 
 
 <script>
+    $(document).ready(function() {
+        var table = $('#dataTable').DataTable({
+            responsive: true,
+            initComplete: function() {
+                // Tampilkan baris tersembunyi jika mengandung hasil pencarian
+                this.api().on('search.dt', function() {
+                    var searchValue = table.search().toLowerCase();
+                    $('#dataTable tbody tr').each(function() {
+                        var rowText = $(this).text().toLowerCase();
+                        if (rowText.indexOf(searchValue) !== -1) {
+                            $(this).show(); // tampilkan jika cocok
+                        } else {
+                            // Hanya sembunyikan jika bukan dari departemen user
+                            if (!$(this).is('[data-search]')) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+
+
     const currentUserRole = "{{ Auth::user()->level }}";
 
 
@@ -924,11 +953,11 @@ $(document).ready(function() {
                         `;
                     }
 
-                    // Kosongkan data lama
+                    // Kosongkan data laa
                     detailTable.clear();
                     document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
 
-                    // Validasi data userDinas
+                   
                     if (data.userDinas && data.userDinas.length > 0) {
                         let newData = data.userDinas.map((item, index) => [
                             index + 1,
