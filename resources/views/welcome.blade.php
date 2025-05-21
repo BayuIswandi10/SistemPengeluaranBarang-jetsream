@@ -550,7 +550,7 @@
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
 
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -1071,7 +1071,7 @@
             iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
   
-        let counter = 1;
+        
 
         function saveToLocalStorage() {
             const rows = document.querySelectorAll('#barangTableTambah tbody tr');
@@ -1083,6 +1083,8 @@
             }));
             localStorage.setItem('barang_keluar_data', JSON.stringify(data));
         }
+
+        let counter = 1;
 
         function tambahComboBox() {
             const tbody = document.querySelector('#barangTableTambah tbody');
@@ -1889,11 +1891,12 @@
             }
         }
 
+        let counterPeserta = 1;
+
         // Update tambahComboBoxPeserta to check vehicle capacity
         function tambahComboBoxPeserta() {
             const container = document.getElementById('pesertaTableTambah').getElementsByTagName('tbody')[0];
             const rows = container.getElementsByTagName('tr');
-            let counter = rows.length; // Use row count for numbering
 
             // Check if vehicle is selected and capacity is defined
             if (!selectedVehicleCapacity) {
@@ -1919,10 +1922,10 @@
 
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td class="nomor">${counter + 1}</td>
-                <td><input type="text" name="peserta[${counter}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counter}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counter}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td class="nomor">${++counterPeserta}</td>
+                <td><input type="text" name="peserta[${counterPeserta}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counterPeserta}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
                         <i class="fas fa-trash"></i>
@@ -1934,16 +1937,13 @@
             updateNomorPeserta();
         }
 
-
         function hapusComboBoxPeserta(button) {
-            const container = document.getElementById('pesertaTableTambah');
-            const rows = container.getElementsByTagName('tr');
+            const tbody = document.querySelector('#pesertaTableTambah tbody');
+            const row = button.closest('tr');
+            const rows = tbody.querySelectorAll('tr');
+            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // Ambil NRP dari baris
 
             if (rows.length > 1) {
-                const row = button.closest('tr');
-                const nrpToDelete = $(row).find('.nrp_karyawan').val(); // ambil NRP dari baris
-
-                // SweetAlert konfirmasi
                 Swal.fire({
                     icon: 'warning',
                     title: 'Apakah Anda yakin?',
@@ -1955,15 +1955,9 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         row.remove();
-                        updateNomor();
-
-                        // Hapus NRP dari localStorage
-                        let storedNRPs = JSON.parse(localStorage.getItem('nrp_karyawan_list')) || [];
-
-                        // Hapus elemen yang sesuai (pakai filter)
-                        storedNRPs = storedNRPs.filter(nrp => nrp !== nrpToDelete);
-
-                        localStorage.setItem('nrp_karyawan_list', JSON.stringify(storedNRPs));
+                        counterPeserta--; // Kurangi counter saat baris dihapus
+                        updateNomorPeserta();
+                        saveToLocalStoragePeserta(); // Simpan setelah hapus
                     }
                 });
             } else {
@@ -1976,11 +1970,9 @@
             }
         }
 
-
         function updateNomorPeserta() {
-            const rows = document.querySelectorAll('#pesertaTableTambah .nomor');
-            rows.forEach((cell, index) => {
-                cell.textContent = index + 1;
+            $("#pesertaTableTambah .nomor").each(function (index) {
+                $(this).text(index + 1);
             });
         }
 
@@ -2048,12 +2040,13 @@
         });
 
 
-        function tambahPesertaIkutSerta() {
-            const container = document.getElementById('pesertaTableTambahPeserta').getElementsByTagName('tbody')[0];
-            const rows = container.getElementsByTagName('tr');
-            const index = rows.length;
+        let counterIkutserta = 1; // Mulai dari 1 karena baris pertama sudah ada di HTML
 
-            if (index >= 5) {
+        function tambahPesertaIkutSerta() {
+            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+            const rows = tbody.querySelectorAll('tr');
+
+            if (rows.length >= 5) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Maksimal 5 Peserta',
@@ -2065,30 +2058,63 @@
 
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td class="nomor">${index + 1}</td>
-                <td><input type="text" name="peserta[${index}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${index}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${index}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td class="nomor">${++counterIkutserta}</td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
 
-            container.appendChild(newRow);
+            tbody.appendChild(newRow);
             updateNomorIkutPeserta();
+            saveToLocalStoragePeserta();
+        }
+
+        function hapusIkutPeserta(button) {
+            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+            const row = button.closest('tr');
+            const rows = tbody.querySelectorAll('tr');
+            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // Ambil NRP dari baris
+
+            if (rows.length > 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Apakah Anda yakin?',
+                    text: 'Baris ini akan dihapus.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        row.remove();
+                        counterIkutserta--; // Kurangi counter saat baris dihapus
+                        updateNomorIkutPeserta();
+                        saveToLocalStoragePeserta(); // Simpan setelah hapus
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak bisa menghapus baris terakhir.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
 
         function updateNomorIkutPeserta() {
-            const rows = document.querySelectorAll('#pesertaTableTambahPeserta tbody tr');
-            rows.forEach((row, index) => {
-                row.querySelector('.nomor').textContent = index + 1;
-
+            $("#pesertaTableTambahPeserta .nomor").each(function (index) {
+                $(this).text(index + 1);
                 // Update name attribute sesuai urutan index
-                row.querySelector(".nrp_karyawan").setAttribute("name", `peserta[${index}][nrp_karyawan]`);
-                row.querySelector(".nama").setAttribute("name", `peserta[${index}][nama]`);
-                row.querySelector(".departemen").setAttribute("name", `peserta[${index}][departemen]`);
+                const row = $(this).closest('tr');
+                row.find(".nrp_karyawan").attr("name", `peserta[${index}][nrp_karyawan]`);
+                row.find(".nama").attr("name", `peserta[${index}][nama]`);
+                row.find(".departemen").attr("name", `peserta[${index}][departemen]`);
             });
         }
 
