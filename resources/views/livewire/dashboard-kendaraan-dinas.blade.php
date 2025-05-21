@@ -732,12 +732,6 @@
                                     console.log("Start Date:", startDate);
                                     console.log("End Date:", endDate);
 
-                                    // Simpan ke localStorage
-                                    localStorage.setItem("selectedDateRange", JSON.stringify({
-                                        start: startDate,
-                                        end: endDate
-                                    }));
-
                                     // Panggil fungsi untuk memuat data
                                     loadCounts(startDate, endDate);
                                 }
@@ -976,59 +970,20 @@
 
                 $(document).ready(function () {
 
-                    const startDateInput = $('#start-date');
-                    const endDateInput = $('#end-date');
+                    flatpickr("#date-range-picker", {
+                        mode: "range",
+                        dateFormat: "Y-m-d",
+                        locale: "id",
+                        onChange: function (selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                const startDate = selectedDates[0].toISOString().split('T')[0];
+                                const endDate = selectedDates[1].toISOString().split('T')[0];
 
-                    const savedRange = localStorage.getItem("selectedDateRange");
-
-                    if (savedRange) {
-                        const { start, end } = JSON.parse(savedRange);
-
-                        flatpickr("#date-range-picker", {
-                            mode: "range",
-                            dateFormat: "Y-m-d",
-                            locale: "id",
-                            defaultDate: [start, end],
-                            onChange: function (selectedDates, dateStr, instance) {
-                                if (selectedDates.length === 2) {
-                                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                                    const endDate = selectedDates[1].toISOString().split('T')[0];
-
-                                    // Simpan ke localStorage
-                                    localStorage.setItem("selectedDateRange", JSON.stringify({
-                                        start: startDate,
-                                        end: endDate
-                                    }));
-
-                                    // Panggil fungsi untuk memuat data
-                                    loadCounts(startDate, endDate);
-                                }
-                            },
-                        });
-
-                        // Jalankan fungsi saat load awal (opsional)
-                        loadCounts(start, end);
-                    } else {
-                        // Inisialisasi Flatpickr biasa jika belum ada data tersimpan
-                        flatpickr("#date-range-picker", {
-                            mode: "range",
-                            dateFormat: "Y-m-d",
-                            locale: "id",
-                            onChange: function (selectedDates, dateStr, instance) {
-                                if (selectedDates.length === 2) {
-                                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                                    const endDate = selectedDates[1].toISOString().split('T')[0];
-
-                                    localStorage.setItem("selectedDateRange", JSON.stringify({
-                                        start: startDate,
-                                        end: endDate
-                                    }));
-
-                                    loadCounts(startDate, endDate);
-                                }
-                            },
-                        });
-                    }
+                                // Panggil fungsi setelah pengguna memilih 2 tanggal
+                                loadCounts(startDate, endDate);
+                            }
+                        },
+                    });
 
                     function formatDateToStartOfDay(dateString) {
                         return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
