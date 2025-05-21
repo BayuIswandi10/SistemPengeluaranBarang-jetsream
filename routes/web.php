@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/hapus-barang', [PengeluaranBarangController::class, 'hapusBarang'])->name('hapus.barang');
     Route::post('/generate-qrcode', [PengeluaranBarangController::class, 'generateQRCode']);
     Route::post('/pengeluaran/detail', [PengeluaranBarangController::class, 'getDetail']);
-    Route::get('/pengeluaran/dataRange', [PengeluaranBarangController::class, 'getDataRange']);
+    Route::get('/pengeluaran/dataBarangRange', [PengeluaranBarangController::class, 'getDataRange']);
     
     Route::post('/approve/{approval}', [ApprovalBarangKeluarController::class, 'approve'])->name('approval.update');
     Route::post('/pengeluaran/update-status-kasie', [ApprovalBarangKeluarController::class, 'updateStatusKaSie'])->name('approval.updateStatusKaSie');
@@ -79,6 +79,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::put('/pengajuan/update', [SuratDinasController::class, 'update'])->name('pengajuan.update');
     Route::get('/pengajuan/surat-tujuan', [SuratDinasController::class, 'getSuratTujuan']);
     Route::post('/pengajuan/pindahkan-peserta', [SuratDinasController::class, 'pindahkanPeserta']);
+    Route::get('/pengajuan/getDataDinasRange', [SuratDinasController::class, 'getSuratDinasData']);
 
 
     Route::post('/pengajuanDinas/update-status-kadeptybs', [ApprovalKendaraanDinasController::class, 'updateStatusKaDeptYBS'])->name('pengajuanDinas.updateStatusKaDeptYBS');

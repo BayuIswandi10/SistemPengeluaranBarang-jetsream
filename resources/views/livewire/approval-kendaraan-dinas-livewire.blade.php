@@ -19,15 +19,13 @@
            <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
             <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
                 
-            <div class="col-md-4 col-12">
-                <div class="input-group">
-                    <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
-                </div>
-            </div>
+            @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs' 
+            || Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'General Service')
+                <a id="exportExcel" href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#eksporModal">
+                    <i class="fas fa-file-export me-1"></i> Export Excel
+                </a>
+            @endif
 
-            <a href="#" id="exportExcel" class="btn btn-success btn-sm">
-                <i class="fas fa-file-export me-1"></i> Export Excel
-            </a>
             </div>
             <div class="card-body">
                 @if (session('success'))
@@ -183,6 +181,49 @@
                         @endforeach
                     </tbody>
                 </table>              
+            </div>
+        </div>
+    </div>
+
+     {{-- Export Excel Modal--}}
+    <div class="modal fade" id="eksporModal" tabindex="-1" role="dialog" aria-labelledby="eksporModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Ekspor Kendaraan Dinas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12">
+                        <div class="d-flex mb-3">
+                            <input type="text" id="date-range-picker" class="form-control me-2" placeholder="Pilih Rentang Tanggal">
+
+                            <a href="#" id="downloadExcel" class="btn btn-success btn-sm d-flex align-items-center px-3" target="_blank" style="height: 38px;">
+                                <i class="fas fa-download me-1"></i> Simpan
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <table id="previewDataEksporModal" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                <th>NO</th>
+                                <th>No Surat Pengajuan Kendaraan Dinas</th>
+                                <th>Tujuan</th>
+                                <th>Jenis Mobil</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eksporBody">
+                                <!-- Data akan diisi secara dinamis -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -464,7 +505,150 @@
     });
 
 
+  
+    $('#downloadExcel').on('click', function (e) {
+        e.preventDefault();
+
+        if (startDate && endDate) {
+            const url = `/data-kendaraan-dinas/export?start=${startDate}&end=${endDate}`;
+            window.open(url, '_blank');
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Rentang tanggal belum dipilih',
+                text: 'Silakan pilih rentang tanggal terlebih dahulu sebelum mengekspor data.',
+                confirmButtonText: 'Oke',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+            });
+        }
+    });
+
+    let startDate = null;
+    let endDate = null;
+
+    $('#eksporModal').on('shown.bs.modal', function () {
+        // Inisialisasi flatpickr setiap kali modal ditampilkan
+        flatpickr("#date-range-picker", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "id",
+            defaultDate: null,
+            onChange: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    startDate = selectedDates[0].toISOString().split('T')[0];
+                    endDate = selectedDates[1].toISOString().split('T')[0];
+                    console.log("Rentang:", startDate, "hingga", endDate);
+
+                    $.ajax({
+                        url: '/pengajuan/getDataDinasRange',
+                        method: 'GET',
+                        data: {
+                            start: startDate,
+                            end: endDate,
+                        },
+                        success: function (response) {
+                            const table = $('#previewDataEksporModal').DataTable();
+
+                            // Hapus data lama
+                            table.clear();
+
+                            if (response.surat_dinas && response.surat_dinas.length > 0) {
+                                response.surat_dinas.forEach(function (item, index) {
+                                    let statusText = '-';
+                                    switch (item.status) {
+                                        case 'Level 1':
+                                            statusText = 'Menunggu Persetujuan Ka.Dept';
+                                            break;
+                                        case 'Level 2':
+                                            statusText = 'Menunggu Persetujuan Ka.Sie General Service';
+                                            break;
+                                        case 'Level 3':
+                                            statusText = 'Menunggu Persetujuan Security';
+                                            break;
+                                        case 'Level 4':
+                                            statusText = 'Sudah Disetujui'
+                                        case 'Expired':
+                                            statusText = 'Tidak Berlaku';
+                                        case 'Level 0':
+                                            statusText = 'Ditolak';
+                                            break;
+                                        default:
+                                            statusText = item.status || '-';
+                                    }
+
+                                    let jenisMobilText
+                                    switch (item.jenis_kendaraan) {
+                                        case 1:
+                                            jenisMobilText = 'KANTOR';
+                                            break;
+                                        case 2:
+                                            jenisMobilText = 'PRIBADI';
+                                            break;
+                                        case 3:
+                                            jenisMobilText = 'TAXI';
+                                            break;
+                                        default:
+                                            jenisMobilText = item.jenisMobilText || '-';
+                                    }
+
+                                    const tujuanGabungan = [
+                                        item.tujuan_penggunaan_1,
+                                        item.tujuan_penggunaan_2,
+                                        item.tujuan_penggunaan_3
+                                    ].filter(Boolean).join(' -> ') || '-';
+
+                                    table.row.add([
+                                        index + 1,
+                                        item.surat_kendaraan_dinas_id || '-',
+                                        tujuanGabungan,
+                                        jenisMobilText,
+                                        statusText,
+                                        `<button 
+                                            type="button" 
+                                            class="btn btn-primary btn-sm" 
+                                            data-toggle="modal" 
+                                            data-target="#detailModal" 
+                                            data-nomor="${item.surat_kendaraan_dinas_id}">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </button>`
+                                    ]);
+                                });
+                            } else {
+                                table.row.add([
+                                    '', '', '', '', '', 'Data tidak ditemukan'
+                                ]);
+                            }
+
+                            table.draw();
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Gagal mengambil data: ' + error);
+                        }
+                    });
+                }
+            },
+        });
+
+
+        // Inisialisasi DataTable hanya sekali
+        if (!$.fn.DataTable.isDataTable('#previewDataEksporModal')) {
+            $('#previewDataEksporModal').DataTable({
+                responsive: true,
+                autoWidth: false,
+                scrollX: false,
+                destroy: true,
+                retrieve: true
+            });
+        }
+    });
+
+
+
     const currentUserRole = "{{ Auth::user()->level }}";
+
 
 
 

@@ -18,11 +18,12 @@
         <div class="card mt-3">
         <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
             <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
-                
-            <!-- Untuk Bootstrap 4 -->
-            <a id="exportExcel" href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#eksporModal">
-                <i class="fas fa-file-export me-1"></i> Export Excel
-            </a>
+
+            @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs')
+                <a id="exportExcel" href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#eksporModal">
+                    <i class="fas fa-file-export me-1"></i> Export Excel
+                </a>
+            @endif
 
         </div>
             <div class="card-body">
@@ -412,7 +413,7 @@ $(document).ready(function() {
                     console.log("Rentang:", startDate, "hingga", endDate);
 
                     $.ajax({
-                        url: '/pengeluaran/dataRange',
+                        url: '/pengeluaran/dataBarangRange',
                         method: 'GET',
                         data: {
                             start: startDate,

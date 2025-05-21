@@ -55,6 +55,18 @@ class SuratDinasController extends Controller
         return Excel::download(new KendaraanDinasExport($start, $end), 'data_kendaraan_dinas.xlsx');
     }
 
+    public function getSuratDinasData(Request $request){
+        $start = $request->query('start');
+        $end = $request->query('end');
+    
+        $suratKendaraan = SuratKendaraanDinas::when($start && $end, function($query) use ($start, $end) {
+            return $query->whereBetween('created_date', [$start, $end]);
+        })
+        ->get();
+    
+        return response()->json(['surat_dinas' => $suratKendaraan]);
+    }
+
     private function generateSuratDinasID($jenisKendaraan, $tanggalPenggunaan)
     {
         // Mapping jenis kendaraan
