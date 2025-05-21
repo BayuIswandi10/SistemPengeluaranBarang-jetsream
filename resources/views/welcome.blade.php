@@ -394,7 +394,6 @@
                                                 <th>No Polisi</th>
                                                 <th>Merk Kendaraan</th>
                                                 <th>Kapasitas</th>
-                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody id="kendaraanPribadiBody">
@@ -405,13 +404,9 @@
                                                 </td>
                                                 <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" required></td>
                                                 <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" required></td>
-                                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKendaraanPribadi()">
-                                        <i class="fas fa-plus"></i> Tambah Kendaraan
-                                    </button>
                                 </div>
                                 
                                 <div class="form-group">
@@ -848,53 +843,128 @@
         </div>
     </body>
     <script>
+        // $(document).ready(function () {
+        //     // khk
+        //     $.ajax({
+        //         url: '/user/getAllUser',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function (data) {
+        //             // Urutkan data berdasarkan name
+        //             data.sort((a, b) => a.name.localeCompare(b.name));
+
+        //                 const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
+        //                 $.each(data, function (index, user) {
+        //                 userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
+        //             });
+
+        //             $('#created_by_barang').html(userOptions.join(''));
+        //             $('#created_by_dinas').html(userOptions.join(''));
+
+        //             // Inisialisasi Selectize setelah isi dropdown selesai dimuat
+        //             $('.selectize').selectize({
+        //                 sortField: 'text', // Mengurutkan berdasarkan teks (yang ditampilkan)
+        //                 searchField: ['text'], // Mendukung pencarian pada label
+        //                 placeholder: 'Pilih atau cari Karyawan',
+        //                 score: function (search) {
+        //                 return function (item) {
+        //                 let text = item.text.toLowerCase();
+        //                 search = search.toLowerCase();
+        //                 return text.includes(search) ? 1 : 0; // Biar bisa cari di tengah
+        //                 };
+        //             },
+        //             });
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error('Gagal memuat data karyawan:', error);
+        //         }
+        //     });
+        // });
+
         $(document).ready(function () {
-            // khk
-            $.ajax({
-                url: '/user/getAllUser',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    // Urutkan data berdasarkan name
-                    data.sort((a, b) => a.name.localeCompare(b.name));
+            // Cache for user data to avoid repeated AJAX calls
+            let userCache = null;
 
-                        const userOptions = ['<option value="" disabled selected>Pilih Karyawan</option>'];
-                        $.each(data, function (index, user) {
-                        userOptions.push(`<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`);
-                    });
-
-                    $('#created_by_barang').html(userOptions.join(''));
-                    $('#created_by_dinas').html(userOptions.join(''));
-
-                    // Inisialisasi Selectize setelah isi dropdown selesai dimuat
-                    $('.selectize').selectize({
-                        sortField: 'text', // Mengurutkan berdasarkan teks (yang ditampilkan)
-                        searchField: ['text'], // Mendukung pencarian pada label
-                        placeholder: 'Pilih atau cari Karyawan',
-                        score: function (search) {
-                        return function (item) {
-                        let text = item.text.toLowerCase();
-                        search = search.toLowerCase();
-                        return text.includes(search) ? 1 : 0; // Biar bisa cari di tengah
-                        };
-                    },
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Gagal memuat data karyawan:', error);
+            function loadUsers() {
+                // If data is cached, use it
+                if (userCache) {
+                    populateDropdowns(userCache);
+                    return;
                 }
-            });
-        });
 
+                $.ajax({
+                    url: '/user/getAllUser',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        // Sort data by name (if not pre-sorted by server)
+                        data.sort((a, b) => a.name.localeCompare(b.name));
+                        userCache = data; // Cache the data
+                        populateDropdowns(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Gagal memuat data karyawan:', error);
+                        // Provide user feedback
+                        const errorOption = '<option value="" disabled selected>Gagal memuat data karyawan</option>';
+                        $('#created_by_barang, #created_by_dinas').html(errorOption);
+                    }
+                });
+            }
+
+            function populateDropdowns(data) {
+                 console.log("Data karyawan yang akan diisi:", data);
+                // Generate structured options for Selectize
+                const userOptions = data.map(user => ({
+                    value: user.nrp_karyawan,
+                    text: `${user.nrp_karyawan} - ${user.name}`
+                }));
+
+                // Populate dropdowns with HTML options
+                const optionsHtml = ['<option value="" disabled selected>Pilih Karyawan</option>']
+                    .concat(data.map(user => `<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`))
+                    .join('');
+
+                $('#created_by_barang').html(optionsHtml);
+                $('#created_by_dinas').html(optionsHtml);
+
+                // Destroy existing Selectize instances to prevent memory leaks
+                $('.selectize').each(function () {
+                    if (this.selectize) {
+                        this.selectize.destroy();
+                    }
+                });
+
+                // Initialize Selectize with structured options
+                $('.selectize').selectize({
+                    options: userOptions, // Provide structured options
+                    valueField: 'value',
+                    labelField: 'text',
+                    searchField: ['text'],
+                    sortField: 'text',
+                    placeholder: 'Pilih atau cari Karyawan',
+                    // Use Selectize's built-in fuzzy search
+                    score: function (search) {
+                        const score = this.getScoreFunction(search);
+                        return function (item) {
+                            return score(item);
+                        };
+                    }
+                });
+            }
+
+            // Trigger the load
+            loadUsers();
+        });
         let globalCalendar;
 
-        $('#calendarModal').on('show.bs.modal', function () {
-            $.get(`/kendaraan/booking-dates-all`, function (data) {
+        // Calendar event handling
+        $('#calendarModal').on('show.bs.modal', function() {
+            $.get(`/kendaraan/booking-dates-all`, function(data) {
                 const events = data
                     .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
                     .map(item => {
                         let badgeText = '';
-                        
+                        let color = '';
                         switch (item.jenis_kendaraan) {
                             case 1:
                                 color = '#28a745';
@@ -933,7 +1003,6 @@
                 if (globalCalendar) globalCalendar.destroy();
 
                 const calendarEl = document.getElementById('calendarAllKendaraan');
-
                 globalCalendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     height: 450,
@@ -944,15 +1013,17 @@
                         center: 'title',
                         right: 'dayGridMonth,timeGridWeek,listMonth'
                     },
+                    // Add flag to track if an event click is being processed
                     eventClick: function(info) {
+                        if (globalCalendar.isProcessing) return; // Prevent multiple clicks
+                        globalCalendar.isProcessing = true; // Set flag to block further clicks
+
                         const event = info.event;
                         const suratId = event.extendedProps.id;
                         const statusSurat = event.extendedProps.status;
-                        const today = new Date();
 
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
-
                         $('#jenisMobil').val('');
                         $('#tanggalPakai').val('');
                         $('#tujuan_1').val('');
@@ -961,33 +1032,30 @@
                         $('#pesertaTableTambahPeserta tbody').empty();
 
                         $.ajax({
-                            url: "/pengajuan/infoSuratKendaraanDinasNonAuth",
-                            type: "POST",
+                            url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
+                            type: 'POST',
                             data: {
                                 surat_kendaraan_dinas_id: suratId,
-                                "_token": "{{ csrf_token() }}"
+                                '_token': '{{ csrf_token() }}'
                             },
-                            dataType: "json",
-                            success: function (response) {
+                            dataType: 'json',
+                            success: function(response) {
                                 if (response) {
                                     window.daftarKendaraanGlobal = response.daftar_kendaraan;
-
-                                    $("#hiddenSuratId").val(suratId);
-                                    $("#nomorSurat").val(suratId);
+                                    $('#hiddenSuratId').val(suratId);
+                                    $('#nomorSurat').val(suratId);
                                     const jenisMapping = {
                                         1: 'KANTOR',
                                         2: 'PRIBADI',
                                         3: 'TAXI'
                                     };
-                                    $("#jenisMobil").val(jenisMapping[response.jenis_kendaraan] || 'TIDAK DIKETAHUI');
+                                    $('#jenisMobil').val(jenisMapping[response.jenis_kendaraan] || 'TIDAK DIKETAHUI');
+                                    $('#tanggalPakai').val(response.tanggal_penggunaan);
+                                    $('#tujuan_1').val(response.tujuan_penggunaan_1);
+                                    $('#tujuan_2').val(response.tujuan_penggunaan_2);
+                                    $('#tujuan_3').val(response.tujuan_penggunaan_3);
 
-                                    $("#tanggalPakai").val(response.tanggal_penggunaan);
-                                    $("#tujuan_1").val(response.tujuan_penggunaan_1);
-                                    $("#tujuan_2").val(response.tujuan_penggunaan_2);
-                                    $("#tujuan_3").val(response.tujuan_penggunaan_3);
-
-                                    const pesertaTable = $("#pesertaTableTambahPeserta tbody");
-
+                                    const pesertaTable = $('#pesertaTableTambahPeserta tbody');
                                     response.userDinas.forEach((user, index) => {
                                         pesertaTable.append(`
                                             <tr>
@@ -1004,23 +1072,26 @@
                                         `);
                                     });
 
-                                    const form = $("#editOrderForm");
-
+                                    const form = $('#editOrderForm');
                                     if (statusSurat === 'Level 1') {
-                                        form.find("input, select, textarea").not("[name='_token']").prop("readonly", true);
-                                        form.find("select").prop("disabled", true);
-                                        $("#tambahPesertaBtn").prop("disabled", false);
+                                        form.find('input, select, textarea').not('[name="_token"]').prop('readonly', true);
+                                        form.find('select').prop('disabled', true);
+                                        $('#tambahPesertaBtn').prop('disabled', false);
                                     } else {
-                                        form.find("input, select, textarea").not("[name='_token']").prop("disabled", true);
-                                        $("#tambahPesertaBtn").prop("disabled", true);
+                                        form.find('input, select, textarea').not('[name="_token"]').prop('disabled', true);
+                                        $('#tambahPesertaBtn').prop('disabled', true);
                                     }
 
-                                    $(".trash-btn").prop("disabled", true);
+                                    $('.trash-btn').prop('disabled', true);
                                     $('#ikutSertaDinasModal').modal('show');
+                                    loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
                                 }
                             },
-                            error: function () {
-                                alert("Gagal mengambil data. Coba lagi.");
+                            error: function() {
+                                alert('Gagal mengambil data. Coba lagi.');
+                            },
+                            complete: function() {
+                                globalCalendar.isProcessing = false; // Reset flag after AJAX completes
                             }
                         });
                     },
@@ -1050,10 +1121,10 @@
                 const currentDate = globalCalendar.getDate();
                 $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
 
-                $('#monthPickerGlobal').off('change').on('change', function () {
+                $('#monthPickerGlobal').off('change').on('change', function() {
                     const selected = this.value;
                     if (selected) {
-                        const newDate = selected + "-01";
+                        const newDate = selected + '-01';
                         globalCalendar.gotoDate(newDate);
                     }
                 });
@@ -1207,7 +1278,109 @@
         
         let selectedVehicleCapacity = null; // Global variable to store the selected vehicle's capacity
 
-        // Update toggleJenisKendaraan to set selectedVehicleCapacity
+        // // Update toggleJenisKendaraan to set selectedVehicleCapacity
+        // function toggleJenisKendaraan() {
+        //     const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
+        //     const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
+        //     const tabelKendaraan = document.getElementById("tabel_kendaraan_pribadi");
+        //     const kendaraanKantorGroup = document.getElementById("kendaraan_kantor_group");
+        //     const kilometerAwal = document.getElementById("kilometer_awal");
+        //     const kendaraanBody = document.getElementById("kendaraanPribadiBody");
+        //     const kendaraanSelect = document.getElementById("kendaraan_dinas_id");
+
+        //     // Reset tampilan dan kapasitas
+        //     kendaraanGroup.style.display = "none";
+        //     tabelKendaraan.style.display = "none";
+        //     kendaraanKantorGroup.style.display = "none";
+        //     kilometerAwal.removeAttribute("required");
+        //     kilometerAwal.value = "";
+        //     kendaraanBody.innerHTML = "";
+        //     kendaraanSelect.innerHTML = "";
+        //     selectedVehicleCapacity = null; // Reset capacity
+
+        //     // AJAX untuk mengambil data kendaraan
+        //     fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             kendaraanList = data;
+
+        //             if (jenisKendaraan === "2" || jenisKendaraan === "3") {
+        //                 // Untuk PRIBADI dan TAXI
+        //                 const isPribadi = jenisKendaraan === "2";
+
+        //                 if (isPribadi) {
+        //                     kendaraanGroup.style.display = "block";
+        //                     kilometerAwal.setAttribute("required", "required");
+        //                     document.getElementById('kendaraan_dinas_id').removeAttribute('required');
+        //                     document.getElementById('kendaraan_dinas_id').disabled = true;
+        //                 } else {
+        //                     kilometerAwal.removeAttribute("required");
+        //                     document.getElementById('kendaraan_dinas_id').removeAttribute('required');
+        //                     document.getElementById('kendaraan_dinas_id').disabled = true;
+        //                 }
+
+        //                 tabelKendaraan.style.display = "block";
+
+        //                 kendaraanBody.innerHTML = `
+        //                     <tr>
+        //                         <td>
+        //                             <input type="hidden" name="kendaraan[0][kendaraan_dinas_id]" class="kendaraan_dinas_id">
+        //                             <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
+        //                         </td>
+        //                         <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
+        //                         <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
+        //                     </tr>
+        //                 `;
+
+        //                 initSelectize(0, jenisKendaraan, true, 'Pilih, cari atau tambahkan Kendaraan');
+        //                 const selectizeControl = $(`#select_nopol_0`)[0].selectize;
+        //                 selectizeControl.clearOptions();
+        //                 data.forEach(k => {
+        //                     selectizeControl.addOption({
+        //                         nomor_kendaraan: k.nomor_kendaraan,
+        //                         merk_kendaraan: k.merk_kendaraan,
+        //                         kapasitas_kendaraan: k.kapasitas_kendaraan
+        //                     });
+        //                 });
+        //                 selectizeControl.refreshOptions(false);
+
+        //             } else if (jenisKendaraan === "1") {
+        //                 // Untuk KANTOR
+        //                 kendaraanKantorGroup.style.display = "block";
+        //                 kendaraanSelect.innerHTML = `<option value="" disabled selected>Pilih Kendaraan</option>`;
+        //                 if (data.length > 0) {
+        //                     data.forEach(k => {
+        //                         kendaraanSelect.innerHTML += `
+        //                             <option value="${k.kendaraan_dinas_id}" data-kapasitas="${k.kapasitas_kendaraan}">
+        //                                 ${k.nomor_kendaraan} - ${k.merk_kendaraan} (Kapasitas: ${k.kapasitas_kendaraan})
+        //                             </option>`;
+        //                     });
+        //                 } else {
+        //                     kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
+        //                 }
+        //                 // Init selectize tanpa add untuk select kantor
+        //                 $('#kendaraan_dinas_id').selectize({
+        //                     create: false,
+        //                     sortField: 'text',
+        //                     valueField: 'value',
+        //                     labelField: 'text',
+        //                     searchField: ['text'],
+        //                     placeholder: 'Pilih atau cari Kendaraan',
+        //                     onChange: function(value) {
+        //                         const selectedOption = kendaraanList.find(k => k.kendaraan_dinas_id == value);
+        //                         selectedVehicleCapacity = selectedOption ? parseInt(selectedOption.kapasitas_kendaraan) : null;
+        //                         validatePesertaCount(); // Validate participant count on vehicle change
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Gagal mengambil data kendaraan:', error);
+        //             if (jenisKendaraan === "1") {
+        //                 kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+        //             }
+        //         });
+        // }
         function toggleJenisKendaraan() {
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
             const kendaraanGroup = document.getElementById("kendaraan_pribadi_group");
@@ -1227,6 +1400,15 @@
             kendaraanSelect.innerHTML = "";
             selectedVehicleCapacity = null; // Reset capacity
 
+            // Destroy existing Selectize instance if it exists
+            if (kendaraanSelect.selectize) {
+                kendaraanSelect.selectize.destroy();
+            }
+
+            // Explicitly enable kendaraan_dinas_id
+            kendaraanSelect.disabled = false;
+            kendaraanSelect.removeAttribute("disabled");
+
             // AJAX untuk mengambil data kendaraan
             fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
                 .then(res => res.json())
@@ -1240,12 +1422,12 @@
                         if (isPribadi) {
                             kendaraanGroup.style.display = "block";
                             kilometerAwal.setAttribute("required", "required");
-                            document.getElementById('kendaraan_dinas_id').removeAttribute('required');
-                            document.getElementById('kendaraan_dinas_id').disabled = true;
+                            kendaraanSelect.removeAttribute("required");
+                            kendaraanSelect.disabled = true;
                         } else {
                             kilometerAwal.removeAttribute("required");
-                            document.getElementById('kendaraan_dinas_id').removeAttribute('required');
-                            document.getElementById('kendaraan_dinas_id').disabled = true;
+                            kendaraanSelect.removeAttribute("required");
+                            kendaraanSelect.disabled = true;
                         }
 
                         tabelKendaraan.style.display = "block";
@@ -1258,9 +1440,6 @@
                                 </td>
                                 <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
                                 <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
-                                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
-                                    <i class="fas fa-trash"></i></button>
-                                </td>
                             </tr>
                         `;
 
@@ -1279,6 +1458,7 @@
                     } else if (jenisKendaraan === "1") {
                         // Untuk KANTOR
                         kendaraanKantorGroup.style.display = "block";
+                        kendaraanSelect.setAttribute("required", "required"); // Ensure required attribute is set
                         kendaraanSelect.innerHTML = `<option value="" disabled selected>Pilih Kendaraan</option>`;
                         if (data.length > 0) {
                             data.forEach(k => {
@@ -1290,7 +1470,8 @@
                         } else {
                             kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
                         }
-                        // Init selectize tanpa add untuk select kantor
+
+                        // Reinitialize Selectize for kantor
                         $('#kendaraan_dinas_id').selectize({
                             create: false,
                             sortField: 'text',
@@ -1310,10 +1491,10 @@
                     console.error('Gagal mengambil data kendaraan:', error);
                     if (jenisKendaraan === "1") {
                         kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                        kendaraanSelect.disabled = false; // Ensure select is enabled even on error
                     }
                 });
         }
-
 
         let kendaraanList = [];
 
@@ -1360,75 +1541,6 @@
                     validatePesertaCount(); // Validate participant count on vehicle change
                 }
             });
-        }
-
-
-        function fetchKendaraanByJenis(jenisKendaraan, index) {
-            fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}`)
-                .then(res => res.json())
-                .then(data => {
-                    kendaraanList = data;
-
-                    const selectizeControl = $(`#select_nopol_${index}`)[0].selectize;
-                    selectizeControl.clearOptions();
-
-                    data.forEach(k => {
-                        selectizeControl.addOption({
-                            nomor_kendaraan: k.nomor_kendaraan,
-                            merk_kendaraan: k.merk_kendaraan,
-                            kapasitas_kendaraan: k.kapasitas_kendaraan
-                        });
-                    });
-
-                    selectizeControl.refreshOptions(false);
-                })
-                .catch(error => {
-                    console.error(`Gagal mengambil data kendaraan untuk jenis ${jenisKendaraan}:`, error);
-                });
-        }
-
-        function tambahKendaraanPribadi() {
-            const tableBody = document.getElementById("kendaraanPribadiBody");
-            const index = tableBody.rows.length;
-
-            const row = `
-                <tr>
-                    <td>
-                        <select id="select_nopol_${index}" name="kendaraan[${index}][nomor_kendaraan]" class="form-control select-nopol" data-index="${index}" required></select>
-                    </td>
-                    <td><input type="text" name="kendaraan[${index}][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
-                    <td><input type="number" name="kendaraan[${index}][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
-                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusKendaraanPribadi(this)">
-                        <i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML("beforeend", row);
-
-            const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
-
-            // Tentukan placeholder berdasarkan jenis kendaraan
-            let placeholderText = '';
-            let allowAdd = false;
-            if (jenisKendaraan === "2" || jenisKendaraan === "3") {
-                placeholderText = 'Pilih, cari atau tambahkan Kendaraan';
-                allowAdd = true;
-            } else {
-                placeholderText = 'Pilih atau cari Kendaraan';
-                allowAdd = false;
-            }
-
-            // Inisialisasi Selectize
-            initSelectize(index, jenisKendaraan, allowAdd, placeholderText);
-
-            // Ambil data kendaraan dari server dan isi Selectize
-            fetchKendaraanByJenis(jenisKendaraan, index);
-        }
-
-
-
-        function hapusKendaraanPribadi(button) {
-            button.closest("tr").remove();
         }
 
 
@@ -1891,14 +2003,62 @@
             }
         }
 
+        // Local storage keys for separation
+        const STORAGE_KEY_TAMBAH = 'nrp_karyawan_list_tambah';
+        const STORAGE_KEY_IKUTSERTA = 'nrp_karyawan_list_ikutserta';
+
         let counterPeserta = 1;
+        let counterIkutserta = 1;
 
-        // Update tambahComboBoxPeserta to check vehicle capacity
+        // Save to local storage for specific table
+        function saveToLocalStoragePeserta(tableId, storageKey) {
+            const nrpInputs = $(`#${tableId} .nrp_karyawan`);
+            const nrpList = Array.from(nrpInputs).map(input => $(input).val()).filter(val => val);
+            localStorage.setItem(storageKey, JSON.stringify(nrpList));
+        }
+
+        // Load from local storage for specific table
+        function loadFromLocalStoragePeserta(tableId, storageKey, addRowFn) {
+            const storedList = localStorage.getItem(storageKey);
+            if (storedList) {
+                const nrpList = JSON.parse(storedList);
+                const currentRows = $(`#${tableId} .nrp_karyawan`).length;
+
+                // Add rows if needed
+                while (currentRows < nrpList.length) {
+                    addRowFn();
+                }
+
+                // Populate inputs
+                $(`#${tableId} .nrp_karyawan`).each(function(idx) {
+                    if (nrpList[idx]) {
+                        $(this).val(nrpList[idx]).trigger('keyup');
+                    }
+                });
+            }
+        }
+
+        // Clear local storage for specific key
+        function clearLocalStorage(storageKey) {
+            localStorage.removeItem(storageKey);
+        }
+
+        // Update participant numbers for a table
+        function updateNomorPeserta(tableId) {
+            $(`#${tableId} .nomor`).each(function(index) {
+                $(this).text(index + 1);
+                const row = $(this).closest('tr');
+                row.find('.nrp_karyawan').attr('name', `peserta[${index}][nrp_karyawan]`);
+                row.find('.nama').attr('name', `peserta[${index}][nama]`);
+                row.find('.departemen').attr('name', `peserta[${index}][departemen]`);
+            });
+        }
+
+        // Add participant row for tambahDinasModal
         function tambahComboBoxPeserta() {
-            const container = document.getElementById('pesertaTableTambah').getElementsByTagName('tbody')[0];
-            const rows = container.getElementsByTagName('tr');
+            const container = document.querySelector('#pesertaTableTambah tbody');
+            const rows = container.querySelectorAll('tr');
 
-            // Check if vehicle is selected and capacity is defined
             if (!selectedVehicleCapacity) {
                 Swal.fire({
                     icon: 'warning',
@@ -1909,7 +2069,6 @@
                 return;
             }
 
-            // Check if adding a new participant exceeds capacity (minus 1 for driver)
             if (rows.length >= selectedVehicleCapacity - 1) {
                 Swal.fire({
                     icon: 'warning',
@@ -1923,25 +2082,25 @@
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td class="nomor">${++counterPeserta}</td>
-                <td><input type="text" name="peserta[${counterPeserta}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counterPeserta}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counterPeserta}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
-
             container.appendChild(newRow);
-            updateNomorPeserta();
+            updateNomorPeserta('pesertaTableTambah');
+            saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
         }
 
+        // Remove participant row for tambahDinasModal
         function hapusComboBoxPeserta(button) {
             const tbody = document.querySelector('#pesertaTableTambah tbody');
             const row = button.closest('tr');
             const rows = tbody.querySelectorAll('tr');
-            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // Ambil NRP dari baris
 
             if (rows.length > 1) {
                 Swal.fire({
@@ -1955,9 +2114,9 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         row.remove();
-                        counterPeserta--; // Kurangi counter saat baris dihapus
-                        updateNomorPeserta();
-                        saveToLocalStoragePeserta(); // Simpan setelah hapus
+                        counterPeserta--;
+                        updateNomorPeserta('pesertaTableTambah');
+                        saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
                     }
                 });
             } else {
@@ -1969,78 +2128,6 @@
                 });
             }
         }
-
-        function updateNomorPeserta() {
-            $("#pesertaTableTambah .nomor").each(function (index) {
-                $(this).text(index + 1);
-            });
-        }
-
-        $(document).ready(function () {
-            $("#created_by").on("input", function () {
-                let nrp = $(this).val();
-                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger("keyup");
-            });
-
-            $(document).on("keyup", ".nrp_karyawan", function () {
-                let nrp = $(this).val();
-                let row = $(this).closest("tr");
-
-                if (nrp.length >= 6) {
-                    $.ajax({
-                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
-                        type: "GET",
-                        data: { nrp_karyawan: nrp },
-                        success: function (response) {
-                            if (response.success) {
-                                row.find(".nama").val(response.data.name);
-                                row.find(".departemen").val(response.data.departemen);
-                            } else {
-                                row.find(".nama").val("");
-                                row.find(".departemen").val("");
-                            }
-                        },
-                        error: function () {
-                            row.find(".nama").val("");
-                            row.find(".departemen").val("");
-                        }
-                    });
-                } else {
-                    row.find(".nama").val("");
-                    row.find(".departemen").val("");
-                }
-            });
-        });
-
-        $(document).on('input', '.nrp_karyawan', function () {
-            let allNRP = [];
-            $('.nrp_karyawan').each(function () {
-                allNRP.push($(this).val());
-            });
-            localStorage.setItem('nrp_karyawan_list', JSON.stringify(allNRP));
-        });
-
-        $(document).ready(function () {
-            const storedList = localStorage.getItem('nrp_karyawan_list');
-            if (storedList) {
-                const nrpList = JSON.parse(storedList);
-
-                // Tambah baris jika jumlah data lebih banyak dari field yang tersedia
-                while ($('#pesertaTableTambah .nrp_karyawan').length < nrpList.length) {
-                    tambahComboBoxPeserta(); // Panggil fungsi Anda yang sudah ada
-                }
-
-                // Set value dari array ke input
-                $('#pesertaTableTambah .nrp_karyawan').each(function (idx) {
-                    if (nrpList[idx]) {
-                        $(this).val(nrpList[idx]).trigger('keyup'); // Trigger agar nama & departemen juga ikut terisi
-                    }
-                });
-            }
-        });
-
-
-        let counterIkutserta = 1; // Mulai dari 1 karena baris pertama sudah ada di HTML
 
         function tambahPesertaIkutSerta() {
             const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
@@ -2068,17 +2155,16 @@
                     </button>
                 </td>
             `;
-
             tbody.appendChild(newRow);
-            updateNomorIkutPeserta();
-            saveToLocalStoragePeserta();
+            updateNomorPeserta('pesertaTableTambahPeserta');
+            saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
         }
 
+        // Remove participant row for ikutSertaDinasModal
         function hapusIkutPeserta(button) {
             const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
             const row = button.closest('tr');
             const rows = tbody.querySelectorAll('tr');
-            const nrpToDelete = $(row).find('.nrp_karyawan').val(); // Ambil NRP dari baris
 
             if (rows.length > 1) {
                 Swal.fire({
@@ -2092,9 +2178,9 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         row.remove();
-                        counterIkutserta--; // Kurangi counter saat baris dihapus
-                        updateNomorIkutPeserta();
-                        saveToLocalStoragePeserta(); // Simpan setelah hapus
+                        counterIkutserta--;
+                        updateNomorPeserta('pesertaTableTambahPeserta');
+                        saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
                     }
                 });
             } else {
@@ -2107,16 +2193,62 @@
             }
         }
 
-        function updateNomorIkutPeserta() {
-            $("#pesertaTableTambahPeserta .nomor").each(function (index) {
-                $(this).text(index + 1);
-                // Update name attribute sesuai urutan index
-                const row = $(this).closest('tr');
-                row.find(".nrp_karyawan").attr("name", `peserta[${index}][nrp_karyawan]`);
-                row.find(".nama").attr("name", `peserta[${index}][nama]`);
-                row.find(".departemen").attr("name", `peserta[${index}][departemen]`);
+        // Handle NRP input and AJAX for user details
+        $(document).ready(function() {
+            // Sync created_by with first participant
+            $('#created_by').on('input', function() {
+                const nrp = $(this).val();
+                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
             });
-        }
+
+            // Handle NRP input changes
+            $(document).on('keyup', '.nrp_karyawan', function() {
+                const nrp = $(this).val();
+                const row = $(this).closest('tr');
+                const tableId = row.closest('table').attr('id');
+                const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
+
+                if (nrp.length >= 6) {
+                    $.ajax({
+                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+                        type: 'GET',
+                        data: { nrp_karyawan: nrp },
+                        success: function(response) {
+                            if (response.success) {
+                                row.find('.nama').val(response.data.name);
+                                row.find('.departemen').val(response.data.departemen);
+                            } else {
+                                row.find('.nama').val('');
+                                row.find('.departemen').val('');
+                            }
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        },
+                        error: function() {
+                            row.find('.nama').val('');
+                            row.find('.departemen').val('');
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        }
+                    });
+                } else {
+                    row.find('.nama').val('');
+                    row.find('.departemen').val('');
+                    saveToLocalStoragePeserta(tableId, storageKey);
+                }
+            });
+
+            // Load stored data on page load
+            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+
+            // Clear local storage on form submission
+            $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_TAMBAH);
+            });
+
+            $('#editOrderForm').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+            });
+        });
 
 
         document.addEventListener("DOMContentLoaded", function () {
