@@ -890,23 +890,45 @@
 
         $('#calendarModal').on('show.bs.modal', function () {
             $.get(`/kendaraan/booking-dates-all`, function (data) {
-                const events = 
-                data
-                .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
-                .map(item => ({
-                    title: item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
-                    start: item.tanggal_penggunaan,
-                    allDay: true,
-                    backgroundColor: '#28a745',
-                    borderColor: '#28a745',
-                    extendedProps: {
-                        merk: item.merk_kendaraan,
-                        nopol: item.nomor_kendaraan,
-                        tanggal: item.tanggal_penggunaan,
-                        id: item.surat_kendaraan_dinas_id,
-                        status: item.status
-                    }
-                }));
+                const events = data
+                    .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
+                    .map(item => {
+                        let badgeText = '';
+                        
+                        switch (item.jenis_kendaraan) {
+                            case 1:
+                                color = '#28a745';
+                                badgeText = '[KANTOR] ';
+                                break;
+                            case 2:
+                                color = '#007bff';
+                                badgeText = '[PRIBADI] ';
+                                break;
+                            case 3:
+                                color = '#ffc107';
+                                badgeText = '[TAXI] ';
+                                break;
+                            default:
+                                badgeText = '';
+                        }
+
+                        return {
+                            title: badgeText + item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+                            start: item.tanggal_penggunaan,
+                            allDay: true,
+                            backgroundColor: color,
+                            borderColor: color,
+                            textColor: '#ffffff',
+                            extendedProps: {
+                                merk: item.merk_kendaraan,
+                                nopol: item.nomor_kendaraan,
+                                tanggal: item.tanggal_penggunaan,
+                                id: item.surat_kendaraan_dinas_id,
+                                status: item.status,
+                                jenis: item.jenis_kendaraan
+                            }
+                        };
+                    });
 
                 if (globalCalendar) globalCalendar.destroy();
 
@@ -915,7 +937,7 @@
                 globalCalendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     height: 450,
-                    locale: 'id', // Bahasa Indonesia
+                    locale: 'id',
                     events: events,
                     headerToolbar: {
                         left: 'prev,next today',
@@ -931,12 +953,12 @@
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
 
-                            $('#jenisMobil').val('');
-                            $('#tanggalPakai').val('');
-                            $('#tujuan_1').val('');
-                            $('#tujuan_2').val('');
-                            $('#tujuan_3').val('');
-                            $('#pesertaTableTambahPeserta tbody').empty();
+                        $('#jenisMobil').val('');
+                        $('#tanggalPakai').val('');
+                        $('#tujuan_1').val('');
+                        $('#tujuan_2').val('');
+                        $('#tujuan_3').val('');
+                        $('#pesertaTableTambahPeserta tbody').empty();
 
                         $.ajax({
                             url: "/pengajuan/infoSuratKendaraanDinasNonAuth",
@@ -951,7 +973,6 @@
                                     window.daftarKendaraanGlobal = response.daftar_kendaraan;
 
                                     $("#hiddenSuratId").val(suratId);
-
                                     $("#nomorSurat").val(suratId);
                                     const jenisMapping = {
                                         1: 'KANTOR',
@@ -967,7 +988,6 @@
 
                                     const pesertaTable = $("#pesertaTableTambahPeserta tbody");
 
-                                    // Tambahkan baris peserta
                                     response.userDinas.forEach((user, index) => {
                                         pesertaTable.append(`
                                             <tr>
@@ -984,7 +1004,6 @@
                                         `);
                                     });
 
-                                    // Handle form enable/disable berdasarkan status
                                     const form = $("#editOrderForm");
 
                                     if (statusSurat === 'Level 1') {
@@ -995,19 +1014,19 @@
                                         form.find("input, select, textarea").not("[name='_token']").prop("disabled", true);
                                         $("#tambahPesertaBtn").prop("disabled", true);
                                     }
+
                                     $(".trash-btn").prop("disabled", true);
                                     $('#ikutSertaDinasModal').modal('show');
                                 }
                             },
                             error: function () {
                                 alert("Gagal mengambil data. Coba lagi.");
-                            },
+                            }
                         });
                     },
                     dateClick: function(info) {
                         const clickedDate = new Date(info.dateStr);
                         const today = new Date();
-                        // Set jam, menit, detik, ms hari ini ke 0 supaya perbandingan tanggal tepat
                         today.setHours(0, 0, 0, 0);
                         clickedDate.setHours(0, 0, 0, 0);
 
@@ -1018,10 +1037,9 @@
                                 text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
                                 confirmButtonText: 'Oke'
                             });
-                            return; // batalkan aksi buka modal
+                            return;
                         }
 
-                        // Jika tanggal valid, isi input dan tampilkan modal
                         $('#tanggal_penggunaan').val(info.dateStr);
                         $('#tambahDinasModal').modal('show');
                     }
@@ -1041,39 +1059,18 @@
                 });
             });
         });
+
+
         function printIframePengeluaranBarang() {
             var iframe = document.getElementById('barangKeluarQrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
 
-        // function printQRCode() {
-        //     var originalContent = document.body.innerHTML;
-        //     var qrCodeContent = document.getElementById("qrcodePengeluaranBarang").innerHTML;
-
-        //     // Tampilkan hanya QR Code
-        //     document.body.innerHTML = qrCodeContent;
-
-        //     window.print();
-
-        //     // Kembalikan tampilan asli setelah pencetakan
-        //     document.body.innerHTML = originalContent;
-        // }
-         function printIframeSuratDinas() {
+        function printIframeSuratDinas() {
             var iframe = document.getElementById('pesertaDinasQrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
-        // function printQRCodeDinas() {
-        //     var originalContent = document.body.innerHTML;
-        //     var qrCodeContent = document.getElementById("qrcodeDinasContainer").innerHTML;
-
-        //     // Tampilkan hanya QR Code
-        //     document.body.innerHTML = qrCodeContent;
-
-        //     window.print();
-
-        //     // Kembalikan tampilan asli setelah pencetakan
-        //     document.body.innerHTML = originalContent;
-        // }
+  
         let counter = 1;
 
         function saveToLocalStorage() {
@@ -1674,69 +1671,6 @@
                 }
             });
         }
-
-        // function saveApproval() {
-        //     var pengeluaranBarangId = document.getElementById('pengeluaranBarangId').value;
-        //     var noPolisi = document.getElementById('noPolisi').value;
-
-        //     // Konfirmasi dengan Swal sebelum melakukan update
-        //     Swal.fire({
-        //         title: 'Apakah Anda yakin?',
-        //         text: 'Setujui pengeluaran ini?',
-        //         icon: 'info',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Ya, Setuju!',
-        //         cancelButtonText: 'Batal',
-        //         reverseButtons: true
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             // Kirim data ke server menggunakan AJAX untuk memperbarui pengeluaran barang dan approval
-        //             $.ajax({
-        //                 url: "{{ route('approval.updateNopolisi') }}",  // Ganti dengan route yang sesuai
-        //                 method: "POST",
-        //                 data: {
-        //                     _token: "{{ csrf_token() }}",  // CSRF token untuk keamanan
-        //                     pengeluaran_barang_id: pengeluaranBarangId,
-        //                     no_polisi: noPolisi
-        //                 },
-        //                 success: function(response) {
-        //                     if (response.success) {
-        //                         // Tampilkan pesan sukses
-        //                         Swal.fire({
-        //                             icon: 'success',
-        //                             title: 'Sukses!',
-        //                             text: response.message,
-        //                             showConfirmButton: false,
-        //                             timer: 2000
-        //                         }).then(() => {
-        //                             // Reload halaman setelah sukses
-        //                             location.reload();
-        //                         });
-        //                     } else {
-        //                         Swal.fire({
-        //                             icon: 'error',
-        //                             title: 'Gagal!',
-        //                             text: response.message,
-        //                             showConfirmButton: false,
-        //                             timer: 2000
-        //                         });
-        //                     }
-        //                 },
-        //                 error: function(xhr, status, error) {
-        //                     Swal.fire({
-        //                         icon: 'error',
-        //                         title: 'Terjadi Kesalahan!',
-        //                         text: 'Error: ' + error,
-        //                         showConfirmButton: false,
-        //                         timer: 2000
-        //                     });
-        //                 }
-        //             });
-        //         }
-        //     });
-        // }
 
         $(document).ready(function () {
 
