@@ -152,15 +152,8 @@
                                         @endif                                        
 
                                         @if($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'General Affairs')
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kasietransportasi" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
-                                            </button>
-
+                                         
                                             <!-- Button Edit -->
-                                            @if ($dataKD->jenis_kendaraan == 1)
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-warning btn-sm mr-2" 
@@ -169,15 +162,6 @@
                                                     data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                            @endif
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
                                         @endif 
                                         
                                         <!-- Button detail -->
@@ -451,6 +435,9 @@
 
 
 <script>
+    const currentUserRole = "{{ Auth::user()->level }}";
+
+
 
     let pesertaDipindahkan = [];
 
@@ -686,67 +673,147 @@
              },
             dataType: "json",
             success: function (response) {
-                if (response) {
-                    window.daftarKendaraanGlobal = response.daftar_kendaraan;
+                // if (response) {
+                //     window.daftarKendaraanGlobal = response.daftar_kendaraan;
 
-                    $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
-                    $("#pemesan").val(response.userDinas[0]?.nrp_karyawan || ''); // asumsi hanya satu pemesan
-                    $("#jenisMobil").val(response.jenis_kendaraan);
-                    $("#tanggalPakai").val(response.tanggal_penggunaan);
-                    $("#jamMulai").val(response.waktu_keluar);
-                    $("#jamSelesai").val(response.waktu_kembali);
-                    $("#tujuan_1").val(response.tujuan_penggunaan_1);
-                    $("#tujuan_2").val(response.tujuan_penggunaan_2);
-                    $("#tujuan_3").val(response.tujuan_penggunaan_3);
+                //     $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
+                //     $("#pemesan").val(response.userDinas[0]?.nrp_karyawan || ''); // asumsi hanya satu pemesan
+                //     $("#jenisMobil").val(response.jenis_kendaraan);
+                //     $("#tanggalPakai").val(response.tanggal_penggunaan);
+                //     $("#jamMulai").val(response.waktu_keluar);
+                //     $("#jamSelesai").val(response.waktu_kembali);
+                //     $("#tujuan_1").val(response.tujuan_penggunaan_1);
+                //     $("#tujuan_2").val(response.tujuan_penggunaan_2);
+                //     $("#tujuan_3").val(response.tujuan_penggunaan_3);
 
-                    // Render Kendaraan
-                    const tbodyKendaraan = $("#kendaraanInfo tbody");
-                    response.data_kendaraan.forEach((item, index) => {
-                        tbodyKendaraan.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>
-                                    <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-                                        ${window.daftarKendaraanGlobal.map(k => `
-                                            <option value="${k.id_kendaraan}" 
-                                                    data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
-                                                    ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
-                                                ${k.nomor_kendaraan}
-                                            </option>
-                                        `).join('')}
-                                    </select>
-                                </td>
-                                <td class="keterangan-kendaraan">${item.keterangan}</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
-                    });
+                //     // Render Kendaraan
+                //     const tbodyKendaraan = $("#kendaraanInfo tbody");
+                //     response.data_kendaraan.forEach((item, index) => {
+                //         tbodyKendaraan.append(`
+                //             <tr>
+                //                 <td>${index + 1}</td>
+                //                 <td>
+                //                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+                //                         ${window.daftarKendaraanGlobal.map(k => `
+                //                             <option value="${k.id_kendaraan}" 
+                //                                     data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
+                //                                     ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
+                //                                 ${k.nomor_kendaraan}
+                //                             </option>
+                //                         `).join('')}
+                //                     </select>
+                //                 </td>
+                //                 <td class="keterangan-kendaraan">${item.keterangan}</td>
+                //                 <td>
+                //                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                //                         <i class="fas fa-trash"></i>
+                //                     </button>
+                //                 </td>
+                //             </tr>
+                //         `);
+                //     });
 
 
-                    // Render Peserta
-                    const tbodyPeserta = $("#pesertaList tbody");
-                    response.userDinas.forEach((user, index) => {
-                        tbodyPeserta.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${user.nrp_karyawan}</td>
-                                <td>${user.name}</td>
-                                <td>${user.departemen}</td>
-                                <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
-                            </tr>
-                        `);
-                    });
+                //     // Render Peserta
+                //     const tbodyPeserta = $("#pesertaList tbody");
+                //     response.userDinas.forEach((user, index) => {
+                //         tbodyPeserta.append(`
+                //             <tr>
+                //                 <td>${index + 1}</td>
+                //                 <td>${user.nrp_karyawan}</td>
+                //                 <td>${user.name}</td>
+                //                 <td>${user.departemen}</td>
+                //                 <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
+                //             </tr>
+                //         `);
+                //     });
+                // }
+                if (!response || !response.surat_kendaraan_dinas_id) {
+                    alert("Data tidak valid.");
+                    return;
                 }
+
+                const isSuperAdmin = currentUserRole === "Super Admin";
+
+                // Atur akses field
+                $("#jenisMobil").prop("readonly", !isSuperAdmin);
+                $("#tanggalPakai").prop("readonly", !isSuperAdmin);
+                $("#tujuan_1, #tujuan_2, #tujuan_3").prop("readonly", !isSuperAdmin);
+
+                // Simpan daftar kendaraan ke global
+                window.daftarKendaraanGlobal = response.daftar_kendaraan || [];
+
+                // Isi field form utama
+                $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
+                $("#pemesan").val(response.userDinas?.[0]?.nrp_karyawan || '');
+                $("#jenisMobil").val(response.jenis_kendaraan || '');
+                $("#tanggalPakai").val(response.tanggal_penggunaan || '');
+                $("#jamMulai").val(response.waktu_keluar || '');
+                $("#jamSelesai").val(response.waktu_kembali || '');
+                $("#tujuan_1").val(response.tujuan_penggunaan_1 || '');
+                $("#tujuan_2").val(response.tujuan_penggunaan_2 || '');
+                $("#tujuan_3").val(response.tujuan_penggunaan_3 || '');
+
+                // Render Kendaraan
+                renderDaftarKendaraan(response.data_kendaraan || []);
+
+                // Render Peserta
+                renderDaftarPeserta(response.userDinas || []);
             },
             error: function () {
                 alert("Gagal mengambil data. Coba lagi.");
             },
         });
     });
+
+    function renderDaftarKendaraan(dataKendaraan) {
+        const tbody = $("#kendaraanInfo tbody");
+        tbody.empty();
+
+        dataKendaraan.forEach((item, index) => {
+            const opsiKendaraan = window.daftarKendaraanGlobal.map(k => `
+                <option value="${k.id_kendaraan}"
+                    data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
+                    ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
+                    ${k.nomor_kendaraan}
+                </option>`).join('');
+
+            tbody.append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+                            ${opsiKendaraan}
+                        </select>
+                    </td>
+                    <td class="keterangan-kendaraan">${item.keterangan}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    function renderDaftarPeserta(dataPeserta) {
+        const tbody = $("#pesertaList tbody");
+        tbody.empty();
+
+        dataPeserta.forEach((user, index) => {
+            tbody.append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${user.nrp_karyawan}</td>
+                    <td>${user.name}</td>
+                    <td>${user.departemen}</td>
+                    <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
+                </tr>
+            `);
+        });
+    }
+
 
     function tambahComboBoxEdit() {
         const tbody = $("#kendaraanInfo tbody");

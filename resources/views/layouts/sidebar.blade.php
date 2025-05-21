@@ -39,8 +39,8 @@
                     </li>
 
                     @if(Auth::check() && Auth::user()->level === 'Super Admin')
-                        <li class="nav-item {{ request()->routeIs('kendaraan', 'form') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ request()->routeIs('kendaraan', 'form') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('kendaraan', 'form', 'approval-dinas') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->routeIs('kendaraan', 'form', 'approval-dinas') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-list-alt"></i>
                                 <p>
                                     Kelola Data
@@ -49,6 +49,12 @@
                             </a>
                         
                             <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('approval-dinas') }}" class="nav-link {{ request()->routeIs('approval-dinas') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-clipboard-list"></i>
+                                        <p>Kelola Penggunaan Kendaraan Dinas</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-clipboard-list"></i>
@@ -66,7 +72,7 @@
                         </li>
                     @endif
                 
-                    @if(Auth::check() && Auth::user()->level !== 'Security')
+                    @if(Auth::check() && Auth::user()->level !== 'Security' && Auth::user()->level !== 'Super Admin')
                         <li class="nav-item {{ request()->routeIs('approval-dinas', 'approval') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link {{ request()->routeIs('approval-dinas', 'approval') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-list-alt"></i>
