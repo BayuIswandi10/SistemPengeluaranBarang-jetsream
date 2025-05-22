@@ -955,6 +955,8 @@
             // Trigger the load
             loadUsers();
         });
+
+
         let globalCalendar;
 
         // Calendar event handling
@@ -968,15 +970,12 @@
                         switch (item.jenis_kendaraan) {
                             case 1:
                                 color = '#28a745';
-                                badgeText = '[KANTOR] ';
                                 break;
                             case 2:
                                 color = '#007bff';
-                                badgeText = '[PRIBADI] ';
                                 break;
                             case 3:
                                 color = '#ffc107';
-                                badgeText = '[TAXI] ';
                                 break;
                             default:
                                 badgeText = '';
@@ -995,7 +994,8 @@
                                 tanggal: item.tanggal_penggunaan,
                                 id: item.surat_kendaraan_dinas_id,
                                 status: item.status,
-                                jenis: item.jenis_kendaraan
+                                jenis: item.jenis_kendaraan,
+                                kapasitas_tersedia: item.kapasitas_tersedia
                             }
                         };
                     });
@@ -1012,6 +1012,28 @@
                         left: 'prev,next today',
                         center: 'title',
                         right: 'dayGridMonth,timeGridWeek,listMonth'
+                    },
+                    eventDidMount: function(info) {
+                        const kapasitas = info.event.extendedProps.kapasitas_tersedia || 'Tidak diketahui';
+                        const bgColor = info.event.backgroundColor;
+
+                        // Set attribute tooltip
+                        $(info.el).attr({
+                            'data-toggle': 'tooltip',
+                            'data-placement': 'top',
+                            'title': 'Kapasitas tersedia: ' + kapasitas
+                        });
+
+                        // Hapus tooltip lama kalau ada
+                        $(info.el).tooltip('dispose');
+
+                        // Inisialisasi ulang tooltip dengan style custom (background color)
+                        $(info.el).tooltip({
+                            template: `<div class="tooltip bs-tooltip-top" role="tooltip">
+                                        <div class="arrow"></div>
+                                        <div class="tooltip-inner" style="background-color: ${bgColor}; color: white;"></div>
+                                    </div>`
+                        });
                     },
                     // Add flag to track if an event click is being processed
                     eventClick: function(info) {

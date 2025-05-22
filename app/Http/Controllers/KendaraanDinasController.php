@@ -250,20 +250,46 @@ class KendaraanDinasController extends Controller
     public function getAllBookingDates()
     {
         try {
-            $data = DB::table('tb_surat_kendaraan_dinas_detail')
-                ->join('tb_surat_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id')
-                ->join('tb_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', '=', 'tb_kendaraan_dinas.kendaraan_dinas_id')
-                ->select('tb_kendaraan_dinas.merk_kendaraan', 'tb_kendaraan_dinas.nomor_kendaraan', 'tb_surat_kendaraan_dinas.tanggal_penggunaan',
-                'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id','tb_surat_kendaraan_dinas.status','tb_surat_kendaraan_dinas.jenis_kendaraan')
+            $data = DB::table('tb_surat_kendaraan_dinas_detail as skdd')
+                ->join('tb_surat_kendaraan_dinas as skd', 'skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
+                ->join('tb_kendaraan_dinas as kd', 'skdd.kendaraan_dinas_id', '=', 'kd.kendaraan_dinas_id')
+                ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', 'skd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
+                ->select(
+                    'kd.kendaraan_dinas_id',
+                    'kd.merk_kendaraan',
+                    'kd.nomor_kendaraan',
+                    'kd.kapasitas_kendaraan',
+                    'skd.tanggal_penggunaan',
+                    'skd.surat_kendaraan_dinas_id',
+                    'skd.status',
+                    'skd.jenis_kendaraan',
+                    DB::raw('COUNT(pkdd.nrp_karyawan) as total_terpakai'),
+                    DB::raw('(kd.kapasitas_kendaraan - COUNT(pkdd.nrp_karyawan) - 1) as kapasitas_tersedia')
+                )
+                ->groupBy(
+                    'kd.kendaraan_dinas_id',
+                    'kd.merk_kendaraan',
+                    'kd.nomor_kendaraan',
+                    'kd.kapasitas_kendaraan',
+                    'skd.tanggal_penggunaan',
+                    'skd.surat_kendaraan_dinas_id',
+                    'skd.status',
+                    'skd.jenis_kendaraan'
+                )
                 ->get();
-
+    
             return response()->json($data);
         } catch (\Exception $e) {
-            // \Log::error('AllBookingDates Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan di server'], 500);
+            \Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            return response()->json([
+                'error' => 'Terjadi kesalahan di server',
+                'debug' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
         }
     }
-
+    
     public function getKendaraanByJenis(Request $request)
     {
         $jenis = $request->jenis_kendaraan;
