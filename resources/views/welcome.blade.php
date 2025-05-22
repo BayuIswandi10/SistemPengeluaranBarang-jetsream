@@ -116,6 +116,16 @@
     </style>
 
     <style>
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        border-radius: 4px;
+    }
+    </style>
+
+
+    <style>
         /* Pastikan modal tidak lebih besar dari layar */
         @media (max-width: 768px) {
             .modal-dialog {
@@ -330,15 +340,34 @@
                 <div class="modal-dialog modal-slide-side" role="document" style="max-width: 100%;">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="monthPickerGlobal">Pilih Bulan:</label>
-                        <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <!-- Input bulan -->
+                            <div>
+                                <label for="monthPickerGlobal">Pilih Bulan:</label>
+                                <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
+                            </div>
+
+                            <!-- Legend kendaraan -->
+                            <div class="d-flex align-items-center" id="legendKendaraan">
+                                <div class="mr-3 d-flex align-items-center">
+                                    <span class="legend-color" style="background-color: #28a745;"></span>
+                                    <span class="ml-1">Kendaraan Kantor</span>
+                                </div>
+                                <div class="mr-3 d-flex align-items-center">
+                                    <span class="legend-color" style="background-color: #007bff;"></span>
+                                    <span class="ml-1">Kendaraan Pribadi</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="legend-color" style="background-color: #ffc107;"></span>
+                                    <span class="ml-1">Taxi</span>
+                                </div>
+                            </div>
+                        </div>
                     <div id="calendarAllKendaraan"></div>
                     </div>
                 </div>
