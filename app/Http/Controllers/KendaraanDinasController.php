@@ -234,8 +234,6 @@ class KendaraanDinasController extends Controller
                     'surat.surat_kendaraan_dinas_id',
                     DB::raw("CONCAT_WS(' - ', surat.tujuan_penggunaan_1, surat.tujuan_penggunaan_2, surat.tujuan_penggunaan_3) as tujuan_penggunaan"),
                     'surat.tanggal_penggunaan',
-                    'surat.waktu_keluar',
-                    'surat.waktu_kembali',
                     'surat.status'
                 )
                 ->get();
