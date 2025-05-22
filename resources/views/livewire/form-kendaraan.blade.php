@@ -256,8 +256,6 @@
                                 <th>ID Surat</th>
                                 <th>Tujuan Penggunaan</th>
                                 <th>Tanggal Penggunaan</th>
-                                <th>Waktu Keluar</th>
-                                <th>Waktu Kembali</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -357,8 +355,6 @@
                             <td>${item.surat_kendaraan_dinas_id}</td>
                             <td>${item.tujuan_penggunaan}</td>
                             <td>${item.tanggal_penggunaan}</td>
-                            <td>${item.waktu_keluar ?? '-'}</td>
-                            <td>${item.waktu_kembali ?? '-'}</td>
                             <td>${statusLabel}</td>
                         </tr>
                     `);
@@ -369,8 +365,8 @@
                     columnDefs: [
                         { className: 'dt-body-center', targets: 0 },
                         { className: 'dt-head-center', targets: 0 },
-                        { className: 'dt-body-center', targets: 6 },
-                        { className: 'dt-head-center', targets: 6 }
+                        { className: 'dt-body-center', targets: 4 },
+                        { className: 'dt-head-center', targets: 4 }
                     ],
                     responsive: true,
                     scrollX: false,
