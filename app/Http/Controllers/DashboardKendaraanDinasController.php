@@ -42,7 +42,10 @@ class DashboardKendaraanDinasController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'General Service') {
+            if ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+                $suratKendaraan = $query->get();
+            }
+            elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'General Service') {
                 // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);

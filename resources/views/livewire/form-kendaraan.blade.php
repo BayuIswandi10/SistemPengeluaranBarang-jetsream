@@ -19,10 +19,7 @@
             <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
                 <button class="btn btn-primary btn-md float-left" data-toggle="modal" data-target="#tambahDataModal">
                     <i class="fa fa-plus mr-1"></i> Tambah Data
-                </button>
-                <button class="btn btn-secondary btn-md ml-2" data-toggle="modal" data-target="#calendarModal">
-                    <i class="fa fa-calendar mr-1"></i> Kalender
-                </button>                      
+                </button>                   
             </div>
             <div class="card-body">
                 @if (session('success'))
@@ -87,7 +84,7 @@
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal" data-id="{{ $kendaraan->kendaraan_dinas_id }}">
-                                        <i class="fa fa-list"></i>
+                                        <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                     <!-- Button Edit -->
                                     <button 

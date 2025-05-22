@@ -107,7 +107,7 @@
                                                 data-toggle="modal" 
                                                 data-target="#detailModal" 
                                                 data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa-solid fa-circle-info"></i>
                                             </button>
                                             <!-- Button Edit -->
                                             <button 
