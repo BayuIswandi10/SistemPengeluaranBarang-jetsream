@@ -440,7 +440,7 @@
                                 
                                 <div class="form-group">
                                     <label for="tanggal_penggunaan">Tanggal Penggunaan <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="tanggal_penggunaan" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off" onchange="toggleJenisKendaraan()>
+                                    <input type="date" class="form-control" id="tanggal_penggunaan" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off" onchange="toggleJenisKendaraan()">
                                 </div>
                                 
                                 <div class="form-group">
@@ -905,7 +905,6 @@
 
         let globalCalendar;
 
-        // Calendar event handling
         $('#calendarModal').on('show.bs.modal', function() {
             $.get(`/kendaraan/booking-dates-all`, function(data) {
                 const events = data
@@ -963,17 +962,14 @@
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 'Tidak diketahui';
                         const bgColor = info.event.backgroundColor;
 
-                        // Set attribute tooltip
                         $(info.el).attr({
                             'data-toggle': 'tooltip',
                             'data-placement': 'top',
                             'title': 'Kapasitas tersedia: ' + kapasitas
                         });
 
-                        // Hapus tooltip lama kalau ada
                         $(info.el).tooltip('dispose');
 
-                        // Inisialisasi ulang tooltip dengan style custom (background color)
                         $(info.el).tooltip({
                             template: `<div class="tooltip bs-tooltip-top" role="tooltip">
                                         <div class="arrow"></div>
@@ -981,10 +977,9 @@
                                     </div>`
                         });
                     },
-                    // Add flag to track if an event click is being processed
                     eventClick: function(info) {
-                        if (globalCalendar.isProcessing) return; // Prevent multiple clicks
-                        globalCalendar.isProcessing = true; // Set flag to block further clicks
+                        if (globalCalendar.isProcessing) return;
+                        globalCalendar.isProcessing = true;
 
                         const event = info.event;
                         const suratId = event.extendedProps.id;
@@ -1056,10 +1051,15 @@
                                 }
                             },
                             error: function() {
-                                alert('Gagal mengambil data. Coba lagi.');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal Memuat Data',
+                                    text: 'Gagal mengambil data surat kendaraan dinas. Silakan coba lagi.',
+                                    confirmButtonText: 'OK'
+                                });
                             },
                             complete: function() {
-                                globalCalendar.isProcessing = false; // Reset flag after AJAX completes
+                                globalCalendar.isProcessing = false;
                             }
                         });
                     },
@@ -1072,15 +1072,20 @@
                         if (clickedDate <= today) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Tanggal tidak valid',
+                                title: 'Tanggal Tidak Valid',
                                 text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
-                                confirmButtonText: 'Oke'
+                                confirmButtonText: 'OK'
                             });
                             return;
                         }
 
                         $('#tanggal_penggunaan').val(info.dateStr);
+                        lastFetchedDate = null; // Force API refresh on next toggleJenisKendaraan
                         $('#tambahDinasModal').modal('show');
+                        // Trigger vehicle refresh if jenis_kendaraan is selected
+                        if (document.getElementById("jenis_kendaraan").value) {
+                            toggleJenisKendaraan();
+                        }
                     }
                 });
 
@@ -1094,7 +1099,22 @@
                     if (selected) {
                         const newDate = selected + '-01';
                         globalCalendar.gotoDate(newDate);
+                        // Update tanggal_penggunaan if modal is open
+                        if ($('#tambahDinasModal').hasClass('show')) {
+                            $('#tanggal_penggunaan').val(newDate);
+                            lastFetchedDate = null; // Force API refresh
+                            if (document.getElementById("jenis_kendaraan").value) {
+                                toggleJenisKendaraan();
+                            }
+                        }
                     }
+                });
+            }).fail(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memuat Kalender',
+                    text: 'Gagal mengambil data pemesanan kendaraan. Silakan coba lagi.',
+                    confirmButtonText: 'OK'
                 });
             });
         });
@@ -1244,9 +1264,11 @@
             loadBarangDataFromLocalStorage();
         });
         
-        let selectedVehicleCapacity = null; // Global variable to store the selected vehicle's capacity
 
-       
+        let selectedVehicleCapacity = null;
+        let kendaraanList = [];
+        let lastFetchedDate = null;
+        let lastFetchedJenis = null;
 
         function toggleJenisKendaraan() {
             const jenisKendaraan = document.getElementById("jenis_kendaraan").value;
@@ -1261,7 +1283,7 @@
             const tujuan2 = document.querySelector('input[name="tujuan_penggunaan_2"]');
             const tujuan3 = document.querySelector('input[name="tujuan_penggunaan_3"]');
 
-            // Reset tampilan dan kapasitas
+            // Reset UI elements
             kendaraanGroup.style.display = "none";
             tabelKendaraan.style.display = "none";
             kendaraanKantorGroup.style.display = "none";
@@ -1269,7 +1291,7 @@
             kilometerAwal.value = "";
             kendaraanBody.innerHTML = "";
             kendaraanSelect.innerHTML = "";
-            selectedVehicleCapacity = null; // Reset capacity
+            selectedVehicleCapacity = null;
 
             // Reset destination fields
             tujuan1.value = "";
@@ -1284,30 +1306,51 @@
                 kendaraanSelect.selectize.destroy();
             }
 
-            // Explicitly enable kendaraan_dinas_id
+            // Enable kendaraan_dinas_id
             kendaraanSelect.disabled = false;
             kendaraanSelect.removeAttribute("disabled");
 
-            if (!tanggalPenggunaan) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Tanggal Penggunaan Belum Dipilih',
-                    text: 'Silakan pilih tanggal penggunaan terlebih dahulu.',
-                    confirmButtonText: 'OK'
-                });
+            if (!tanggalPenggunaan || !jenisKendaraan) {
+                if (!tanggalPenggunaan) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tanggal Penggunaan Belum Dipilih',
+                        text: 'Silakan pilih tanggal penggunaan terlebih dahulu.',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (!jenisKendaraan) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Jenis Kendaraan Belum Dipilih',
+                        text: 'Silakan pilih jenis kendaraan terlebih dahulu.',
+                        confirmButtonText: 'OK'
+                    });
+                }
                 return;
             }
 
-            // AJAX untuk mengambil data kendaraan
+            // Avoid redundant API calls
+            if (lastFetchedDate === tanggalPenggunaan && lastFetchedJenis === jenisKendaraan) {
+                return;
+            }
+
+            // Update last fetched values
+            lastFetchedDate = tanggalPenggunaan;
+            lastFetchedJenis = jenisKendaraan;
+
+            // Fetch vehicle data
             fetch(`/kendaraan/get-by-jenis?jenis_kendaraan=${jenisKendaraan}&tanggal_penggunaan=${tanggalPenggunaan}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Gagal mengambil data kendaraan');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     kendaraanList = data;
 
                     if (jenisKendaraan === "2" || jenisKendaraan === "3") {
-                        // Untuk PRIBADI dan TAXI
                         const isPribadi = jenisKendaraan === "2";
-
                         if (isPribadi) {
                             kendaraanGroup.style.display = "block";
                             kilometerAwal.setAttribute("required", "required");
@@ -1335,30 +1378,56 @@
                         initSelectize(0, jenisKendaraan, true, 'Pilih, cari atau tambahkan Kendaraan');
                         const selectizeControl = $(`#select_nopol_0`)[0].selectize;
                         selectizeControl.clearOptions();
-                        data.forEach(k => {
+
+                        if (data.length === 0) {
                             selectizeControl.addOption({
-                                nomor_kendaraan: k.nomor_kendaraan,
-                                merk_kendaraan: k.merk_kendaraan,
-                                kapasitas_kendaraan: k.kapasitas_kendaraan,
-                                kapasitas_tersedia: k.kapasitas_tersedia,
-                                tujuan_penggunaan_1: k.tujuan_penggunaan_1,
-                                tujuan_penggunaan_2: k.tujuan_penggunaan_2,
-                                tujuan_penggunaan_3: k.tujuan_penggunaan_3
+                                nomor_kendaraan: '',
+                                merk_kendaraan: 'Tidak ada kendaraan tersedia',
+                                kapasitas_kendaraan: 0,
+                                kapasitas_tersedia: 0
                             });
-                        });
+                            selectizeControl.disable();
+                        } else {
+                            data.forEach(k => {
+                                selectizeControl.addOption({
+                                    nomor_kendaraan: k.nomor_kendaraan,
+                                    merk_kendaraan: k.merk_kendaraan,
+                                    kapasitas_kendaraan: k.kapasitas_kendaraan,
+                                    kapasitas_tersedia: k.kapasitas_tersedia,
+                                    tujuan_penggunaan_1: k.tujuan_penggunaan_1,
+                                    tujuan_penggunaan_2: k.tujuan_penggunaan_2,
+                                    tujuan_penggunaan_3: k.tujuan_penggunaan_3
+                                });
+                            });
+                            selectizeControl.enable();
+                        }
                         selectizeControl.refreshOptions(false);
 
-                        // Handle destination fields for PRIBADI/TAXI
                         selectizeControl.on('change', function(value) {
                             const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
-                            if (selected && selected.tujuan_penggunaan_1) {
+                            const merkField = $(`input[name="kendaraan[0][merk_kendaraan]"]`);
+                            const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
+
+                            if (selected && selected.nomor_kendaraan) {
+                                merkField.val(selected.merk_kendaraan).prop('readonly', true);
+                                kapasitasField.val(selected.kapasitas_tersedia).prop('readonly', true);
+                                selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || null;
                                 tujuan1.value = selected.tujuan_penggunaan_1 || "";
                                 tujuan2.value = selected.tujuan_penggunaan_2 || "";
                                 tujuan3.value = selected.tujuan_penggunaan_3 || "";
-                                tujuan1.setAttribute("readonly", "readonly");
-                                tujuan2.setAttribute("readonly", "readonly");
-                                tujuan3.setAttribute("readonly", "readonly");
+                                if (selected.tujuan_penggunaan_1) {
+                                    tujuan1.setAttribute("readonly", "readonly");
+                                    tujuan2.setAttribute("readonly", "readonly");
+                                    tujuan3.setAttribute("readonly", "readonly");
+                                } else {
+                                    tujuan1.removeAttribute("readonly");
+                                    tujuan2.removeAttribute("readonly");
+                                    tujuan3.removeAttribute("readonly");
+                                }
                             } else {
+                                merkField.val('').prop('readonly', false);
+                                kapasitasField.val('').prop('readonly', false);
+                                selectedVehicleCapacity = null;
                                 tujuan1.value = "";
                                 tujuan2.value = "";
                                 tujuan3.value = "";
@@ -1366,14 +1435,18 @@
                                 tujuan2.removeAttribute("readonly");
                                 tujuan3.removeAttribute("readonly");
                             }
+                            validatePesertaCount();
                         });
 
                     } else if (jenisKendaraan === "1") {
-                        // Untuk KANTOR
                         kendaraanKantorGroup.style.display = "block";
                         kendaraanSelect.setAttribute("required", "required");
                         kendaraanSelect.innerHTML = `<option value="" disabled selected>Pilih Kendaraan</option>`;
-                        if (data.length > 0) {
+
+                        if (data.length === 0) {
+                            kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
+                            kendaraanSelect.disabled = true;
+                        } else {
                             data.forEach(k => {
                                 kendaraanSelect.innerHTML += `
                                     <option value="${k.kendaraan_dinas_id}" 
@@ -1384,11 +1457,8 @@
                                         ${k.nomor_kendaraan} - ${k.merk_kendaraan} (Kapasitas Tersedia: ${k.kapasitas_tersedia})
                                     </option>`;
                             });
-                        } else {
-                            kendaraanSelect.innerHTML = `<option value="" disabled>Tidak ada kendaraan tersedia</option>`;
                         }
 
-                        // Reinitialize Selectize for kantor
                         $('#kendaraan_dinas_id').selectize({
                             create: false,
                             sortField: 'text',
@@ -1414,18 +1484,21 @@
                                     tujuan2.removeAttribute("readonly");
                                     tujuan3.removeAttribute("readonly");
                                 }
-                                validatePesertaCount(); // Validate participant count on vehicle change
+                                validatePesertaCount();
                             }
                         });
                     }
                 })
                 .catch(error => {
                     console.error('Gagal mengambil data kendaraan:', error);
-                    if (jenisKendaraan === "1") {
-                        kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
-                        kendaraanSelect.disabled = false;
-                    }
-                    // Reset destination fields on error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Memuat Data',
+                        text: 'Terjadi kesalahan saat mengambil data kendaraan. Silakan coba lagi.',
+                        confirmButtonText: 'OK'
+                    });
+                    kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
+                    kendaraanSelect.disabled = true;
                     tujuan1.value = "";
                     tujuan2.value = "";
                     tujuan3.value = "";
@@ -1434,8 +1507,6 @@
                     tujuan3.removeAttribute("readonly");
                 });
         }
-
-        let kendaraanList = [];
 
         function initSelectize(index, jenis, allowAdd = false, placeholderText = '') {
             const selectEl = $(`#select_nopol_${index}`);
@@ -1466,16 +1537,15 @@
                     const tujuan2 = document.querySelector('input[name="tujuan_penggunaan_2"]');
                     const tujuan3 = document.querySelector('input[name="tujuan_penggunaan_3"]');
 
-                    if (selected) {
+                    if (selected && selected.nomor_kendaraan) {
                         merkField.val(selected.merk_kendaraan).prop('readonly', !selected.isNew);
                         kapasitasField.val(selected.kapasitas_tersedia || selected.kapasitas_kendaraan).prop('readonly', !selected.isNew);
-                        selectedVehicleCapacity = selected.kapasitas_tersedia ? parseInt(selected.kapasitas_tersedia) : (selected.kapasitas_kendaraan ? parseInt(selected.kapasitas_kendaraan) : null);
+                        selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || parseInt(selected.kapasitas_kendaraan) || null;
                         if (selected.kendaraan_dinas_id) {
                             $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val(selected.kendaraan_dinas_id);
                         } else {
                             $(`input[name="kendaraan[${index}][kendaraan_dinas_id]"]`).val('');
                         }
-                        // Set destination fields if vehicle is used
                         if (selected.tujuan_penggunaan_1) {
                             tujuan1.value = selected.tujuan_penggunaan_1 || "";
                             tujuan2.value = selected.tujuan_penggunaan_2 || "";
@@ -1503,7 +1573,7 @@
                         tujuan2.removeAttribute("readonly");
                         tujuan3.removeAttribute("readonly");
                     }
-                    validatePesertaCount(); // Validate participant count on vehicle change
+                    validatePesertaCount();
                 }
             });
         }
