@@ -313,7 +313,7 @@ class KendaraanDinasController extends Controller
                 ->leftJoin('tb_surat_kendaraan_dinas as skd', function ($join) use ($tanggal) {
                     $join->on('skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
                         ->whereDate('skd.tanggal_penggunaan', '=', $tanggal)
-                        ->where('skd.status', '!=', 'Dibatalkan');
+                        ->where('skd.status', '!=', 'Expired');
                 })
                 ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
                     $join->on('skdd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
