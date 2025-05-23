@@ -553,10 +553,12 @@ class SuratDinasController extends Controller
         }
     }
 
+
+
     public function editNonAuth(Request $request)
     {
         try {
-            $suratDinasId = $request->surat_kendaraan_dinas_id;
+            $suratDinasIds = explode(',', $request->surat_kendaraan_dinas_id); // Split comma-separated IDs
 
             $suratDinas = SuratKendaraanDinas::with([
                 'pencatatanKendaraanDinas' => function($query) {
@@ -564,27 +566,32 @@ class SuratDinasController extends Controller
                 },
                 'pencatatanKendaraanDinas.user',
                 'suratDetail.kendaraan'
-            ])->findOrFail($suratDinasId);
+            ])
+            ->whereIn('surat_kendaraan_dinas_id', $suratDinasIds)
+            ->get();
 
-            // Mapping data user dinas (peserta)
-            $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+            // Mapping data for each surat
+            $data = $suratDinas->map(function ($surat) {
+                $userDinasData = $surat->pencatatanKendaraanDinas->map(function ($user) {
+                    return [
+                        'nrp_karyawan' => $user->nrp_karyawan,
+                        'name' => $user->user->name ?? 'Tidak Diketahui',
+                        'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                    ];
+                });
+
                 return [
-                    'nrp_karyawan' => $user->nrp_karyawan,
-                    'name' => $user->user->name ?? 'Tidak Diketahui',
-                    'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                    'surat_kendaraan_dinas_id' => $surat->surat_kendaraan_dinas_id,
+                    'tujuan_penggunaan_1' => $surat->tujuan_penggunaan_1,
+                    'tujuan_penggunaan_2' => $surat->tujuan_penggunaan_2,
+                    'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
+                    'jenis_kendaraan' => $surat->jenis_kendaraan,
+                    'tanggal_penggunaan' => $surat->tanggal_penggunaan,
+                    'userDinas' => $userDinasData,
                 ];
             });
 
-            // Return hanya data yang diminta
-            return response()->json([
-                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1,
-                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2,
-                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3,
-                'jenis_kendaraan' => $suratDinas->jenis_kendaraan,
-                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan,
-                'userDinas' => $userDinasData,
-            ], 200);
-
+            return response()->json($data, 200);
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan saat memuat data.',

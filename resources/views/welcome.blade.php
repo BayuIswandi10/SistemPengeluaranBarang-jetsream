@@ -510,7 +510,7 @@
             </div>
 
             {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal --}}
-            <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            {{-- <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -595,8 +595,162 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
+            {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal 2--}}
+            {{-- <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="editDataModalLabel">Ikut Serta Kendaraan Dinas</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.updateNonAuth')}}" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="surat_kendaraan_dinas_id" id="hiddenSuratId">
+
+                                <!-- Main Information Table -->
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor Surat</th>
+                                            <th>Jenis Mobil</th>
+                                            <th>Tanggal Penggunaan</th>
+                                            <th>Tujuan 1</th>
+                                            <th>Tujuan 2</th>
+                                            <th>Tujuan 3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" id="nomorSurat" name="nomor_surat" class="form-control" disabled></td>
+                                            <td><input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control"></td>
+                                            <td><input type="text" name="tanggal_penggunaan" id="tanggalPakai" class="form-control"></td>
+                                            <td><input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="-"></td>
+                                            <td><input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="-"></td>
+                                            <td><input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="-"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Peserta Dinas Table -->
+                                <div class="form-group mt-3">
+                                    <label><strong>Peserta Dinas</strong> <span class="text-danger">*</span></label>
+                                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>NRP</th>
+                                                <th>Nama</th>
+                                                <th>Departemen</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="nomor">1</td>
+                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
+                                        <i class="fas fa-plus"></i> Tambah Peserta
+                                    </button>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
+
+            <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editDataModalLabel">Ikut Serta Kendaraan Dinas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Bookings Table -->
+                <div class="mb-4">
+                    <h6>Kendaraan</h6>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>No Polisi</th>
+                                <th>Jenis Mobil</th>
+                                <th>Tanggal Penggunaan</th>
+                                <th>Tujuan 1</th>
+                                <th>Tujuan 2</th>
+                                <th>Tujuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingTableBody">
+                            <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Peserta Dinas Table -->
+                <div class="form-group mt-3">
+                    <h6>Peserta Dinas</h6>
+                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>No Surat</th>
+                                <th>NRP</th>
+                                <th>Nama</th>
+                                <th>Departemen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pesertaTableBody">
+                            <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Close Button -->
+                <div class="form-group d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
 
        <!-- Grafis Section -->
@@ -905,6 +1059,219 @@
 
         let globalCalendar;
 
+        // $('#calendarModal').on('show.bs.modal', function() {
+        //     $.get(`/kendaraan/booking-dates-all`, function(data) {
+        //         const events = data
+        //             .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
+        //             .map(item => {
+        //                 let badgeText = '';
+        //                 let color = '';
+        //                 switch (item.jenis_kendaraan) {
+        //                     case 1:
+        //                         color = '#28a745';
+        //                         break;
+        //                     case 2:
+        //                         color = '#007bff';
+        //                         break;
+        //                     case 3:
+        //                         color = '#ffc107';
+        //                         break;
+        //                     default:
+        //                         badgeText = '';
+        //                 }
+
+        //                 return {
+        //                     title: badgeText + item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+        //                     start: item.tanggal_penggunaan,
+        //                     allDay: true,
+        //                     backgroundColor: color,
+        //                     borderColor: color,
+        //                     textColor: '#ffffff',
+        //                     extendedProps: {
+        //                         merk: item.merk_kendaraan,
+        //                         nopol: item.nomor_kendaraan,
+        //                         tanggal: item.tanggal_penggunaan,
+        //                         id: item.surat_kendaraan_dinas_id,
+        //                         status: item.status,
+        //                         jenis: item.jenis_kendaraan,
+        //                         kapasitas_tersedia: item.kapasitas_tersedia
+        //                     }
+        //                 };
+        //             });
+
+        //         if (globalCalendar) globalCalendar.destroy();
+
+        //         const calendarEl = document.getElementById('calendarAllKendaraan');
+        //         globalCalendar = new FullCalendar.Calendar(calendarEl, {
+        //             initialView: 'dayGridMonth',
+        //             height: 450,
+        //             locale: 'id',
+        //             events: events,
+        //             headerToolbar: {
+        //                 left: 'prev,next today',
+        //                 center: 'title',
+        //                 right: 'dayGridMonth,timeGridWeek,listMonth'
+        //             },
+        //             eventDidMount: function(info) {
+        //                 const kapasitas = info.event.extendedProps.kapasitas_tersedia || 'Tidak diketahui';
+        //                 const bgColor = info.event.backgroundColor;
+
+        //                 $(info.el).attr({
+        //                     'data-toggle': 'tooltip',
+        //                     'data-placement': 'top',
+        //                     'title': 'Kapasitas tersedia: ' + kapasitas
+        //                 });
+
+        //                 $(info.el).tooltip('dispose');
+
+        //                 $(info.el).tooltip({
+        //                     template: `<div class="tooltip bs-tooltip-top" role="tooltip">
+        //                                 <div class="arrow"></div>
+        //                                 <div class="tooltip-inner" style="background-color: ${bgColor}; color: white;"></div>
+        //                             </div>`
+        //                 });
+        //             },
+        //             eventClick: function(info) {
+        //                 if (globalCalendar.isProcessing) return;
+        //                 globalCalendar.isProcessing = true;
+
+        //                 const event = info.event;
+        //                 const suratId = event.extendedProps.id;
+        //                 const statusSurat = event.extendedProps.status;
+
+        //                 $('#eventTitle').text(event.title);
+        //                 $('#eventDate').text(event.startStr);
+        //                 $('#jenisMobil').val('');
+        //                 $('#tanggalPakai').val('');
+        //                 $('#tujuan_1').val('');
+        //                 $('#tujuan_2').val('');
+        //                 $('#tujuan_3').val('');
+        //                 $('#pesertaTableTambahPeserta tbody').empty();
+
+        //                 $.ajax({
+        //                     url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
+        //                     type: 'POST',
+        //                     data: {
+        //                         surat_kendaraan_dinas_id: suratId,
+        //                         '_token': '{{ csrf_token() }}'
+        //                     },
+        //                     dataType: 'json',
+        //                     success: function(response) {
+        //                         if (response) {
+        //                             window.daftarKendaraanGlobal = response.daftar_kendaraan;
+        //                             $('#hiddenSuratId').val(suratId);
+        //                             $('#nomorSurat').val(suratId);
+        //                             const jenisMapping = {
+        //                                 1: 'KANTOR',
+        //                                 2: 'PRIBADI',
+        //                                 3: 'TAXI'
+        //                             };
+        //                             $('#jenisMobil').val(jenisMapping[response.jenis_kendaraan] || 'TIDAK DIKETAHUI');
+        //                             $('#tanggalPakai').val(response.tanggal_penggunaan);
+        //                             $('#tujuan_1').val(response.tujuan_penggunaan_1);
+        //                             $('#tujuan_2').val(response.tujuan_penggunaan_2);
+        //                             $('#tujuan_3').val(response.tujuan_penggunaan_3);
+
+        //                             const pesertaTable = $('#pesertaTableTambahPeserta tbody');
+        //                             response.userDinas.forEach((user, index) => {
+        //                                 pesertaTable.append(`
+        //                                     <tr>
+        //                                         <td class="nomor">${index + 1}</td>
+        //                                         <td><input type="text" name="peserta[${index}][nrp_karyawan]" class="form-control" value="${user.nrp_karyawan}" readonly></td>
+        //                                         <td><input type="text" name="peserta[${index}][nama]" class="form-control" value="${user.name}" readonly></td>
+        //                                         <td><input type="text" name="peserta[${index}][departemen]" class="form-control" value="${user.departemen}" readonly></td>
+        //                                         <td>
+        //                                             <button type="button" class="btn btn-danger btn-sm trash-btn" disabled>
+        //                                                 <i class="fas fa-trash"></i>
+        //                                             </button>
+        //                                         </td>
+        //                                     </tr>
+        //                                 `);
+        //                             });
+
+        //                             const form = $('#editOrderForm');
+        //                             if (statusSurat === 'Level 1') {
+        //                                 form.find('input, select, textarea').not('[name="_token"]').prop('readonly', true);
+        //                                 form.find('select').prop('disabled', true);
+        //                                 $('#tambahPesertaBtn').prop('disabled', false);
+        //                             } else {
+        //                                 form.find('input, select, textarea').not('[name="_token"]').prop('disabled', true);
+        //                                 $('#tambahPesertaBtn').prop('disabled', true);
+        //                             }
+
+        //                             $('.trash-btn').prop('disabled', true);
+        //                             $('#ikutSertaDinasModal').modal('show');
+        //                             loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+        //                         }
+        //                     },
+        //                     error: function() {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: 'Gagal Memuat Data',
+        //                             text: 'Gagal mengambil data surat kendaraan dinas. Silakan coba lagi.',
+        //                             confirmButtonText: 'OK'
+        //                         });
+        //                     },
+        //                     complete: function() {
+        //                         globalCalendar.isProcessing = false;
+        //                     }
+        //                 });
+        //             },
+        //             dateClick: function(info) {
+        //                 const clickedDate = new Date(info.dateStr);
+        //                 const today = new Date();
+        //                 today.setHours(0, 0, 0, 0);
+        //                 clickedDate.setHours(0, 0, 0, 0);
+
+        //                 if (clickedDate <= today) {
+        //                     Swal.fire({
+        //                         icon: 'warning',
+        //                         title: 'Tanggal Tidak Valid',
+        //                         text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
+        //                         confirmButtonText: 'OK'
+        //                     });
+        //                     return;
+        //                 }
+
+        //                 $('#tanggal_penggunaan').val(info.dateStr);
+        //                 lastFetchedDate = null; // Force API refresh on next toggleJenisKendaraan
+        //                 $('#tambahDinasModal').modal('show');
+        //                 // Trigger vehicle refresh if jenis_kendaraan is selected
+        //                 if (document.getElementById("jenis_kendaraan").value) {
+        //                     toggleJenisKendaraan();
+        //                 }
+        //             }
+        //         });
+
+        //         globalCalendar.render();
+
+        //         const currentDate = globalCalendar.getDate();
+        //         $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
+
+        //         $('#monthPickerGlobal').off('change').on('change', function() {
+        //             const selected = this.value;
+        //             if (selected) {
+        //                 const newDate = selected + '-01';
+        //                 globalCalendar.gotoDate(newDate);
+        //                 // Update tanggal_penggunaan if modal is open
+        //                 if ($('#tambahDinasModal').hasClass('show')) {
+        //                     $('#tanggal_penggunaan').val(newDate);
+        //                     lastFetchedDate = null; // Force API refresh
+        //                     if (document.getElementById("jenis_kendaraan").value) {
+        //                         toggleJenisKendaraan();
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     }).fail(function() {
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Gagal Memuat Kalender',
+        //             text: 'Gagal mengambil data pemesanan kendaraan. Silakan coba lagi.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     });
+        // });
         $('#calendarModal').on('show.bs.modal', function() {
             $.get(`/kendaraan/booking-dates-all`, function(data) {
                 const events = data
@@ -937,7 +1304,7 @@
                                 merk: item.merk_kendaraan,
                                 nopol: item.nomor_kendaraan,
                                 tanggal: item.tanggal_penggunaan,
-                                id: item.surat_kendaraan_dinas_id,
+                                surat_ids: item.surat_ids.split(','), // Split the comma-separated surat_ids into an array
                                 status: item.status,
                                 jenis: item.jenis_kendaraan,
                                 kapasitas_tersedia: item.kapasitas_tersedia
@@ -982,72 +1349,75 @@
                         globalCalendar.isProcessing = true;
 
                         const event = info.event;
-                        const suratId = event.extendedProps.id;
-                        const statusSurat = event.extendedProps.status;
+                        const suratIds = event.extendedProps.surat_ids; // Array of surat_kendaraan_dinas_id
+                        const jenisKendaraan = event.extendedProps.jenis;
+                        const noPolisi = event.extendedProps.nopol; // Get the license plate number
 
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
-                        $('#jenisMobil').val('');
-                        $('#tanggalPakai').val('');
-                        $('#tujuan_1').val('');
-                        $('#tujuan_2').val('');
-                        $('#tujuan_3').val('');
-                        $('#pesertaTableTambahPeserta tbody').empty();
 
+                        // Fetch details for all related surat_ids
                         $.ajax({
                             url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
                             type: 'POST',
                             data: {
-                                surat_kendaraan_dinas_id: suratId,
+                                surat_kendaraan_dinas_id: suratIds.join(','), // Send comma-separated surat_ids
                                 '_token': '{{ csrf_token() }}'
                             },
                             dataType: 'json',
                             success: function(response) {
-                                if (response) {
-                                    window.daftarKendaraanGlobal = response.daftar_kendaraan;
-                                    $('#hiddenSuratId').val(suratId);
-                                    $('#nomorSurat').val(suratId);
+                                if (response && Array.isArray(response)) {
                                     const jenisMapping = {
                                         1: 'KANTOR',
                                         2: 'PRIBADI',
                                         3: 'TAXI'
                                     };
-                                    $('#jenisMobil').val(jenisMapping[response.jenis_kendaraan] || 'TIDAK DIKETAHUI');
-                                    $('#tanggalPakai').val(response.tanggal_penggunaan);
-                                    $('#tujuan_1').val(response.tujuan_penggunaan_1);
-                                    $('#tujuan_2').val(response.tujuan_penggunaan_2);
-                                    $('#tujuan_3').val(response.tujuan_penggunaan_3);
 
-                                    const pesertaTable = $('#pesertaTableTambahPeserta tbody');
-                                    response.userDinas.forEach((user, index) => {
-                                        pesertaTable.append(`
-                                            <tr>
-                                                <td class="nomor">${index + 1}</td>
-                                                <td><input type="text" name="peserta[${index}][nrp_karyawan]" class="form-control" value="${user.nrp_karyawan}" readonly></td>
-                                                <td><input type="text" name="peserta[${index}][nama]" class="form-control" value="${user.name}" readonly></td>
-                                                <td><input type="text" name="peserta[${index}][departemen]" class="form-control" value="${user.departemen}" readonly></td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm trash-btn" disabled>
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `);
+                                    // Aggregate booking data into a single row
+                                    const bookingTableBody = $('#bookingTableBody');
+                                    bookingTableBody.empty();
+                                    const uniqueBookings = response.reduce((acc, booking) => {
+                                        acc.tanggal = booking.tanggal_penggunaan || acc.tanggal || '-';
+                                        acc.jenis = jenisMapping[booking.jenis_kendaraan] || acc.jenis || 'TIDAK DIKETAHUI';
+                                        acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
+                                        acc.tujuan2 = acc.tujuan2 || booking.tujuan_penggunaan_2 || '-';
+                                        acc.tujuan3 = acc.tujuan3 || booking.tujuan_penggunaan_3 || '-';
+                                        return acc;
+                                    }, {});
+                                    bookingTableBody.append(`
+                                        <tr>
+                                            <td>1</td>
+                                            <td>${noPolisi || '-'}</td>
+                                            <td>${uniqueBookings.jenis}</td>
+                                            <td>${uniqueBookings.tanggal}</td>
+                                            <td>${uniqueBookings.tujuan1}</td>
+                                            <td>${uniqueBookings.tujuan2}</td>
+                                            <td>${uniqueBookings.tujuan3}</td>
+                                        </tr>
+                                    `);
+
+                                    // Populate the peserta table with "No Surat" for each participant
+                                    const pesertaTableBody = $('#pesertaTableBody');
+                                    pesertaTableBody.empty();
+                                    let participantIndex = 1;
+                                    response.forEach(booking => {
+                                        if (booking.userDinas && Array.isArray(booking.userDinas)) {
+                                            booking.userDinas.forEach(user => {
+                                                pesertaTableBody.append(`
+                                                    <tr>
+                                                        <td>${participantIndex}</td>
+                                                        <td>${booking.surat_kendaraan_dinas_id || '-'}</td>
+                                                        <td>${user.nrp_karyawan || '-'}</td>
+                                                        <td>${user.name || '-'}</td>
+                                                        <td>${user.departemen || '-'}</td>
+                                                    </tr>
+                                                `);
+                                                participantIndex++;
+                                            });
+                                        }
                                     });
 
-                                    const form = $('#editOrderForm');
-                                    if (statusSurat === 'Level 1') {
-                                        form.find('input, select, textarea').not('[name="_token"]').prop('readonly', true);
-                                        form.find('select').prop('disabled', true);
-                                        $('#tambahPesertaBtn').prop('disabled', false);
-                                    } else {
-                                        form.find('input, select, textarea').not('[name="_token"]').prop('disabled', true);
-                                        $('#tambahPesertaBtn').prop('disabled', true);
-                                    }
-
-                                    $('.trash-btn').prop('disabled', true);
                                     $('#ikutSertaDinasModal').modal('show');
-                                    loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
                                 }
                             },
                             error: function() {
@@ -1082,7 +1452,6 @@
                         $('#tanggal_penggunaan').val(info.dateStr);
                         lastFetchedDate = null; // Force API refresh on next toggleJenisKendaraan
                         $('#tambahDinasModal').modal('show');
-                        // Trigger vehicle refresh if jenis_kendaraan is selected
                         if (document.getElementById("jenis_kendaraan").value) {
                             toggleJenisKendaraan();
                         }
@@ -1099,7 +1468,6 @@
                     if (selected) {
                         const newDate = selected + '-01';
                         globalCalendar.gotoDate(newDate);
-                        // Update tanggal_penggunaan if modal is open
                         if ($('#tambahDinasModal').hasClass('show')) {
                             $('#tanggal_penggunaan').val(newDate);
                             lastFetchedDate = null; // Force API refresh
