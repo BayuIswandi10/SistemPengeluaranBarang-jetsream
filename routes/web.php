@@ -110,5 +110,6 @@ Route::post('/pengajuan/infoSuratKendaraanDinasNonAuth', [SuratDinasController::
 
 Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 Route::get('/kendaraan/get-by-jenis', [KendaraanDinasController::class, 'getKendaraanByJenis'])->name('get-by-jenis');
+Route::post('/kendaraan/getKendaraanByNopol', [KendaraanDinasController::class, 'getKendaraanByNopol'])->name('kendaraan.getKendaraanByNopol');
 
 Route::get('/user/getAllUser', [UserController::class, 'getAllUser']);

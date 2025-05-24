@@ -510,175 +510,6 @@
             </div>
 
             {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal --}}
-            {{-- <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="editDataModalLabel">Ikut Serta Kendaraan Dinas</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Informasi Nomor Surat -->
-                            <label for="nomorSurat" class="mt-2">Nomor Surat <span class="text-danger">*</span></label>
-                            <input type="text" id="nomorSurat" name="nomor_surat" class="form-control" disabled>
-
-
-                            <!-- Form Edit -->
-                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.updateNonAuth')}}" enctype="multipart/form-data" >
-                                @csrf
-                                
-                                <input type="hidden" name="surat_kendaraan_dinas_id" id="hiddenSuratId">
-
-                                <label class="mt-3">Tujuan <span class="text-danger">*</span></label>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="-">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="-">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="-">
-                                    </div>
-                                </div>
-
-
-                                <!-- Jenis Mobil -->
-                                <label for="jenisMobil" class="mt-2">Jenis Mobil <span class="text-danger">*</span></label>
-                                <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control">
-
-                                <!-- Digunakan Pada -->
-                                <label for="tanggalPakai" class="mt-2">Digunakan Pada <span class="text-danger">*</span></label>
-                                <input type="text" name="tanggal_penggunaan" id="tanggalPakai" class="form-control">
-
-                                <!-- Peserta Dinas Table -->
-                                <div class="form-group mt-2">
-                                    <label>Peserta Dinas <span class="text-danger">*</span></label>
-                                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>NRP</th>
-                                                <th>Nama</th>
-                                                <th>Departemen</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
-
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
-                                        <i class="fas fa-plus"></i> Tambah Peserta
-                                    </button>
-                                </div>
-        
-                                <!-- Submit Button -->
-                                <div class="form-group d-flex justify-content-end">
-                                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
-
-            {{-- Ikut Serta Penggunaan Kendaraan Dinas Modal 2--}}
-            {{-- <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-                <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="editDataModalLabel">Ikut Serta Kendaraan Dinas</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="editOrderForm" method="POST" action="{{route('pengajuan.updateNonAuth')}}" enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="surat_kendaraan_dinas_id" id="hiddenSuratId">
-
-                                <!-- Main Information Table -->
-                                <table class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Nomor Surat</th>
-                                            <th>Jenis Mobil</th>
-                                            <th>Tanggal Penggunaan</th>
-                                            <th>Tujuan 1</th>
-                                            <th>Tujuan 2</th>
-                                            <th>Tujuan 3</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><input type="text" id="nomorSurat" name="nomor_surat" class="form-control" disabled></td>
-                                            <td><input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control"></td>
-                                            <td><input type="text" name="tanggal_penggunaan" id="tanggalPakai" class="form-control"></td>
-                                            <td><input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="-"></td>
-                                            <td><input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="-"></td>
-                                            <td><input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="-"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <!-- Peserta Dinas Table -->
-                                <div class="form-group mt-3">
-                                    <label><strong>Peserta Dinas</strong> <span class="text-danger">*</span></label>
-                                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>NRP</th>
-                                                <th>Nama</th>
-                                                <th>Departemen</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" id="tambahPesertaBtn" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
-                                        <i class="fas fa-plus"></i> Tambah Peserta
-                                    </button>
-                                </div>
-
-                                <!-- Submit Button -->
-                                <div class="form-group d-flex justify-content-end">
-                                    <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
-
             <div class="modal fade" id="ikutSertaDinasModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
@@ -721,7 +552,7 @@
                             <!-- Peserta Dinas Table -->
                             <div class="form-group mt-3">
                                 <h6>Peserta Dinas</h6>
-                                <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
+                                <table id="pesertaIkut" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -764,15 +595,15 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data" id="tambah_penggunaan_kendaraan_dinas">
+                            <form id="formTambahikutserta" method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data">
                                 @csrf
                                 <!-- Hidden Inputs for Pre-filled Data -->
-                                <input type="hidden" name="tujuan_penggunaan_1" id="tujuan_penggunaan_1">
-                                <input type="hidden" name="tujuan_penggunaan_2" id="tujuan_penggunaan_2">
-                                <input type="hidden" name="tujuan_penggunaan_3" id="tujuan_penggunaan_3">
-                                <input type="hidden" name="tanggal_penggunaan" id="tanggal_penggunaan">
-                                <input type="hidden" name="jenis_kendaraan" id="jenis_kendaraan">
-                                <input type="hidden" name="kendaraan_dinas_id" id="kendaraan_dinas_id">
+                                <input type="hidden" name="tujuan_penggunaan_1" id="ikut_tujuan_penggunaan_1">
+                                <input type="hidden" name="tujuan_penggunaan_2" id="ikut_tujuan_penggunaan_2">
+                                <input type="hidden" name="tujuan_penggunaan_3" id="ikut_tujuan_penggunaan_3">
+                                <input type="hidden" name="tanggal_penggunaan" id="ikut_tanggal_penggunaan">
+                                <input type="hidden" name="jenis_kendaraan" id="ikut_jenis_kendaraan">
+                                <input type="hidden" name="kendaraan_dinas_id" id="ikut_kendaraan_dinas_id">
 
                                 <!-- Input Fields -->
                                 <div class="form-group">
@@ -785,7 +616,7 @@
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
                                     <label>Peserta Dinas <span class="text-danger">*</span></label>
-                                    <table id="pesertaTableTambah" class="table table-striped table-bordered">
+                                    <table id="pesertaTableTambahPeserta" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
@@ -802,14 +633,14 @@
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxPeserta()">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
                                         <i class="fas fa-plus"></i> Tambah Peserta
                                     </button>
                                 </div>
@@ -1153,6 +984,7 @@
                         }
 
                         return {
+                            id: item.kendaraan_dinas_id,
                             title: badgeText + item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
                             start: item.tanggal_penggunaan,
                             allDay: true,
@@ -1166,7 +998,8 @@
                                 surat_ids: item.surat_ids.split(','), // Split the comma-separated surat_ids into an array
                                 status: item.status,
                                 jenis: item.jenis_kendaraan,
-                                kapasitas_tersedia: item.kapasitas_tersedia
+                                kapasitas_tersedia: item.kapasitas_tersedia,
+                                kendaraan_dinas_id: item.kendaraan_dinas_id
                             }
                         };
                     });
@@ -1208,19 +1041,22 @@
                         globalCalendar.isProcessing = true;
 
                         const event = info.event;
+                        globalCalendar.currentEventId = event.id; // Store kendaraan_dinas_id as event ID
                         const suratIds = event.extendedProps.surat_ids; // Array of surat_kendaraan_dinas_id
                         const jenisKendaraan = event.extendedProps.jenis;
-                        const noPolisi = event.extendedProps.nopol; // Get the license plate number
+                        const noPolisi = event.extendedProps.nopol;
+                        const kendaraanDinasId = event.extendedProps.kendaraan_dinas_id; // Get kendaraan_dinas_id
 
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
 
-                        // Fetch details for all related surat_ids
+                        // Fetch details for all related surat_ids for the selected kendaraan_dinas_id
                         $.ajax({
                             url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
                             type: 'POST',
                             data: {
                                 surat_kendaraan_dinas_id: suratIds.join(','), // Send comma-separated surat_ids
+                                kendaraan_dinas_id: kendaraanDinasId, // Filter by kendaraan_dinas_id
                                 '_token': '{{ csrf_token() }}'
                             },
                             dataType: 'json',
@@ -1232,10 +1068,15 @@
                                         3: 'TAXI'
                                     };
 
+                                    // Filter response for the selected kendaraan_dinas_id
+                                    const filteredBookings = response.filter(booking => 
+                                        booking.kendaraan_dinas_id == kendaraanDinasId
+                                    );
+
                                     // Aggregate booking data into a single row
                                     const bookingTableBody = $('#bookingTableBody');
                                     bookingTableBody.empty();
-                                    const uniqueBookings = response.reduce((acc, booking) => {
+                                    const uniqueBookings = filteredBookings.reduce((acc, booking) => {
                                         acc.tanggal = booking.tanggal_penggunaan || acc.tanggal || '-';
                                         acc.jenis = jenisMapping[booking.jenis_kendaraan] || acc.jenis || 'TIDAK DIKETAHUI';
                                         acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
@@ -1259,7 +1100,7 @@
                                     const pesertaTableBody = $('#pesertaTableBody');
                                     pesertaTableBody.empty();
                                     let participantIndex = 1;
-                                    response.forEach(booking => {
+                                    filteredBookings.forEach(booking => {
                                         if (booking.userDinas && Array.isArray(booking.userDinas)) {
                                             booking.userDinas.forEach(user => {
                                                 pesertaTableBody.append(`
@@ -1805,6 +1646,53 @@
             });
         }
 
+
+        $('#ikutSertaButton').on('click', function() {
+            // Get data from the booking table in ikutSertaDinasModal
+            const bookingRow = $('#bookingTableBody tr').first();
+            const noPolisi = bookingRow.find('td').eq(1).text();
+            const jenisKendaraan = bookingRow.find('td').eq(2).text();
+            const tanggalPenggunaan = bookingRow.find('td').eq(3).text();
+            const tujuan1 = bookingRow.find('td').eq(4).text();
+            const tujuan2 = bookingRow.find('td').eq(5).text();
+            const tujuan3 = bookingRow.find('td').eq(6).text();
+
+            // Get kendaraan_dinas_id and kapasitas_tersedia from the event data
+            const event = globalCalendar.getEventById(globalCalendar.currentEventId);
+            const kendaraanDinasId = event ? event.extendedProps.kendaraan_dinas_id : null;
+            const kapasitasTersedia = event ? event.extendedProps.kapasitas_tersedia : 0;
+
+            // Check if there is available capacity
+            if (!kendaraanDinasId || kapasitasTersedia <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: !kendaraanDinasId ? 'Kendaraan Tidak Valid' : 'Kapasitas Penuh',
+                    text: !kendaraanDinasId ? 'Kendaraan tidak ditemukan. Silakan pilih ulang.' : 'Kendaraan ini sudah penuh. Silakan pilih kendaraan lain.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Map jenis_kendaraan to numeric value
+            const jenisMapping = {
+                'KANTOR': 1,
+                'PRIBADI': 2,
+                'TAXI': 3
+            };
+            const jenisKendaraanId = jenisMapping[jenisKendaraan] || 1;
+
+            // Set hidden input values in tambahIkutSertaModal
+            $('#ikut_tujuan_penggunaan_1').val(tujuan1 !== '-' ? tujuan1 : '');
+            $('#ikut_tujuan_penggunaan_2').val(tujuan2 !== '-' ? tujuan2 : '');
+            $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
+            $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
+            $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
+            $('#ikut_kendaraan_dinas_id').val(kendaraanDinasId);
+
+            // Show the tambahIkutSertaModal
+            $('#tambahIkutSertaModal').modal('show');
+        });
+
         $(document).ready(function() {
             $('#lokasi_barang_keluar').selectize({
                 create: true,
@@ -2253,11 +2141,11 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah Peserta Melebihi Kapasitas',
-                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}, hanya ${selectedVehicleCapacity - 1} peserta yang diperbolehkan (termasuk sopir).`,
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
                     confirmButtonText: 'OK'
                 });
                 // Remove excess rows
-                while (pesertaTable.getElementsByTagName('tr').length > selectedVehicleCapacity - 1) {
+                while (pesertaTable.getElementsByTagName('tr').length > selectedVehicleCapacity) {
                     pesertaTable.deleteRow(-1);
                 }
                 updateNomorPeserta();
@@ -2334,7 +2222,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Kapasitas Penuh',
-                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}, hanya ${selectedVehicleCapacity - 1} peserta yang diperbolehkan (termasuk sopir).`,
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -2394,11 +2282,21 @@
             const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
             const rows = tbody.querySelectorAll('tr');
 
-            if (rows.length >= 5) {
+            if (!selectedVehicleCapacity) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Maksimal 5 Peserta',
-                    text: 'Anda hanya bisa menambahkan hingga 5 peserta saja.',
+                    title: 'Kapasitas Kendaraan Tidak Diketahui',
+                    text: 'Silakan pilih kendaraan terlebih dahulu.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            if (rows.length >= selectedVehicleCapacity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kapasitas Penuh',
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -2506,7 +2404,7 @@
                 clearLocalStorage(STORAGE_KEY_TAMBAH);
             });
 
-            $('#editOrderForm').on('submit', function() {
+            $('#formTambahikutserta').on('submit', function() {
                 clearLocalStorage(STORAGE_KEY_IKUTSERTA);
             });
         });
