@@ -1471,15 +1471,49 @@
                         }
                         selectizeControl.refreshOptions(false);
 
+                        // selectizeControl.on('change', function(value) {
+                        //     const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
+                        //     const merkField = $(`input[name="kendaraan[0][merk_kendaraan]"]`);
+                        //     const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
+
+                        //     if (selected && selected.nomor_kendaraan) {
+                        //         merkField.val(selected.merk_kendaraan).prop('readonly', true);
+                        //         kapasitasField.val(selected.kapasitas_tersedia).prop('readonly', true);
+                        //         selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || null;
+                        //         tujuan1.value = selected.tujuan_penggunaan_1 || "";
+                        //         tujuan2.value = selected.tujuan_penggunaan_2 || "";
+                        //         tujuan3.value = selected.tujuan_penggunaan_3 || "";
+                        //         if (selected.tujuan_penggunaan_1) {
+                        //             tujuan1.setAttribute("readonly", "readonly");
+                        //             tujuan2.setAttribute("readonly", "readonly");
+                        //             tujuan3.setAttribute("readonly", "readonly");
+                        //         } else {
+                        //             tujuan1.removeAttribute("readonly");
+                        //             tujuan2.removeAttribute("readonly");
+                        //             tujuan3.removeAttribute("readonly");
+                        //         }
+                        //     } else {
+                        //         merkField.val('').prop('readonly', false);
+                        //         kapasitasField.val('').prop('readonly', false);
+                        //         selectedVehicleCapacity = null;
+                        //         tujuan1.value = "";
+                        //         tujuan2.value = "";
+                        //         tujuan3.value = "";
+                        //         tujuan1.removeAttribute("readonly");
+                        //         tujuan2.removeAttribute("readonly");
+                        //         tujuan3.removeAttribute("readonly");
+                        //     }
+                        //     validatePesertaCount();
+                        // });
                         selectizeControl.on('change', function(value) {
                             const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
                             const merkField = $(`input[name="kendaraan[0][merk_kendaraan]"]`);
                             const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
 
                             if (selected && selected.nomor_kendaraan) {
-                                merkField.val(selected.merk_kendaraan).prop('readonly', true);
-                                kapasitasField.val(selected.kapasitas_tersedia).prop('readonly', true);
-                                selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || null;
+                                merkField.val(selected.merk_kendaraan).prop('readonly', !selected.isNew);
+                                kapasitasField.val(selected.kapasitas_tersedia || selected.kapasitas_kendaraan).prop('readonly', !selected.isNew);
+                                selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || parseInt(selected.kapasitas_kendaraan) || null;
                                 tujuan1.value = selected.tujuan_penggunaan_1 || "";
                                 tujuan2.value = selected.tujuan_penggunaan_2 || "";
                                 tujuan3.value = selected.tujuan_penggunaan_3 || "";
@@ -2204,18 +2238,63 @@
         }
 
         // Add participant row for tambahDinasModal
+        // function tambahComboBoxPeserta() {
+        //     const container = document.querySelector('#pesertaTableTambah tbody');
+        //     const rows = container.querySelectorAll('tr');
+
+        //     if (!selectedVehicleCapacity) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Pilih Kendaraan Terlebih Dahulu',
+        //             text: 'Silakan pilih kendaraan untuk menentukan kapasitas maksimal peserta.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
+
+        //     if (rows.length >= selectedVehicleCapacity) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Kapasitas Penuh',
+        //             text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
+
+        //     const newRow = document.createElement('tr');
+        //     newRow.innerHTML = `
+        //         <td class="nomor">${++counterPeserta}</td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+        //         <td>
+        //             <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+        //                 <i class="fas fa-trash"></i>
+        //             </button>
+        //         </td>
+        //     `;
+        //     container.appendChild(newRow);
+        //     updateNomorPeserta('pesertaTableTambah');
+        //     saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+        // }
+
         function tambahComboBoxPeserta() {
             const container = document.querySelector('#pesertaTableTambah tbody');
             const rows = container.querySelectorAll('tr');
 
             if (!selectedVehicleCapacity) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Pilih Kendaraan Terlebih Dahulu',
-                    text: 'Silakan pilih kendaraan untuk menentukan kapasitas maksimal peserta.',
-                    confirmButtonText: 'OK'
-                });
-                return;
+                const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
+                if (kapasitasField.val() === '' || isNaN(parseInt(kapasitasField.val()))) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Kapasitas Kendaraan Belum Diisi',
+                        text: 'Silakan isi kapasitas kendaraan terlebih dahulu.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                selectedVehicleCapacity = parseInt(kapasitasField.val()) - 1;
             }
 
             if (rows.length >= selectedVehicleCapacity) {
