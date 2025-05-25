@@ -65,10 +65,7 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($kendaraanDinas as $dataKD)
-                            @php
-                                $visible = !($dataKD->user && $dataKD->user->departemen !== $user->departemen);
-                            @endphp
-                            <tr @if(!$visible) style="display: none;" data-search="true" @endif>
+                            <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
                                 <td>
@@ -479,33 +476,6 @@
 
 
 <script>
-    $(document).ready(function() {
-        var table = $('#dataTable').DataTable({
-            responsive: true,
-            initComplete: function() {
-                // Tampilkan baris tersembunyi jika mengandung hasil pencarian
-                this.api().on('search.dt', function() {
-                    var searchValue = table.search().toLowerCase();
-                    $('#dataTable tbody tr').each(function() {
-                        var rowText = $(this).text().toLowerCase();
-                        if (rowText.indexOf(searchValue) !== -1) {
-                            $(this).show(); // tampilkan jika cocok
-                        } else {
-                            // Hanya sembunyikan jika bukan dari departemen user
-                            if (!$(this).is('[data-search]')) {
-                                $(this).show();
-                            } else {
-                                $(this).hide();
-                            }
-                        }
-                    });
-                });
-            }
-        });
-    });
-
-
-  
     $('#downloadExcel').on('click', function (e) {
         e.preventDefault();
 

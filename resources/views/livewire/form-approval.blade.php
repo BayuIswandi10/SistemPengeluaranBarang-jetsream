@@ -64,11 +64,7 @@
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
-                                @php
-                                    $kodeDept = explode('/', $pengeluaranBarang->pengeluaran_barang_id)[1] ?? '';
-                                    $hiddenClass = (Auth::user()->departemen !== 'General Affairs' && $kodeDept !== Auth::user()->singkatan) ? 'd-none custom-hidden' : '';
-                                @endphp
-                                <tr class="{{ $hiddenClass }}">
+                            <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
                                 <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
@@ -586,40 +582,6 @@ $(document).ready(function() {
             });
         }
     });
-
-    // Tangani event search
-    table.on('search.dt', function () {
-        const keyword = table.search().toLowerCase();
-
-        table.rows().every(function () {
-            const row = this.node();
-            const text = $(row).text().toLowerCase();
-
-            // Ambil kode departemen dari kolom ke-2 (atau sesuaikan dengan struktur datamu)
-            const kodeDept = $(row).find('td:nth-child(2)').text().split('/')[1];
-
-            if (keyword === "") {
-                // Jika search kosong, tampilkan hanya baris dari departemen user
-                if (kodeDept === userSingkatan) {
-                    $(row).removeClass('d-none');
-                } else {
-                    $(row).addClass('d-none');
-                }
-            } else {
-                // Jika search tidak kosong
-                if (text.includes(keyword)) {
-                    // Tampilkan jika cocok
-                    $(row).removeClass('d-none');
-                } else {
-                    // Sembunyikan jika tidak cocok dan bukan departemen user
-                    if (kodeDept !== userSingkatan) {
-                        $(row).addClass('d-none');
-                    }
-                }
-            }
-        });
-    });
-
 
     // Common function to show confirmation and then update status
     function confirmUpdate(pengeluaranBarangId, url) {
