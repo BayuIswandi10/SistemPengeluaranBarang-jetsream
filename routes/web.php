@@ -40,8 +40,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
     Route::middleware([CheckLevel::class . ':Super Admin'])->group(function () {
-        Route::get('/form', PengeluaranBarangLiveWire::class)->name('form');
         Route::get('/kendaraan', KendaraanDinasLiveWire::class)->name('kendaraan');
+        // Route::get('/form', PengeluaranBarangLiveWire::class)->name('form');
     });
 
   

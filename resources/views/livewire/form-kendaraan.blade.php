@@ -83,7 +83,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal" data-id="{{ $kendaraan->kendaraan_dinas_id }}">
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#detailModal" data-id="{{ $kendaraan->kendaraan_dinas_id }}">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                     <!-- Button Edit -->

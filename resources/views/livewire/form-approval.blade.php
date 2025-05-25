@@ -98,6 +98,18 @@
                                 </td>
                                 <td>
                                     <div class="button-group d-flex">
+                                        @if($user->level === 'Super Admin' && $user->departemen == 'General Affairs')
+                                         
+                                            <!-- Button Edit -->
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-warning btn-sm mr-2" 
+                                                    data-toggle="modal" 
+                                                    data-target="#editDataModal" 
+                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                        @endif 
                                         <!-- Button for Level 1 (Ka.Sie) -->
                                         @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Ka.Sie')
                                             
@@ -332,6 +344,77 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     {{-- Edit Modal --}}
+    <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Pengeluaran Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('pengeluaran_barang.update') }}" enctype="multipart/form-data" id="editForm">
+                        @csrf
+                        @method('PUT')
+        
+                        <input type="hidden" name="pengeluaran_barang_id" id="edit_pengeluaran_barang_id">
+        
+                        <div class="form-group">
+                            <label for="edit_jenis_kendaraan">Jenis Kendaraan <span class="text-danger">*</span></label>
+                            <select class="form-control" id="edit_jenis_kendaraan" name="jenis_kendaraan" required autocomplete="off">
+                                <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                                <option value="TRUCK">TRUCK</option>
+                                <option value="PICK UP">PICK UP</option>
+                                <option value="SEDAN">SEDAN</option>
+                                <option value="JEEP">JEEP</option>
+                                <option value="SP. MOTOR">SP. MOTOR</option>
+                            </select>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="edit_lokasi_barang_keluar">Lokasi Barang Keluar  <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_lokasi_barang_keluar" name="lokasi_barang_keluar" readonly>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="edit_tujuan_pengeluaran_barang">Tujuan Pengeluaran <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_tujuan_pengeluaran_barang" name="tujuan_pengeluaran_barang" required autocomplete="off">
+                        </div>
+        
+                        <div class="form-group">
+                            <label>Detail Barang Keluar <span class="text-danger">*</span></label>
+                            <table id="editBarangTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan diisi melalui JavaScript -->
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxEdit()">
+                                <i class="fas fa-plus"></i> Tambah Barang
+                            </button>
+                        </div>
+        
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Ubah Data</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -787,6 +870,66 @@ $(document).ready(function() {
                     }
                 });
             });
+        });
+    });
+
+    $('#editDataModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget); 
+        const pengeluaranBarangId = button.data('id'); 
+
+
+        $('#edit_pengeluaran_barang_id').val('');
+        $('#edit_jenis_kendaraan').val('');
+        $('#edit_lokasi_barang_keluar').val('');
+        $('#edit_tujuan_pengeluaran_barang').val('');
+        $('#editBarangTable tbody').empty();
+
+        
+        $.ajax({
+            url: `/pengeluaran/edit`, 
+            method: 'POST',
+            data: {
+                pengeluaran_barang_id: pengeluaranBarangId,
+                "_token": "{{ csrf_token() }}" // CSRF Token
+            },
+            success: function (response) {
+                
+                $('#edit_pengeluaran_barang_id').val(response.pengeluaran_barang_id);
+                $('#edit_jenis_kendaraan').val(response.jenis_kendaraan);
+                $('#edit_lokasi_barang_keluar').val(response.lokasi_barang_keluar);
+                $('#edit_tujuan_pengeluaran_barang').val(response.tujuan_pengeluaran_barang);
+
+                const tableBody = $('#editBarangTable tbody');
+                response.barangKeluar.forEach((barang, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <input type="hidden" name="barang_ids[]" value="${barang.barang_keluar_id || ''}">
+                                <input type="text" name="nama_barang[]" class="form-control" value="${barang.nama_barang}" required autocomplete="off">
+                            </td>
+                            <td><input type="number" name="jumlah[]" class="form-control" value="${barang.jumlah_barang}" min="1" required autocomplete="off"></td>
+                            <td>
+                                <select name="satuan[]" class="form-control" required>
+                                    <option value="" disabled>Pilih Satuan</option>
+                                    <option value="unit" ${barang.satuan_barang === 'unit' ? 'selected' : ''}>Unit</option>
+                                    <option value="pcs" ${barang.satuan_barang === 'pcs' ? 'selected' : ''}>PCS</option>
+                                </select>
+                            </td>
+                            <td><input type="text" name="keterangan[]" class="form-control" value="${barang.keterangan_barang}" required autocomplete="off"></td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    tableBody.append(row);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(`Error: ${error}`);
+                alert('Gagal mengambil data. Silakan coba lagi.');
+            }
         });
     });
 

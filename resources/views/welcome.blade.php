@@ -1965,7 +1965,7 @@
                                     <td>${item.jenis_kendaraan}</td>
                                     <td>${item.tanggal_penggunaan}</td>
                                     <td>
-                                        <button type="button" class="btn btn-info btn-sm" onclick="getQrCodePenggunaanKendaraanDinas('${item.surat_kendaraan_dinas_id}')">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="getQrCodePenggunaanKendaraanDinas('${item.surat_kendaraan_dinas_id}')">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
                                     </td>

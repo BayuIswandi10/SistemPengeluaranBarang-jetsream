@@ -39,8 +39,8 @@
                     </li>
 
                     @if(Auth::check() && Auth::user()->level === 'Super Admin')
-                        <li class="nav-item {{ request()->routeIs('kendaraan', 'form', 'approval-dinas') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ request()->routeIs('kendaraan', 'form', 'approval-dinas') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('kendaraan', 'approval', 'approval-dinas') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->routeIs('kendaraan', 'approval', 'approval-dinas') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-list-alt"></i>
                                 <p>
                                     Kelola Data
@@ -56,7 +56,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('form') }}" class="nav-link {{ request()->routeIs('form') ? 'active' : '' }}">
+                                    <a href="{{ route('approval') }}" class="nav-link {{ request()->routeIs('approval') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-clipboard-list"></i>
                                         <p>Kelola Pengeluaran Barang</p>
                                     </a>

@@ -68,6 +68,12 @@ class ApprovalBarangKeluarLiveWire extends Component
 
             // Gabungkan koleksi
             $pengeluaranBarangs = $level2FromGA->concat($others);
+        } elseif ($user->level === 'Super Admin') {
+            // Super Admin dapat melihat semua data
+            $pengeluaranBarangs = (clone $query)
+                ->where('status', '!=', 'Level 0')
+                ->orderBy('created_date', 'desc')
+                ->get();        
         } else {
             // Jika level tidak dikenali, tampilkan data kosong
             $pengeluaranBarangs = collect();
