@@ -1047,6 +1047,20 @@
                         const noPolisi = event.extendedProps.nopol;
                         const kendaraanDinasId = event.extendedProps.kendaraan_dinas_id; // Get kendaraan_dinas_id
 
+                        // Check if the event date is in the past (H-1 logic)
+                        const eventDate = new Date(event.start);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); // Normalize to midnight
+                        eventDate.setHours(0, 0, 0, 0); // Normalize to midnight
+
+                        // Hide Ikut Serta button if event date is in the past
+                        const ikutSertaButton = $('#ikutSertaButton');
+                        if (eventDate < today) {
+                            ikutSertaButton.hide();
+                        } else {
+                            ikutSertaButton.show();
+                        }
+
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
 
