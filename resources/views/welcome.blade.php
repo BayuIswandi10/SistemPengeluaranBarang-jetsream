@@ -1010,9 +1010,14 @@
                     placeholder: 'Pilih atau cari Karyawan',
                     // Use Selectize's built-in fuzzy search
                     score: function (search) {
-                        const score = this.getScoreFunction(search);
+                        // const score = this.getScoreFunction(search);
+                        // return function (item) {
+                        //     return score(item);
+                        // };
                         return function (item) {
-                            return score(item);
+                            let text = item.text.toLowerCase();
+                            search = search.toLowerCase();
+                            return text.includes(search) ? 1 : 0;
                         };
                     }
                 });
