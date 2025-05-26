@@ -1470,41 +1470,6 @@
                             selectizeControl.enable();
                         }
                         selectizeControl.refreshOptions(false);
-
-                        // selectizeControl.on('change', function(value) {
-                        //     const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
-                        //     const merkField = $(`input[name="kendaraan[0][merk_kendaraan]"]`);
-                        //     const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
-
-                        //     if (selected && selected.nomor_kendaraan) {
-                        //         merkField.val(selected.merk_kendaraan).prop('readonly', true);
-                        //         kapasitasField.val(selected.kapasitas_tersedia).prop('readonly', true);
-                        //         selectedVehicleCapacity = parseInt(selected.kapasitas_tersedia) || null;
-                        //         tujuan1.value = selected.tujuan_penggunaan_1 || "";
-                        //         tujuan2.value = selected.tujuan_penggunaan_2 || "";
-                        //         tujuan3.value = selected.tujuan_penggunaan_3 || "";
-                        //         if (selected.tujuan_penggunaan_1) {
-                        //             tujuan1.setAttribute("readonly", "readonly");
-                        //             tujuan2.setAttribute("readonly", "readonly");
-                        //             tujuan3.setAttribute("readonly", "readonly");
-                        //         } else {
-                        //             tujuan1.removeAttribute("readonly");
-                        //             tujuan2.removeAttribute("readonly");
-                        //             tujuan3.removeAttribute("readonly");
-                        //         }
-                        //     } else {
-                        //         merkField.val('').prop('readonly', false);
-                        //         kapasitasField.val('').prop('readonly', false);
-                        //         selectedVehicleCapacity = null;
-                        //         tujuan1.value = "";
-                        //         tujuan2.value = "";
-                        //         tujuan3.value = "";
-                        //         tujuan1.removeAttribute("readonly");
-                        //         tujuan2.removeAttribute("readonly");
-                        //         tujuan3.removeAttribute("readonly");
-                        //     }
-                        //     validatePesertaCount();
-                        // });
                         selectizeControl.on('change', function(value) {
                             const selected = kendaraanList.find(k => k.nomor_kendaraan === value);
                             const merkField = $(`input[name="kendaraan[0][merk_kendaraan]"]`);
