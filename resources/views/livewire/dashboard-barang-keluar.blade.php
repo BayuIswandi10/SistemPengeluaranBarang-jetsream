@@ -326,15 +326,15 @@
                     labels: dailyData.labels,
                     datasets: [
                         {
-                            label: 'Kategori Non-Scrap',
-                            data: dailyData.kategori_0, // Pastikan ini array data valid
+                            label: 'Kategori Scrap',
+                            data: dailyData.kategori_1, 
                             backgroundColor: 'rgba(255, 99, 132, 0.6)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Kategori Scrap',
-                            data: dailyData.kategori_1, // Pastikan ini array data valid
+                            label: 'Kategori Non-Scrap',
+                            data: dailyData.kategori_0, 
                             backgroundColor: 'rgba(54, 162, 235, 0.6)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
