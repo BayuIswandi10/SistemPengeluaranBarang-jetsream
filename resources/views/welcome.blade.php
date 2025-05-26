@@ -1,5 +1,24 @@
 
 <x-guest-layout>
+    <!-- Tambahkan CSS untuk mendukung responsivitas -->
+    <style>
+        @media (max-width: 767px) {
+            #legendKendaraan {
+                font-size: 14px; /* Kurangi ukuran font untuk layar kecil */
+            }
+            #legendKendaraan .legend-color {
+                width: 12px !important; /* Ukuran kotak legenda lebih kecil di mobile */
+                height: 12px !important;
+            }
+            #legendKendaraan span:not(.legend-color) {
+                font-size: 12px; /* Ukuran teks lebih kecil di mobile */
+            }
+            .modal-body {
+                padding: 15px; /* Kurangi padding untuk menghemat ruang */
+            }
+        }
+    </style>
+    
     <style>
         
         /* Hero Section Styling */
@@ -116,14 +135,13 @@
     </style>
 
     <style>
-    .legend-color {
-        width: 16px;
-        height: 16px;
-        display: inline-block;
-        border-radius: 4px;
-    }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border-radius: 4px;
+        }
     </style>
-
 
     <style>
         /* Pastikan modal tidak lebih besar dari layar */
@@ -139,21 +157,64 @@
             overflow-x: auto;
         }
 
+    </style>
+
+    <style>
         /* Modal benar-benar lebar, hampir penuh, tetap menyamping */
         .modal-slide-side {
-            width: calc(90% - 2rem); /* Menyisakan 1rem di kiri dan kanan */
-            margin: 4rem auto;
+            width: calc(100% - 2rem); /* Ubah menjadi 100% untuk memenuhi lebar penuh */
+            max-width: 100%; /* Pastikan tidak dibatasi oleh max-width */
+            margin: 1rem; /* Kurangi margin untuk lebih dekat ke tepi */
         }
 
-        .modal-slide-side .modal-content {
-            height: 90vh;
-            overflow-y: auto;
-            border-radius: 10px;
-            padding: 1rem;
+        /* Pastikan modal-content dan modal-header mengisi lebar penuh */
+        .modal-slide-side .modal-content,
+        .modal-slide-side .modal-header {
+            width: 100%;
+            border-radius: 0; /* Hilangkan border-radius jika tidak diinginkan */
         }
 
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+        }
 
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
 
+        .modal-header .close {
+            padding: 0.5rem 0.75rem;
+            margin: -0.5rem -0.75rem -0.5rem auto;
+        }
+
+        /* Responsivitas */
+        @media (max-width: 767px) {
+            .modal-slide-side {
+                width: calc(100% - 1rem); /* Kurangi margin di mobile */
+                margin: 0.5rem;
+            }
+            .modal-header {
+                padding: 0.5rem 1rem;
+            }
+            .modal-title {
+                font-size: 1rem;
+            }
+            #legendKendaraan .legend-color {
+                width: 12px !important;
+                height: 12px !important;
+            }
+            #legendKendaraan span:not(.legend-color) {
+                font-size: 12px;
+            }
+            .modal-body {
+                padding: 15px;
+            }
+        }
     </style>
 
     <body>
@@ -335,42 +396,43 @@
                 </div>
             </div>
 
-            <!-- Modal Kalender Umum -->
+            {{-- Lihat Kalender Pemakaian Kendaraan --}}
             <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-slide-side" role="document" style="max-width: 100%;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <!-- Input bulan -->
-                            <div>
-                                <label for="monthPickerGlobal">Pilih Bulan:</label>
-                                <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
-                            </div>
-
-                            <!-- Legend kendaraan -->
-                            <div class="d-flex align-items-center" id="legendKendaraan">
-                                <div class="mr-3 d-flex align-items-center">
-                                    <span class="legend-color" style="background-color: #28a745;"></span>
-                                    <span class="ml-1">Kendaraan Kantor</span>
-                                </div>
-                                <div class="mr-3 d-flex align-items-center">
-                                    <span class="legend-color" style="background-color: #007bff;"></span>
-                                    <span class="ml-1">Kendaraan Pribadi</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="legend-color" style="background-color: #ffc107;"></span>
-                                    <span class="ml-1">Taxi</span>
-                                </div>
-                            </div>
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="tambahDinasModalLabel">Lihat Kalender Pemakaian Kendaraan</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                    <div id="calendarAllKendaraan"></div>
+                        <div class="modal-body">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+                                <!-- Input bulan -->
+                                <div class="mb-3 mb-md-0">
+                                    <label for="monthPickerGlobal">Pilih Bulan:</label>
+                                    <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
+                                </div>
+
+                                <!-- Legend kendaraan -->
+                                <div class="d-flex flex-wrap" id="legendKendaraan">
+                                    <div class="d-flex align-items-center mb-2 mb-md-0 mr-3">
+                                        <span class="legend-color" style="background-color: #28a745; width: 16px; height: 16px; display: inline-block; margin-right: 8px;"></span>
+                                        <span>Kendaraan Kantor</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2 mb-md-0 mr-3">
+                                        <span class="legend-color" style="background-color: #007bff; width: 16px; height: 16px; display: inline-block; margin-right: 8px;"></span>
+                                        <span>Kendaraan Pribadi</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2 mb-md-0">
+                                        <span class="legend-color" style="background-color: #ffc107; width: 16px; height: 16px; display: inline-block; margin-right: 8px;"></span>
+                                        <span>Taxi</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="calendarAllKendaraan"></div>
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
 
