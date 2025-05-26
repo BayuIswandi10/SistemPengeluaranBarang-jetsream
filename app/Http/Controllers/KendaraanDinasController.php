@@ -295,6 +295,66 @@ class KendaraanDinasController extends Controller
         }
     }
 
+    // public function getKendaraanByJenis(Request $request)
+    // {
+    //     $jenis = $request->input('jenis_kendaraan');
+    //     $tanggal = $request->input('tanggal_penggunaan');
+
+    //     if (!$jenis) {
+    //         return response()->json(['message' => 'Jenis kendaraan tidak ditemukan'], 400);
+    //     }
+    //     if (!$tanggal) {
+    //         return response()->json(['message' => 'Tanggal penggunaan tidak ditemukan'], 400);
+    //     }
+
+    //     try {
+    //         $kendaraan = DB::table('tb_kendaraan_dinas as kd')
+    //             ->leftJoin('tb_surat_kendaraan_dinas_detail as skdd', 'kd.kendaraan_dinas_id', '=', 'skdd.kendaraan_dinas_id')
+    //             ->leftJoin('tb_surat_kendaraan_dinas as skd', function ($join) use ($tanggal) {
+    //                 $join->on('skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
+    //                     ->whereDate('skd.tanggal_penggunaan', '=', $tanggal)
+    //                     ->where('skd.status', '!=', 'Expired');
+    //             })
+    //             ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
+    //                 $join->on('skdd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
+    //                     ->where('pkdd.status', '=', 'Aktif');
+    //             })
+    //             ->where('kd.jenis_kendaraan', $jenis)
+    //             ->select(
+    //                 'kd.kendaraan_dinas_id',
+    //                 'kd.nomor_kendaraan',
+    //                 'kd.merk_kendaraan',
+    //                 'kd.kapasitas_kendaraan',
+    //                 DB::raw('COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) as total_terpakai'),
+    //                 DB::raw('GREATEST(0, kd.kapasitas_kendaraan - COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) - 1) as kapasitas_tersedia'),
+    //                 'skd.tujuan_penggunaan_1',
+    //                 'skd.tujuan_penggunaan_2',
+    //                 'skd.tujuan_penggunaan_3'
+    //             )
+    //             ->groupBy(
+    //                 'kd.kendaraan_dinas_id',
+    //                 'kd.nomor_kendaraan',
+    //                 'kd.merk_kendaraan',
+    //                 'kd.kapasitas_kendaraan',
+    //                 'skd.tujuan_penggunaan_1',
+    //                 'skd.tujuan_penggunaan_2',
+    //                 'skd.tujuan_penggunaan_3'
+    //             )
+    //             ->orderBy('kd.nomor_kendaraan')
+    //             ->get();
+
+    //         return response()->json($kendaraan);
+    //     } catch (\Exception $e) {
+    //         \Log::error('getKendaraanByJenis Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+    //         return response()->json([
+    //             'error' => 'Terjadi kesalahan di server',
+    //             'debug' => $e->getMessage(),
+    //             'line' => $e->getLine(),
+    //             'file' => $e->getFile(),
+    //         ], 500);
+    //     }
+    // }
+
     public function getKendaraanByJenis(Request $request)
     {
         $jenis = $request->input('jenis_kendaraan');
@@ -312,8 +372,7 @@ class KendaraanDinasController extends Controller
                 ->leftJoin('tb_surat_kendaraan_dinas_detail as skdd', 'kd.kendaraan_dinas_id', '=', 'skdd.kendaraan_dinas_id')
                 ->leftJoin('tb_surat_kendaraan_dinas as skd', function ($join) use ($tanggal) {
                     $join->on('skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
-                        ->whereDate('skd.tanggal_penggunaan', '=', $tanggal)
-                        ->where('skd.status', '!=', 'Expired');
+                        ->whereDate('skd.tanggal_penggunaan', '=', $tanggal);
                 })
                 ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
                     $join->on('skdd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
@@ -325,21 +384,24 @@ class KendaraanDinasController extends Controller
                     'kd.nomor_kendaraan',
                     'kd.merk_kendaraan',
                     'kd.kapasitas_kendaraan',
-                    DB::raw('COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) as total_terpakai'),
-                    DB::raw('GREATEST(0, kd.kapasitas_kendaraan - COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) - 1) as kapasitas_tersedia'),
-                    'skd.tujuan_penggunaan_1',
-                    'skd.tujuan_penggunaan_2',
-                    'skd.tujuan_penggunaan_3'
+                    DB::raw('COUNT(DISTINCT CASE 
+                        WHEN skd.tanggal_penggunaan = "' . $tanggal . '" 
+                            AND skd.status NOT IN ("Level 0", "Expired") 
+                            THEN pkdd.nrp_karyawan 
+                        ELSE NULL END) as total_terpakai'),
+                    DB::raw('GREATEST(0, kd.kapasitas_kendaraan - COUNT(DISTINCT CASE 
+                        WHEN skd.tanggal_penggunaan = "' . $tanggal . '" 
+                            AND skd.status NOT IN ("Level 0", "Expired") 
+                            THEN pkdd.nrp_karyawan 
+                        ELSE NULL END) - 1) as kapasitas_tersedia')
                 )
                 ->groupBy(
                     'kd.kendaraan_dinas_id',
                     'kd.nomor_kendaraan',
                     'kd.merk_kendaraan',
-                    'kd.kapasitas_kendaraan',
-                    'skd.tujuan_penggunaan_1',
-                    'skd.tujuan_penggunaan_2',
-                    'skd.tujuan_penggunaan_3'
+                    'kd.kapasitas_kendaraan'
                 )
+                ->havingRaw('kapasitas_tersedia > 0 AND total_terpakai = 0') // tampilkan hanya kendaraan yg masih tersedia
                 ->orderBy('kd.nomor_kendaraan')
                 ->get();
 
@@ -354,7 +416,6 @@ class KendaraanDinasController extends Controller
             ], 500);
         }
     }
-
 
     
 }
