@@ -1167,10 +1167,258 @@
         });
         
         let globalCalendar;
+        let currentEventCapacity = 0;
+        const $ikutSertaButton = $('#ikutSertaButton');
+        const $tambahIkutSertaModal = $('#tambahIkutSertaModal');
+        const $pesertaTableBody = $('#pesertaTableTambahPeserta tbody');
+        // $('#calendarModal').on('show.bs.modal', function() {
+        //     $.get(`/kendaraan/booking-dates-all`, function(data) {
+        //         const events = data
+        //             .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
+        //             .map(item => {
+        //                 let badgeText = '';
+        //                 let color = '';
+        //                 switch (item.jenis_kendaraan) {
+        //                     case 1:
+        //                         color = '#28a745';
+        //                         break;
+        //                     case 2:
+        //                         color = '#007bff';
+        //                         break;
+        //                     case 3:
+        //                         color = '#ffc107';
+        //                         break;
+        //                     default:
+        //                         badgeText = '';
+        //                 }
+
+        //                 return {
+        //                     id: item.kendaraan_dinas_id,
+        //                     title: badgeText + item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+        //                     start: item.tanggal_penggunaan,
+        //                     allDay: true,
+        //                     backgroundColor: color,
+        //                     borderColor: color,
+        //                     textColor: '#ffffff',
+        //                     extendedProps: {
+        //                         merk: item.merk_kendaraan,
+        //                         nopol: item.nomor_kendaraan,
+        //                         tanggal: item.tanggal_penggunaan,
+        //                         surat_ids: item.surat_ids.split(','), // Split the comma-separated surat_ids into an array
+        //                         status: item.status,
+        //                         jenis: item.jenis_kendaraan,
+        //                         kapasitas_tersedia: item.kapasitas_tersedia,
+        //                         kendaraan_dinas_id: item.kendaraan_dinas_id
+        //                     }
+        //                 };
+        //             });
+
+        //         if (globalCalendar) globalCalendar.destroy();
+
+        //         const calendarEl = document.getElementById('calendarAllKendaraan');
+        //         globalCalendar = new FullCalendar.Calendar(calendarEl, {
+        //             initialView: 'dayGridMonth',
+        //             height: 450,
+        //             locale: 'id',
+        //             events: events,
+        //             headerToolbar: {
+        //                 left: 'prev,next today',
+        //                 center: 'title',
+        //                 right: 'dayGridMonth,timeGridWeek,listMonth'
+        //             },
+        //             eventDidMount: function(info) {
+                        
+        //                 const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
+        //                 const bgColor = info.event.backgroundColor;
+
+        //                 $(info.el).attr({
+        //                     'data-toggle': 'tooltip',
+        //                     'data-placement': 'top',
+        //                     'title': 'Kapasitas tersedia: ' + kapasitas
+        //                 });
+
+        //                 $(info.el).tooltip('dispose');
+
+        //                 $(info.el).tooltip({
+        //                     template: `<div class="tooltip bs-tooltip-top" role="tooltip">
+        //                                 <div class="arrow"></div>
+        //                                 <div class="tooltip-inner" style="background-color: ${bgColor}; color: white;"></div>
+        //                             </div>`
+        //                 });
+        //             },
+        //             eventClick: function(info) {
+        //                 if (globalCalendar.isProcessing) return;
+        //                 globalCalendar.isProcessing = true;
+
+        //                 const event = info.event;
+        //                 globalCalendar.currentEventId = event.id; // Store kendaraan_dinas_id as event ID
+        //                 const suratIds = event.extendedProps.surat_ids; // Array of surat_kendaraan_dinas_id
+        //                 const jenisKendaraan = event.extendedProps.jenis;
+        //                 const noPolisi = event.extendedProps.nopol;
+        //                 const kendaraanDinasId = event.extendedProps.kendaraan_dinas_id; // Get kendaraan_dinas_id
+        //                 const kapasitasTersedia = event.extendedProps.kapasitas_tersedia || 0;
+        //                 console.log('Selected Vehicle Capacity eventClick:', kapasitasTersedia);
+
+
+        //                 // Check if the event date is in the past (H-1 logic)
+        //                 const eventDate = new Date(event.start);
+        //                 const today = new Date();
+        //                 today.setHours(0, 0, 0, 0); // Normalize to midnight
+        //                 eventDate.setHours(0, 0, 0, 0); // Normalize to midnight
+
+        //                 // Hide Ikut Serta button if event date is in the past
+        //                 const ikutSertaButton = $('#ikutSertaButton');
+        //                 if (eventDate < today || kapasitasTersedia <= 0) {
+        //                     ikutSertaButton.hide();
+        //                 } else {
+        //                     ikutSertaButton.show();
+        //                 }
+
+        //                 $('#eventTitle').text(event.title);
+        //                 $('#eventDate').text(event.startStr);
+
+        //                 // Fetch details for all related surat_ids for the selected kendaraan_dinas_id
+        //                 $.ajax({
+        //                     url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
+        //                     type: 'POST',
+        //                     data: {
+        //                         surat_kendaraan_dinas_id: suratIds.join(','), // Send comma-separated surat_ids
+        //                         kendaraan_dinas_id: kendaraanDinasId, // Filter by kendaraan_dinas_id
+        //                         '_token': '{{ csrf_token() }}'
+        //                     },
+        //                     dataType: 'json',
+        //                     success: function(response) {
+        //                         if (response && Array.isArray(response)) {
+        //                             const jenisMapping = {
+        //                                 1: 'KANTOR',
+        //                                 2: 'PRIBADI',
+        //                                 3: 'TAXI'
+        //                             };
+
+        //                             // Filter response for the selected kendaraan_dinas_id
+        //                             const filteredBookings = response.filter(booking => 
+        //                                 booking.kendaraan_dinas_id == kendaraanDinasId
+        //                             );
+
+        //                             // Aggregate booking data into a single row
+        //                             const bookingTableBody = $('#bookingTableBody');
+        //                             bookingTableBody.empty();
+        //                             const uniqueBookings = filteredBookings.reduce((acc, booking) => {
+        //                                 acc.tanggal = booking.tanggal_penggunaan || acc.tanggal || '-';
+        //                                 acc.jenis = jenisMapping[booking.jenis_kendaraan] || acc.jenis || 'TIDAK DIKETAHUI';
+        //                                 acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
+        //                                 acc.tujuan2 = acc.tujuan2 || booking.tujuan_penggunaan_2 || '-';
+        //                                 acc.tujuan3 = acc.tujuan3 || booking.tujuan_penggunaan_3 || '-';
+        //                                 return acc;
+        //                             }, {});
+        //                             bookingTableBody.append(`
+        //                                 <tr>
+        //                                     <td>1</td>
+        //                                     <td>${noPolisi || '-'}</td>
+        //                                     <td>${uniqueBookings.jenis}</td>
+        //                                     <td>${uniqueBookings.tanggal}</td>
+        //                                     <td>${uniqueBookings.tujuan1}</td>
+        //                                     <td>${uniqueBookings.tujuan2}</td>
+        //                                     <td>${uniqueBookings.tujuan3}</td>
+        //                                 </tr>
+        //                             `);
+
+        //                             // Populate the peserta table with "No Surat" for each participant
+        //                             const pesertaTableBody = $('#pesertaTableBody');
+        //                             pesertaTableBody.empty();
+        //                             let participantIndex = 1;
+        //                             filteredBookings.forEach(booking => {
+        //                                 if (booking.userDinas && Array.isArray(booking.userDinas)) {
+        //                                     booking.userDinas.forEach(user => {
+        //                                         pesertaTableBody.append(`
+        //                                             <tr>
+        //                                                 <td>${participantIndex}</td>
+        //                                                 <td>${booking.surat_kendaraan_dinas_id || '-'}</td>
+        //                                                 <td>${user.nrp_karyawan || '-'}</td>
+        //                                                 <td>${user.name || '-'}</td>
+        //                                                 <td>${user.departemen || '-'}</td>
+        //                                             </tr>
+        //                                         `);
+        //                                         participantIndex++;
+        //                                     });
+        //                                 }
+        //                             });
+
+        //                             $('#ikutSertaDinasModal').modal('show');
+        //                         }
+        //                     },
+        //                     error: function() {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: 'Gagal Memuat Data',
+        //                             text: 'Gagal mengambil data surat kendaraan dinas. Silakan coba lagi.',
+        //                             confirmButtonText: 'OK'
+        //                         });
+        //                     },
+        //                     complete: function() {
+        //                         globalCalendar.isProcessing = false;
+        //                     }
+        //                 });
+        //             },
+        //             dateClick: function(info) {
+        //                 const clickedDate = new Date(info.dateStr);
+        //                 const today = new Date();
+        //                 today.setHours(0, 0, 0, 0);
+        //                 clickedDate.setHours(0, 0, 0, 0);
+
+        //                 if (clickedDate <= today) {
+        //                     Swal.fire({
+        //                         icon: 'warning',
+        //                         title: 'Tanggal Tidak Valid',
+        //                         text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
+        //                         confirmButtonText: 'OK'
+        //                     });
+        //                     return;
+        //                 }
+
+        //                 $('#tanggal_penggunaan').val(info.dateStr);
+        //                 lastFetchedDate = null; // Force API refresh on next toggleJenisKendaraan
+        //                 $('#tambahDinasModal').modal('show');
+        //                 if (document.getElementById("jenis_kendaraan").value) {
+        //                     toggleJenisKendaraan();
+        //                 }
+        //             }
+        //         });
+
+        //         globalCalendar.render();
+
+        //         const currentDate = globalCalendar.getDate();
+        //         $('#monthPickerGlobal').val(currentDate.toISOString().slice(0, 7));
+
+        //         $('#monthPickerGlobal').off('change').on('change', function() {
+        //             const selected = this.value;
+        //             if (selected) {
+        //                 const newDate = selected + '-01';
+        //                 globalCalendar.gotoDate(newDate);
+        //                 if ($('#tambahDinasModal').hasClass('show')) {
+        //                     $('#tanggal_penggunaan').val(newDate);
+        //                     lastFetchedDate = null; // Force API refresh
+        //                     if (document.getElementById("jenis_kendaraan").value) {
+        //                         toggleJenisKendaraan();
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     }).fail(function() {
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Gagal Memuat Kalender',
+        //             text: 'Gagal mengambil data pemesanan kendaraan. Silakan coba lagi.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     });
+        // });
+
         $('#calendarModal').on('show.bs.modal', function() {
             $.get(`/kendaraan/booking-dates-all`, function(data) {
+                console.log('Fetching booking-dates-all at:', new Date().toISOString());
                 const events = data
-                    .filter(item => item.status !== 'Expired' || item.status == 'Level 0')
+                    .filter(item => item.status !== 'Expired' || item.status === 'Level 0')
                     .map(item => {
                         let badgeText = '';
                         let color = '';
@@ -1200,7 +1448,7 @@
                                 merk: item.merk_kendaraan,
                                 nopol: item.nomor_kendaraan,
                                 tanggal: item.tanggal_penggunaan,
-                                surat_ids: item.surat_ids.split(','), // Split the comma-separated surat_ids into an array
+                                surat_ids: item.surat_ids.split(','),
                                 status: item.status,
                                 jenis: item.jenis_kendaraan,
                                 kapasitas_tersedia: item.kapasitas_tersedia,
@@ -1223,7 +1471,6 @@
                         right: 'dayGridMonth,timeGridWeek,listMonth'
                     },
                     eventDidMount: function(info) {
-                        
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
                         const bgColor = info.event.backgroundColor;
 
@@ -1234,7 +1481,6 @@
                         });
 
                         $(info.el).tooltip('dispose');
-
                         $(info.el).tooltip({
                             template: `<div class="tooltip bs-tooltip-top" role="tooltip">
                                         <div class="arrow"></div>
@@ -1247,24 +1493,23 @@
                         globalCalendar.isProcessing = true;
 
                         const event = info.event;
-                        globalCalendar.currentEventId = event.id; // Store kendaraan_dinas_id as event ID
-                        const suratIds = event.extendedProps.surat_ids; // Array of surat_kendaraan_dinas_id
+                        globalCalendar.currentEventId = event.id;
+                        const suratIds = event.extendedProps.surat_ids;
                         const jenisKendaraan = event.extendedProps.jenis;
                         const noPolisi = event.extendedProps.nopol;
-                        const kendaraanDinasId = event.extendedProps.kendaraan_dinas_id; // Get kendaraan_dinas_id
-                        const kapasitasTersedia = event.extendedProps.kapasitas_tersedia || 0;
-                        console.log('Selected Vehicle Capacity eventClick:', kapasitasTersedia);
+                        const kendaraanDinasId = event.extendedProps.kendaraan_dinas_id;
+                        currentEventCapacity = event.extendedProps.kapasitas_tersedia || 0;
+                        selectedVehicleCapacity = currentEventCapacity;
+                        console.log('Selected Vehicle Capacity eventClick:', currentEventCapacity);
+                        console.log('Event ID eventClick:', globalCalendar.currentEventId);
 
-
-                        // Check if the event date is in the past (H-1 logic)
                         const eventDate = new Date(event.start);
                         const today = new Date();
-                        today.setHours(0, 0, 0, 0); // Normalize to midnight
-                        eventDate.setHours(0, 0, 0, 0); // Normalize to midnight
+                        today.setHours(0, 0, 0, 0);
+                        eventDate.setHours(0, 0, 0, 0);
 
-                        // Hide Ikut Serta button if event date is in the past
-                        const ikutSertaButton = $('#ikutSertaButton');
-                        if (eventDate < today || kapasitasTersedia <= 0) {
+                        const ikutSertaButton = $ikutSertaButton;
+                        if (eventDate < today || currentEventCapacity <= 0) {
                             ikutSertaButton.hide();
                         } else {
                             ikutSertaButton.show();
@@ -1273,13 +1518,12 @@
                         $('#eventTitle').text(event.title);
                         $('#eventDate').text(event.startStr);
 
-                        // Fetch details for all related surat_ids for the selected kendaraan_dinas_id
                         $.ajax({
                             url: '/pengajuan/infoSuratKendaraanDinasNonAuth',
                             type: 'POST',
                             data: {
-                                surat_kendaraan_dinas_id: suratIds.join(','), // Send comma-separated surat_ids
-                                kendaraan_dinas_id: kendaraanDinasId, // Filter by kendaraan_dinas_id
+                                surat_kendaraan_dinas_id: suratIds.join(','),
+                                kendaraan_dinas_id: kendaraanDinasId,
                                 '_token': '{{ csrf_token() }}'
                             },
                             dataType: 'json',
@@ -1291,12 +1535,10 @@
                                         3: 'TAXI'
                                     };
 
-                                    // Filter response for the selected kendaraan_dinas_id
                                     const filteredBookings = response.filter(booking => 
                                         booking.kendaraan_dinas_id == kendaraanDinasId
                                     );
 
-                                    // Aggregate booking data into a single row
                                     const bookingTableBody = $('#bookingTableBody');
                                     bookingTableBody.empty();
                                     const uniqueBookings = filteredBookings.reduce((acc, booking) => {
@@ -1319,7 +1561,6 @@
                                         </tr>
                                     `);
 
-                                    // Populate the peserta table with "No Surat" for each participant
                                     const pesertaTableBody = $('#pesertaTableBody');
                                     pesertaTableBody.empty();
                                     let participantIndex = 1;
@@ -1373,7 +1614,7 @@
                         }
 
                         $('#tanggal_penggunaan').val(info.dateStr);
-                        lastFetchedDate = null; // Force API refresh on next toggleJenisKendaraan
+                        lastFetchedDate = null;
                         $('#tambahDinasModal').modal('show');
                         if (document.getElementById("jenis_kendaraan").value) {
                             toggleJenisKendaraan();
@@ -1393,7 +1634,7 @@
                         globalCalendar.gotoDate(newDate);
                         if ($('#tambahDinasModal').hasClass('show')) {
                             $('#tanggal_penggunaan').val(newDate);
-                            lastFetchedDate = null; // Force API refresh
+                            lastFetchedDate = null;
                             if (document.getElementById("jenis_kendaraan").value) {
                                 toggleJenisKendaraan();
                             }
@@ -1724,26 +1965,71 @@
 
 
 
-        $('#ikutSertaButton').on('click', function() {
-            // Get data from the booking table in ikutSertaDinasModal
-            const bookingRow = $('#bookingTableBody tr').first();
-            const noPolisi = bookingRow.find('td').eq(1).text();
-            const jenisKendaraan = bookingRow.find('td').eq(2).text();
-            const tanggalPenggunaan = bookingRow.find('td').eq(3).text();
-            const tujuan1 = bookingRow.find('td').eq(4).text();
-            const tujuan2 = bookingRow.find('td').eq(5).text();
-            const tujuan3 = bookingRow.find('td').eq(6).text();
+        // $('#ikutSertaButton').on('click', function() {
+        //     // Get data from the booking table in ikutSertaDinasModal
+        //     const bookingRow = $('#bookingTableBody tr').first();
+        //     const noPolisi = bookingRow.find('td').eq(1).text();
+        //     const jenisKendaraan = bookingRow.find('td').eq(2).text();
+        //     const tanggalPenggunaan = bookingRow.find('td').eq(3).text();
+        //     const tujuan1 = bookingRow.find('td').eq(4).text();
+        //     const tujuan2 = bookingRow.find('td').eq(5).text();
+        //     const tujuan3 = bookingRow.find('td').eq(6).text();
 
-            // Get kendaraan_dinas_id and kapasitas_tersedia from the event data
+        //     // Get kendaraan_dinas_id and kapasitas_tersedia from the event data
+        //     const event = globalCalendar.getEventById(globalCalendar.currentEventId);
+        //     const kendaraanDinasId = event ? event.extendedProps.kendaraan_dinas_id : null;
+        //     const kapasitasTersedia = event ? event.extendedProps.kapasitas_tersedia : 0;
+
+        //     // Update selectedVehicleCapacity
+        //     selectedVehicleCapacity = kapasitasTersedia;
+
+        //     // Check if there is available capacity
+        //     if (!kendaraanDinasId || kapasitasTersedia <= 0) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: !kendaraanDinasId ? 'Kendaraan Tidak Valid' : 'Kapasitas Penuh',
+        //             text: !kendaraanDinasId ? 'Kendaraan tidak ditemukan. Silakan pilih ulang.' : 'Kendaraan ini sudah penuh. Silakan pilih kendaraan lain.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
+
+        //     // Map jenis_kendaraan to numeric value
+        //     const jenisMapping = {
+        //         'KANTOR': 1,
+        //         'PRIBADI': 2,
+        //         'TAXI': 3
+        //     };
+        //     const jenisKendaraanId = jenisMapping[jenisKendaraan] || 1;
+
+        //     // Set hidden input values in tambahIkutSertaModal
+        //     $('#ikut_tujuan_penggunaan_1').val(tujuan1 !== '-' ? tujuan1 : '');
+        //     $('#ikut_tujuan_penggunaan_2').val(tujuan2 !== '-' ? tujuan2 : '');
+        //     $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
+        //     $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
+        //     $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
+        //     $('#ikut_kendaraan_dinas_id').val(kendaraanDinasId);
+
+        //     // Show the tambahIkutSertaModal
+        //     $('#tambahIkutSertaModal').modal('show');
+        //     console.log('Selected Vehicle Capacity ikutSertaButton:', selectedVehicleCapacity);
+        // });
+        $ikutSertaButton.on('click', function() {
+            const $bookingRow = $('#bookingTableBody tr').first();
+            const noPolisi = $bookingRow.find('td').eq(1).text();
+            const jenisKendaraan = $bookingRow.find('td').eq(2).text();
+            const tanggalPenggunaan = $bookingRow.find('td').eq(3).text();
+            const tujuan1 = $bookingRow.find('td').eq(4).text();
+            const tujuan2 = $bookingRow.find('td').eq(5).text();
+            const tujuan3 = $bookingRow.find('td').eq(6).text();
+
             const event = globalCalendar.getEventById(globalCalendar.currentEventId);
-            const kendaraanDinasId = event ? event.extendedProps.kendaraan_dinas_id : null;
-            const kapasitasTersedia = event ? event.extendedProps.kapasitas_tersedia : 0;
+            const kendaraanDinasId = event?.extendedProps.kendaraan_dinas_id ?? null;
+            selectedVehicleCapacity = currentEventCapacity;
+            console.log('Selected Vehicle Capacity ikutSertaButton:', selectedVehicleCapacity);
+            console.log('Event ID ikutSertaButton:', globalCalendar.currentEventId);
 
-            // Update selectedVehicleCapacity
-            selectedVehicleCapacity = kapasitasTersedia;
-
-            // Check if there is available capacity
-            if (!kendaraanDinasId || kapasitasTersedia <= 0) {
+            if (!kendaraanDinasId || selectedVehicleCapacity <= 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: !kendaraanDinasId ? 'Kendaraan Tidak Valid' : 'Kapasitas Penuh',
@@ -1753,15 +2039,9 @@
                 return;
             }
 
-            // Map jenis_kendaraan to numeric value
-            const jenisMapping = {
-                'KANTOR': 1,
-                'PRIBADI': 2,
-                'TAXI': 3
-            };
+            const jenisMapping = { 'KANTOR': 1, 'PRIBADI': 2, 'TAXI': 3 };
             const jenisKendaraanId = jenisMapping[jenisKendaraan] || 1;
 
-            // Set hidden input values in tambahIkutSertaModal
             $('#ikut_tujuan_penggunaan_1').val(tujuan1 !== '-' ? tujuan1 : '');
             $('#ikut_tujuan_penggunaan_2').val(tujuan2 !== '-' ? tujuan2 : '');
             $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
@@ -1769,9 +2049,13 @@
             $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
             $('#ikut_kendaraan_dinas_id').val(kendaraanDinasId);
 
-            // Show the tambahIkutSertaModal
-            $('#tambahIkutSertaModal').modal('show');
-            console.log('Selected Vehicle Capacity ikutSertaButton:', selectedVehicleCapacity);
+            $tambahIkutSertaModal.on('show.bs.modal', function() {
+                counterIkutserta = 0;
+                $pesertaTableBody.empty();
+                tambahPesertaIkutSerta();
+            });
+
+            $tambahIkutSertaModal.modal('show');
         });
 
         $(document).ready(function() {
