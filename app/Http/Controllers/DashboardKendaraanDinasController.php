@@ -39,7 +39,8 @@ class DashboardKendaraanDinasController extends Controller
                     'pencatatanKendaraanDinas', 
                     'suratDetail'
                 ])
-                ->whereBetween('created_date', [$startDate, $endDate]);
+                ->whereBetween('created_date', [$startDate, $endDate])
+                ->where('status', '!=', 'Expired');
 
             // Filter data berdasarkan level user
             if ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
@@ -57,7 +58,6 @@ class DashboardKendaraanDinasController extends Controller
             ) {
                 // Ka.Sie dengan seksi General Service → dapat semua data
                 $suratKendaraan = $query->get();
-
             } else {
                 // Selain itu, kosong
                 $suratKendaraan = collect();
@@ -75,9 +75,9 @@ class DashboardKendaraanDinasController extends Controller
 
             // Mengambil data berdasarkan status
             $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', '!=', 'Level 0')
-            ->pluck('surat_kendaraan_dinas_id')
-            ->toArray();
+                ->where('status_approval', '!=', 'Level 0')
+                ->pluck('surat_kendaraan_dinas_id')
+                ->toArray();
             $kendaraanDisetujui = $suratKendaraan->filter(function ($item) use ($approvedIdsByUser) {
                 return in_array($item->surat_kendaraan_dinas_id, $approvedIdsByUser);
             })->values();
@@ -87,38 +87,60 @@ class DashboardKendaraanDinasController extends Controller
             )->values();
 
             $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', 'Level 0')
-            ->pluck('surat_kendaraan_dinas_id')
-            ->toArray();
+                ->where('status_approval', 'Level 0')
+                ->pluck('surat_kendaraan_dinas_id')
+                ->toArray();
             $kendaraanDitolak = $suratKendaraan->filter(function ($item) use ($rejectedIdsByUser) {
                 return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
             })->values();
-    
+
             // 1. Ambil semua surat kendaraan dinas dalam rentang tanggal
             $suratIds = SuratKendaraanDinas::whereBetween('created_date', [$startDate, $endDate])
-                ->pluck('surat_kendaraan_dinas_id');
-    
+            ->pluck('surat_kendaraan_dinas_id');
+
             // 2. Ambil detail surat berdasarkan ID surat
-            $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)->get();
-    
+            $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)
+            ->with(['surat' => function ($query) {
+                $query->select('surat_kendaraan_dinas_id','tanggal_penggunaan', 'created_by');
+            }])
+            ->get();
+
             // 3. Ambil kendaraan_dinas_id yang terlibat
             $kendaraanDigunakanIds = $detailSurat->pluck('kendaraan_dinas_id')->unique();
-    
+
             // 4. Ambil semua kendaraan dinas
             $kendaraanDinasAll = KendaraanDinas::all();
-    
-           // Filter kendaraan jenis_kendaraan == 1
+
+            // Filter kendaraan jenis_kendaraan == 1
             $filteredKendaraanDinas = $kendaraanDinasAll->where('jenis_kendaraan', 1);
 
             // Kendaraan yang sedang digunakan dan jenis_kendaraan == 1
             $kendaraanDinasSedangDigunakan = $filteredKendaraanDinas
-                ->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
-                ->values();
+            ->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+            ->map(function ($kendaraan) use ($detailSurat) {
+                // Ambil semua surat terkait untuk kendaraan ini
+                $relatedSurat = $detailSurat->where('kendaraan_dinas_id', $kendaraan->kendaraan_dinas_id)
+                    ->map(function ($detail) {
+                        return [
+                            'no_surat' => $detail->surat->surat_kendaraan_dinas_id,
+                            'tanggal_penggunaan' => $detail->surat->tanggal_penggunaan,
+                            'created_by' => $detail->surat->created_by
+                        ];
+                    })->values();
+                
+                // Tambahkan data surat ke kendaraan
+                $kendaraan->surat_details = $relatedSurat;
+                return $kendaraan;
+            })->values();
 
             // Kendaraan yang tersedia dan jenis_kendaraan == 1
             $kendaraanDinasTersedia = $filteredKendaraanDinas
-                ->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
-                ->values();
+            ->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
+            ->map(function ($kendaraan) {
+                // Kendaraan tersedia tidak memiliki surat terkait
+                $kendaraan->surat_details = [];
+                return $kendaraan;
+            })->values();
 
             // Response JSON dengan data lengkap dan rentang tanggal
             return response()->json([

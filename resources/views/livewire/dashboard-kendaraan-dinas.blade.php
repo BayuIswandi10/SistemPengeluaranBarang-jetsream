@@ -327,9 +327,9 @@
                     </div>
                 </div>
 
-                    {{-- Modal Kendaraan Tersedia--}}
+                    {{-- Modal Kendaraan Tersedia dan Tidak Tersedia--}}
                     <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document"> <!-- Ganti dari modal-xl ke modal-lg -->
+                        <div class="modal-dialog modal-xl" role="document"> <!-- Ganti dari modal-xl ke modal-lg -->
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">Data Kendaraan</h5>
@@ -343,7 +343,8 @@
                                                     <th>Jenis Kendaraan</th>
                                                     <th>Nomor Kendaraan</th>
                                                     <th>Kapasitas Penumpang</th>
-                                                    <th>Status</th>
+                                                    <th>Tanggal Penggunaan</th>
+                                                    <th>Surat Kendaraan Dinas</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -744,7 +745,7 @@
                             const today = getTodayDate();
                             const formattedStartDate = startDate ? formatDateToStartOfDay(startDate) : formatDateToStartOfDay(today);
                             const formattedEndDate = endDate ? formatDateToEndOfDay(endDate) : formatDateToEndOfDay(today);
-                            
+
                             // Reset tabel DataTable sebelum memuat data baru
                             let table = $('#dataTableKendaraan').DataTable();
                             table.clear();
@@ -767,25 +768,37 @@
                                         filteredData = response.data.suratKendaraan.data || [];
                                     }
 
-                                    const statusMapping = {
-                                        '1': 'Tersedia',
-                                        '2': 'Digunakan',
-                                        '0': 'Tidak Tersedia'
+                                    const jenisKendaraanMapping = {
+                                        '1': 'Kantor',
+                                        '2': 'Pribadi',
+                                        '3': 'Taxi'
                                     };
 
                                     console.log("Filtered Data:", filteredData);
 
                                     filteredData.forEach(function (item, index) {
-                                        const mappedStatus = statusMapping[item.status_kendaraan] || item.status_kendaraan;
+                                        // Map jenis_kendaraan to readable text
+                                        const jenisKendaraan = jenisKendaraanMapping[item.jenis_kendaraan] || item.jenis_kendaraan;
+
+                                        // Handle surat_details for Tanggal Digunakan and Surat Kendaraan Dinas
+                                        let tanggalDigunakan = '-';
+                                        let suratKendaraanDinas = '-';
+                                        
+                                        if (item.surat_details && item.surat_details.length > 0) {
+                                            // Assuming created_date comes from the related SuratKendaraanDinas in surat_details
+                                            // Join all created_date values (if multiple) or take the first one
+                                            tanggalDigunakan = item.surat_details.map(surat => surat.tanggal_penggunaan || '-').join(', ');
+                                            // Join all no_surat values (if multiple)
+                                            suratKendaraanDinas = item.surat_details.map(surat => surat.no_surat).join(', ');
+                                        }
+
                                         table.row.add([
-                                            index + 1,
-                                            item.jenis_kendaraan == 1 ? 'Kantor' :
-                                            item.jenis_kendaraan == 2 ? 'Pribadi' :
-                                            item.jenis_kendaraan == 3 ? 'Taxi' :
-                                            item.jenis_kendaraan,
-                                            item.nomor_kendaraan,
-                                            item.kapasitas_kendaraan,
-                                            mappedStatus
+                                            index + 1, // NO
+                                            jenisKendaraan, // Jenis Kendaraan
+                                            item.nomor_kendaraan, // Nomor Kendaraan
+                                            item.kapasitas_kendaraan, // Kapasitas Penumpang
+                                            tanggalDigunakan, // Tanggal Digunakan (from surat_details.created_date)
+                                            suratKendaraanDinas // Surat Kendaraan Dinas (from surat_details.no_surat)
                                         ]);
                                     });
 
@@ -799,7 +812,6 @@
                                 }
                             });
                         }
-
 
                         // Fungsi untuk memuat data tabel surat kendaraan dinas
                         function loadTableData(statusFilter, startDate, endDate) {

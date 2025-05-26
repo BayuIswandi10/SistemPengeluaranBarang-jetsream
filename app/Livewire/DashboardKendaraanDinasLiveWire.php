@@ -15,14 +15,13 @@ class DashboardKendaraanDinasLiveWire extends Component
 {
     public function render()
     {
-        
         $user = Auth::user();
         $user->level = trim($user->level);
-        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-06 00:00:00
-        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-06 23:59:59
+        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-26 00:00:00
+        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-26 23:59:59
         $query = SuratKendaraanDinas::with(['user', 'approval'])
-        ->whereBetween('created_date', [$startOfDay, $endOfDay]);
-        
+            ->whereBetween('created_date', [$startOfDay, $endOfDay])
+            ->where('status', '!=', 'Expired');
 
         // Filter data berdasarkan level user
         if (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'General Service') {
@@ -30,20 +29,19 @@ class DashboardKendaraanDinasLiveWire extends Component
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
-        }
-        elseif (
+        } elseif (
             in_array($user->level, ['Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
         ) {
             // Ka.Sie dengan seksi General Service → dapat semua data
             $suratKendaraanDinasList = $query->get();
-
         } else {
             // Selain itu, kosong
             $suratKendaraanDinasList = collect();
         }
 
         // Ekstrak angka dari level user
+        $userLevel = null;
         if ($user->level === 'Ka.Dept') {
             $userLevel = 2;
         } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'General Affairs') {
@@ -53,9 +51,9 @@ class DashboardKendaraanDinasLiveWire extends Component
         }
 
         $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-        ->where('status_approval', '!=', 'Level 0')
-        ->pluck('surat_kendaraan_dinas_id')
-        ->toArray();
+            ->where('status_approval', '!=', 'Level 0')
+            ->pluck('surat_kendaraan_dinas_id')
+            ->toArray();
         $suratDisetujui = $suratKendaraanDinasList->filter(function ($item) use ($approvedIdsByUser) {
             return in_array($item->surat_kendaraan_dinas_id, $approvedIdsByUser);
         })->count();
@@ -65,9 +63,9 @@ class DashboardKendaraanDinasLiveWire extends Component
         )->count();
 
         $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-        ->where('status_approval', 'Level 0')
-        ->pluck('surat_kendaraan_dinas_id')
-        ->toArray();
+            ->where('status_approval', 'Level 0')
+            ->pluck('surat_kendaraan_dinas_id')
+            ->toArray();
         $suratDitolak = $suratKendaraanDinasList->filter(function ($item) use ($rejectedIdsByUser) {
             return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
         })->count();
@@ -80,7 +78,11 @@ class DashboardKendaraanDinasLiveWire extends Component
             ->pluck('surat_kendaraan_dinas_id');
 
         // 2. Ambil detail surat berdasarkan ID surat
-        $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)->get();
+        $detailSurat = SuratKendaraanDinasDetail::whereIn('surat_kendaraan_dinas_id', $suratIds)
+            ->with(['surat' => function ($query) {
+                $query->select('surat_kendaraan_dinas_id', 'created_by');
+            }])
+            ->get();
 
         // 3. Ambil kendaraan_dinas_id yang terlibat
         $kendaraanDigunakanIds = $detailSurat->pluck('kendaraan_dinas_id')->unique();
@@ -94,12 +96,27 @@ class DashboardKendaraanDinasLiveWire extends Component
         // Kendaraan yang sedang digunakan dan jenis_kendaraan == 1
         $kendaraanDinasSedangDigunakan = $filteredKendaraanDinas
             ->whereIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
-            ->count();
+            ->map(function ($kendaraan) use ($detailSurat) {
+                // Ambil semua surat terkait untuk kendaraan ini
+                $relatedSurat = $detailSurat->where('kendaraan_dinas_id', $kendaraan->kendaraan_dinas_id)
+                    ->map(function ($detail) {
+                        return [
+                            'no_surat' => $detail->surat->surat_kendaraan_dinas_id, // Use surat_kendaraan_dinas_id as no_surat
+                            'created_by' => $detail->surat->created_by
+                        ];
+                    });
+                $kendaraan->surat_details = $relatedSurat;
+                return $kendaraan;
+            })->count();
 
         // Kendaraan yang tersedia dan jenis_kendaraan == 1
         $kendaraanDinasTersedia = $filteredKendaraanDinas
             ->whereNotIn('kendaraan_dinas_id', $kendaraanDigunakanIds)
-            ->count();
+            ->map(function ($kendaraan) {
+                // Kendaraan tersedia tidak memiliki surat terkait
+                $kendaraan->surat_details = [];
+                return $kendaraan;
+            })->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();
@@ -166,7 +183,6 @@ class DashboardKendaraanDinasLiveWire extends Component
                 return [$label => $count];
             })
             ->toArray();
-        
 
         return view('livewire.dashboard-kendaraan-dinas', [
             'suratKendaraanDinas' => $suratKendaraanDinasList,
