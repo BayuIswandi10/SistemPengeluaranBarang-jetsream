@@ -210,20 +210,45 @@ class SuratDinasController extends Controller
         }
 
         // Cek apakah user sudah mengajukan atau sudah diajukan pada tanggal yang sama
+        // $existingRequest = SuratKendaraanDinas::where('created_by', $nrpKaryawan)
+        // ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
+        // ->exists();
+
+        // if ($existingRequest) {
+        //     return redirect()->back()->with('error', 'Anda sudah mengajukan kendaraan dinas pada tanggal ini.')->withInput();
+        // }
+
+        // Cek apakah user sudah mengajukan atau sudah diajukan pada tanggal yang sama
         $existingRequest = SuratKendaraanDinas::where('created_by', $nrpKaryawan)
-        ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
-        ->exists();
+            ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
+            ->whereNotIn('status', ['Level 0', 'Expired']) // Tambahkan pengecualian status
+            ->exists();
 
         if ($existingRequest) {
             return redirect()->back()->with('error', 'Anda sudah mengajukan kendaraan dinas pada tanggal ini.')->withInput();
         }
 
+        // // Cek apakah peserta yang diajukan sudah memiliki pengajuan di tanggal yang sama
+        // if ($request->has('peserta') && is_array($request->peserta)) {
+        //     foreach ($request->peserta as $peserta) {
+        //         $existsAsParticipant = PencatatanKendaraanDinas::where('nrp_karyawan', $peserta['nrp_karyawan'])
+        //             ->whereHas('suratKendaraanDinas', function ($query) use ($tanggalPenggunaan) {
+        //                 $query->whereDate('tanggal_penggunaan', $tanggalPenggunaan);
+        //             })
+        //             ->exists();
+
+        //         if ($existsAsParticipant) {
+        //             return redirect()->back()->with('error', 'Peserta dengan NRP ' . $peserta['nrp_karyawan'] . ' sudah diajukan di tanggal yang sama.')->withInput();
+        //         }
+        //     }
+        // }
         // Cek apakah peserta yang diajukan sudah memiliki pengajuan di tanggal yang sama
         if ($request->has('peserta') && is_array($request->peserta)) {
             foreach ($request->peserta as $peserta) {
                 $existsAsParticipant = PencatatanKendaraanDinas::where('nrp_karyawan', $peserta['nrp_karyawan'])
                     ->whereHas('suratKendaraanDinas', function ($query) use ($tanggalPenggunaan) {
-                        $query->whereDate('tanggal_penggunaan', $tanggalPenggunaan);
+                        $query->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
+                            ->whereNotIn('status', ['Level 0', 'Expired']);
                     })
                     ->exists();
 
@@ -232,6 +257,7 @@ class SuratDinasController extends Controller
                 }
             }
         }
+
 
         DB::beginTransaction();
         try {
