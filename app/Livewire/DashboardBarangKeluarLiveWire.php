@@ -22,8 +22,8 @@ class DashboardBarangKeluarLiveWire extends Component
             ->whereBetween('created_date', [$startOfDay, $endOfDay]);
 
          // Filter data berdasarkan level user
-         if ($user->level === 'Staff' && $user->departemen === 'FIN') {
-            $pengeluaranBarangs = $query->get();
+         if ($user->level === 'Staff' && $user->departemen === 'Finance') {
+              $pengeluaranBarangs = $query->where('kategori_pengeluaran', 1)->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
             $pengeluaranBarangs = $query->get();
         } elseif (in_array($user->level, ['Ka.Sie','Ka.Dept'])) {
@@ -47,9 +47,9 @@ class DashboardBarangKeluarLiveWire extends Component
         } elseif ($user->level === 'Staff' && $user->departemen === 'Finance') {
             $userLevel = 5;
         } elseif ($user->level === 'Security') {
-            $userLevel = 6;
+            $userLevel = 5;
         } elseif ($user->level === 'Super Admin') {
-            $userLevel = 7;
+            $userLevel = 5;
         } else {
             $userLevel = 1; // default fallback jika tidak dikenali
         }
