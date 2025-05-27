@@ -54,7 +54,7 @@
                             <th>NO</th>
                             <th>Jenis Kendaraan</th>
                             <th>Nomor Kendaraan</th>
-                            <th>Kapasitas Penumpang</th>
+                            <th>Kapasitas Kendaraan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -170,8 +170,8 @@
                         </div>  
 
                         <div class="form-group">
-                            <label for="kapasitas_kendaraan">Kapasitas Penumpang <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Penumpang" required autocomplete="off">
+                            <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
                         </div> 
     
                         <!-- Submit Button -->
@@ -223,8 +223,8 @@
                         </div>  
 
                         <div class="form-group">
-                            <label for="kapasitas_kendaraan">Kapasitas Penumpang <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Penumpang" required autocomplete="off">
+                            <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
                         </div> 
         
         

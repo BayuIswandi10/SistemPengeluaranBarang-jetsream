@@ -2577,8 +2577,8 @@
                 if (kapasitasField.val() === '' || isNaN(parseInt(kapasitasField.val()))) {
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Kapasitas Kendaraan Belum Diisi',
-                        text: 'Silakan isi kapasitas kendaraan terlebih dahulu.',
+                        title: 'Pilih Kendaraan Terlebih Dahulu',
+                        text: 'Silakan isi pilih kendaraan.',
                         confirmButtonText: 'OK'
                     });
                     return;
