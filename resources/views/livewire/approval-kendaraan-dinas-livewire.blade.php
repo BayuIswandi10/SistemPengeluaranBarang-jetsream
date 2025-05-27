@@ -349,16 +349,12 @@
                                                 <th>No</th>
                                                 <th>No Kendaraan</th>
                                                 <th>Keterangan</th>
-                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
 
                                         </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxEdit()">
-                                        <i class="fas fa-plus"></i> Tambah Kendaraan
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -765,10 +761,102 @@
     });
 
 
+    // $('#editDataModal').on('show.bs.modal', function (event) {
+    //     const button = $(event.relatedTarget); 
+    //     const dataKD = button.data('id'); 
+
+
+    //     $('#nomorSurat').text('');
+    //     $('#pemesan').val('');
+    //     $('#jenisMobil').val('');
+    //     $('#tanggalPakai').val('');
+    //     $('#jamMulai').val('');
+    //     $('#jamSelesai').val('');
+    //     $('#kendaraanInfo tbody').empty();
+    //     $('#pesertaList tbody').empty();
+
+        
+    //     $.ajax({
+    //         url: "/pengajuan/edit", // Sesuaikan dengan route Laravel
+    //         type: "POST",
+    //         data: { surat_kendaraan_dinas_id: dataKD,
+    //             "_token": "{{ csrf_token() }}"  // CSRF token
+    //          },
+    //         dataType: "json",
+    //         success: function (response) {
+                
+    //             if (!response || !response.surat_kendaraan_dinas_id) {
+    //                 alert("Data tidak valid.");
+    //                 return;
+    //             }
+
+    //             const isSuperAdmin = currentUserRole === "Super Admin";
+
+    //             // Atur akses field
+    //             $("#jenisMobil").prop("readonly", !isSuperAdmin);
+    //             $("#tanggalPakai").prop("readonly", !isSuperAdmin);
+    //             $("#tujuan_1, #tujuan_2, #tujuan_3").prop("readonly", !isSuperAdmin);
+
+    //             // Simpan daftar kendaraan ke global
+    //             window.daftarKendaraanGlobal = response.daftar_kendaraan || [];
+
+    //             // Isi field form utama
+    //             $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
+    //             $("#pemesan").val(response.userDinas?.[0]?.nrp_karyawan || '');
+    //             $("#jenisMobil").val(response.jenis_kendaraan || '');
+    //             $("#tanggalPakai").val(response.tanggal_penggunaan || '');
+    //             $("#jamMulai").val(response.waktu_keluar || '');
+    //             $("#jamSelesai").val(response.waktu_kembali || '');
+    //             $("#tujuan_1").val(response.tujuan_penggunaan_1 || '');
+    //             $("#tujuan_2").val(response.tujuan_penggunaan_2 || '');
+    //             $("#tujuan_3").val(response.tujuan_penggunaan_3 || '');
+
+    //             // Render Kendaraan
+    //             renderDaftarKendaraan(response.data_kendaraan || []);
+
+    //             // Render Peserta
+    //             renderDaftarPeserta(response.userDinas || []);
+    //         },
+    //         error: function () {
+    //             alert("Gagal mengambil data. Coba lagi.");
+    //         },
+    //     });
+    // });
+
+    // function renderDaftarKendaraan(dataKendaraan) {
+    //     const tbody = $("#kendaraanInfo tbody");
+    //     tbody.empty();
+
+    //     dataKendaraan.forEach((item, index) => {
+    //         const opsiKendaraan = window.daftarKendaraanGlobal.map(k => `
+    //             <option value="${k.id_kendaraan}"
+    //                 data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
+    //                 ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
+    //                 ${k.nomor_kendaraan}
+    //             </option>`).join('');
+
+    //         tbody.append(`
+    //             <tr>
+    //                 <td>${index + 1}</td>
+    //                 <td>
+    //                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+    //                         ${opsiKendaraan}
+    //                     </select>
+    //                 </td>
+    //                 <td class="keterangan-kendaraan">${item.keterangan}</td>
+    //                 <td>
+    //                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+    //                         <i class="fas fa-trash"></i>
+    //                     </button>
+    //                 </td>
+    //             </tr>
+    //         `);
+    //     });
+    // }
+
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget); 
         const dataKD = button.data('id'); 
-
 
         $('#nomorSurat').text('');
         $('#pemesan').val('');
@@ -779,70 +867,16 @@
         $('#kendaraanInfo tbody').empty();
         $('#pesertaList tbody').empty();
 
-        
         $.ajax({
             url: "/pengajuan/edit", // Sesuaikan dengan route Laravel
             type: "POST",
-            data: { surat_kendaraan_dinas_id: dataKD,
+            data: { 
+                surat_kendaraan_dinas_id: dataKD,
                 "_token": "{{ csrf_token() }}"  // CSRF token
-             },
+            },
             dataType: "json",
             success: function (response) {
-                // if (response) {
-                //     window.daftarKendaraanGlobal = response.daftar_kendaraan;
-
-                //     $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
-                //     $("#pemesan").val(response.userDinas[0]?.nrp_karyawan || ''); // asumsi hanya satu pemesan
-                //     $("#jenisMobil").val(response.jenis_kendaraan);
-                //     $("#tanggalPakai").val(response.tanggal_penggunaan);
-                //     $("#jamMulai").val(response.waktu_keluar);
-                //     $("#jamSelesai").val(response.waktu_kembali);
-                //     $("#tujuan_1").val(response.tujuan_penggunaan_1);
-                //     $("#tujuan_2").val(response.tujuan_penggunaan_2);
-                //     $("#tujuan_3").val(response.tujuan_penggunaan_3);
-
-                //     // Render Kendaraan
-                //     const tbodyKendaraan = $("#kendaraanInfo tbody");
-                //     response.data_kendaraan.forEach((item, index) => {
-                //         tbodyKendaraan.append(`
-                //             <tr>
-                //                 <td>${index + 1}</td>
-                //                 <td>
-                //                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-                //                         ${window.daftarKendaraanGlobal.map(k => `
-                //                             <option value="${k.id_kendaraan}" 
-                //                                     data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
-                //                                     ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
-                //                                 ${k.nomor_kendaraan}
-                //                             </option>
-                //                         `).join('')}
-                //                     </select>
-                //                 </td>
-                //                 <td class="keterangan-kendaraan">${item.keterangan}</td>
-                //                 <td>
-                //                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-                //                         <i class="fas fa-trash"></i>
-                //                     </button>
-                //                 </td>
-                //             </tr>
-                //         `);
-                //     });
-
-
-                //     // Render Peserta
-                //     const tbodyPeserta = $("#pesertaList tbody");
-                //     response.userDinas.forEach((user, index) => {
-                //         tbodyPeserta.append(`
-                //             <tr>
-                //                 <td>${index + 1}</td>
-                //                 <td>${user.nrp_karyawan}</td>
-                //                 <td>${user.name}</td>
-                //                 <td>${user.departemen}</td>
-                //                 <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
-                //             </tr>
-                //         `);
-                //     });
-                // }
+                
                 if (!response || !response.surat_kendaraan_dinas_id) {
                     alert("Data tidak valid.");
                     return;
@@ -886,27 +920,14 @@
         tbody.empty();
 
         dataKendaraan.forEach((item, index) => {
-            const opsiKendaraan = window.daftarKendaraanGlobal.map(k => `
-                <option value="${k.id_kendaraan}"
-                    data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
-                    ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
-                    ${k.nomor_kendaraan}
-                </option>`).join('');
-
             tbody.append(`
                 <tr>
                     <td>${index + 1}</td>
                     <td>
-                        <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-                            ${opsiKendaraan}
-                        </select>
+                        <input type="text" name="nomor_kendaraan[]" class="form-control" 
+                            value="${item.nomor_kendaraan || ''}" readonly>
                     </td>
-                    <td class="keterangan-kendaraan">${item.keterangan}</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
+                    <td class="keterangan-kendaraan">${item.keterangan || ''}</td>
                 </tr>
             `);
         });
@@ -930,39 +951,39 @@
     }
 
 
-    function tambahComboBoxEdit() {
-        const tbody = $("#kendaraanInfo tbody");
-        const index = tbody.children().length + 1;
+    // function tambahComboBoxEdit() {
+    //     const tbody = $("#kendaraanInfo tbody");
+    //     const index = tbody.children().length + 1;
 
-        const kendaraanOptions = window.daftarKendaraanGlobal.map(k => `
-            <option value="${k.id_kendaraan}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
-                ${k.nomor_kendaraan}
-            </option>
-        `).join('');
+    //     const kendaraanOptions = window.daftarKendaraanGlobal.map(k => `
+    //         <option value="${k.id_kendaraan}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
+    //             ${k.nomor_kendaraan}
+    //         </option>
+    //     `).join('');
 
-        tbody.append(`
-            <tr>
-                <td>${index}</td>
-                <td>
-                    <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-                        ${kendaraanOptions}
-                    </select>
-                </td>
-                <td class="keterangan-kendaraan"></td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>                
-                </td>
-            </tr>
-        `);
-    }
+    //     tbody.append(`
+    //         <tr>
+    //             <td>${index}</td>
+    //             <td>
+    //                 <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
+    //                     ${kendaraanOptions}
+    //                 </select>
+    //             </td>
+    //             <td class="keterangan-kendaraan"></td>
+    //             <td>
+    //                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
+    //                     <i class="fas fa-trash"></i>
+    //                 </button>                
+    //             </td>
+    //         </tr>
+    //     `);
+    // }
 
 
 
-    function hapusComboBoxEdit(button) {
-        $(button).closest('tr').remove();
-    }
+    // function hapusComboBoxEdit(button) {
+    //     $(button).closest('tr').remove();
+    // }
 
     function updateKeterangan(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];

@@ -37,13 +37,13 @@ class ApprovalBarangKeluarLiveWire extends Component
             ->orderBy('status', 'asc')
             ->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
-            // Ambil semua data terlebih dahulu
-            $pengeluaranBarangs = (clone $query)->with('user')->orderByRaw("FIELD(status, 'Level 2') DESC")->get();
-        
-            // Sorting lokal: departemen user tampil di atas
-            $pengeluaranBarangs = $pengeluaranBarangs->sortByDesc(function ($item) use ($user) {
-                return $item->user->departemen === $user->departemen ? 1 : 0;
-            })->values(); // values() untuk reset index array
+            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri
+            $pengeluaranBarangs = (clone $query)->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })
+            ->orderByRaw("FIELD(status, 'Level 2') DESC")
+            ->orderBy('status', 'asc')
+            ->get();
         }
          elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
             // Level 2 untuk pengajuan dari GA sendiri

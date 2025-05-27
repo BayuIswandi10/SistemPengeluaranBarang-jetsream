@@ -19,7 +19,15 @@ class ApprovalKendaraanDinasLivewire extends Component
                 $kendaraanDinas = $query->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })->get();
-            }
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
+            // Ka.Dept biasa → hanya data dari departemen yang sama, urutkan Level 1 dulu
+            $kendaraanDinas = $query->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })
+            ->orderByRaw("FIELD(status, 'Level 1') DESC")
+            ->orderBy('status', 'asc')
+            ->get();
+        }
         elseif (
             in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')

@@ -265,11 +265,11 @@
 
                 // Logika berbeda berdasarkan kategori pengeluaran
                 if (data.kategori_pengeluaran === 1) {
-                    // Scrap -> cukup sampai level 4
-                    isApproved = maxLevel >= 4;
-                } else {
-                    // Non Scrap -> harus sampai level 5
+                    // Scrap -> cukup sampai level 5
                     isApproved = maxLevel >= 5;
+                } else {
+                    // Non Scrap -> harus sampai level 4
+                    isApproved = maxLevel >= 4;
                 }
 
                 // Tampilkan badge persetujuan
