@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <style>
+            body.default-cursor {
+                cursor: pointer; /* kursor "hand" */
+            }
+
+            body.input-cursor {
+                cursor: auto; /* kursor default untuk input/select */
+            }
+        </style>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -126,6 +135,24 @@
                         });
                     });
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                function updateCursor() {
+                    const active = document.activeElement;
+                    if (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable) {
+                        document.body.classList.add('input-cursor');
+                        document.body.classList.remove('default-cursor');
+                    } else {
+                        document.body.classList.add('default-cursor');
+                        document.body.classList.remove('input-cursor');
+                    }
+                }
+
+                // Jalankan saat awal dan saat fokus/blur terjadi
+                updateCursor();
+                document.addEventListener('focus', updateCursor, true);
+                document.addEventListener('blur', updateCursor, true);
             });
 
         </script>
