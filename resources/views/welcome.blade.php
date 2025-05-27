@@ -314,6 +314,15 @@
                                 <div class="form-group">
                                     <label for="no_polisi">No Polisi <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="no_polisi" name="no_polisi" placeholder="Masukan No Polisi Kendaraan" required autocomplete="off">
+                                    <small id="no_polisi_error" class="text-danger" style="display: none;">
+                                        Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
+                                        - 1–2 huruf awal<br>
+                                        - Spasi<br>
+                                        - 1–4 angka<br>
+                                        - Spasi<br>
+                                        - 1–3 huruf akhir<br>
+                                        Contoh lain: D 45 XY, AB 9876 A
+                                    </small>
                                 </div>
                                 
                                 <div class="form-group">
@@ -335,7 +344,9 @@
                                         <option value="P2">P2</option>
                                     </select>
                                 </div>
-
+                                <small id="lokasi_tujuan_error" class="text-danger" style="display: none;">
+                                        Lokasi Barang Keluar dan Tujuan Pengeluaran tidak boleh sama.
+                                </small>
             
                                     <!-- Barang Keluar Table -->
                                     <div class="form-group">
@@ -1771,18 +1782,6 @@
             $tambahIkutSertaModal.modal('show');
         });
 
-        $(document).ready(function() {
-            $('#lokasi_barang_keluar').selectize({
-                create: true,
-                sortField: 'text'
-            });
-
-            $('#tujuan_pengeluaran_barang').selectize({
-                create: true,
-                sortField: 'text'
-            });
-        });
-
         $(document).ready(function () {  
 
             // Event untuk menangani klik elemen dengan id modalPengajuan
@@ -2542,6 +2541,48 @@
                 e.target.value = val.slice(0, 2);
             }
         });
+
+        document.getElementById('no_polisi').addEventListener('input', function () {
+            const input = this.value.trim();
+            const errorMsg = document.getElementById('no_polisi_error');
+            // Regex: 1 huruf, spasi, 1-4 angka, spasi, 1-3 huruf
+            const regex = /^[A-Z]{1,2}\s\d{1,4}\s[A-Z]{1,3}$/;
+
+            if (input === '') {
+                errorMsg.style.display = 'none';
+            } else if (!regex.test(input.toUpperCase())) {
+                errorMsg.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'none';
+            }
+        });
+
+        $(document).ready(function () {
+            const lokasiSelect = $('#lokasi_barang_keluar').selectize({
+                create: true,
+                sortField: 'text',
+                onChange: validateLokasiTujuan
+            });
+
+            const tujuanSelect = $('#tujuan_pengeluaran_barang').selectize({
+                create: true,
+                sortField: 'text',
+                onChange: validateLokasiTujuan
+            });
+
+            function validateLokasiTujuan() {
+                const lokasi = lokasiSelect[0].selectize.getValue().trim().toLowerCase();
+                const tujuan = tujuanSelect[0].selectize.getValue().trim().toLowerCase();
+                const errorMsg = $('#lokasi_tujuan_error');
+
+                if (lokasi && tujuan && lokasi === tujuan) {
+                    errorMsg.show();
+                } else {
+                    errorMsg.hide();
+                }
+            }
+        });
+
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
