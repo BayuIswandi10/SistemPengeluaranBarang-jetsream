@@ -2185,7 +2185,8 @@
                                     <td>${barangInfo.nama_barang}</td>
                                     <td>${barangInfo.jumlah_barang}</td>
                                     <td>${barangInfo.satuan_barang}</td>
-                                    <td>${barangInfo.keterangan_barang}</td>
+                                    <td>${barangInfo.keterangan_barang?.trim() ? barangInfo.keterangan_barang : '-'}</td>
+
                                 </tr>
                             `);
                         });
@@ -2227,7 +2228,9 @@
                                     <td>${barang.satuan_barang}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="3"> ${barang.keterangan_barang}</td>
+                                    <td colspan="3">
+                                        ${barang.keterangan_barang?.trim() ? barang.keterangan_barang : '-'}
+                                    </td>
                                 </tr>
                             `;
                         });
