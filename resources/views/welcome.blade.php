@@ -2583,6 +2583,62 @@
             }
         });
 
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tombol Submit
+            const form = document.getElementById('tambah_pengeluaran_barang');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            const formDinasModal = document.getElementById('tambahDinasModal');
+            const submitButtonDinas = formDinasModal.querySelector('button[type="submit"]');
+
+            submitButton.addEventListener('click', function (e) {
+                // Cek validasi form terlebih dahulu
+                if (form.checkValidity()) {
+                    e.preventDefault(); // Cegah submit bawaan
+
+                    Swal.fire({
+                        title: 'Ajukan Pengeluaran Barang?',
+                        text: "Pastikan seluruh data telah diisi dengan benar.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Ajukan',
+                        cancelButtonText: 'Tinjau Ulang',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Submit form jika dikonfirmasi
+                        }
+                    });
+                } else {
+                    // Trigger browser untuk menampilkan error bawaan HTML5
+                    form.reportValidity();
+                }
+            });
+            submitButtonDinas.addEventListener('click', function (e) {
+                // Cek validasi formDinasModal terlebih dahulu
+                if (formDinasModal.checkValidity()) {
+                    e.preventDefault(); // Cegah submit bawaan
+
+                    Swal.fire({
+                        title: 'Ajukan Pengeluaran Barang?',
+                        text: "Pastikan seluruh data telah diisi dengan benar.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Ajukan',
+                        cancelButtonText: 'Tinjau Ulang',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            formDinasModal.submit(); // Submit formDinasModal jika dikonfirmasi
+                        }
+                    });
+                } else {
+                    // Trigger browser untuk menampilkan error bawaan HTML5
+                    formDinasModal.reportValidity();
+                }
+            });
+        });
+
 
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
