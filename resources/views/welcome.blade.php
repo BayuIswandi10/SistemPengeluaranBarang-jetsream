@@ -549,7 +549,7 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
 
@@ -957,7 +957,199 @@
     </body>
     <script>
      
+        // KODE SEBELUM REVISI
+        // $(document).ready(function () {
+        //     // Cache for user data to avoid repeated AJAX calls
+        //     let userCache = null;
 
+        //     function loadUsers() {
+        //         // If data is cached, use it
+        //         if (userCache) {
+        //             populateDropdowns(userCache);
+        //             return;
+        //         }
+
+        //         $.ajax({
+        //             url: '/user/getAllUser',
+        //             type: 'GET',
+        //             dataType: 'json',
+        //             success: function (data) {
+        //                 // Sort data by name (if not pre-sorted by server)
+        //                 data.sort((a, b) => a.name.localeCompare(b.name));
+        //                 userCache = data; // Cache the data
+        //                 populateDropdowns(data);
+        //             },
+        //             error: function (xhr, status, error) {
+        //                 console.error('Gagal memuat data karyawan:', error);
+        //                 // Provide user feedback
+        //                 const errorOption = '<option value="" disabled selected>Gagal memuat data karyawan</option>';
+        //                 $('#created_by_barang, #created_by_dinas').html(errorOption);
+        //             }
+        //         });
+        //     }
+
+        //     function populateDropdowns(data) {
+        //          console.log("Data karyawan yang akan diisi:", data);
+        //         // Generate structured options for Selectize
+        //         const userOptions = data.map(user => ({
+        //             value: user.nrp_karyawan,
+        //             text: `${user.nrp_karyawan} - ${user.name}`
+        //         }));
+
+        //         // Populate dropdowns with HTML options
+        //         const optionsHtml = ['<option value="" disabled selected>Pilih Karyawan</option>']
+        //             .concat(data.map(user => `<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`))
+        //             .join('');
+
+        //         $('#created_by_barang').html(optionsHtml);
+        //         $('#created_by_dinas').html(optionsHtml);
+
+        //         // Destroy existing Selectize instances to prevent memory leaks
+        //         $('.selectize').each(function () {
+        //             if (this.selectize) {
+        //                 this.selectize.destroy();
+        //             }
+        //         });
+
+        //         // Initialize Selectize with structured options
+        //         $('.selectize').selectize({
+        //             options: userOptions, // Provide structured options
+        //             valueField: 'value',
+        //             labelField: 'text',
+        //             searchField: ['text'],
+        //             sortField: 'text',
+        //             placeholder: 'Pilih atau cari Karyawan',
+        //             // Use Selectize's built-in fuzzy search
+        //             score: function (search) {
+        //                 // const score = this.getScoreFunction(search);
+        //                 // return function (item) {
+        //                 //     return score(item);
+        //                 // };
+        //                 return function (item) {
+        //                     let text = item.text.toLowerCase();
+        //                     search = search.toLowerCase();
+        //                     return text.includes(search) ? 1 : 0;
+        //                 };
+        //             }
+        //         });
+        //     }
+
+        //     // Trigger the load
+        //     loadUsers();
+        // });
+
+        // KODE REVISI TAPI BARU CREATE PENGAJUAN
+        // $(document).ready(function () {
+        //     // Cache for user data to avoid repeated AJAX calls
+        //     let userCache = null;
+
+        //     function loadUsers() {
+        //         // If data is cached, use it
+        //         if (userCache) {
+        //             populateDropdowns(userCache);
+        //             return;
+        //         }
+
+        //         $.ajax({
+        //             url: '/user/getAllUser',
+        //             type: 'GET',
+        //             dataType: 'json',
+        //             success: function (data) {
+        //                 // Sort data by name (if not pre-sorted by server)
+        //                 data.sort((a, b) => a.name.localeCompare(b.name));
+        //                 userCache = data; // Cache the data
+        //                 populateDropdowns(data);
+        //             },
+        //             error: function (xhr, status, error) {
+        //                 console.error('Gagal memuat data karyawan:', error);
+        //                 // Provide user feedback
+        //                 const errorOption = '<option value="" disabled selected>Gagal memuat data karyawan</option>';
+        //                 $('#created_by_barang, #created_by_dinas').html(errorOption);
+        //             }
+        //         });
+        //     }
+
+        //     function populateDropdowns(data) {
+        //         console.log("Data karyawan yang akan diisi:", data);
+        //         // Generate structured options for Selectize
+        //         const userOptions = data.map(user => ({
+        //             value: user.nrp_karyawan,
+        //             text: `${user.nrp_karyawan} - ${user.name}`,
+        //             name: user.name,
+        //             departemen: user.departemen || '' // Tambahkan departemen jika ada
+        //         }));
+
+        //         // Populate dropdowns with HTML options
+        //         const optionsHtml = ['<option value="" disabled selected>Pilih Karyawan</option>']
+        //             .concat(data.map(user => `<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`))
+        //             .join('');
+
+        //         $('#created_by_barang').html(optionsHtml);
+        //         $('#created_by_dinas').html(optionsHtml);
+
+        //         // Destroy existing Selectize instances to prevent memory leaks
+        //         $('.selectize').each(function () {
+        //             if (this.selectize) {
+        //                 this.selectize.destroy();
+        //             }
+        //         });
+
+        //         // Initialize Selectize with structured options
+        //         $('.selectize').selectize({
+        //             options: userOptions, // Provide structured options
+        //             valueField: 'value',
+        //             labelField: 'text',
+        //             searchField: ['text'],
+        //             sortField: 'text',
+        //             placeholder: 'Pilih atau cari Karyawan',
+        //             // Use Selectize's built-in fuzzy search
+        //             score: function (search) {
+        //                 return function (item) {
+        //                     let text = item.text.toLowerCase();
+        //                     search = search.toLowerCase();
+        //                     return text.includes(search) ? 1 : 0;
+        //                 };
+        //             },
+        //             // Add onChange callback untuk created_by_dinas
+        //             onChange: function(value) {
+        //                 // Check if this is the created_by_dinas selectize
+        //                 if (this.$input.attr('id') === 'created_by_dinas') {
+        //                     setFirstParticipant(value);
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     // Function to set first participant data from created_by_dinas selection
+        //     function setFirstParticipant(nrpValue) {
+        //         if (!nrpValue) return;
+
+        //         // Set NRP value to first participant row
+        //         const firstRow = $('#pesertaTableTambah tbody tr:first');
+        //         const nrpInput = firstRow.find('.nrp_karyawan');
+                
+        //         // Set the NRP value
+        //         nrpInput.val(nrpValue);
+                
+        //         // Trigger keyup event to activate the existing AJAX functionality
+        //         nrpInput.trigger('keyup');
+                
+        //         console.log('Set first participant NRP from dropdown:', nrpValue);
+        //     }
+
+        //     // Alternative method using jQuery change event (if selectize onChange doesn't work)
+        //     $(document).on('change', '#created_by_dinas', function() {
+        //         const selectedNRP = $(this).val();
+        //         if (selectedNRP) {
+        //             setFirstParticipant(selectedNRP);
+        //         }
+        //     });
+
+        //     // Trigger the load
+        //     loadUsers();
+        // });
+
+        // KODE REVISI TAPI BARU CREATE PENGAJUAN DAN IKUT SERTA
         $(document).ready(function () {
             // Cache for user data to avoid repeated AJAX calls
             let userCache = null;
@@ -989,11 +1181,13 @@
             }
 
             function populateDropdowns(data) {
-                 console.log("Data karyawan yang akan diisi:", data);
+                console.log("Data karyawan yang akan diisi:", data);
                 // Generate structured options for Selectize
                 const userOptions = data.map(user => ({
                     value: user.nrp_karyawan,
-                    text: `${user.nrp_karyawan} - ${user.name}`
+                    text: `${user.nrp_karyawan} - ${user.name}`,
+                    name: user.name,
+                    departemen: user.departemen || '' // Tambahkan departemen jika ada
                 }));
 
                 // Populate dropdowns with HTML options
@@ -1021,21 +1215,220 @@
                     placeholder: 'Pilih atau cari Karyawan',
                     // Use Selectize's built-in fuzzy search
                     score: function (search) {
-                        // const score = this.getScoreFunction(search);
-                        // return function (item) {
-                        //     return score(item);
-                        // };
                         return function (item) {
                             let text = item.text.toLowerCase();
                             search = search.toLowerCase();
                             return text.includes(search) ? 1 : 0;
                         };
+                    },
+                    // Add onChange callback untuk created_by_dinas
+                    onChange: function(value) {
+                        // Check if this is the created_by_dinas selectize
+                        if (this.$input.attr('id') === 'created_by_dinas') {
+                            // Determine which modal is currently active
+                            const activeModal = determineActiveModal();
+                            setFirstParticipant(value, activeModal);
+                        }
                     }
                 });
             }
 
+            // Function to determine which modal is currently active
+            function determineActiveModal() {
+                // Check if tambahIkutSertaModal is visible/active
+                if ($('#tambahIkutSertaModal').hasClass('show') || $('#tambahIkutSertaModal').is(':visible')) {
+                    return 'ikutserta';
+                }
+                // Default to regular modal
+                return 'regular';
+            }
+
+            // Function to set first participant data from created_by_dinas selection
+            function setFirstParticipant(nrpValue, modalType = 'regular') {
+                if (!nrpValue) return;
+
+                let firstRow, tableSelector;
+                
+                // Determine which table to target based on modal type
+                if (modalType === 'ikutserta') {
+                    tableSelector = '#pesertaTableTambahPeserta tbody tr:first';
+                } else {
+                    tableSelector = '#pesertaTableTambah tbody tr:first';
+                }
+                
+                firstRow = $(tableSelector);
+                
+                if (firstRow.length === 0) {
+                    console.warn('First participant row not found for modal type:', modalType);
+                    return;
+                }
+
+                const nrpInput = firstRow.find('.nrp_karyawan');
+                
+                // Set the NRP value
+                nrpInput.val(nrpValue);
+                
+                // Trigger keyup event to activate the existing AJAX functionality
+                nrpInput.trigger('keyup');
+                
+                console.log(`Set first participant NRP from dropdown for ${modalType} modal:`, nrpValue);
+            }
+
+            // Alternative method using jQuery change event (if selectize onChange doesn't work)
+            $(document).on('change', '#created_by_dinas', function() {
+                const selectedNRP = $(this).val();
+                if (selectedNRP) {
+                    const activeModal = determineActiveModal();
+                    setFirstParticipant(selectedNRP, activeModal);
+                }
+            });
+
+            // Reset selectize when modal is opened
+            $('#tambahIkutSertaModal').on('shown.bs.modal', function () {
+                // Clear the selectize value when ikut serta modal is opened
+                const selectizeInstance = $('#created_by_dinas')[0].selectize;
+                if (selectizeInstance) {
+                    selectizeInstance.clear();
+                }
+            });
+
+            // Also handle for the regular modal if needed
+            $('[data-target="#tambahModal"], [data-toggle="modal"][data-target*="tambah"]').on('click', function() {
+                // Clear the selectize value when regular modal is opened
+                setTimeout(function() {
+                    const selectizeInstance = $('#created_by_dinas')[0].selectize;
+                    if (selectizeInstance) {
+                        selectizeInstance.clear();
+                    }
+                }, 100);
+            });
+
             // Trigger the load
             loadUsers();
+        });
+
+        // Handle NRP input and AJAX for user details (existing functionality)
+        $(document).ready(function() {
+            // Sync created_by with first participant (existing functionality)
+            $('#created_by').on('input', function() {
+                const nrp = $(this).val();
+                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
+            });
+
+            // Handle NRP input changes (existing functionality) - Updated to handle both tables
+            $(document).on('keyup', '.nrp_karyawan', function() {
+                const nrp = $(this).val();
+                const row = $(this).closest('tr');
+                const tableId = row.closest('table').attr('id');
+                
+                // Determine storage key based on table
+                let storageKey;
+                if (tableId === 'pesertaTableTambah') {
+                    storageKey = STORAGE_KEY_TAMBAH;
+                } else if (tableId === 'pesertaTableTambahPeserta') {
+                    storageKey = STORAGE_KEY_IKUTSERTA;
+                } else {
+                    // Fallback - determine by modal context
+                    const isIkutSertaModal = row.closest('#tambahIkutSertaModal').length > 0;
+                    storageKey = isIkutSertaModal ? STORAGE_KEY_IKUTSERTA : STORAGE_KEY_TAMBAH;
+                }
+
+                if (nrp.length >= 6) {
+                    $.ajax({
+                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+                        type: 'GET',
+                        data: { nrp_karyawan: nrp },
+                        success: function(response) {
+                            if (response.success) {
+                                row.find('.nama').val(response.data.name);
+                                row.find('.departemen').val(response.data.departemen);
+                            } else {
+                                row.find('.nama').val('');
+                                row.find('.departemen').val('');
+                            }
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        },
+                        error: function() {
+                            row.find('.nama').val('');
+                            row.find('.departemen').val('');
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        }
+                    });
+                } else {
+                    row.find('.nama').val('');
+                    row.find('.departemen').val('');
+                    saveToLocalStoragePeserta(tableId, storageKey);
+                }
+            });
+
+            // Load stored data on page load (existing functionality)
+            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+
+            // Clear local storage on form submission (existing functionality)
+            $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_TAMBAH);
+            });
+
+            $('#formTambahikutserta').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+            });
+        });
+        // Handle NRP input and AJAX for user details (existing functionality)
+        $(document).ready(function() {
+            // Sync created_by with first participant (existing functionality)
+            $('#created_by').on('input', function() {
+                const nrp = $(this).val();
+                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
+            });
+
+            // Handle NRP input changes (existing functionality)
+            $(document).on('keyup', '.nrp_karyawan', function() {
+                const nrp = $(this).val();
+                const row = $(this).closest('tr');
+                const tableId = row.closest('table').attr('id');
+                const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
+
+                if (nrp.length >= 6) {
+                    $.ajax({
+                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+                        type: 'GET',
+                        data: { nrp_karyawan: nrp },
+                        success: function(response) {
+                            if (response.success) {
+                                row.find('.nama').val(response.data.name);
+                                row.find('.departemen').val(response.data.departemen);
+                            } else {
+                                row.find('.nama').val('');
+                                row.find('.departemen').val('');
+                            }
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        },
+                        error: function() {
+                            row.find('.nama').val('');
+                            row.find('.departemen').val('');
+                            saveToLocalStoragePeserta(tableId, storageKey);
+                        }
+                    });
+                } else {
+                    row.find('.nama').val('');
+                    row.find('.departemen').val('');
+                    saveToLocalStoragePeserta(tableId, storageKey);
+                }
+            });
+
+            // Load stored data on page load (existing functionality)
+            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+
+            // Clear local storage on form submission (existing functionality)
+            $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_TAMBAH);
+            });
+
+            $('#formTambahikutserta').on('submit', function() {
+                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+            });
         });
 
         function printIframePengeluaranBarang() {
@@ -2435,62 +2828,62 @@
             }
         }
 
-        // Handle NRP input and AJAX for user details
-        $(document).ready(function() {
-            // Sync created_by with first participant
-            $('#created_by').on('input', function() {
-                const nrp = $(this).val();
-                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
-            });
+        // // Handle NRP input and AJAX for user details
+        // $(document).ready(function() {
+        //     // Sync created_by with first participant
+        //     $('#created_by').on('input', function() {
+        //         const nrp = $(this).val();
+        //         $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
+        //     });
 
-            // Handle NRP input changes
-            $(document).on('keyup', '.nrp_karyawan', function() {
-                const nrp = $(this).val();
-                const row = $(this).closest('tr');
-                const tableId = row.closest('table').attr('id');
-                const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
+        //     // Handle NRP input changes
+        //     $(document).on('keyup', '.nrp_karyawan', function() {
+        //         const nrp = $(this).val();
+        //         const row = $(this).closest('tr');
+        //         const tableId = row.closest('table').attr('id');
+        //         const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
 
-                if (nrp.length >= 6) {
-                    $.ajax({
-                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
-                        type: 'GET',
-                        data: { nrp_karyawan: nrp },
-                        success: function(response) {
-                            if (response.success) {
-                                row.find('.nama').val(response.data.name);
-                                row.find('.departemen').val(response.data.departemen);
-                            } else {
-                                row.find('.nama').val('');
-                                row.find('.departemen').val('');
-                            }
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        },
-                        error: function() {
-                            row.find('.nama').val('');
-                            row.find('.departemen').val('');
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        }
-                    });
-                } else {
-                    row.find('.nama').val('');
-                    row.find('.departemen').val('');
-                    saveToLocalStoragePeserta(tableId, storageKey);
-                }
-            });
+        //         if (nrp.length >= 6) {
+        //             $.ajax({
+        //                 url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+        //                 type: 'GET',
+        //                 data: { nrp_karyawan: nrp },
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         row.find('.nama').val(response.data.name);
+        //                         row.find('.departemen').val(response.data.departemen);
+        //                     } else {
+        //                         row.find('.nama').val('');
+        //                         row.find('.departemen').val('');
+        //                     }
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 },
+        //                 error: function() {
+        //                     row.find('.nama').val('');
+        //                     row.find('.departemen').val('');
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 }
+        //             });
+        //         } else {
+        //             row.find('.nama').val('');
+        //             row.find('.departemen').val('');
+        //             saveToLocalStoragePeserta(tableId, storageKey);
+        //         }
+        //     });
 
-            // Load stored data on page load
-            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
-            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+        //     // Load stored data on page load
+        //     loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+        //     loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
 
-            // Clear local storage on form submission
-            $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_TAMBAH);
-            });
+        //     // Clear local storage on form submission
+        //     $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_TAMBAH);
+        //     });
 
-            $('#formTambahikutserta').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
-            });
-        });
+        //     $('#formTambahikutserta').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+        //     });
+        // });
 
 
         document.addEventListener("DOMContentLoaded", function () {
