@@ -34,14 +34,16 @@
     <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                    <!-- Badge Status di Header -->
+                    <div id="approvalStatusBadge"></div>
+                </div>
+                <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Badge Status Persetujuan -->
-                <div id="approvalStatusBadge" class="mb-3 text-center"></div>
 
                 <!-- Info Nomor Pengeluaran dan Kategori -->
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -114,14 +116,16 @@
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
+                        <!-- Badge Status di Header -->
+                        <div id="approvalStatusBadgeDinas"></div>
+                    </div>
+                    <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Badge Status Persetujuan -->
-                    <div id="approvalStatusBadgeDinas" class="mb-3 text-center"></div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
@@ -255,8 +259,8 @@
                  // Tampilkan badge kategori
                 document.getElementById('kategoriBarangCard').innerHTML = 
                     data.kategori_pengeluaran === 1 
-                    ? '<span class="badge badge-danger fs-5 px-4 py-2">Scrap</span>' 
-                    : '<span class="badge badge-info fs-5 px-4 py-2">Non Scrap</span>';
+                    ? '<span class="badge badge-danger px-2 py-3">Scrap</span>' 
+                    : '<span class="badge badge-info px-2 py-3">Non Scrap</span>';
 
                 // Badge besar status persetujuan
                 const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
@@ -274,8 +278,8 @@
 
                 // Tampilkan badge persetujuan
                 document.getElementById('approvalStatusBadge').innerHTML = isApproved
-                    ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>'
-                    : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
+                    ? '<span class="badge badge-success px-2 py-3">Persetujuan Lengkap</span>'
+                    : '<span class="badge badge-danger px-2 py-3">Persetujuan Tidak Lengkap</span>';
         
                 document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                 const tbody = document.getElementById('detailBody');
@@ -577,8 +581,8 @@
                      // Badge besar status persetujuan
                     const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
                     document.getElementById('approvalStatusBadgeDinas').innerHTML = maxLevel >= 3   
-                        ? '<span class="badge badge-success fs-4 px-5 py-3">Persetujuan Lengkap</span>' 
-                        : '<span class="badge badge-danger fs-4 px-5 py-3">Persetujuan Tidak Lengkap</span>';
+                        ? '<span class="badge badge-success px-2 py-3">Persetujuan Lengkap</span>' 
+                        : '<span class="badge badge-danger px-2 py-3">Persetujuan Tidak Lengkap</span>';
 
                     let statusPengeluaran = data.status; // Pastikan API mengembalikan status
 
