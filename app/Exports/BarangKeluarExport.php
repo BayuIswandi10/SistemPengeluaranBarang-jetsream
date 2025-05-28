@@ -37,12 +37,36 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize
 
         $this->totalCount = $pengeluaranBarangs->count();
 
-        foreach ($pengeluaranBarangs as $pengeluaran) {
+       foreach ($pengeluaranBarangs as $pengeluaran) {
+            $barangs = $pengeluaran->barangKeluar;
+
+            $approvals = ApprovalBarangKeluar::where('pengeluaran_barang_id', $pengeluaran->pengeluaran_barang_id)->get();
+
+            $approvalStatus = '-';
+            $kategori = $pengeluaran->kategori_pengeluaran;
+
+            $hasRejected = $approvals->contains(function ($a) {
+                return $a->status_approval === 'Level 0';
+            });
+
+            if ($hasRejected) {
+                $approvalStatus = 'Ditolak';
+            } else {
+                // Hitung jumlah approval valid (tidak termasuk null, '-' atau 'Level 0')
+                $validCount = $approvals->whereNotIn('status_approval', [null, '-', 'Level 0'])->count();
+
+                if ($kategori == 1) { // Scrap
+                    $approvalStatus = $validCount >= 5 ? 'Lengkap' : 'Proses';
+                } else { // Non Scrap
+                    $approvalStatus = $validCount >= 4 ? 'Lengkap' : 'Proses';
+                }
+            }
+
             $baseRow = [
                 $pengeluaran->pengeluaran_barang_id,
                 '', // Barang
-                '', // Approval
-                $pengeluaran->kategori_pengeluaran == 1 ? 'Scrap' : 'Non Scrap',
+                $approvalStatus, // Ganti kolom approval jadi ringkasan saja
+                $kategori == 1 ? 'Scrap' : 'Non Scrap',
                 $pengeluaran->pembawa_scrap ?? '-',
                 $pengeluaran->created_by ?? '-',
                 Carbon::parse($pengeluaran->created_date)->format('d-m-Y H:i'),
@@ -55,24 +79,17 @@ class BarangKeluarExport implements FromArray, WithHeadings, ShouldAutoSize
                 Carbon::parse($pengeluaran->updated_date)->format('d-m-Y H:i'),
             ];
 
-            $barangs = $pengeluaran->barangKeluar;
-            $approvals = ApprovalBarangKeluar::with('user')
-                ->where('pengeluaran_barang_id', $pengeluaran->pengeluaran_barang_id)
-                ->get()
-                ->map(function ($approval) use ($pengeluaran) {
-                    return ($approval->user->name ?? 'Tidak Diketahui') . ' (' .
-                        $this->translateApprovalStatus($approval->status_approval ?? '-', $pengeluaran->kategori_pengeluaran) . ')';
-                });
-
-            $max = max($barangs->count(), $approvals->count());
-
-            for ($i = 0; $i < $max; $i++) {
-                $row = $baseRow;
-                $row[1] = $barangs[$i]->nama_barang ?? '';
-                $row[2] = $approvals[$i] ?? '';
-                $result[] = $row;
+            if ($barangs->isEmpty()) {
+                $result[] = $baseRow;
+            } else {
+                foreach ($barangs as $barang) {
+                    $row = $baseRow;
+                    $row[1] = $barang->nama_barang ?? '';
+                    $result[] = $row;
+                }
             }
         }
+
 
         return $result;
     }

@@ -12,20 +12,36 @@
         .modal-body {
             overflow-x: auto;
         }
+
+        #dataTable {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        }
+        #dataTable.visible {
+        opacity: 1;
+        }
+
     </style>
     <div class="container-fluid">
 
         <div class="card mt-3">
-        <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
-            <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
+            <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
+                <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
 
-            @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs')
-                <a id="exportExcel" href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#eksporModal">
-                    <i class="fas fa-file-export me-1"></i> Export Excel
-                </a>
-            @endif
+                <div class="d-flex align-items-center" style="margin-left: auto; gap: 0.5rem;">
+                  <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
-        </div>
+                    @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs')
+                        <a href="#" id="downloadExcel"
+                        class="btn btn-success btn-sm d-flex align-items-center px-3"
+                        style="height: 38px; white-space: nowrap;">
+                        <i class="fas fa-file-excel fa-lg mr-2"></i>
+                        <span>Export Excel</span>
+                        </a>
+
+                    @endif
+                </div>
+            </div>
             <div class="card-body">
                 @if (session('success'))
                     <script>
@@ -50,6 +66,7 @@
                         });
                     </script>
                 @endif
+                
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>    
@@ -230,49 +247,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Export Excel Modal--}}
-    <div class="modal fade" id="eksporModal" tabindex="-1" role="dialog" aria-labelledby="eksporModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Ekspor Barang Keluar</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-md-12">
-                        <div class="d-flex mb-3">
-                            <input type="text" id="date-range-picker" class="form-control me-2" placeholder="Pilih Rentang Tanggal">
-
-                            <a href="#" id="downloadExcel" class="btn btn-success btn-sm d-flex align-items-center px-3" target="_blank" style="height: 38px;">
-                                <i class="fas fa-download me-1"></i> Simpan
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <table id="previewDataEksporModal" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                <th>NO</th>
-                                <th>Nomor Pengeluaran Barang</th>
-                                <th>Tujuan</th>
-                                <th>Jenis Kendaraan</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eksporBody">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
         
     {{-- Detail Modal --}}
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
@@ -417,11 +391,124 @@
     </div>
 </div>
 
+@script
+<script>
+    let dataTableInstance;
+
+   Livewire.on('dataUpdated', () => {
+        console.log('dataUpdated event received!');
+        setTimeout(() => {
+            initDataTable();
+        }, 100); // delay 100ms, bisa disesuaikan
+    });
+
+
+   function initDataTable() {
+        const table = $('#dataTable');
+
+        // sembunyikan dulu
+        table.removeClass('visible');
+
+        if (dataTableInstance) {
+            dataTableInstance.destroy();
+        }
+
+        dataTableInstance = table.DataTable({
+            language: {
+                processing: "Memproses...",
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Tidak ada data",
+                infoFiltered: "(difilter dari _MAX_ total entri)",
+                loadingRecords: "Memuat...",
+                zeroRecords: "Tidak ditemukan data yang cocok",
+                emptyTable: "Tidak ada data di tabel"
+            },
+            columnDefs: [
+                { className: 'dt-body-center', targets: 0 },
+                { className: 'dt-head-center', targets: 0 },
+                { className: 'dt-body-center', targets: 5 },
+                { className: 'dt-head-center', targets: 5 }
+            ],
+            scrollX: false,
+            responsive: true,
+            initComplete: function() {
+                // tampilkan setelah selesai inisialisasi
+                table.addClass('visible');
+            }
+        });
+    }
+
+
+     function formatDate(date) {
+        const wibOffset = 7 * 60; // offset WIB dalam menit
+        const localTime = new Date(date.getTime() + (wibOffset - date.getTimezoneOffset()) * 60000);
+
+        const year = localTime.getFullYear();
+        const month = String(localTime.getMonth() + 1).padStart(2, '0');
+        const day = String(localTime.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+   const today = new Date();
+    // Awal bulan sebelumnya
+    const defaultStartDate = new Date(today.getFullYear(), today.getMonth() - 1, 1, 0, 0, 0);
+    // Akhir bulan ini
+    const defaultEndDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+
+    // Format tanggal (YYYY-MM-DD)
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Inisialisasi flatpickr
+    const fp = flatpickr("#date-range-picker", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        locale: "id",
+        rangeSeparator: " sampai ",
+        defaultDate: [defaultStartDate, defaultEndDate],
+        onClose: function (selectedDates) {
+            if (selectedDates.length === 2) {
+                startDate = formatDate(selectedDates[0]);
+                endDate = formatDate(selectedDates[1]);
+            } else {
+                startDate = formatDate(defaultStartDate);
+                endDate = formatDate(defaultEndDate);
+                fp.setDate([defaultStartDate, defaultEndDate]);
+            }
+
+            this.input.value = `${startDate} s/d ${endDate}`;
+            @this.set('startDate', startDate);
+            @this.set('endDate', endDate);
+            @this.call('updateDateRange', { startDate, endDate });
+        }
+    });
+
+    // Atur nilai awal saat load
+    startDate = formatDate(defaultStartDate);
+    endDate = formatDate(defaultEndDate);
+    document.querySelector("#date-range-picker").value = `${startDate} s/d ${endDate}`;
+
+    // Handler tombol download
+    $('#downloadExcel').on('click', function (e) {
+        e.preventDefault();
+
+        const url = `/data-barang-keluar/export?start=${startDate}&end=${endDate}`;
+        window.open(url, '_blank');
+    });
+
+
+    initDataTable();
+</script>
+@endscript
 
 <script>
-
-    
-
 $(document).ready(function() {
     // Button for Ka.Sie approval
     $('.update-status-kasie').on('click', function() {
@@ -446,142 +533,26 @@ $(document).ready(function() {
         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
     });
 
-    //Search Lintas Departemen
-    const userSingkatan = "{{ Auth::user()->singkatan }}";
+   function initDataTable() {
+        const table = $('#dataTable');
 
-    // Inisialisasi DataTable
-    const table = $('#dataTable').DataTable({
-        responsive: true
-    });
-
-     $('#downloadExcel').on('click', function (e) {
-        e.preventDefault();
-
-        if (startDate && endDate) {
-            const url = `/data-barang-keluar/export?start=${startDate}&end=${endDate}`;
-            window.open(url, '_blank');
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Rentang tanggal belum dipilih',
-                text: 'Silakan pilih rentang tanggal terlebih dahulu sebelum mengekspor data.',
-                confirmButtonText: 'Oke',
-                customClass: {
-                    confirmButton: 'btn btn-primary'
-                },
-                buttonsStyling: false
-            });
+        // Cek apakah sudah diinisialisasi sebagai DataTable
+        if ($.fn.DataTable.isDataTable(table)) {
+            table.DataTable().clear().destroy(); // Hapus data dan destroy instance
         }
-    });
 
-    
-    let startDate = null;
-    let endDate = null;
-
-    $('#eksporModal').on('shown.bs.modal', function () {
-        // Inisialisasi flatpickr setiap kali modal ditampilkan (tanpa validasi sekali)
-        flatpickr("#date-range-picker", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            locale: "id",
-            defaultDate: null,
-            onChange: function (selectedDates) {
-                if (selectedDates.length === 2) {
-                    startDate = selectedDates[0].toISOString().split('T')[0];
-                    endDate = selectedDates[1].toISOString().split('T')[0];
-                    console.log("Rentang:", startDate, "hingga", endDate);
-
-                    $.ajax({
-                        url: '/pengeluaran/dataBarangRange',
-                        method: 'GET',
-                        data: {
-                            start: startDate,
-                            end: endDate,
-                        },
-                        success: function (response) {
-                            const table = $('#previewDataEksporModal').DataTable();
-
-                            // Hapus semua data di DataTable
-                            table.clear();
-
-                            if (response.barang_keluar && response.barang_keluar.length > 0) {
-                                response.barang_keluar.forEach(function (item, index) {
-                                    // Interpretasi status
-                                    let statusText = '-';
-                                    switch (item.status) {
-                                        case 'Level 1':
-                                            statusText = 'Menunggu Persetujuan PIC/Ka.Sie';
-                                            break;
-                                        case 'Level 2':
-                                            statusText = 'PIC/Ka.Sie Sudah Menyetujui';
-                                            break;
-                                        case 'Level 3':
-                                            statusText = 'Menunggu Persetujuan Ka.Dept GA';
-                                            break;
-                                        case 'Level 4':
-                                            if (item.kategori_pengeluaran == 1) {
-                                                statusText = 'Menunggu Persetujuan Finance';
-                                            } else {
-                                                statusText = 'Menunggu Persetujuan Security';
-                                            }
-                                            break;
-                                        case 'Level 5':
-                                            statusText = 'Menunggu Persetujuan Security';
-                                            break;
-                                        case 'Level 6':
-                                            statusText = 'Sudah Disetujui';
-                                            break;
-                                        case 'Level 0':
-                                            statusText = 'Ditolak';
-                                            break;
-                                        default:
-                                            statusText = item.status || '-';
-                                    }
-
-                                    table.row.add([
-                                        index + 1,
-                                        item.pengeluaran_barang_id || '-',
-                                        item.tujuan_pengeluaran_barang || '-',
-                                        item.jenis_kendaraan || '-',
-                                        statusText,
-                                        `<button 
-                                            type="button" 
-                                            class="btn btn-primary btn-sm" 
-                                            data-toggle="modal" 
-                                            data-target="#detailModal" 
-                                            data-nomor="${item.pengeluaran_barang_id}">
-                                            <i class="fa-solid fa-circle-info"></i>
-                                        </button>`
-                                    ]);
-                                });
-                            }
-                            else {
-                                table.row.add([
-                                    '', '', '', '', '', 'Data tidak ditemukan'
-                                ]);
-                            }
-
-                            table.draw();
-                        },
-                        error: function (xhr, status, error) {
-                            alert('Gagal mengambil data: ' + error);
-                        }
-                    });
-                }
-            },
+        // Inisialisasi ulang DataTable
+        table.DataTable({
+            columnDefs: [
+                { className: 'dt-body-center', targets: 0 },
+                { className: 'dt-head-center', targets: 0 },
+                { className: 'dt-body-center', targets: 5 },
+                { className: 'dt-head-center', targets: 5 }
+            ],
+            scrollX: false,
+            responsive: true
         });
-
-        // Inisialisasi DataTable (cek hanya sekali)
-        if (!$.fn.DataTable.isDataTable('#previewDataEksporModal')) {
-            $('#previewDataEksporModal').DataTable({
-                responsive: true,
-                autoWidth: false,
-                scrollX: false,
-                destroy: true, // Optional jika re-init
-                retrieve: true // Biarkan reuse jika sudah ada
-            });
-        }
-    });
+    }
 
     // Common function to show confirmation and then update status
     function confirmUpdate(pengeluaranBarangId, url) {
@@ -898,20 +869,20 @@ $(document).ready(function() {
     });
 
 
-    $(document).ready(function () {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                columnDefs: [
-                    { className: 'dt-body-center', targets: 0 },
-                    { className: 'dt-head-center', targets: 0 },
-                    { className: 'dt-body-center', targets: 5 },
-                    { className: 'dt-head-center', targets: 5 }
-                ],
-                scrollX: false,
-                responsive: true
-            });
-        }
-    });
+    // $(document).ready(function () {
+    //     if (!$.fn.DataTable.isDataTable('#dataTable')) {
+    //         $('#dataTable').DataTable({
+    //             columnDefs: [
+    //                 { className: 'dt-body-center', targets: 0 },
+    //                 { className: 'dt-head-center', targets: 0 },
+    //                 { className: 'dt-body-center', targets: 5 },
+    //                 { className: 'dt-head-center', targets: 5 }
+    //             ],
+    //             scrollX: false,
+    //             responsive: true
+    //         });
+    //     }
+    // });
 
 
 

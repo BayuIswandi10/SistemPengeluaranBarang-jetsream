@@ -2,60 +2,89 @@
 
 namespace App\Livewire;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\PengeluaranBarang;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 
 class ApprovalBarangKeluarLiveWire extends Component
 {
-    public function render()
+    public $startDate;
+    public $endDate;
+    public $pengeluaranBarangs;
+
+    public function mount()
     {
-        $user = Auth::user(); // Dapatkan user yang sedang login
-        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']); // Relasi
-    
-        // Jika user berasal dari departemen FIN (apapun levelnya)
+        $this->startDate = Carbon::now()->subMonthNoOverflow()->startOfMonth()->format('Y-m-d 00:00:00');
+        $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $this->pengeluaranBarangs = $this->fetchPengeluaranBarangs();
+    }
+
+   protected $listeners = ['updateDateRange' => 'updateDateRange'];
+
+    public function updateDateRange($data = null)
+    {
+        if ($data) {
+            $this->startDate = $data['startDate'];
+            $this->endDate = $data['endDate'];
+        }
+       
+        $this->pengeluaranBarangs = $this->fetchPengeluaranBarangs();
+        $this->dispatch('dataUpdated');
+    }
+
+
+    private function fetchPengeluaranBarangs()
+    {
+        $user = Auth::user();
+        $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar']);
+
+        $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
+        $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
+
         if ($user->departemen === 'Finance') {
-            $pengeluaranBarangs = (clone $query)
-                // ->where('status', 'Level 4')
+            return (clone $query)
+                ->whereBetween('created_date', [$start, $end])
                 ->where('kategori_pengeluaran', 1)
                 ->orderByRaw("FIELD(status, 'Level 4') DESC")
                 ->orderBy('status', 'asc')
                 ->get();
         } elseif ($user->level === 'Staff') {
-            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri atau yang dibuat oleh dirinya sendiri
-            $pengeluaranBarangs = (clone $query)->where(function ($q) use ($user) {
+            return (clone $query)->where(function ($q) use ($user) {
                 $q->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen); // Departemen user
-                })->orWhere('created_by', $user->nrp_karyawan); // Dibuat oleh user
-            })->get();
+                    $query->where('departemen', $user->departemen);
+                })->orWhere('created_by', $user->nrp_karyawan);
+            })
+            ->whereBetween('created_date', [$start, $end])
+            ->get();
         } elseif ($user->level === 'Ka.Sie') {
-            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri
-            $pengeluaranBarangs = (clone $query)->whereHas('user', function ($query) use ($user) {
+            return (clone $query)->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })
+            ->whereBetween('created_date', [$start, $end])
             ->orderByRaw("FIELD(status, 'Level 1') DESC")
             ->orderBy('status', 'asc')
             ->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
-            // Data yang dapat dilihat: Pengeluaran dari departemennya sendiri
-            $pengeluaranBarangs = (clone $query)->whereHas('user', function ($query) use ($user) {
+            return (clone $query)->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })
+            ->whereBetween('created_date', [$start, $end])
             ->orderByRaw("FIELD(status, 'Level 2') DESC")
             ->orderBy('status', 'asc')
             ->get();
-        }
-         elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
-            // Level 2 untuk pengajuan dari GA sendiri
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
             $level2FromGA = (clone $query)
+                ->whereBetween('created_date', [$start, $end])
                 ->where('status', 'Level 2')
                 ->whereHas('user', function ($q) {
                     $q->where('departemen', 'General Affairs');
                 })
                 ->get();
 
-            // Semua data lain, Level 3 diprioritaskan
             $others = (clone $query)
+                ->whereBetween('created_date', [$start, $end])
                 ->where(function ($q) {
                     $q->where('status', '!=', 'Level 2')
                     ->orWhereHas('user', function ($q2) {
@@ -66,19 +95,26 @@ class ApprovalBarangKeluarLiveWire extends Component
                 ->orderBy('status', 'asc')
                 ->get();
 
-            // Gabungkan koleksi
-            $pengeluaranBarangs = $level2FromGA->concat($others);
+            return $level2FromGA->concat($others);
         } elseif ($user->level === 'Super Admin') {
-            // Super Admin dapat melihat semua data
-            $pengeluaranBarangs = (clone $query)
+            return (clone $query)
+                ->whereBetween('created_date', [$start, $end])
                 ->where('status', '!=', 'Level 0')
                 ->orderBy('created_date', 'desc')
-                ->get();        
+                ->get();
         } else {
-            // Jika level tidak dikenali, tampilkan data kosong
-            $pengeluaranBarangs = collect();
-        }    
-
-        return view('livewire.form-approval', compact('pengeluaranBarangs', 'user')); 
+            return collect();
+        }
     }
+
+
+   public function render()
+    {
+        $user = Auth::user();
+        return view('livewire.form-approval', [
+            'pengeluaranBarangs' => $this->pengeluaranBarangs,
+            'user' => $user,
+        ]);
+    }
+
 }
