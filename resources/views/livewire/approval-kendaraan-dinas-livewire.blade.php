@@ -106,7 +106,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
                                                 data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -125,7 +125,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kasietransportasi" 
                                                 data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button Edit -->
@@ -760,100 +760,6 @@
         });
     });
 
-
-    // $('#editDataModal').on('show.bs.modal', function (event) {
-    //     const button = $(event.relatedTarget); 
-    //     const dataKD = button.data('id'); 
-
-
-    //     $('#nomorSurat').text('');
-    //     $('#pemesan').val('');
-    //     $('#jenisMobil').val('');
-    //     $('#tanggalPakai').val('');
-    //     $('#jamMulai').val('');
-    //     $('#jamSelesai').val('');
-    //     $('#kendaraanInfo tbody').empty();
-    //     $('#pesertaList tbody').empty();
-
-        
-    //     $.ajax({
-    //         url: "/pengajuan/edit", // Sesuaikan dengan route Laravel
-    //         type: "POST",
-    //         data: { surat_kendaraan_dinas_id: dataKD,
-    //             "_token": "{{ csrf_token() }}"  // CSRF token
-    //          },
-    //         dataType: "json",
-    //         success: function (response) {
-                
-    //             if (!response || !response.surat_kendaraan_dinas_id) {
-    //                 alert("Data tidak valid.");
-    //                 return;
-    //             }
-
-    //             const isSuperAdmin = currentUserRole === "Super Admin";
-
-    //             // Atur akses field
-    //             $("#jenisMobil").prop("readonly", !isSuperAdmin);
-    //             $("#tanggalPakai").prop("readonly", !isSuperAdmin);
-    //             $("#tujuan_1, #tujuan_2, #tujuan_3").prop("readonly", !isSuperAdmin);
-
-    //             // Simpan daftar kendaraan ke global
-    //             window.daftarKendaraanGlobal = response.daftar_kendaraan || [];
-
-    //             // Isi field form utama
-    //             $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
-    //             $("#pemesan").val(response.userDinas?.[0]?.nrp_karyawan || '');
-    //             $("#jenisMobil").val(response.jenis_kendaraan || '');
-    //             $("#tanggalPakai").val(response.tanggal_penggunaan || '');
-    //             $("#jamMulai").val(response.waktu_keluar || '');
-    //             $("#jamSelesai").val(response.waktu_kembali || '');
-    //             $("#tujuan_1").val(response.tujuan_penggunaan_1 || '');
-    //             $("#tujuan_2").val(response.tujuan_penggunaan_2 || '');
-    //             $("#tujuan_3").val(response.tujuan_penggunaan_3 || '');
-
-    //             // Render Kendaraan
-    //             renderDaftarKendaraan(response.data_kendaraan || []);
-
-    //             // Render Peserta
-    //             renderDaftarPeserta(response.userDinas || []);
-    //         },
-    //         error: function () {
-    //             alert("Gagal mengambil data. Coba lagi.");
-    //         },
-    //     });
-    // });
-
-    // function renderDaftarKendaraan(dataKendaraan) {
-    //     const tbody = $("#kendaraanInfo tbody");
-    //     tbody.empty();
-
-    //     dataKendaraan.forEach((item, index) => {
-    //         const opsiKendaraan = window.daftarKendaraanGlobal.map(k => `
-    //             <option value="${k.id_kendaraan}"
-    //                 data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}"
-    //                 ${k.id_kendaraan === item.id_kendaraan ? 'selected' : ''}>
-    //                 ${k.nomor_kendaraan}
-    //             </option>`).join('');
-
-    //         tbody.append(`
-    //             <tr>
-    //                 <td>${index + 1}</td>
-    //                 <td>
-    //                     <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-    //                         ${opsiKendaraan}
-    //                     </select>
-    //                 </td>
-    //                 <td class="keterangan-kendaraan">${item.keterangan}</td>
-    //                 <td>
-    //                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-    //                         <i class="fas fa-trash"></i>
-    //                     </button>
-    //                 </td>
-    //             </tr>
-    //         `);
-    //     });
-    // }
-
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget); 
         const dataKD = button.data('id'); 
@@ -950,41 +856,6 @@
         });
     }
 
-
-    // function tambahComboBoxEdit() {
-    //     const tbody = $("#kendaraanInfo tbody");
-    //     const index = tbody.children().length + 1;
-
-    //     const kendaraanOptions = window.daftarKendaraanGlobal.map(k => `
-    //         <option value="${k.id_kendaraan}" data-ket="${k.merk_kendaraan} - ${k.jenis_kendaraan}">
-    //             ${k.nomor_kendaraan}
-    //         </option>
-    //     `).join('');
-
-    //     tbody.append(`
-    //         <tr>
-    //             <td>${index}</td>
-    //             <td>
-    //                 <select name="nomor_kendaraan[]" class="form-control" onchange="updateKeterangan(this)">
-    //                     ${kendaraanOptions}
-    //                 </select>
-    //             </td>
-    //             <td class="keterangan-kendaraan"></td>
-    //             <td>
-    //                 <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxEdit(this)">
-    //                     <i class="fas fa-trash"></i>
-    //                 </button>                
-    //             </td>
-    //         </tr>
-    //     `);
-    // }
-
-
-
-    // function hapusComboBoxEdit(button) {
-    //     $(button).closest('tr').remove();
-    // }
-
     function updateKeterangan(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const keterangan = selectedOption.getAttribute("data-ket") || '';
@@ -1012,12 +883,6 @@ $(document).ready(function() {
         var dataKDId = $(this).data('id');
         confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
     });
-
-    // $(document).on('click', '.reject-status', function() {
-    //     var dataKDId = $(this).data('id');
-    //     confirmUpdate(dataKDId, '/pengajuanDinas/reject-status');
-    // });
-
 
     // Common function to show confirmation and then update status
     function confirmUpdate(dataKDId, url) {
@@ -1063,7 +928,8 @@ $(document).ready(function() {
                             title: 'Berhasil!',
                             text: 'Surat Dinas dengan No: ' + dataKDId + ' telah disetujui.',
                             icon: 'success',
-                            confirmButtonText: 'OK'
+                            showConfirmButton: false,
+                            timer: 2000,
                         }).then(() => {
                             location.reload(); // Reload the table after successful update
                         });
@@ -1260,7 +1126,8 @@ $(document).ready(function() {
                                     title: 'Penolakan Berhasil!',
                                     text: data.message,
                                     icon: 'success',
-                                    confirmButtonText: 'OK'
+                                    showConfirmButton: false,
+                                    timer: 2000
                                 }).then(() => {
                                     location.reload(); // Reload halaman untuk merefleksikan perubahan
                                 });

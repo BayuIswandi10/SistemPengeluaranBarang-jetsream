@@ -113,7 +113,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kasie" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -131,7 +131,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -155,7 +155,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -178,7 +178,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -197,7 +197,7 @@
                                                 type="button" 
                                                 class="btn btn-success btn-sm mr-2 update-status-finance" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check-circle"></i>
                                             </button>
 
                                             <!-- Button reject -->
@@ -627,7 +627,8 @@ $(document).ready(function() {
                             title: 'Berhasil!',
                             text: 'Pengeluaran barang dengan no: ' + pengeluaranBarangId + ' telah disetujui.',
                             icon: 'success',
-                            confirmButtonText: 'OK'
+                            showConfirmButton: false,
+                            timer: 2000
                         }).then(() => {
                             location.reload(); // Reload the table after successful update
                         });
@@ -806,7 +807,8 @@ $(document).ready(function() {
                                     title: 'Berhasil!',
                                     text: data.message,
                                     icon: 'success',
-                                    confirmButtonText: 'OK'
+                                    showConfirmButton: false,
+                                    timer: 2000
                                 }).then(() => {
                                     location.reload(); // Reload halaman untuk merefleksikan perubahan
                                 });

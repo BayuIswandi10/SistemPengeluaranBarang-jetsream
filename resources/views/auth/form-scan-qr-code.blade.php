@@ -63,7 +63,7 @@
             <div class="card-body">
                 <video id="preview"></video>
                 <div class="input-group mt-3">
-                    <input type="text" id="scanResult" class="form-control" placeholder="Scan QR atau ketik nomor pengeluaran">
+                    <input type="text" id="scanResult" class="form-control" placeholder="Scan QR atau ketik nomor pengeluaran" autocomplete="off">
                     <div class="input-group-append">
                         <button id="btnCari" class="btn btn-primary" style="background-color: #4B687E; border-radius:8px;">Cari</button>
                     </div>
@@ -351,6 +351,7 @@
                             "Level 6": "Security"
                         };
                         const approvMapping = {
+                            "Level 0": "Menolak",
                             "Level 1": "Mengeluarkan",
                             "Level 2": "Membawa",
                             "Level 3": "Menyetujui",
@@ -395,7 +396,7 @@
                         console.error("Error fetching data:", error);
                         Swal.fire({
                           title: 'Error!',
-                          text: 'Gagal mengambil data pengeluaran.',
+                          text: 'Gagal mengambil data pengeluaran barang.',
                           icon: 'error',
                           confirmButtonText: 'OK'
                       });
@@ -575,7 +576,12 @@
                     },
                     error: function (xhr, status, error) {
                         console.error("Error fetching data:", error);
-                        alert("Terjadi kesalahan saat mengambil data.");
+                        Swal.fire({
+                          title: 'Error!',
+                          text: 'Gagal mengambil data surat dinas.',
+                          icon: 'error',
+                          confirmButtonText: 'OK'
+                      });
                     }
                 });
         }

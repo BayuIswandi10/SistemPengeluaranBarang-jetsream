@@ -22,7 +22,7 @@
             <div class="card-body">
               <div class="container">
                 <video id="preview" style="width: 100%; max-height: 250px; border-radius: 8px;"></video>
-                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Masukkan atau scan barcode" autofocus>
+                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Masukkan atau scan barcode" autofocus autocomplete="off">
                 <button type="button" class="btn btn-success mt-2" id="searchButton">Cari</button>
               </div>
             </div>
@@ -692,7 +692,12 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching data:", error);
-                    alert("Terjadi kesalahan saat mengambil data.");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Gagal mengambil data surat dinas.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
     }
