@@ -193,7 +193,7 @@ class ApprovalKendaraanDinasController extends Controller
              // Kirim email ke penerima
              $statusText = $this->getStatusText('Level 0');
              $userDepartment = $this->getDepartmentName($levelKaryawan);
-             $this->sendApprovalEmail($emailReceiver, $suratDinasId, $user->name, $statusText, $userDepartment);
+             $this->sendApprovalEmail($emailReceiver, $suratDinasId, $user->name, $statusText, $userDepartment, $alasan);
 
             DB::commit();
     
@@ -275,9 +275,9 @@ class ApprovalKendaraanDinasController extends Controller
         }
     }
 
-    private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment)
+    private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment, $reason = null)
     {
-        Mail::to($userEmail)->send(new ApprovalDinasNotification($suratDinasId, $approvedBy, $status, $fromDepartment));
+        Mail::to($userEmail)->send(new ApprovalDinasNotification($suratDinasId, $approvedBy, $status, $fromDepartment, $reason));
     }
 
     private function getStatusText($level)

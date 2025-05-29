@@ -9,13 +9,15 @@ class ApprovalDinasNotification extends Mailable
     public $approvedBy;
     public $status;
     public $fromDepartment;
+    public $reason;
 
-    public function __construct($suratDinasId, $approvedBy, $status, $fromDepartment)
+    public function __construct($suratDinasId, $approvedBy, $status, $fromDepartment, $reason=null)
     {
         $this->suratDinasId = $suratDinasId;
         $this->approvedBy = $approvedBy;
         $this->status = $status;
         $this->fromDepartment = $fromDepartment;
+        $this->reason = $reason;
     }
 
     public function build()
@@ -26,7 +28,8 @@ class ApprovalDinasNotification extends Mailable
                 'suratDinasId' => $this->suratDinasId,
                 'approvedBy' => $this->approvedBy,
                 'status' => $this->status,
-                'fromDepartment'=> $this->fromDepartment
+                'fromDepartment'=> $this->fromDepartment,
+                'reason' => $this->reason
             ]);
     }
 }

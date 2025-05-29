@@ -14,16 +14,22 @@
             </td>
         </tr>
         <tr>
-            <td style="padding: 20px; color: #333333;">
-                <p><strong>Dari:</strong> {{ $approvedBy }}, {{ $fromDepartment }}</p>
-                <p><strong>Nomor Surat Dinas:</strong> {{ $suratDinasId }}</p>
-                <p><strong>Status:</strong> {{ $status }}</p>
-                <p>Silakan cek sistem untuk informasi lebih lanjut.</p>
-                <p>Scan QR Code di bawah untuk melihat detail:</p>
-                <p style="text-align: center;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($suratDinasId) }}" alt="QR Code">
-                </p>
-            </td>
+           <td style="padding: 20px; color: #333333;">
+            <p><strong>Dari:</strong> {{ $approvedBy }}, {{ $fromDepartment }}</p>
+            <p><strong>Nomor Surat Dinas:</strong> {{ $suratDinasId }}</p>
+            <p><strong>Status:</strong> {{ $status }}</p>
+
+            @if (!empty($reason))
+                <p><strong>Alasan:</strong> {{ $reason }}</p>
+            @endif
+
+            <p>Silakan cek sistem untuk informasi lebih lanjut.</p>
+            <p>Scan QR Code di bawah untuk melihat detail:</p>
+            <p style="text-align: center;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($suratDinasId) }}" alt="QR Code">
+            </p>
+        </td>
+
         </tr>
         <tr>
             <td style="padding: 20px; text-align: center; color: #777777;">
