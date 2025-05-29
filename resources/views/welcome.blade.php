@@ -20,6 +20,17 @@
     </style>
     
     <style>
+        .nav-link {
+            cursor: pointer;
+        }
+        .fc-daygrid-day {
+            transition: background-color 0.2s ease;
+        }
+
+        .fc-daygrid-day:hover {
+            background-color: #f0f8ff; /* Warna biru muda lembut */
+            border-radius: 4px;
+        }
         
         /* Hero Section Styling */
         .hero-section {
@@ -217,6 +228,8 @@
         }
     </style>
 
+    
+
     <body>
         @if (session('success'))
             <script>
@@ -253,6 +266,8 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('kamera') }}" id="openScanner" class="text-decoration-none text-dark">Scan Pengajuan</a></li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="modal" data-target="#tambahDataModal">Pengajuan Pengeluaran Barang</a></li>
                         <li class="nav-item">
@@ -776,27 +791,27 @@
 
         <section class="section position-relative pull-top">
             <div class="container">
-                <div class="card shadow">
+                <div class="card shadow" >
                     <div class="card-header text-center"  style="border-top: 5px solid #5A6ACF;">
                         <h4>Pengajuan yang Siap untuk Dicetak</h4>
                     </div>
                     <div class="card-body p-5 bg-white">
                         <div class="row">
                             <!-- Card 1: Pengeluaran Barang -->
-                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalPengajuanTrigger">
+                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalPengajuanTrigger" style="cursor: pointer;">
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
-                                        <i class="fas fa-box-open text-primary h1"></i>
-                                        <h3 class="mt-4 text-capitalize h5">Pengeluaran Barang</h3>
+                                        <i class="fas fa-box-open text-primary h1" style="cursor: pointer;"></i>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Pengeluaran Barang</h3>
                                     </div>
                                 </div>
                             </div>
                             <!-- Card 2: Penggunaan Kendaraan Dinas -->
-                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalSuratKendaraanTrigger">
+                            <div class="col-lg-6 col-md-6 mt-5 mt-md-0 text-center" id="modalSuratKendaraanTrigger" style="cursor: pointer;">
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
-                                        <i class="fas fa-car-side text-primary h1"></i>
-                                        <h3 class="mt-4 text-capitalize h5">Penggunaan Kendaraan Dinas</h3>
+                                        <i class="fas fa-car-side text-primary h1" style="cursor: pointer;"></i>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Penggunaan Kendaraan Dinas</h3>
                                     </div>
                                 </div>
                             </div>
@@ -1605,7 +1620,7 @@
 
                         return {
                             id: item.kendaraan_dinas_id,
-                            title: badgeText + item.merk_kendaraan + ' - ' + item.nomor_kendaraan,
+                            title: `<strong>${item.nomor_kendaraan}</strong><br>${item.merk_kendaraan} (Sisa: ${item.kapasitas_tersedia || 0})`,
                             start: item.tanggal_penggunaan,
                             allDay: true,
                             backgroundColor: color,
@@ -1641,19 +1656,11 @@
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
                         const bgColor = info.event.backgroundColor;
 
-                        $(info.el).attr({
-                            'data-toggle': 'tooltip',
-                            'data-placement': 'top',
-                            'title': 'Kapasitas tersedia: ' + kapasitas
-                        });
-
-                        $(info.el).tooltip('dispose');
-                        $(info.el).tooltip({
-                            template: `<div class="tooltip bs-tooltip-top" role="tooltip">
-                                        <div class="arrow"></div>
-                                        <div class="tooltip-inner" style="background-color: ${bgColor}; color: white;"></div>
-                                    </div>`
-                        });
+                        // Tambahkan cursor pointer
+                        $(info.el).css('cursor', 'pointer');
+                    },
+                    eventContent: function(arg) {
+                        return { html: `<div class="fc-custom-event">${arg.event.title}</div>` };
                     },
                     eventClick: function(info) {
                         if (globalCalendar.isProcessing) return;

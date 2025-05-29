@@ -71,7 +71,7 @@
             </div>
             
             <div class="card-footer d-flex justify-content-center">
-                <a href="{{ route('login') }}">
+               <a href="{{ url('/') }}">
                     <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
                         {{ __('Kembali') }}
                     </x-button>

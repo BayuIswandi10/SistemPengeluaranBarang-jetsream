@@ -87,16 +87,6 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- Tombol Scan QR -->
-                <div class="d-flex justify-content-center align-items-center mt-3">
-                    <div class="card text-center p-3 shadow-lg" style="width: 80px; border-radius: 10px;">
-                        <a href="{{ route('kamera') }}" id="openScanner" class="text-decoration-none text-dark">
-                            <i class="fa-solid fa-qrcode fa-2x"></i>
-                            <h6 class="mt-2">Scan</h6>
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
 
