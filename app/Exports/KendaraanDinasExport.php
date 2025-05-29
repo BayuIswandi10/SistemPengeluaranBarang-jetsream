@@ -95,10 +95,10 @@ class KendaraanDinasExport implements FromArray, WithHeadings, ShouldAutoSize
     {
         return match (strtoupper($status)) {
             'LEVEL 0' => 'Ditolak',
-            'LEVEL 1' => 'Mengajukan',
-            'LEVEL 2' => 'Ka.Dept Ybs Menyetujui',
-            'LEVEL 3' => 'PIC/Ka.Sie General Service Menyetujui',
-            'LEVEL 4' => 'Security Menyetujui',
+            'LEVEL 1' => 'Proses',
+            'LEVEL 2' => 'Proses',
+            'LEVEL 3' => 'Proses',
+            'LEVEL 4' => 'Lengkap',
             default => ucfirst($status),
         };
     }

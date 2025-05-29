@@ -2109,7 +2109,7 @@
                         today.setHours(0, 0, 0, 0);
                         clickedDate.setHours(0, 0, 0, 0);
 
-                        if (clickedDate <= today) {
+                        if (clickedDate < today) {
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Tanggal Tidak Valid',
@@ -2119,9 +2119,22 @@
                             return;
                         }
 
+                        // Atur value tanggal
                         $('#tanggal_penggunaan').val(info.dateStr);
                         lastFetchedDate = null;
+
+                        // Tampilkan modal
                         $('#tambahDinasModal').modal('show');
+
+                        // Filter opsi kendaraan jika tanggal == hari ini
+                        const kantorOption = document.querySelector('#jenis_kendaraan option[value="1"]');
+                        if (clickedDate.getTime() === today.getTime()) {
+                            if (kantorOption) kantorOption.style.display = 'none';
+                        } else {
+                            if (kantorOption) kantorOption.style.display = 'block';
+                        }
+
+                        // Jalankan toggle jika diperlukan
                         if (document.getElementById("jenis_kendaraan").value) {
                             toggleJenisKendaraan();
                         }
