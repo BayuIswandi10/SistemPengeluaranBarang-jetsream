@@ -613,7 +613,7 @@ class ApprovalBarangKeluarController extends Controller
             // Kirim email ke penerima
             $statusText = $this->getStatusText('Level 0');
             $userDepartment = $this->getDepartmentName($levelKaryawan);
-            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
+            $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment, $alasan);
     
             DB::commit();
     
@@ -630,10 +630,17 @@ class ApprovalBarangKeluarController extends Controller
         }
     }
 
-    private function sendApprovalEmail($userEmail, $pengeluaranBarangId, $approvedBy, $status, $fromDepartment)
+   private function sendApprovalEmail($userEmail, $pengeluaranBarangId, $approvedBy, $status, $fromDepartment, $reason = null)
     {
-        Mail::to($userEmail)->send(new ApprovalNotification($pengeluaranBarangId, $approvedBy, $status, $fromDepartment));
+        Mail::to($userEmail)->send(new ApprovalNotification(
+            $pengeluaranBarangId,
+            $approvedBy,
+            $status,
+            $fromDepartment,
+            $reason 
+        ));
     }
+
 
     private function getStatusText($level)
     {

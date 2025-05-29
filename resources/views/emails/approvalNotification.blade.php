@@ -18,6 +18,11 @@
                 <p><strong>Dari:</strong> {{ $approvedBy }}, {{ $fromDepartment }}</p>
                 <p><strong>Pengeluaran Barang ID:</strong> {{ $pengeluaranBarangId }}</p>
                 <p><strong>Status:</strong> {{ $status }}</p>
+
+                @if (!empty($reason))
+                    <p><strong>Alasan:</strong> {{ $reason }}</p>
+                @endif
+                
                 <p>Silakan cek sistem untuk informasi lebih lanjut.</p>
                 <p>Scan QR Code di bawah untuk melihat detail:</p>
                 <p style="text-align: center;">
