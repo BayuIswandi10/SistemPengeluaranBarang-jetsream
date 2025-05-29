@@ -146,6 +146,10 @@
                                         <th>No</th>
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
+                                        <th>Tanggal Penggunaan</th>
+                                        <th>Tujuan 1</th>
+                                        <th>Tujuan 2</th>
+                                        <th>Tujuan 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -607,6 +611,10 @@
                                     <td>${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
+                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_3 || '-'}</td>
                                 </tr>
                             `;
                             document.getElementById('kendaraanInfoBody').innerHTML += row;

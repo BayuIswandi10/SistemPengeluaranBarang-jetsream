@@ -388,6 +388,12 @@ class SuratDinasController extends Controller
     public function getDetailSurat(Request $request)
     {
         $suratDinasId = $request->surat_kendaraan_dinas_id;
+
+        $jenisKendaraanMapping = [
+            1 => 'KANTOR',
+            2 => 'PRIBADI', 
+            3 => 'TAXI'
+        ];
     
         // Mengambil data surat dinas beserta pencatatan kendaraan dinas
         $suratDinas = SuratKendaraanDinas::with([
@@ -421,12 +427,17 @@ class SuratDinasController extends Controller
             ];
         });
 
-        // Ambil data kendaraan dinas
-        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+        // Ambil data kendaraan dinas dengan informasi tambahan
+        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) use ($suratDinas, $jenisKendaraanMapping) {
+            $jenisKendaraanText = $jenisKendaraanMapping[$detail->kendaraan->jenis_kendaraan] ?? 'Tidak Diketahui';
             return [
                 'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
                 'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
-                'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+                'keterangan' => ($detail->kendaraan->merk_kendaraan ?? 'Tidak Diketahui') . ' - ' . $jenisKendaraanText,
+                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan ?? '-',
+                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1 ?? '-',
+                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
+                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
             ];
         });
     
@@ -441,6 +452,12 @@ class SuratDinasController extends Controller
     public function getDetailSuratNonAuth(Request $request)
     {
         $suratDinasId = $request->surat_kendaraan_dinas_id;
+
+        $jenisKendaraanMapping = [
+            1 => 'KANTOR',
+            2 => 'PRIBADI', 
+            3 => 'TAXI'
+        ];
     
         // Mengambil data surat dinas beserta pencatatan kendaraan dinas
         $suratDinas = SuratKendaraanDinas::with([
@@ -474,12 +491,17 @@ class SuratDinasController extends Controller
             ];
         });
 
-        // Ambil data kendaraan dinas
-        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) {
+        // Ambil data kendaraan dinas dengan informasi tambahan
+        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) use ($suratDinas, $jenisKendaraanMapping) {
+            $jenisKendaraanText = $jenisKendaraanMapping[$detail->kendaraan->jenis_kendaraan] ?? 'Tidak Diketahui';
             return [
                 'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
                 'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
-                'keterangan' => $detail->kendaraan->merk_kendaraan . ' - ' . $detail->kendaraan->jenis_kendaraan ?? 'Tidak Diketahui',
+                'keterangan' => ($detail->kendaraan->merk_kendaraan ?? 'Tidak Diketahui') . ' - ' . $jenisKendaraanText,
+                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan ?? '-',
+                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1 ?? '-',
+                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
+                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
             ];
         });
     

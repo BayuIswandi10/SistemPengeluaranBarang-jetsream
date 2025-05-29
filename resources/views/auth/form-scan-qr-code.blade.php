@@ -195,6 +195,10 @@
                                         <th>No</th>
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
+                                        <th>Tanggal Penggunaan</th>
+                                        <th>Tujuan 1</th>
+                                        <th>Tujuan 2</th>
+                                        <th>Tujuan 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -254,6 +258,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="printSuratDinas()">Print Surat Dinas</button>
+                </div>    
             </div>
         </div>
     </div>
@@ -492,6 +500,10 @@
                                         <td>${index + 1}</td>
                                         <td>${item.nomor_kendaraan}</td>
                                         <td>${item.keterangan}</td>
+                                        <td>${item.tanggal_penggunaan || '-'}</td>
+                                        <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                        <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                        <td>${item.tujuan_penggunaan_3 || '-'}</td>
                                     </tr>
                                 `;
                                 document.getElementById('kendaraanInfoBody').innerHTML += row;
@@ -589,6 +601,371 @@
                       });
                     }
                 });
+        }
+
+        function printSuratDinas() {
+            // Ambil data dari modal
+            const nomorSurat = document.getElementById('nomorSuratCard').innerText;
+            const statusBadge = document.getElementById('approvalStatusBadgeDinas').innerHTML;
+            
+            // Ambil data kendaraan
+            let kendaraanRows = '';
+            const kendaraanTable = document.getElementById('kendaraanInfoBody');
+            if (kendaraanTable) {
+                const rows = kendaraanTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > 0) {
+                        kendaraanRows += `
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[3].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[4].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[5].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[6].innerText}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+            
+            // Ambil data peserta dari DataTable
+            let pesertaRows = '';
+            
+            // Cek apakah DataTable sudah diinisialisasi
+            if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                const dataTable = $('#detaildataTableModal').DataTable();
+                const data = dataTable.rows({ page: 'all' }).data();
+                
+                // Loop melalui semua data di DataTable
+                for (let i = 0; i < data.length; i++) {
+                    const rowData = data[i];
+                    if (rowData && rowData.length >= 4) {
+                        pesertaRows += `
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${rowData[0] || '-'}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${rowData[1] || '-'}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${rowData[2] || '-'}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${rowData[3] || '-'}</td>
+                            </tr>
+                        `;
+                    }
+                }
+            } else {
+                // Fallback ke cara lama jika DataTable belum diinisialisasi
+                const pesertaTable = document.getElementById('detailBody');
+                if (pesertaTable) {
+                    const rows = pesertaTable.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 4 && cells[0].innerText.trim() !== '') {
+                            pesertaRows += `
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
+                                    <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[1].innerText}</td>
+                                    <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
+                                    <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                }
+            }
+            
+            // Ambil data historis persetujuan
+            let historyRows = '';
+            const historyTable = document.getElementById('addhistory');
+            if (historyTable) {
+                const rows = historyTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > 0) {
+                        historyRows += `
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[4].innerText}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+            
+            // Buat window baru untuk print
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            // HTML content untuk print dengan format formal
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Detail Surat Dinas - ${nomorSurat}</title>
+                    <style>
+                        @page {
+                            margin: 20mm;
+                            size: A4;
+                        }
+                        
+                        body {
+                            font-family: 'Times New Roman', serif;
+                            font-size: 12px;
+                            line-height: 1.4;
+                            color: #000;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        
+                        .header {
+                            text-align: center;
+                            border-bottom: 3px solid #000;
+                            padding-bottom: 15px;
+                            margin-bottom: 20px;
+                        }
+                        
+                        .company-name {
+                            font-size: 20px;
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                            text-transform: uppercase;
+                        }
+                        
+                        .document-title {
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin-top: 15px;
+                            text-decoration: underline;
+                        }
+                        
+                        .document-info {
+                            margin: 20px 0;
+                            font-size: 13px;
+                        }
+                        
+                        .status-info {
+                            float: right;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 15px 0;
+                            font-size: 11px;
+                        }
+                        
+                        .section-title {
+                            font-size: 14px;
+                            font-weight: bold;
+                            margin: 25px 0 10px 0;
+                            padding: 8px;
+                            background: #f0f0f0;
+                            border: 1px solid #000;
+                            text-align: center;
+                            text-transform: uppercase;
+                        }
+                        
+                        th {
+                            background: #f8f8f8;
+                            border: 1px solid #000;
+                            padding: 10px 8px;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 11px;
+                        }
+                        
+                        td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            vertical-align: top;
+                        }
+                        
+                        .text-center {
+                            text-align: center;
+                        }
+                        
+                        .signature-section {
+                            margin-top: 40px;
+                            display: flex;
+                            justify-content: space-between;
+                        }
+                        
+                        .signature-box {
+                            width: 200px;
+                            text-align: center;
+                        }
+                        
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 60px;
+                            padding-top: 5px;
+                        }
+                        
+                        .print-date {
+                            font-size: 10px;
+                            text-align: right;
+                            margin-top: 20px;
+                            font-style: italic;
+                        }
+                        
+                        @media print {
+                            body { 
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            
+                            .page-break {
+                                page-break-before: always;
+                            }
+                            
+                            table {
+                                page-break-inside: avoid;
+                            }
+                            
+                            tr {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="company-name">PT. YUTAKA MANUFACTURING INDONESIA</div>
+                        <div style="font-size: 12px;">MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520 | Telepon: +62 21 8980769 | Fax: +62 21 8980770</div>
+                        <div class="document-title">SURAT DINAS</div>
+                    </div>
+                    
+                    <div class="document-info">
+                        <div style="float: left;">
+                            <strong>Nomor Surat:</strong> ${nomorSurat}
+                        </div>
+                        <div class="status-info">
+                            ${statusBadge.replace(/badge-success|badge-danger|px-2|py-3/g, '').replace(/class="badge /g, 'style="padding: 5px 10px; border: 1px solid #000; ')}
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                    
+                    <div class="section-title">I. INFORMASI KENDARAAN</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 15%;">No Kendaraan</th>
+                                <th style="width: 20%;">Keterangan</th>
+                                <th style="width: 15%;">Tanggal Penggunaan</th>
+                                <th style="width: 15%;">Tujuan 1</th>
+                                <th style="width: 15%;">Tujuan 2</th>
+                                <th style="width: 15%;">Tujuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${kendaraanRows || '<tr><td colspan="7" style="text-align: center; font-style: italic;">Tidak ada data kendaraan</td></tr>'}
+                        </tbody>
+                    </table>
+                    
+                    <div class="section-title">II. INFORMASI PESERTA</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">No</th>
+                                <th style="width: 20%;">NRP Peserta</th>
+                                <th style="width: 36%;">Nama Peserta</th>
+                                <th style="width: 36%;">Departemen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pesertaRows || '<tr><td colspan="4" style="text-align: center; font-style: italic;">Tidak ada data peserta</td></tr>'}
+                        </tbody>
+                    </table>
+                    
+                    <div class="section-title">III. HISTORIS PERSETUJUAN</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">No</th>
+                                <th style="width: 25%;">Nama</th>
+                                <th style="width: 20%;">Tingkatan</th>
+                                <th style="width: 25%;">Departemen</th>
+                                <th style="width: 22%;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${historyRows || '<tr><td colspan="5" style="text-align: center; font-style: italic;">Tidak ada data historis</td></tr>'}
+                        </tbody>
+                    </table>
+                    
+                    <div class="signature-section" style="margin-top: 40px;">
+                        <div class="signature-box">
+                            <div>Dibuat Oleh:</div>
+                            <div class="signature-line">
+                                <div>(...........................)</div>
+                                <div style="font-size: 10px;">Nama & Tanggal</div>
+                            </div>
+                        </div>
+                        
+                        <div class="signature-box">
+                            <div>Disetujui Oleh:</div>
+                            <div class="signature-line">
+                                <div>(...........................)</div>
+                                <div style="font-size: 10px;">Nama & Tanggal</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-date">
+                        Dicetak pada: ${new Date().toLocaleDateString('id-ID', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Tulis content ke window baru
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Tunggu sebentar untuk memastikan content dimuat, lalu print
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+
+        // Fungsi untuk menambahkan tombol print ke modal (opsional)
+        function addPrintButtonToModal() {
+            const modalFooter = document.querySelector('#suratDinasModal .modal-footer');
+            if (!modalFooter) {
+                // Jika tidak ada footer, buat footer baru
+                const modalContent = document.querySelector('#suratDinasModal .modal-content');
+                const footer = document.createElement('div');
+                footer.className = 'modal-footer';
+                footer.innerHTML = `
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="printSuratDinas()">
+                        <i class="fas fa-print"></i> Cetak
+                    </button>
+                `;
+                modalContent.appendChild(footer);
+            } else {
+                // Jika sudah ada footer, tambahkan tombol print
+                const printBtn = document.createElement('button');
+                printBtn.type = 'button';
+                printBtn.className = 'btn btn-primary';
+                printBtn.onclick = printSuratDinas;
+                printBtn.innerHTML = '<i class="fas fa-print"></i> Cetak';
+                modalFooter.appendChild(printBtn);
+            }
         }
     </script>
 </body>
