@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('status', 35);
             $table->string('updated_by', 35)->nullable();
             $table->timestamp('updated_date')->useCurrent()->nullable();
-            $table->string('alasan_penolakan', 255)->nullable();
+            $table->string('alasan_penolakan', 500)->nullable();
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')
