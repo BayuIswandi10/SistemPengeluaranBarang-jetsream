@@ -431,6 +431,8 @@
                 { className: 'dt-body-center', targets: 5 },
                 { className: 'dt-head-center', targets: 5 }
             ],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            pageLength: 10,
             scrollX: false,
             responsive: true,
             initComplete: function() {
@@ -549,6 +551,8 @@ $(document).ready(function() {
                 { className: 'dt-body-center', targets: 5 },
                 { className: 'dt-head-center', targets: 5 }
             ],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            pageLength: 10,
             scrollX: false,
             responsive: true
         });
@@ -905,22 +909,6 @@ $(document).ready(function() {
             }
         });
     });
-
-
-    // $(document).ready(function () {
-    //     if (!$.fn.DataTable.isDataTable('#dataTable')) {
-    //         $('#dataTable').DataTable({
-    //             columnDefs: [
-    //                 { className: 'dt-body-center', targets: 0 },
-    //                 { className: 'dt-head-center', targets: 0 },
-    //                 { className: 'dt-body-center', targets: 5 },
-    //                 { className: 'dt-head-center', targets: 5 }
-    //             ],
-    //             scrollX: false,
-    //             responsive: true
-    //         });
-    //     }
-    // });
 
 
 

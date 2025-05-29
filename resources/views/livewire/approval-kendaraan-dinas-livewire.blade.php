@@ -12,6 +12,56 @@
         .modal-body {
             overflow-x: auto;
         }
+        
+        .tujuan-container-minimal {
+            /* border-left: 4px solid #007bff; */
+            /* background: #f8f9fa; */
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .tujuan-container-minimal:hover {
+            background: #e9ecef;
+            border-left-color: #0056b3;
+        }
+
+        .tujuan-list-minimal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .tujuan-item-minimal {
+            background: #007bff;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .tujuan-item-minimal:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .tujuan-number-minimal {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
     </style>
     <div class="container-fluid">
 
@@ -73,13 +123,40 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
-                                <td>
+                                {{-- <td>
                                     {{ $dataKD->tujuan_penggunaan_1 ?? '-' }} > {{ $dataKD->tujuan_penggunaan_2 ?? '-' }}
                                     > {{ $dataKD->tujuan_penggunaan_3 ?? '-' }}
+                                </td> --}}
+                                <td>
+                                    @php
+                                        $tujuanList = array_filter([
+                                            $dataKD->tujuan_penggunaan_1,
+                                            $dataKD->tujuan_penggunaan_2,
+                                            $dataKD->tujuan_penggunaan_3
+                                        ]);
+                                    @endphp
+                                    
+                                    @if(count($tujuanList) > 0)
+                                        <div class="tujuan-container-minimal">
+                                            <div class="tujuan-list-minimal">
+                                                @foreach($tujuanList as $index => $tujuan)
+                                                    <span class="tujuan-item-minimal">
+                                                        <span class="tujuan-number-minimal">{{ $index + 1 }}</span>
+                                                        {{ $tujuan }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="no-tujuan">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>Tidak ada tujuan</span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     @if ($dataKD->jenis_kendaraan == 1)
-                                        Mobil Dinas
+                                        Mobil kantor
                                     @elseif ($dataKD->jenis_kendaraan == 2)
                                         Mobil Pribadi
                                     @elseif ($dataKD->jenis_kendaraan == 3)
@@ -213,6 +290,10 @@
                                         <th>No</th>
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
+                                        <th>Tanggal Penggunaan</th>
+                                        <th>Tujuan 1</th>
+                                        <th>Tujuan 2</th>
+                                        <th>Tujuan 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -472,6 +553,8 @@
                 { className: 'dt-body-center', targets: 5 },
                 { className: 'dt-head-center', targets: 5 }
             ],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            pageLength: 10,
             scrollX: false,
             responsive: true,
             initComplete: function() {
@@ -918,6 +1001,10 @@ $(document).ready(function() {
                                     <td>${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
+                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_3 || '-'}</td>
                                 </tr>
                             `;
                             document.getElementById('kendaraanInfoBody').innerHTML += row;
