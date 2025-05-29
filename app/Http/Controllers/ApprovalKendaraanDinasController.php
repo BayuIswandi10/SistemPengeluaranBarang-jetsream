@@ -150,6 +150,7 @@ class ApprovalKendaraanDinasController extends Controller
         $user = Auth::user();
         $nrpKaryawan = $user->nrp_karyawan;
         $levelKaryawan = $user->level;
+        $alasan = $request->input('alasan');
 
         try {
             // Ambil ID pengeluaran_barang dari request
@@ -157,7 +158,8 @@ class ApprovalKendaraanDinasController extends Controller
     
             // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengajuan = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
-                ->update(['status' => 'Level 0']);
+                ->update(['status' => 'Level 0',
+                    'alasan_penolakan' => $alasan]);
     
             if (!$updatePengajuan) {
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');

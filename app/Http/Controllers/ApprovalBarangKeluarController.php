@@ -574,10 +574,13 @@ class ApprovalBarangKeluarController extends Controller
         try {
             // Ambil ID pengeluaran_barang dari request
             $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
+            $alasan = $request->input('alasan');
     
             // Update status pada tb_pencatatan_pengeluaran_barang
             $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
-                ->update(['status' => 'Level 0']);
+              ->update([
+                    'status' => 'Level 0',
+                    'alasan_penolakan' => $alasan]);
     
             if (!$updatePengeluaran) {
                 throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');

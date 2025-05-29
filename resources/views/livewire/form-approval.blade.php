@@ -319,7 +319,7 @@
         </div>
     </div>
 
-     {{-- Edit Modal --}}
+    {{-- Edit Modal --}}
     <div class="modal fade" id="editDataModal" tabindex="-1" role="dialog" aria-labelledby="editDataModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
@@ -729,30 +729,65 @@ $(document).ready(function() {
 
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Inisialisasi Selectize untuk elemen dengan class .select-tools
         $('.select-tools').selectize({
             create: true, // Memungkinkan pengguna menambahkan opsi baru
             sortField: 'text' // Mengurutkan opsi berdasarkan teks
         });
 
-        // Handle click event on update status button
+        // Handle event klik untuk tombol dengan class .reject-status
         document.querySelectorAll('.reject-status').forEach(button => {
             button.addEventListener('click', function () {
                 const pengeluaranBarangId = this.getAttribute('data-id');
 
-                // Konfirmasi menggunakan SweetAlert
+                // Tampilkan SweetAlert dengan textarea input untuk alasan penolakan
                 Swal.fire({
                     title: 'Tolak Pengajuan',
-                    text: 'Apakah Anda yakin ingin menolak pengeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
-                    icon: 'error',
+                    html: `
+                        <p>Masukkan alasan penolakan untuk pengeluaran barang dengan nomor 
+                        <strong>${pengeluaranBarangId}</strong>:</p>
+                         <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
+                            <option value="">-- Pilih alasan penolakan cepat --</option>
+                            <option value="Data tidak lengkap">Data tidak lengkap</option>
+                            <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
+                            <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
+                        </select>
+
+                        <textarea id="alasanPenolakan" class="swal2-textarea"
+                            placeholder="Tuliskan alasan penolakan di sini..."
+                            style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
+                    `,
+                    icon: 'warning',
                     showCancelButton: true,
+                    confirmButtonText: 'Kirim Penolakan',
+                    cancelButtonText: 'Batal',
                     reverseButtons: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, tolak!',
-                    cancelButtonText: 'Batal'
+                    didOpen: () => {
+                        const select = document.getElementById('alasanDropdown');
+                        const textarea = document.getElementById('alasanPenolakan');
+
+                        // Isi textarea otomatis saat opsi dipilih
+                        select.addEventListener('change', () => {
+                            textarea.value = select.value;
+                        });
+                    },
+                    preConfirm: () => {
+                        const alasanSelect = document.getElementById('alasanDropdown').value.trim();
+                        const alasanText = document.getElementById('alasanPenolakan').value.trim();
+
+                        const alasan = alasanText || alasanSelect;
+
+                        if (!alasan) {
+                            Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
+                        }
+
+                        return alasan;
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Tampilkan loading modal setelah klik "Ya, tolak!"
+                        const alasanPenolakan = result.value;
+
+                        // Tampilkan loading modal
                         Swal.fire({
                             title: 'Menolak Pengajuan...',
                             html: 'Mohon tunggu, sedang memproses penolakan.',
@@ -762,18 +797,21 @@ $(document).ready(function() {
                             }
                         });
 
+                        // Kirim request ke backend
                         fetch("{{ route('approval.rejectStatus') }}", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
                             },
-                            body: JSON.stringify({ pengeluaran_barang_id: pengeluaranBarangId })
+                            body: JSON.stringify({
+                                pengeluaran_barang_id: pengeluaranBarangId,
+                                alasan: alasanPenolakan
+                            })
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Tampilkan notifikasi berhasil
                                 Swal.fire({
                                     title: 'Berhasil!',
                                     text: data.message,
@@ -781,10 +819,9 @@ $(document).ready(function() {
                                     showConfirmButton: false,
                                     timer: 2000
                                 }).then(() => {
-                                    location.reload(); // Reload halaman untuk merefleksikan perubahan
+                                    location.reload();
                                 });
                             } else {
-                                // Tampilkan notifikasi error
                                 Swal.fire({
                                     title: 'Gagal!',
                                     text: data.message,
@@ -794,7 +831,6 @@ $(document).ready(function() {
                             }
                         })
                         .catch(error => {
-                            // Tampilkan notifikasi error jika terjadi kesalahan
                             Swal.fire({
                                 title: 'Terjadi Kesalahan!',
                                 text: 'Error: ' + error.message,
@@ -807,6 +843,8 @@ $(document).ready(function() {
             });
         });
     });
+
+
 
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget); 
