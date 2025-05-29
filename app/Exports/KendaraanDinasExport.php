@@ -44,13 +44,6 @@ class KendaraanDinasExport implements FromArray, WithHeadings, ShouldAutoSize
                 $surat->tujuan_penggunaan_3
             ])->filter()->implode(', ') ?: '-';
 
-            // Riwayat persetujuan digabung menjadi satu kolom
-            $historisPersetujuan = $surat->approval->map(function ($item) {
-                $nama = $item->user->name ?? 'Tidak Diketahui';
-                $status = $this->translateStatus($item->status_approval);
-                return "$nama ($status)";
-            })->implode(', ') ?: '-';
-
             // Ambil kendaraan pertama yang tersedia (jika ada)
             $kendaraan = $surat->suratDetail->pluck('kendaraan')->filter()->first();
             $jenisKendaraan = $this->mapJenisKendaraan($kendaraan->jenis_kendaraan ?? null);
@@ -77,7 +70,6 @@ class KendaraanDinasExport implements FromArray, WithHeadings, ShouldAutoSize
                     $pesertaText,
                     $informasiKendaraan,
                     $kapasitasKendaraan,
-                    $historisPersetujuan,
                 ];
             }
         }
@@ -96,7 +88,6 @@ class KendaraanDinasExport implements FromArray, WithHeadings, ShouldAutoSize
             'Peserta (Nama - Departemen)',
             'Informasi Kendaraan',
             'Kapasitas Kendaraan',
-            'Riwayat Persetujuan',
         ];
     }
 

@@ -9,45 +9,71 @@ use Illuminate\Support\Facades\Auth;
 
 class ApprovalKendaraanDinasLivewire extends Component
 {
-    public function render()
-    {
-        $user = Auth::user(); // Dapatkan user yang sedang login
-        $query = SuratKendaraanDinas::with(['user', 'approval', 'pencatatanKendaraanDinas']); // Relasi
-        $startDate = Carbon::now()->subMonthNoOverflow()->startOfMonth();
-        $endDate = Carbon::now()->endOfMonth(); // Akhir bulan ini
+    public $startDate;
+    public $endDate;
+    public $kendaraanDinas;
 
-       // Filter data berdasarkan level user
-       if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'General Service') {
-                // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
-                $kendaraanDinas = $query->whereHas('user', function ($query) use ($user) {
+    protected $listeners = ['updateDateRange' => 'updateDateRange'];
+
+    public function mount()
+    {
+        $this->startDate = Carbon::now()->subMonthNoOverflow()->startOfMonth()->format('Y-m-d 00:00:00');
+        $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d 23:59:59');
+        $this->kendaraanDinas = $this->fetchKendaraanDinas();
+    }
+
+    public function updateDateRange($data = null)
+    {
+        if ($data) {
+            $this->startDate = $data['startDate'];
+            $this->endDate = $data['endDate'];
+        }
+
+        $this->kendaraanDinas = $this->fetchKendaraanDinas();
+        $this->dispatch('dataUpdated');
+    }
+
+    private function fetchKendaraanDinas()
+    {
+        $user = Auth::user();
+        $query = SuratKendaraanDinas::with(['user', 'approval', 'pencatatanKendaraanDinas']);
+
+        $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
+        $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
+
+        if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'General Service') {
+            return (clone $query)->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })
-                ->whereBetween('created_date', [$startDate, $endDate])
+                ->whereBetween('created_date', [$start, $end])
                 ->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
-            // Ka.Dept biasa → hanya data dari departemen yang sama, urutkan Level 1 dulu
-            $kendaraanDinas = $query->whereHas('user', function ($query) use ($user) {
-                $query->where('departemen', $user->departemen);
-            })
-            ->whereBetween('created_date', [$startDate, $endDate])
-            ->orderByRaw("FIELD(status, 'Level 1') DESC")
-            ->orderBy('status', 'asc')
-            ->get();
-        }
-        elseif (
+            return (clone $query)->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen);
+                })
+                ->whereBetween('created_date', [$start, $end])
+                ->orderByRaw("FIELD(status, 'Level 1') DESC")
+                ->orderBy('status', 'asc')
+                ->get();
+        } elseif (
             in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
         ) {
-            // Ka.Sie dengan seksi General Service → dapat semua data
-            $kendaraanDinas = $query->orderByRaw("FIELD(status, 'Level 2') DESC")
-            ->whereBetween('created_date', [$startDate, $endDate])
-            ->get();
-
+            return (clone $query)
+                ->whereBetween('created_date', [$start, $end])
+                ->orderByRaw("FIELD(status, 'Level 2') DESC")
+                ->get();
         } else {
-            // Selain itu, kosong
-            $kendaraanDinas = collect();
+            return collect();
         }
+    }
 
-        return view('livewire.approval-kendaraan-dinas-livewire', compact('kendaraanDinas', 'user'));
+    public function render()
+    {
+        $user = Auth::user();
+        return view('livewire.approval-kendaraan-dinas-livewire', [
+            'kendaraanDinas' => $this->kendaraanDinas,
+            'user' => $user,
+        ]);
     }
 }
