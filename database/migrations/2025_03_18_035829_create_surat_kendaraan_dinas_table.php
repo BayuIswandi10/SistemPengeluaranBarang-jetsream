@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('expired_status', 15);
             $table->string('kilometer_awal', 35)->nullable();
             $table->string('kilometer_akhir', 35)->nullable();
+            $table->string('alasan_penolakan', 255)->nullable();
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')

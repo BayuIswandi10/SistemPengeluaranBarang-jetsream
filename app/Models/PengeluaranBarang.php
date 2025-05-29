@@ -27,7 +27,8 @@ class PengeluaranBarang extends Model
         'no_polisi',
         'status',
         'updated_by',
-        'updated_date'
+        'updated_date',
+        'alasan_penolakan',
     ];
 
     public function user()
