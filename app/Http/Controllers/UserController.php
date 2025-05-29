@@ -8,7 +8,7 @@ class UserController extends Controller
 {
     public function getAllUser()
     {
-        $users = User::select('nrp_karyawan', 'name')->get();
+        $users = User::select('nrp_karyawan', 'name', 'departemen')->get();
         return response()->json($users);
     }
 

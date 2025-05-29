@@ -564,7 +564,8 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td>
+                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td> --}}
+                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
 
@@ -717,7 +718,8 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td> --}}
+                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                                                 <td>
@@ -972,70 +974,722 @@
     </body>
     <script>
         // KODE REVISI TAPI BARU CREATE PENGAJUAN DAN IKUT SERTA
-        $(document).ready(function () {
-            // Cache for user data to avoid repeated AJAX calls
-            let userCache = null;
+        // $(document).ready(function () {
+        //     // Cache for user data to avoid repeated AJAX calls
+        //     let userCache = null;
 
-            function loadUsers() {
-                // If data is cached, use it
-                if (userCache) {
-                    populateDropdowns(userCache);
-                    return;
-                }
+        //     function loadUsers() {
+        //         // If data is cached, use it
+        //         if (userCache) {
+        //             populateDropdowns(userCache);
+        //             return;
+        //         }
 
-                $.ajax({
-                    url: '/user/getAllUser',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        // Sort data by name (if not pre-sorted by server)
-                        data.sort((a, b) => a.name.localeCompare(b.name));
-                        userCache = data; // Cache the data
-                        populateDropdowns(data);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Gagal memuat data karyawan:', error);
-                        // Provide user feedback
-                        const errorOption = '<option value="" disabled selected>Gagal memuat data karyawan</option>';
-                        $('#created_by_barang, #created_by_dinas').html(errorOption);
-                    }
-                });
+        //         $.ajax({
+        //             url: '/user/getAllUser',
+        //             type: 'GET',
+        //             dataType: 'json',
+        //             success: function (data) {
+        //                 // Sort data by name (if not pre-sorted by server)
+        //                 data.sort((a, b) => a.name.localeCompare(b.name));
+        //                 userCache = data; // Cache the data
+        //                 populateDropdowns(data);
+        //             },
+        //             error: function (xhr, status, error) {
+        //                 console.error('Gagal memuat data karyawan:', error);
+        //                 // Provide user feedback
+        //                 const errorOption = '<option value="" disabled selected>Gagal memuat data karyawan</option>';
+        //                 $('#created_by_barang, #created_by_dinas').html(errorOption);
+        //             }
+        //         });
+        //     }
+
+        //     function populateDropdowns(data) {
+        //         console.log("Data karyawan yang akan diisi:", data);
+        //         // Generate structured options for Selectize
+        //         const userOptions = data.map(user => ({
+        //             value: user.nrp_karyawan,
+        //             text: `${user.nrp_karyawan} - ${user.name}`,
+        //             name: user.name,
+        //             departemen: user.departemen || '' // Tambahkan departemen jika ada
+        //         }));
+
+        //         // Populate dropdowns with HTML options
+        //         const optionsHtml = ['<option value="" disabled selected>Pilih Karyawan</option>']
+        //             .concat(data.map(user => `<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`))
+        //             .join('');
+
+        //         $('#created_by_barang').html(optionsHtml);
+        //         $('#created_by_dinas').html(optionsHtml);
+
+        //         // Destroy existing Selectize instances to prevent memory leaks
+        //         $('.selectize').each(function () {
+        //             if (this.selectize) {
+        //                 this.selectize.destroy();
+        //             }
+        //         });
+
+        //         // Initialize Selectize with structured options
+        //         $('.selectize').selectize({
+        //             options: userOptions, // Provide structured options
+        //             valueField: 'value',
+        //             labelField: 'text',
+        //             searchField: ['text'],
+        //             sortField: 'text',
+        //             placeholder: 'Pilih atau cari Karyawan',
+        //             // Use Selectize's built-in fuzzy search
+        //             score: function (search) {
+        //                 return function (item) {
+        //                     let text = item.text.toLowerCase();
+        //                     search = search.toLowerCase();
+        //                     return text.includes(search) ? 1 : 0;
+        //                 };
+        //             },
+        //             // Add onChange callback untuk created_by_dinas
+        //             onChange: function(value) {
+        //                 // Check if this is the created_by_dinas selectize
+        //                 if (this.$input.attr('id') === 'created_by_dinas') {
+        //                     // Determine which modal is currently active
+        //                     const activeModal = determineActiveModal();
+        //                     setFirstParticipant(value, activeModal);
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     // Function to determine which modal is currently active
+        //     function determineActiveModal() {
+        //         // Check if tambahIkutSertaModal is visible/active
+        //         if ($('#tambahIkutSertaModal').hasClass('show') || $('#tambahIkutSertaModal').is(':visible')) {
+        //             return 'ikutserta';
+        //         }
+        //         // Default to regular modal
+        //         return 'regular';
+        //     }
+
+        //     // Function to set first participant data from created_by_dinas selection
+        //     function setFirstParticipant(nrpValue, modalType = 'regular') {
+        //         if (!nrpValue) return;
+
+        //         let firstRow, tableSelector;
+                
+        //         // Determine which table to target based on modal type
+        //         if (modalType === 'ikutserta') {
+        //             tableSelector = '#pesertaTableTambahPeserta tbody tr:first';
+        //         } else {
+        //             tableSelector = '#pesertaTableTambah tbody tr:first';
+        //         }
+                
+        //         firstRow = $(tableSelector);
+                
+        //         if (firstRow.length === 0) {
+        //             console.warn('First participant row not found for modal type:', modalType);
+        //             return;
+        //         }
+
+        //         const nrpInput = firstRow.find('.nrp_karyawan');
+                
+        //         // Set the NRP value
+        //         nrpInput.val(nrpValue);
+                
+        //         // Trigger keyup event to activate the existing AJAX functionality
+        //         nrpInput.trigger('keyup');
+                
+        //         console.log(`Set first participant NRP from dropdown for ${modalType} modal:`, nrpValue);
+        //     }
+
+        //     // Alternative method using jQuery change event (if selectize onChange doesn't work)
+        //     $(document).on('change', '#created_by_dinas', function() {
+        //         const selectedNRP = $(this).val();
+        //         if (selectedNRP) {
+        //             const activeModal = determineActiveModal();
+        //             setFirstParticipant(selectedNRP, activeModal);
+        //         }
+        //     });
+
+        //     // Reset selectize when modal is opened
+        //     $('#tambahIkutSertaModal').on('shown.bs.modal', function () {
+        //         // Clear the selectize value when ikut serta modal is opened
+        //         const selectizeInstance = $('#created_by_dinas')[0].selectize;
+        //         if (selectizeInstance) {
+        //             selectizeInstance.clear();
+        //         }
+        //     });
+
+        //     // Also handle for the regular modal if needed
+        //     $('[data-target="#tambahModal"], [data-toggle="modal"][data-target*="tambah"]').on('click', function() {
+        //         // Clear the selectize value when regular modal is opened
+        //         setTimeout(function() {
+        //             const selectizeInstance = $('#created_by_dinas')[0].selectize;
+        //             if (selectizeInstance) {
+        //                 selectizeInstance.clear();
+        //             }
+        //         }, 100);
+        //     });
+
+        //     // Trigger the load
+        //     loadUsers();
+        // });
+
+        // // Handle NRP input and AJAX for user details (existing functionality)
+        // $(document).ready(function() {
+        //     // Sync created_by with first participant (existing functionality)
+        //     $('#created_by').on('input', function() {
+        //         const nrp = $(this).val();
+        //         $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
+        //     });
+
+        //     // Handle NRP input changes (existing functionality) - Updated to handle both tables
+        //     $(document).on('keyup', '.nrp_karyawan', function() {
+        //         const nrp = $(this).val();
+        //         const row = $(this).closest('tr');
+        //         const tableId = row.closest('table').attr('id');
+                
+        //         // Determine storage key based on table
+        //         let storageKey;
+        //         if (tableId === 'pesertaTableTambah') {
+        //             storageKey = STORAGE_KEY_TAMBAH;
+        //         } else if (tableId === 'pesertaTableTambahPeserta') {
+        //             storageKey = STORAGE_KEY_IKUTSERTA;
+        //         } else {
+        //             // Fallback - determine by modal context
+        //             const isIkutSertaModal = row.closest('#tambahIkutSertaModal').length > 0;
+        //             storageKey = isIkutSertaModal ? STORAGE_KEY_IKUTSERTA : STORAGE_KEY_TAMBAH;
+        //         }
+
+        //         if (nrp.length >= 6) {
+        //             $.ajax({
+        //                 url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+        //                 type: 'GET',
+        //                 data: { nrp_karyawan: nrp },
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         row.find('.nama').val(response.data.name);
+        //                         row.find('.departemen').val(response.data.departemen);
+        //                     } else {
+        //                         row.find('.nama').val('');
+        //                         row.find('.departemen').val('');
+        //                     }
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 },
+        //                 error: function() {
+        //                     row.find('.nama').val('');
+        //                     row.find('.departemen').val('');
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 }
+        //             });
+        //         } else {
+        //             row.find('.nama').val('');
+        //             row.find('.departemen').val('');
+        //             saveToLocalStoragePeserta(tableId, storageKey);
+        //         }
+        //     });
+
+        //     // Load stored data on page load (existing functionality)
+        //     loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+        //     loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+
+        //     // Clear local storage on form submission (existing functionality)
+        //     $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_TAMBAH);
+        //     });
+
+        //     $('#formTambahikutserta').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+        //     });
+        // });
+        // // Handle NRP input and AJAX for user details (existing functionality)
+        // $(document).ready(function() {
+        //     // Sync created_by with first participant (existing functionality)
+        //     $('#created_by').on('input', function() {
+        //         const nrp = $(this).val();
+        //         $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
+        //     });
+
+        //     // Handle NRP input changes (existing functionality)
+        //     $(document).on('keyup', '.nrp_karyawan', function() {
+        //         const nrp = $(this).val();
+        //         const row = $(this).closest('tr');
+        //         const tableId = row.closest('table').attr('id');
+        //         const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
+
+        //         if (nrp.length >= 6) {
+        //             $.ajax({
+        //                 url: "{{ route('pengajuan_dinas.getUserDetails') }}",
+        //                 type: 'GET',
+        //                 data: { nrp_karyawan: nrp },
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         row.find('.nama').val(response.data.name);
+        //                         row.find('.departemen').val(response.data.departemen);
+        //                     } else {
+        //                         row.find('.nama').val('');
+        //                         row.find('.departemen').val('');
+        //                     }
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 },
+        //                 error: function() {
+        //                     row.find('.nama').val('');
+        //                     row.find('.departemen').val('');
+        //                     saveToLocalStoragePeserta(tableId, storageKey);
+        //                 }
+        //             });
+        //         } else {
+        //             row.find('.nama').val('');
+        //             row.find('.departemen').val('');
+        //             saveToLocalStoragePeserta(tableId, storageKey);
+        //         }
+        //     });
+
+        //     // Load stored data on page load (existing functionality)
+        //     loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+        //     loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+
+        //     // Clear local storage on form submission (existing functionality)
+        //     $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_TAMBAH);
+        //     });
+
+        //     $('#formTambahikutserta').on('submit', function() {
+        //         clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+        //     });
+        // });
+
+        // Local storage keys for separation
+        const STORAGE_KEY_TAMBAH = 'nrp_karyawan_list_tambah';
+        const STORAGE_KEY_IKUTSERTA = 'nrp_karyawan_list_ikutserta';
+
+        let counterPeserta = 1;
+        let counterIkutserta = 1;
+        let userCache = null; // Global cache for user data
+
+        // Optimized user data loading with caching
+        function loadUsers() {
+            if (userCache) {
+                return Promise.resolve(userCache);
             }
 
-            function populateDropdowns(data) {
-                console.log("Data karyawan yang akan diisi:", data);
-                // Generate structured options for Selectize
+            return $.ajax({
+                url: '/user/getAllUser',
+                type: 'GET',
+                dataType: 'json'
+            }).then(function(data) {
+                // Sort data by name for better UX
+                data.sort((a, b) => a.name.localeCompare(b.name));
+                userCache = data;
+                return data;
+            }).catch(function(xhr, status, error) {
+                console.error('Gagal memuat data karyawan:', error);
+                throw error;
+            });
+        }
+
+        // Get user data by NRP from cache
+        function getUserByNRP(nrp) {
+            if (!userCache) return null;
+            return userCache.find(user => user.nrp_karyawan === nrp);
+        }
+
+        // Initialize Selectize for NRP input
+        function initializeSelectizeForNRP(element, onChangeCallback) {
+            if (!userCache) {
+                console.warn('User cache not loaded, cannot initialize Selectize');
+                return;
+            }
+
+            // Destroy existing selectize if exists
+            if (element.selectize) {
+                element.selectize.destroy();
+            }
+
+            const userOptions = userCache.map(user => ({
+                value: user.nrp_karyawan,
+                text: `${user.nrp_karyawan} - ${user.name}`,
+                name: user.name,
+                departemen: user.departemen || ''
+            }));
+
+            $(element).selectize({
+                options: userOptions,
+                valueField: 'value',
+                labelField: 'text',
+                searchField: ['text'],
+                sortField: 'text',
+                placeholder: 'Pilih atau cari NRP Karyawan',
+                create: false,
+                maxItems: 1,
+                allowEmptyOption: true,
+                closeAfterSelect: true,
+                // Optimized search scoring
+                score: function(search) {
+                    return function(item) {
+                        const text = item.text.toLowerCase();
+                        const searchLower = search.toLowerCase();
+                        
+                        // Exact match gets highest score
+                        if (text === searchLower) return 2;
+                        
+                        // Starts with search term gets high score
+                        if (text.startsWith(searchLower)) return 1.5;
+                        
+                        // Contains search term gets medium score
+                        if (text.includes(searchLower)) return 1;
+                        
+                        return 0;
+                    };
+                },
+                onChange: function(value) {
+                    if (onChangeCallback && typeof onChangeCallback === 'function') {
+                        onChangeCallback(value, this);
+                    }
+                }
+            });
+        }
+
+        // Optimized function to set participant data
+        function setParticipantData(row, nrp) {
+            const userData = getUserByNRP(nrp);
+            
+            if (userData) {
+                row.find('.nama').val(userData.name);
+                row.find('.departemen').val(userData.departemen || '');
+            } else {
+                row.find('.nama').val('');
+                row.find('.departemen').val('');
+            }
+            
+            // Save to localStorage
+            const tableId = row.closest('table').attr('id');
+            const storageKey = getStorageKeyByTableId(tableId);
+            saveToLocalStoragePeserta(tableId, storageKey);
+        }
+
+        // Get storage key based on table ID
+        function getStorageKeyByTableId(tableId) {
+            switch(tableId) {
+                case 'pesertaTableTambah':
+                    return STORAGE_KEY_TAMBAH;
+                case 'pesertaTableTambahPeserta':
+                    return STORAGE_KEY_IKUTSERTA;
+                default:
+                    return STORAGE_KEY_TAMBAH;
+            }
+        }
+
+        // Save to local storage for specific table
+        function saveToLocalStoragePeserta(tableId, storageKey) {
+            const nrpInputs = $(`#${tableId} .nrp_karyawan`);
+            const nrpList = Array.from(nrpInputs).map(input => $(input).val()).filter(val => val);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(nrpList));
+            } catch (e) {
+                console.error('Failed to save to localStorage:', e);
+            }
+        }
+
+        // Load from local storage for specific table
+        function loadFromLocalStoragePeserta(tableId, storageKey, addRowFn) {
+            try {
+                const storedList = localStorage.getItem(storageKey);
+                if (storedList) {
+                    const nrpList = JSON.parse(storedList);
+                    const currentRows = $(`#${tableId} .nrp_karyawan`).length;
+
+                    // Add rows if needed
+                    while (currentRows < nrpList.length) {
+                        addRowFn();
+                    }
+
+                    // Populate inputs with delay to ensure DOM is ready
+                    setTimeout(() => {
+                        $(`#${tableId} .nrp_karyawan`).each(function(idx) {
+                            if (nrpList[idx] && this.selectize) {
+                                this.selectize.setValue(nrpList[idx]);
+                            }
+                        });
+                    }, 100);
+                }
+            } catch (e) {
+                console.error('Failed to load from localStorage:', e);
+            }
+        }
+
+        // Clear local storage for specific key
+        function clearLocalStorage(storageKey) {
+            try {
+                localStorage.removeItem(storageKey);
+            } catch (e) {
+                console.error('Failed to clear localStorage:', e);
+            }
+        }
+
+        // Update participant numbers for a table
+        function updateNomorPeserta(tableId) {
+            $(`#${tableId} .nomor`).each(function(index) {
+                $(this).text(index + 1);
+                const row = $(this).closest('tr');
+                row.find('.nrp_karyawan').attr('name', `peserta[${index}][nrp_karyawan]`);
+                row.find('.nama').attr('name', `peserta[${index}][nama]`);
+                row.find('.departemen').attr('name', `peserta[${index}][departemen]`);
+            });
+        }
+
+        // Enhanced tambahComboBoxPeserta with Selectize
+        function tambahComboBoxPeserta() {
+            const container = document.querySelector('#pesertaTableTambah tbody');
+            const rows = container.querySelectorAll('tr');
+
+            if (!selectedVehicleCapacity) {
+                const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
+                if (kapasitasField.val() === '' || isNaN(parseInt(kapasitasField.val()))) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilih Kendaraan Terlebih Dahulu',
+                        text: 'Silakan isi pilih kendaraan.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                selectedVehicleCapacity = parseInt(kapasitasField.val()) - 1;
+            }
+
+            if (rows.length >= selectedVehicleCapacity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kapasitas Penuh',
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="nomor">${++counterPeserta}</td>
+                <td>
+                    <select name="peserta[${counterPeserta - 1}][nrp_karyawan]" 
+                            class="form-control nrp_karyawan selectize-nrp" 
+                            required>
+                        <option value="">Pilih NRP Karyawan</option>
+                    </select>
+                </td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            container.appendChild(newRow);
+            
+            // Initialize Selectize for the new NRP input
+            const newNrpSelect = newRow.querySelector('.nrp_karyawan');
+            initializeSelectizeForNRP(newNrpSelect, function(value, selectizeInstance) {
+                const row = $(selectizeInstance.$input).closest('tr');
+                setParticipantData(row, value);
+            });
+            
+            updateNomorPeserta('pesertaTableTambah');
+            saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+        }
+
+        // Enhanced tambahPesertaIkutSerta with Selectize
+        function tambahPesertaIkutSerta() {
+            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+            const rows = tbody.querySelectorAll('tr');
+
+            if (!selectedVehicleCapacity || selectedVehicleCapacity <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kapasitas Kendaraan Tidak Diketahui',
+                    text: 'Silakan pilih kendaraan terlebih dahulu.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            if (rows.length >= selectedVehicleCapacity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Kapasitas Penuh',
+                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="nomor">${++counterIkutserta}</td>
+                <td>
+                    <select name="peserta[${counterIkutserta - 1}][nrp_karyawan]" 
+                            class="form-control nrp_karyawan selectize-nrp" 
+                            required>
+                        <option value="">Pilih NRP Karyawan</option>
+                    </select>
+                </td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(newRow);
+            
+            // Initialize Selectize for the new NRP input
+            const newNrpSelect = newRow.querySelector('.nrp_karyawan');
+            initializeSelectizeForNRP(newNrpSelect, function(value, selectizeInstance) {
+                const row = $(selectizeInstance.$input).closest('tr');
+                setParticipantData(row, value);
+            });
+            
+            updateNomorPeserta('pesertaTableTambahPeserta');
+            saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
+        }
+
+        // Remove participant row for tambahDinasModal
+        function hapusComboBoxPeserta(button) {
+            const tbody = document.querySelector('#pesertaTableTambah tbody');
+            const row = button.closest('tr');
+            const rows = tbody.querySelectorAll('tr');
+
+            if (rows.length > 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Apakah Anda yakin?',
+                    text: 'Baris ini akan dihapus.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Destroy selectize before removing row
+                        const selectizeInput = row.querySelector('.nrp_karyawan');
+                        if (selectizeInput && selectizeInput.selectize) {
+                            selectizeInput.selectize.destroy();
+                        }
+                        
+                        row.remove();
+                        counterPeserta--;
+                        updateNomorPeserta('pesertaTableTambah');
+                        saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak bisa menghapus baris terakhir.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Remove participant row for ikutSertaDinasModal
+        function hapusIkutPeserta(button) {
+            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+            const row = button.closest('tr');
+            const rows = tbody.querySelectorAll('tr');
+
+            if (rows.length > 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Apakah Anda yakin?',
+                    text: 'Baris ini akan dihapus.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Destroy selectize before removing row
+                        const selectizeInput = row.querySelector('.nrp_karyawan');
+                        if (selectizeInput && selectizeInput.selectize) {
+                            selectizeInput.selectize.destroy();
+                        }
+                        
+                        row.remove();
+                        counterIkutserta--;
+                        updateNomorPeserta('pesertaTableTambahPeserta');
+                        saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak bisa menghapus baris terakhir.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Document ready functions
+        $(document).ready(function () {
+            // Load user data first
+            loadUsers().then(function(userData) {
+                console.log('User data loaded successfully:', userData.length, 'users');
+                
+                // Initialize existing selectize dropdowns
+                populateMainDropdowns(userData);
+                
+                // Initialize existing NRP selectize inputs if any
+                $('.selectize-nrp').each(function() {
+                    initializeSelectizeForNRP(this, function(value, selectizeInstance) {
+                        const row = $(selectizeInstance.$input).closest('tr');
+                        setParticipantData(row, value);
+                    });
+                });
+                
+                // Load stored data from localStorage
+                loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
+                loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+                
+            }).catch(function(error) {
+                console.error('Failed to load user data:', error);
+                // Provide fallback functionality
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memuat Data',
+                    text: 'Tidak dapat memuat data karyawan. Silakan refresh halaman.',
+                    confirmButtonText: 'OK'
+                });
+            });
+
+            // Function to populate main dropdowns (created_by_dinas, etc.)
+            function populateMainDropdowns(data) {
                 const userOptions = data.map(user => ({
                     value: user.nrp_karyawan,
                     text: `${user.nrp_karyawan} - ${user.name}`,
                     name: user.name,
-                    departemen: user.departemen || '' // Tambahkan departemen jika ada
+                    departemen: user.departemen || ''
                 }));
 
-                // Populate dropdowns with HTML options
                 const optionsHtml = ['<option value="" disabled selected>Pilih Karyawan</option>']
                     .concat(data.map(user => `<option value="${user.nrp_karyawan}">${user.nrp_karyawan} - ${user.name}</option>`))
                     .join('');
 
-                $('#created_by_barang').html(optionsHtml);
-                $('#created_by_dinas').html(optionsHtml);
+                $('#created_by_barang, #created_by_dinas').html(optionsHtml);
 
-                // Destroy existing Selectize instances to prevent memory leaks
-                $('.selectize').each(function () {
+                // Destroy existing Selectize instances
+                $('.selectize:not(.selectize-nrp)').each(function () {
                     if (this.selectize) {
                         this.selectize.destroy();
                     }
                 });
 
-                // Initialize Selectize with structured options
-                $('.selectize').selectize({
-                    options: userOptions, // Provide structured options
+                // Initialize main selectize dropdowns
+                $('.selectize:not(.selectize-nrp)').selectize({
+                    options: userOptions,
                     valueField: 'value',
                     labelField: 'text',
                     searchField: ['text'],
                     sortField: 'text',
                     placeholder: 'Pilih atau cari Karyawan',
-                    // Use Selectize's built-in fuzzy search
                     score: function (search) {
                         return function (item) {
                             let text = item.text.toLowerCase();
@@ -1043,11 +1697,8 @@
                             return text.includes(search) ? 1 : 0;
                         };
                     },
-                    // Add onChange callback untuk created_by_dinas
                     onChange: function(value) {
-                        // Check if this is the created_by_dinas selectize
                         if (this.$input.attr('id') === 'created_by_dinas') {
-                            // Determine which modal is currently active
                             const activeModal = determineActiveModal();
                             setFirstParticipant(value, activeModal);
                         }
@@ -1057,11 +1708,9 @@
 
             // Function to determine which modal is currently active
             function determineActiveModal() {
-                // Check if tambahIkutSertaModal is visible/active
                 if ($('#tambahIkutSertaModal').hasClass('show') || $('#tambahIkutSertaModal').is(':visible')) {
                     return 'ikutserta';
                 }
-                // Default to regular modal
                 return 'regular';
             }
 
@@ -1071,7 +1720,6 @@
 
                 let firstRow, tableSelector;
                 
-                // Determine which table to target based on modal type
                 if (modalType === 'ikutserta') {
                     tableSelector = '#pesertaTableTambahPeserta tbody tr:first';
                 } else {
@@ -1085,38 +1733,24 @@
                     return;
                 }
 
-                const nrpInput = firstRow.find('.nrp_karyawan');
+                const nrpInput = firstRow.find('.nrp_karyawan')[0];
                 
-                // Set the NRP value
-                nrpInput.val(nrpValue);
-                
-                // Trigger keyup event to activate the existing AJAX functionality
-                nrpInput.trigger('keyup');
+                if (nrpInput && nrpInput.selectize) {
+                    nrpInput.selectize.setValue(nrpValue);
+                }
                 
                 console.log(`Set first participant NRP from dropdown for ${modalType} modal:`, nrpValue);
             }
 
-            // Alternative method using jQuery change event (if selectize onChange doesn't work)
-            $(document).on('change', '#created_by_dinas', function() {
-                const selectedNRP = $(this).val();
-                if (selectedNRP) {
-                    const activeModal = determineActiveModal();
-                    setFirstParticipant(selectedNRP, activeModal);
-                }
-            });
-
-            // Reset selectize when modal is opened
+            // Modal event handlers
             $('#tambahIkutSertaModal').on('shown.bs.modal', function () {
-                // Clear the selectize value when ikut serta modal is opened
                 const selectizeInstance = $('#created_by_dinas')[0].selectize;
                 if (selectizeInstance) {
                     selectizeInstance.clear();
                 }
             });
 
-            // Also handle for the regular modal if needed
             $('[data-target="#tambahModal"], [data-toggle="modal"][data-target*="tambah"]').on('click', function() {
-                // Clear the selectize value when regular modal is opened
                 setTimeout(function() {
                     const selectizeInstance = $('#created_by_dinas')[0].selectize;
                     if (selectizeInstance) {
@@ -1125,69 +1759,7 @@
                 }, 100);
             });
 
-            // Trigger the load
-            loadUsers();
-        });
-
-        // Handle NRP input and AJAX for user details (existing functionality)
-        $(document).ready(function() {
-            // Sync created_by with first participant (existing functionality)
-            $('#created_by').on('input', function() {
-                const nrp = $(this).val();
-                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
-            });
-
-            // Handle NRP input changes (existing functionality) - Updated to handle both tables
-            $(document).on('keyup', '.nrp_karyawan', function() {
-                const nrp = $(this).val();
-                const row = $(this).closest('tr');
-                const tableId = row.closest('table').attr('id');
-                
-                // Determine storage key based on table
-                let storageKey;
-                if (tableId === 'pesertaTableTambah') {
-                    storageKey = STORAGE_KEY_TAMBAH;
-                } else if (tableId === 'pesertaTableTambahPeserta') {
-                    storageKey = STORAGE_KEY_IKUTSERTA;
-                } else {
-                    // Fallback - determine by modal context
-                    const isIkutSertaModal = row.closest('#tambahIkutSertaModal').length > 0;
-                    storageKey = isIkutSertaModal ? STORAGE_KEY_IKUTSERTA : STORAGE_KEY_TAMBAH;
-                }
-
-                if (nrp.length >= 6) {
-                    $.ajax({
-                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
-                        type: 'GET',
-                        data: { nrp_karyawan: nrp },
-                        success: function(response) {
-                            if (response.success) {
-                                row.find('.nama').val(response.data.name);
-                                row.find('.departemen').val(response.data.departemen);
-                            } else {
-                                row.find('.nama').val('');
-                                row.find('.departemen').val('');
-                            }
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        },
-                        error: function() {
-                            row.find('.nama').val('');
-                            row.find('.departemen').val('');
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        }
-                    });
-                } else {
-                    row.find('.nama').val('');
-                    row.find('.departemen').val('');
-                    saveToLocalStoragePeserta(tableId, storageKey);
-                }
-            });
-
-            // Load stored data on page load (existing functionality)
-            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
-            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
-
-            // Clear local storage on form submission (existing functionality)
+            // Clear local storage on form submission
             $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
                 clearLocalStorage(STORAGE_KEY_TAMBAH);
             });
@@ -1195,61 +1767,14 @@
             $('#formTambahikutserta').on('submit', function() {
                 clearLocalStorage(STORAGE_KEY_IKUTSERTA);
             });
-        });
-        // Handle NRP input and AJAX for user details (existing functionality)
-        $(document).ready(function() {
-            // Sync created_by with first participant (existing functionality)
+
+            // Legacy support for created_by sync
             $('#created_by').on('input', function() {
                 const nrp = $(this).val();
-                $("input[name='peserta[0][nrp_karyawan]']").val(nrp).trigger('keyup');
-            });
-
-            // Handle NRP input changes (existing functionality)
-            $(document).on('keyup', '.nrp_karyawan', function() {
-                const nrp = $(this).val();
-                const row = $(this).closest('tr');
-                const tableId = row.closest('table').attr('id');
-                const storageKey = tableId === 'pesertaTableTambah' ? STORAGE_KEY_TAMBAH : STORAGE_KEY_IKUTSERTA;
-
-                if (nrp.length >= 6) {
-                    $.ajax({
-                        url: "{{ route('pengajuan_dinas.getUserDetails') }}",
-                        type: 'GET',
-                        data: { nrp_karyawan: nrp },
-                        success: function(response) {
-                            if (response.success) {
-                                row.find('.nama').val(response.data.name);
-                                row.find('.departemen').val(response.data.departemen);
-                            } else {
-                                row.find('.nama').val('');
-                                row.find('.departemen').val('');
-                            }
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        },
-                        error: function() {
-                            row.find('.nama').val('');
-                            row.find('.departemen').val('');
-                            saveToLocalStoragePeserta(tableId, storageKey);
-                        }
-                    });
-                } else {
-                    row.find('.nama').val('');
-                    row.find('.departemen').val('');
-                    saveToLocalStoragePeserta(tableId, storageKey);
+                const firstParticipantNrp = $("input[name='peserta[0][nrp_karyawan]']")[0];
+                if (firstParticipantNrp && firstParticipantNrp.selectize) {
+                    firstParticipantNrp.selectize.setValue(nrp);
                 }
-            });
-
-            // Load stored data on page load (existing functionality)
-            loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
-            loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
-
-            // Clear local storage on form submission (existing functionality)
-            $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_TAMBAH);
-            });
-
-            $('#formTambahikutserta').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
             });
         });
 
@@ -2439,208 +2964,208 @@
             }
         }
 
-        // Local storage keys for separation
-        const STORAGE_KEY_TAMBAH = 'nrp_karyawan_list_tambah';
-        const STORAGE_KEY_IKUTSERTA = 'nrp_karyawan_list_ikutserta';
+        // // Local storage keys for separation
+        // const STORAGE_KEY_TAMBAH = 'nrp_karyawan_list_tambah';
+        // const STORAGE_KEY_IKUTSERTA = 'nrp_karyawan_list_ikutserta';
 
-        let counterPeserta = 1;
-        let counterIkutserta = 1;
+        // let counterPeserta = 1;
+        // let counterIkutserta = 1;
 
-        // Save to local storage for specific table
-        function saveToLocalStoragePeserta(tableId, storageKey) {
-            const nrpInputs = $(`#${tableId} .nrp_karyawan`);
-            const nrpList = Array.from(nrpInputs).map(input => $(input).val()).filter(val => val);
-            localStorage.setItem(storageKey, JSON.stringify(nrpList));
-        }
+        // // Save to local storage for specific table
+        // function saveToLocalStoragePeserta(tableId, storageKey) {
+        //     const nrpInputs = $(`#${tableId} .nrp_karyawan`);
+        //     const nrpList = Array.from(nrpInputs).map(input => $(input).val()).filter(val => val);
+        //     localStorage.setItem(storageKey, JSON.stringify(nrpList));
+        // }
 
-        // Load from local storage for specific table
-        function loadFromLocalStoragePeserta(tableId, storageKey, addRowFn) {
-            const storedList = localStorage.getItem(storageKey);
-            if (storedList) {
-                const nrpList = JSON.parse(storedList);
-                const currentRows = $(`#${tableId} .nrp_karyawan`).length;
+        // // Load from local storage for specific table
+        // function loadFromLocalStoragePeserta(tableId, storageKey, addRowFn) {
+        //     const storedList = localStorage.getItem(storageKey);
+        //     if (storedList) {
+        //         const nrpList = JSON.parse(storedList);
+        //         const currentRows = $(`#${tableId} .nrp_karyawan`).length;
 
-                // Add rows if needed
-                while (currentRows < nrpList.length) {
-                    addRowFn();
-                }
+        //         // Add rows if needed
+        //         while (currentRows < nrpList.length) {
+        //             addRowFn();
+        //         }
 
-                // Populate inputs
-                $(`#${tableId} .nrp_karyawan`).each(function(idx) {
-                    if (nrpList[idx]) {
-                        $(this).val(nrpList[idx]).trigger('keyup');
-                    }
-                });
-            }
-        }
+        //         // Populate inputs
+        //         $(`#${tableId} .nrp_karyawan`).each(function(idx) {
+        //             if (nrpList[idx]) {
+        //                 $(this).val(nrpList[idx]).trigger('keyup');
+        //             }
+        //         });
+        //     }
+        // }
 
-        // Clear local storage for specific key
-        function clearLocalStorage(storageKey) {
-            localStorage.removeItem(storageKey);
-        }
+        // // Clear local storage for specific key
+        // function clearLocalStorage(storageKey) {
+        //     localStorage.removeItem(storageKey);
+        // }
 
-        // Update participant numbers for a table
-        function updateNomorPeserta(tableId) {
-            $(`#${tableId} .nomor`).each(function(index) {
-                $(this).text(index + 1);
-                const row = $(this).closest('tr');
-                row.find('.nrp_karyawan').attr('name', `peserta[${index}][nrp_karyawan]`);
-                row.find('.nama').attr('name', `peserta[${index}][nama]`);
-                row.find('.departemen').attr('name', `peserta[${index}][departemen]`);
-            });
-        }
+        // // Update participant numbers for a table
+        // function updateNomorPeserta(tableId) {
+        //     $(`#${tableId} .nomor`).each(function(index) {
+        //         $(this).text(index + 1);
+        //         const row = $(this).closest('tr');
+        //         row.find('.nrp_karyawan').attr('name', `peserta[${index}][nrp_karyawan]`);
+        //         row.find('.nama').attr('name', `peserta[${index}][nama]`);
+        //         row.find('.departemen').attr('name', `peserta[${index}][departemen]`);
+        //     });
+        // }
 
-        function tambahComboBoxPeserta() {
-            const container = document.querySelector('#pesertaTableTambah tbody');
-            const rows = container.querySelectorAll('tr');
+        // function tambahComboBoxPeserta() {
+        //     const container = document.querySelector('#pesertaTableTambah tbody');
+        //     const rows = container.querySelectorAll('tr');
 
-            if (!selectedVehicleCapacity) {
-                const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
-                if (kapasitasField.val() === '' || isNaN(parseInt(kapasitasField.val()))) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Pilih Kendaraan Terlebih Dahulu',
-                        text: 'Silakan isi pilih kendaraan.',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
-                selectedVehicleCapacity = parseInt(kapasitasField.val()) - 1;
-            }
+        //     if (!selectedVehicleCapacity) {
+        //         const kapasitasField = $(`input[name="kendaraan[0][kapasitas_kendaraan]"]`);
+        //         if (kapasitasField.val() === '' || isNaN(parseInt(kapasitasField.val()))) {
+        //             Swal.fire({
+        //                 icon: 'warning',
+        //                 title: 'Pilih Kendaraan Terlebih Dahulu',
+        //                 text: 'Silakan isi pilih kendaraan.',
+        //                 confirmButtonText: 'OK'
+        //             });
+        //             return;
+        //         }
+        //         selectedVehicleCapacity = parseInt(kapasitasField.val()) - 1;
+        //     }
 
-            if (rows.length >= selectedVehicleCapacity) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Kapasitas Penuh',
-                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
+        //     if (rows.length >= selectedVehicleCapacity) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Kapasitas Penuh',
+        //             text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
 
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="nomor">${++counterPeserta}</td>
-                <td><input type="text" name="peserta[${counterPeserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            container.appendChild(newRow);
-            updateNomorPeserta('pesertaTableTambah');
-            saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
-        }
+        //     const newRow = document.createElement('tr');
+        //     newRow.innerHTML = `
+        //         <td class="nomor">${++counterPeserta}</td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+        //         <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+        //         <td>
+        //             <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+        //                 <i class="fas fa-trash"></i>
+        //             </button>
+        //         </td>
+        //     `;
+        //     container.appendChild(newRow);
+        //     updateNomorPeserta('pesertaTableTambah');
+        //     saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+        // }
 
-        // Remove participant row for tambahDinasModal
-        function hapusComboBoxPeserta(button) {
-            const tbody = document.querySelector('#pesertaTableTambah tbody');
-            const row = button.closest('tr');
-            const rows = tbody.querySelectorAll('tr');
+        // // Remove participant row for tambahDinasModal
+        // function hapusComboBoxPeserta(button) {
+        //     const tbody = document.querySelector('#pesertaTableTambah tbody');
+        //     const row = button.closest('tr');
+        //     const rows = tbody.querySelectorAll('tr');
 
-            if (rows.length > 1) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Apakah Anda yakin?',
-                    text: 'Baris ini akan dihapus.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        row.remove();
-                        counterPeserta--;
-                        updateNomorPeserta('pesertaTableTambah');
-                        saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tidak bisa menghapus baris terakhir.',
-                    text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        }
+        //     if (rows.length > 1) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Apakah Anda yakin?',
+        //             text: 'Baris ini akan dihapus.',
+        //             showCancelButton: true,
+        //             confirmButtonText: 'Yes',
+        //             cancelButtonText: 'No',
+        //             reverseButtons: true
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 row.remove();
+        //                 counterPeserta--;
+        //                 updateNomorPeserta('pesertaTableTambah');
+        //                 saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+        //             }
+        //         });
+        //     } else {
+        //         Swal.fire({
+        //             icon: 'info',
+        //             title: 'Tidak bisa menghapus baris terakhir.',
+        //             text: 'Harap tambahkan baris baru jika perlu.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     }
+        // }
 
-        function tambahPesertaIkutSerta() {
-            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
-            const rows = tbody.querySelectorAll('tr');
+        // function tambahPesertaIkutSerta() {
+        //     const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+        //     const rows = tbody.querySelectorAll('tr');
 
-            if (!selectedVehicleCapacity || selectedVehicleCapacity <= 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Kapasitas Kendaraan Tidak Diketahui',
-                    text: 'Silakan pilih kendaraan terlebih dahulu.',
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
+        //     if (!selectedVehicleCapacity || selectedVehicleCapacity <= 0) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Kapasitas Kendaraan Tidak Diketahui',
+        //             text: 'Silakan pilih kendaraan terlebih dahulu.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
 
-            if (rows.length >= selectedVehicleCapacity) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Kapasitas Penuh',
-                    text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
+        //     if (rows.length >= selectedVehicleCapacity) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Kapasitas Penuh',
+        //             text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return;
+        //     }
 
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="nomor">${++counterIkutserta}</td>
-                <td><input type="text" name="peserta[${counterIkutserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
-                <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(newRow);
-            updateNomorPeserta('pesertaTableTambahPeserta');
-            saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
-        }
+        //     const newRow = document.createElement('tr');
+        //     newRow.innerHTML = `
+        //         <td class="nomor">${++counterIkutserta}</td>
+        //         <td><input type="text" name="peserta[${counterIkutserta - 1}][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td>
+        //         <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
+        //         <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+        //         <td>
+        //             <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
+        //                 <i class="fas fa-trash"></i>
+        //             </button>
+        //         </td>
+        //     `;
+        //     tbody.appendChild(newRow);
+        //     updateNomorPeserta('pesertaTableTambahPeserta');
+        //     saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
+        // }
 
-        // Remove participant row for ikutSertaDinasModal
-        function hapusIkutPeserta(button) {
-            const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
-            const row = button.closest('tr');
-            const rows = tbody.querySelectorAll('tr');
+        // // Remove participant row for ikutSertaDinasModal
+        // function hapusIkutPeserta(button) {
+        //     const tbody = document.querySelector('#pesertaTableTambahPeserta tbody');
+        //     const row = button.closest('tr');
+        //     const rows = tbody.querySelectorAll('tr');
 
-            if (rows.length > 1) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Apakah Anda yakin?',
-                    text: 'Baris ini akan dihapus.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        row.remove();
-                        counterIkutserta--;
-                        updateNomorPeserta('pesertaTableTambahPeserta');
-                        saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tidak bisa menghapus baris terakhir.',
-                    text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        }
+        //     if (rows.length > 1) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Apakah Anda yakin?',
+        //             text: 'Baris ini akan dihapus.',
+        //             showCancelButton: true,
+        //             confirmButtonText: 'Yes',
+        //             cancelButtonText: 'No',
+        //             reverseButtons: true
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 row.remove();
+        //                 counterIkutserta--;
+        //                 updateNomorPeserta('pesertaTableTambahPeserta');
+        //                 saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
+        //             }
+        //         });
+        //     } else {
+        //         Swal.fire({
+        //             icon: 'info',
+        //             title: 'Tidak bisa menghapus baris terakhir.',
+        //             text: 'Harap tambahkan baris baru jika perlu.',
+        //             confirmButtonText: 'OK'
+        //         });
+        //     }
+        // }
 
 
         document.addEventListener("DOMContentLoaded", function () {
