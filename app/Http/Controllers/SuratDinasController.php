@@ -404,19 +404,20 @@ class SuratDinasController extends Controller
             'suratDetail.kendaraan'
         ])->findOrFail($suratDinasId);
 
-        // Mengambil informasi tambahan terkait persetujuan
-        $approvalData = ApprovalKendaraanDinas::with('user')
-            ->where('surat_kendaraan_dinas_id', $suratDinasId)
-            ->get()
-            ->map(function ($approval, $index) {
-                return [
-                    'no' => $index + 1,
-                    'nama' => $approval->user->name ?? 'Tidak Diketahui',
-                    'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
-                    'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
-                    'status' => $approval->status_approval,
-                ];
-            });
+       // Mengambil informasi tambahan terkait persetujuan
+        $approvalData = ApprovalKendaraanDinas::with('user', 'suratKendaraanDinas')
+        ->where('surat_kendaraan_dinas_id', $suratDinasId)
+        ->get()
+        ->map(function ($approval, $index) {
+            return [
+                'no' => $index + 1,
+                'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                'status' => $approval->status_approval,
+                'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
+            ];
+        });
     
         // Mapping data user dinas dengan nama & departemen
         $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
@@ -469,18 +470,20 @@ class SuratDinasController extends Controller
         ])->findOrFail($suratDinasId);
 
         // Mengambil informasi tambahan terkait persetujuan
-        $approvalData = ApprovalKendaraanDinas::with('user')
-            ->where('surat_kendaraan_dinas_id', $suratDinasId)
-            ->get()
-            ->map(function ($approval, $index) {
-                return [
-                    'no' => $index + 1,
-                    'nama' => $approval->user->name ?? 'Tidak Diketahui',
-                    'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
-                    'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
-                    'status' => $approval->status_approval,
-                ];
-            });
+        $approvalData = ApprovalKendaraanDinas::with('user', 'suratKendaraanDinas')
+        ->where('surat_kendaraan_dinas_id', $suratDinasId)
+        ->get()
+        ->map(function ($approval, $index) {
+            return [
+                'no' => $index + 1,
+                'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                'status' => $approval->status_approval,
+                'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
+            ];
+        });
+
     
         // Mapping data user dinas dengan nama & departemen
         $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {

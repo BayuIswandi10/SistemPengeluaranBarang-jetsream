@@ -97,6 +97,7 @@
                                     <th>Tingkatan</th>
                                     <th>Departemen</th>
                                     <th>Status</th>
+                                    <th>Alasan Penolakan</th>
                                 </tr>
                             </thead>
                             <tbody id="additionalInfoBody">
@@ -199,6 +200,7 @@
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
                                         <th>Status</th>
+                                        <th>Alasan Penolakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="addhistory">
@@ -268,22 +270,37 @@
 
                 // Badge besar status persetujuan
                 const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                const adaYangMenolak = (data.informasi_tambahan ?? []).some(x => x.status === 'Level 0');
 
-                let isApproved = false;
+                let statusBadgeHTML = '';
 
-                // Logika berbeda berdasarkan kategori pengeluaran
-                if (data.kategori_pengeluaran === 1) {
-                    // Scrap -> cukup sampai level 5
-                    isApproved = maxLevel >= 5;
+                if (adaYangMenolak) {
+                    // Status DITOLAK
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                            <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 6px;"></i> Ditolak
+                        </span>
+                    `;
+                } else if (
+                    (data.kategori_pengeluaran === 1 && maxLevel >= 5) || 
+                    (data.kategori_pengeluaran === 0 && maxLevel >= 4)
+                ) {
+                    // Status LENGKAP
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                            <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 6px;"></i> Lengkap
+                        </span>
+                    `;
                 } else {
-                    // Non Scrap -> harus sampai level 4
-                    isApproved = maxLevel >= 4;
+                    // Status BELUM LENGKAP
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                        </span>
+                    `;
                 }
 
-                // Tampilkan badge persetujuan
-                document.getElementById('approvalStatusBadge').innerHTML = isApproved
-                    ? '<span class="badge badge-success px-2 py-3">Persetujuan Lengkap</span>'
-                    : '<span class="badge badge-danger px-2 py-3">Persetujuan Tidak Lengkap</span>';
+                document.getElementById('approvalStatusBadge').innerHTML = statusBadgeHTML;
         
                 document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                 const tbody = document.getElementById('detailBody');
@@ -338,6 +355,7 @@
                     "Level 6": "Security"
                 };
                 const approvMapping = {
+                    "Level 0": "Menolak",
                     "Level 1": "Mengeluarkan",
                     "Level 2": "Membawa",
                     "Level 3": "Menyetujui",
@@ -348,15 +366,23 @@
                 
                 // Menambahkan data ke tabel informasi tambahan
                 if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                    additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${info.nama}</td>
-                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                            <td>${info.departemen}</td>
-                            <td>${approvMapping[info.status] || info.status}</td>
-                        </tr>
-                    `).join('');
+                    data.informasi_tambahan.forEach((info, index) => {
+                        let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
+                            ? info.alasan_penolakan 
+                            : '-'; // hanya isi di baris terakhir
+
+                        let row = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${info.nama}</td>
+                                <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                <td>${info.departemen}</td>
+                                <td>${approvMapping[info.status] || info.status}</td>
+                                <td>${alasanPenolakan}</td>
+                            </tr>
+                        `;
+                        additionalInfoBody.innerHTML += row;
+                    });
                 } else {
                     additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
                 }
@@ -582,25 +608,54 @@
                         1 : "Mengeluarkan"
                     };
 
-                     // Badge besar status persetujuan
-                    const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
-                    document.getElementById('approvalStatusBadgeDinas').innerHTML = maxLevel >= 3   
-                        ? '<span class="badge badge-success px-2 py-3">Persetujuan Lengkap</span>' 
-                        : '<span class="badge badge-danger px-2 py-3">Persetujuan Tidak Lengkap</span>';
+                    let statusBadgeHTML = '';
+                    const informasiTambahan = data.informasi_tambahan ?? [];
 
-                    let statusPengeluaran = data.status; // Pastikan API mengembalikan status
+                    // Cek apakah ada yang menolak
+                    const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
 
-                    if (statusPengeluaran === "Level 3") {
-                        document.getElementById('approveButtonDinas').style.display = "inline-block"; // Tampilkan tombol
+                    // Cek level tertinggi yang menyetujui
+                    const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+
+                    if (adaYangMenolak) {
+                        statusBadgeHTML = `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
+                            </span>
+                        `;
+                    } else if (maxLevel >= 3) {
+                        statusBadgeHTML = `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                                <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                            </span>
+                        `;
                     } else {
-                        document.getElementById('approveButtonDinas').style.display = "none"; // Sembunyikan tombol
+                        statusBadgeHTML = `
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                            </span>
+                        `;
                     }
+
+                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
                     // Kosongkan data lama kendaraan
                     document.getElementById('kendaraanInfoBody').innerHTML = "";
 
                     if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
                             $('#detaildataTableModal').DataTable().clear().destroy();
+                    }
+
+                    // Ambil status terakhir (item terakhir dalam array informasi_tambahan)
+                    const statusTerakhir = informasiTambahan.length > 0
+                        ? informasiTambahan[informasiTambahan.length - 1].status
+                        : null;
+
+                    // Cek tombol hanya muncul kalau level terakhir tepat "Level 3"
+                    if (statusTerakhir === "Level 3" && !adaYangMenolak) {
+                        document.getElementById('approveButtonDinas').style.display = "inline-block";
+                    } else {
+                        document.getElementById('approveButtonDinas').style.display = "none";
                     }
 
                     // Validasi dan tampilkan data kendaraan
@@ -662,20 +717,25 @@
                     // Validasi data informasi_tambahan
                     const additionalInfoBody = document.getElementById('addhistory');
 
-                    if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                        data.informasi_tambahan.forEach((info, index) => {
-                            let row = `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${info.nama}</td>
-                                    <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                    <td>${info.departemen}</td>
-                                    <td>${approvMapping[info.status] || info.status}</td>
-                                </tr>
-                            `;
-                            additionalInfoBody.innerHTML += row;
-                        });
-                    } else {
+                        if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                            data.informasi_tambahan.forEach((info, index) => {
+                                let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
+                                    ? info.alasan_penolakan 
+                                    : '-'; // hanya isi di baris terakhir
+
+                                let row = `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${info.nama}</td>
+                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                        <td>${info.departemen}</td>
+                                        <td>${approvMapping[info.status] || info.status}</td>
+                                        <td>${alasanPenolakan}</td>
+                                    </tr>
+                                `;
+                                additionalInfoBody.innerHTML += row;
+                            });
+                        } else {
                         additionalInfoBody.innerHTML = `
                             <tr>
                                 <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>

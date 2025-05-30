@@ -72,7 +72,7 @@ class PengeluaranBarangController extends Controller
         $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
 
         // Mengambil informasi tambahan terkait pengeluaran barang (misal: User yang mengeluarkan barang)
-        $approvalData = ApprovalBarangKeluar::with('user')
+        $approvalData = ApprovalBarangKeluar::with('user','pengeluaranBarang')
             ->where('pengeluaran_barang_id', $pengeluaranId)
             ->get()
             ->map(function ($approval, $index) {
@@ -82,6 +82,7 @@ class PengeluaranBarangController extends Controller
                     'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
                     'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
                     'status' => $approval->status_approval,
+                    'alasan_penolakan' => $approval->pengeluaranBarang->alasan_penolakan ?? '-',
                 ];
             });
 
@@ -104,7 +105,7 @@ class PengeluaranBarangController extends Controller
         $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
 
         // Mengambil informasi tambahan terkait pengeluaran barang (misal: User yang mengeluarkan barang)
-        $approvalData = ApprovalBarangKeluar::with('user')
+       $approvalData = ApprovalBarangKeluar::with('user','pengeluaranBarang')
             ->where('pengeluaran_barang_id', $pengeluaranId)
             ->get()
             ->map(function ($approval, $index) {
@@ -114,6 +115,7 @@ class PengeluaranBarangController extends Controller
                     'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
                     'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
                     'status' => $approval->status_approval,
+                    'alasan_penolakan' => $approval->pengeluaranBarang->alasan_penolakan ?? '-',
                 ];
             });
 

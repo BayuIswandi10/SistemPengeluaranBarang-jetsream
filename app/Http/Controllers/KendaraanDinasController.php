@@ -245,165 +245,57 @@ class KendaraanDinasController extends Controller
         }
     }    
 
-    // public function getAllBookingDates()
-    // {
-    //     try {
-    //         $data = DB::table('tb_surat_kendaraan_dinas_detail as skdd')
-    //             ->join('tb_surat_kendaraan_dinas as skd', 'skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
-    //             ->join('tb_kendaraan_dinas as kd', 'skdd.kendaraan_dinas_id', '=', 'kd.kendaraan_dinas_id')
-    //             ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
-    //                 $join->on('skd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
-    //                     ->where('pkdd.status', '=', 'Aktif'); // Only include Aktif status for participants
-    //             })
-    //             ->where(function ($query) {
-    //                 $query->whereNotIn('skd.status', ['Level 0', 'Expired']);
-    //                 // If 'Aktif' is a valid status for skd, add it explicitly; otherwise, this is sufficient
-    //             })
-    //             ->select(
-    //                 'kd.kendaraan_dinas_id',
-    //                 'kd.merk_kendaraan',
-    //                 'kd.nomor_kendaraan',
-    //                 DB::raw('(kd.kapasitas_kendaraan - 1) as kapasitas_kendaraan'), // Displayed capacity: 6 - 1 = 5
-    //                 'skd.tanggal_penggunaan',
-    //                 'skd.jenis_kendaraan',
-    //                 'skd.status',
-    //                 DB::raw('GROUP_CONCAT(skd.surat_kendaraan_dinas_id) as surat_ids'),
-    //                 DB::raw('COUNT(DISTINCT pkdd.nrp_karyawan) as total_terpakai'),
-    //                 DB::raw('((kd.kapasitas_kendaraan - 1) - COUNT(DISTINCT pkdd.nrp_karyawan)) as kapasitas_tersedia') // Available capacity
-    //             )
-    //             ->groupBy(
-    //                 'kd.kendaraan_dinas_id',
-    //                 'kd.merk_kendaraan',
-    //                 'kd.nomor_kendaraan',
-    //                 'kd.kapasitas_kendaraan',
-    //                 'skd.tanggal_penggunaan',
-    //                 'skd.jenis_kendaraan',
-    //                 'skd.status'
-    //             )
-    //             ->havingRaw('kapasitas_tersedia >= 0')
-    //             ->get();
-
-    //         return response()->json($data);
-    //     } catch (\Exception $e) {
-    //         \Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
-    //         return response()->json([
-    //             'error' => 'Terjadi kesalahan di server',
-    //             'debug' => $e->getMessage(),
-    //             'line' => $e->getLine(),
-    //             'file' => $e->getFile(),
-    //         ], 500);
-    //     }
-    // }
+    
     public function getAllBookingDates()
-{
-    try {
-        $data = DB::table('tb_surat_kendaraan_dinas_detail as skdd')
-            ->join('tb_surat_kendaraan_dinas as skd', 'skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
-            ->join('tb_kendaraan_dinas as kd', 'skdd.kendaraan_dinas_id', '=', 'kd.kendaraan_dinas_id')
-            ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
-                $join->on('skd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
-                    ->where('pkdd.status', '=', 'Aktif'); // Only include Aktif participants
-            })
-            ->whereNotIn('skd.status', ['Expired', 'Level 0']) // Allow 'Level 0' and other valid statuses
-            ->select(
-                'kd.kendaraan_dinas_id',
-                'kd.merk_kendaraan',
-                'kd.nomor_kendaraan',
-                DB::raw('(kd.kapasitas_kendaraan - 1) as kapasitas_kendaraan'), // Displayed capacity: 6 - 1 = 5
-                'skd.tanggal_penggunaan',
-                DB::raw('MIN(skd.jenis_kendaraan) as jenis_kendaraan'), // Pilih salah satu jenis_kendaraan (atau atur logika lain)
-                DB::raw('MIN(skd.status) as status'), // Pilih salah satu status (atau atur logika lain)
-                DB::raw('GROUP_CONCAT(DISTINCT skd.surat_kendaraan_dinas_id ORDER BY skd.surat_kendaraan_dinas_id) as surat_ids'),
-                DB::raw('COUNT(DISTINCT pkdd.nrp_karyawan) as total_terpakai'),
-                DB::raw('((kd.kapasitas_kendaraan - 1) - COUNT(DISTINCT pkdd.nrp_karyawan)) as kapasitas_tersedia')
-            )
-            ->groupBy(
-                'kd.kendaraan_dinas_id',
-                'kd.merk_kendaraan',
-                'kd.nomor_kendaraan',
-                'kd.kapasitas_kendaraan',
-                'skd.tanggal_penggunaan'
-            )
-            ->havingRaw('kapasitas_tersedia >= 0')
-            ->get();
+    {
+        try {
+            $data = DB::table('tb_surat_kendaraan_dinas_detail as skdd')
+                ->join('tb_surat_kendaraan_dinas as skd', 'skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
+                ->join('tb_kendaraan_dinas as kd', 'skdd.kendaraan_dinas_id', '=', 'kd.kendaraan_dinas_id')
+                ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
+                    $join->on('skd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
+                        ->where('pkdd.status', '=', 'Aktif'); // Only include Aktif participants
+                })
+                ->whereNotIn('skd.status', ['Expired', 'Level 0']) // Allow 'Level 0' and other valid statuses
+                ->select(
+                    'kd.kendaraan_dinas_id',
+                    'kd.merk_kendaraan',
+                    'kd.nomor_kendaraan',
+                    DB::raw('(kd.kapasitas_kendaraan - 1) as kapasitas_kendaraan'), // Displayed capacity: 6 - 1 = 5
+                    'skd.tanggal_penggunaan',
+                    DB::raw('MIN(skd.jenis_kendaraan) as jenis_kendaraan'), // Pilih salah satu jenis_kendaraan (atau atur logika lain)
+                    DB::raw('MIN(skd.status) as status'), // Pilih salah satu status (atau atur logika lain)
+                    DB::raw('GROUP_CONCAT(DISTINCT skd.surat_kendaraan_dinas_id ORDER BY skd.surat_kendaraan_dinas_id) as surat_ids'),
+                    DB::raw('COUNT(DISTINCT pkdd.nrp_karyawan) as total_terpakai'),
+                    DB::raw('((kd.kapasitas_kendaraan - 1) - COUNT(DISTINCT pkdd.nrp_karyawan)) as kapasitas_tersedia')
+                )
+                ->groupBy(
+                    'kd.kendaraan_dinas_id',
+                    'kd.merk_kendaraan',
+                    'kd.nomor_kendaraan',
+                    'kd.kapasitas_kendaraan',
+                    'skd.tanggal_penggunaan'
+                )
+                ->havingRaw('kapasitas_tersedia >= 0')
+                ->get();
 
-        // Log hasil untuk debugging
-        \Log::info('getAllBookingDates Response:', [
-            'data_count' => $data->count(),
-            'data' => $data->toArray()
-        ]);
+            // Log hasil untuk debugging
+            \Log::info('getAllBookingDates Response:', [
+                'data_count' => $data->count(),
+                'data' => $data->toArray()
+            ]);
 
-        return response()->json($data);
-    } catch (\Exception $e) {
-        \Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
-        return response()->json([
-            'error' => 'Terjadi kesalahan di server',
-            'debug' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-        ], 500);
+            return response()->json($data);
+        } catch (\Exception $e) {
+            \Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            return response()->json([
+                'error' => 'Terjadi kesalahan di server',
+                'debug' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
     }
-}
-
-    // public function getKendaraanByJenis(Request $request)
-    // {
-    //     $jenis = $request->input('jenis_kendaraan');
-    //     $tanggal = $request->input('tanggal_penggunaan');
-
-    //     if (!$jenis) {
-    //         return response()->json(['message' => 'Jenis kendaraan tidak ditemukan'], 400);
-    //     }
-    //     if (!$tanggal) {
-    //         return response()->json(['message' => 'Tanggal penggunaan tidak ditemukan'], 400);
-    //     }
-
-    //     try {
-    //         $kendaraan = DB::table('tb_kendaraan_dinas as kd')
-    //             ->leftJoin('tb_surat_kendaraan_dinas_detail as skdd', 'kd.kendaraan_dinas_id', '=', 'skdd.kendaraan_dinas_id')
-    //             ->leftJoin('tb_surat_kendaraan_dinas as skd', function ($join) use ($tanggal) {
-    //                 $join->on('skdd.surat_kendaraan_dinas_id', '=', 'skd.surat_kendaraan_dinas_id')
-    //                     ->whereDate('skd.tanggal_penggunaan', '=', $tanggal)
-    //                     ->where('skd.status', '!=', 'Expired');
-    //             })
-    //             ->leftJoin('tb_pencatatan_kendaraan_dinas as pkdd', function ($join) {
-    //                 $join->on('skdd.surat_kendaraan_dinas_id', '=', 'pkdd.surat_kendaraan_dinas_id')
-    //                     ->where('pkdd.status', '=', 'Aktif');
-    //             })
-    //             ->where('kd.jenis_kendaraan', $jenis)
-    //             ->select(
-    //                 'kd.kendaraan_dinas_id',
-    //                 'kd.nomor_kendaraan',
-    //                 'kd.merk_kendaraan',
-    //                 'kd.kapasitas_kendaraan',
-    //                 DB::raw('COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) as total_terpakai'),
-    //                 DB::raw('GREATEST(0, kd.kapasitas_kendaraan - COUNT(DISTINCT CASE WHEN skd.tanggal_penggunaan = "' . $tanggal . '" THEN pkdd.nrp_karyawan ELSE NULL END) - 1) as kapasitas_tersedia'),
-    //                 'skd.tujuan_penggunaan_1',
-    //                 'skd.tujuan_penggunaan_2',
-    //                 'skd.tujuan_penggunaan_3'
-    //             )
-    //             ->groupBy(
-    //                 'kd.kendaraan_dinas_id',
-    //                 'kd.nomor_kendaraan',
-    //                 'kd.merk_kendaraan',
-    //                 'kd.kapasitas_kendaraan',
-    //                 'skd.tujuan_penggunaan_1',
-    //                 'skd.tujuan_penggunaan_2',
-    //                 'skd.tujuan_penggunaan_3'
-    //             )
-    //             ->orderBy('kd.nomor_kendaraan')
-    //             ->get();
-
-    //         return response()->json($kendaraan);
-    //     } catch (\Exception $e) {
-    //         \Log::error('getKendaraanByJenis Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
-    //         return response()->json([
-    //             'error' => 'Terjadi kesalahan di server',
-    //             'debug' => $e->getMessage(),
-    //             'line' => $e->getLine(),
-    //             'file' => $e->getFile(),
-    //         ], 500);
-    //     }
-    // }
 
     public function getKendaraanByJenis(Request $request)
     {
