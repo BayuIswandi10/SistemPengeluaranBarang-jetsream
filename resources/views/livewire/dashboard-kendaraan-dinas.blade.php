@@ -728,6 +728,13 @@
                             mode: "range",
                             dateFormat: "Y-m-d",
                             locale: "id",
+                            onValueUpdate: function(selectedDates, dateStr, instance) {
+                                if (selectedDates.length === 2) {
+                                    const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                                    const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                    instance._input.value = `${start} s/d ${end}`;
+                                }
+                            },
                             onChange: function (selectedDates, dateStr, instance) {
                                 if (selectedDates.length === 2) {
                                     const startDate = selectedDates[0].toISOString().split('T')[0];
@@ -989,6 +996,13 @@
                         mode: "range",
                         dateFormat: "Y-m-d",
                         locale: "id",
+                        onValueUpdate: function(selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                                const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                instance._input.value = `${start} s/d ${end}`;
+                            }
+                        },
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
                                 const startDate = selectedDates[0].toISOString().split('T')[0];
@@ -1056,6 +1070,13 @@
                     mode: "range", // Mode range date picker
                     dateFormat: "Y-m-d", // Format tanggal (contoh: 2025-02-13)
                     locale: "id", // Opsional: Locale Indonesia
+                    onValueUpdate: function(selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                                const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                instance._input.value = `${start} s/d ${end}`;
+                            }
+                        },
                     onClose: function (selectedDates, dateStr, instance) {
                         if (selectedDates.length === 2) { // Pastikan ada dua tanggal yang dipilih
                             // Format tanggal menjadi YYYY-MM-DD

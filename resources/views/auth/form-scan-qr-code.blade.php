@@ -266,8 +266,6 @@
         </div>
     </div>
 
-    
-
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });

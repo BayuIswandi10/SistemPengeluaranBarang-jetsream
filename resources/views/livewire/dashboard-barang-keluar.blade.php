@@ -625,6 +625,13 @@
                         mode: "range",
                         dateFormat: "Y-m-d",
                         locale: "id",
+                        onValueUpdate: function(selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                                const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                instance._input.value = `${start} s/d ${end}`;
+                            }
+                        },
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
                                 const startDate = selectedDates[0].toISOString().split('T')[0];
