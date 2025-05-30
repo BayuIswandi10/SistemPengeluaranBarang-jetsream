@@ -2787,59 +2787,104 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Tombol Submit
+            // Form Pengeluaran Barang
             const form = document.getElementById('tambah_pengeluaran_barang');
-            const submitButton = form.querySelector('button[type="submit"]');
+            const submitButton = form?.querySelector('button[type="submit"]');
 
-            const formDinasModal = document.getElementById('tambahDinasModal');
-            const submitButtonDinas = formDinasModal.querySelector('button[type="submit"]');
+            // Form Penggunaan Kendaraan Dinas
+            const formDinas = document.getElementById('tambah_penggunaan_kendaraan_dinas');
+            const submitButtonDinas = formDinas?.querySelector('button[type="submit"]');
 
-            submitButton.addEventListener('click', function (e) {
-                // Cek validasi form terlebih dahulu
-                if (form.checkValidity()) {
-                    e.preventDefault(); // Cegah submit bawaan
+            // Form Ikut Serta
+            const formIkutSerta = document.getElementById('formTambahikutserta');
+            const submitButtonIkutSerta = formIkutSerta?.querySelector('button[type="submit"]');
 
-                    Swal.fire({
-                        title: 'Ajukan Pengeluaran Barang?',
-                        text: "Pastikan seluruh data telah diisi dengan benar.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, Ajukan',
-                        cancelButtonText: 'Tinjau Ulang',
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit(); // Submit form jika dikonfirmasi
-                        }
-                    });
-                } else {
-                    // Trigger browser untuk menampilkan error bawaan HTML5
-                    form.reportValidity();
-                }
-            });
-            submitButtonDinas.addEventListener('click', function (e) {
-                // Cek validasi formDinasModal terlebih dahulu
-                if (formDinasModal.checkValidity()) {
-                    e.preventDefault(); // Cegah submit bawaan
+            // Handler untuk Form Pengeluaran Barang
+            if (submitButton && form) {
+                submitButton.addEventListener('click', function (e) {
+                    // Cek validasi form terlebih dahulu
+                    if (form.checkValidity()) {
+                        e.preventDefault(); // Cegah submit bawaan
+                        
+                        Swal.fire({
+                            title: 'Apakah Anda Yakin?',
+                            text: "Pastikan seluruh data pengeluaran barang telah diisi dengan benar.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ya, Ajukan',
+                            cancelButtonText: 'Tinjau Ulang',
+                            reverseButtons: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit(); // Submit form jika dikonfirmasi
+                            }
+                        });
+                    } else {
+                        // Trigger browser untuk menampilkan error bawaan HTML5
+                        form.reportValidity();
+                    }
+                });
+            }
 
-                    Swal.fire({
-                        title: 'Ajukan Pengeluaran Barang?',
-                        text: "Pastikan seluruh data telah diisi dengan benar.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, Ajukan',
-                        cancelButtonText: 'Tinjau Ulang',
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            formDinasModal.submit(); // Submit formDinasModal jika dikonfirmasi
-                        }
-                    });
-                } else {
-                    // Trigger browser untuk menampilkan error bawaan HTML5
-                    formDinasModal.reportValidity();
-                }
-            });
+            // Handler untuk Form Penggunaan Kendaraan Dinas
+            if (submitButtonDinas && formDinas) {
+                submitButtonDinas.addEventListener('click', function (e) {
+                    // Cek validasi form terlebih dahulu
+                    if (formDinas.checkValidity()) {
+                        e.preventDefault(); // Cegah submit bawaan
+                        
+                        Swal.fire({
+                            title: 'Apakah Anda Yakin?',
+                            text: "Pastikan seluruh data penggunaan kendaraan dinas telah diisi dengan benar.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ya, Ajukan',
+                            cancelButtonText: 'Tinjau Ulang',
+                            reverseButtons: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                formDinas.submit(); // Submit form jika dikonfirmasi
+                            }
+                        });
+                    } else {
+                        // Trigger browser untuk menampilkan error bawaan HTML5
+                        formDinas.reportValidity();
+                    }
+                });
+            }
+
+            // Handler untuk Form Ikut Serta
+            if (submitButtonIkutSerta && formIkutSerta) {
+                submitButtonIkutSerta.addEventListener('click', function (e) {
+                    // Cek validasi form terlebih dahulu
+                    if (formIkutSerta.checkValidity()) {
+                        e.preventDefault(); // Cegah submit bawaan
+                        
+                        Swal.fire({
+                            title: 'Apakah Anda Yakin?',
+                            text: "Pastikan seluruh data peserta telah diisi dengan benar.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ya, Tambahkan',
+                            cancelButtonText: 'Tinjau Ulang',
+                            reverseButtons: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                formIkutSerta.submit(); // Submit form jika dikonfirmasi
+                            }
+                        });
+                    } else {
+                        // Trigger browser untuk menampilkan error bawaan HTML5
+                        formIkutSerta.reportValidity();
+                    }
+                });
+            }
         });
 
 
