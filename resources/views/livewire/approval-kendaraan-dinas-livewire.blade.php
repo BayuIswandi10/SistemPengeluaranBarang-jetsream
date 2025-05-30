@@ -1,5 +1,38 @@
 <div class ="content-wrapper">
     <style>
+         #dataTable {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        }
+        #dataTable.visible {
+        opacity: 1;
+        }
+
+        #dataTable thead th:first-child {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 8px 0 !important; /* Sesuaikan padding jika perlu */
+        }
+
+        #dataTable thead th:first-child input[type="checkbox"] {
+            margin: 0 auto !important; /* Memusatkan checkbox secara horizontal */
+            display: block !important;
+            vertical-align: middle !important;
+        }
+
+        #dataTable tbody td:first-child {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 8px 0 !important; /* Sesuaikan padding agar sesuai dengan header */
+        }
+
+        #dataTable tbody td:first-child input[type="checkbox"] {
+            margin: 0 auto !important; /* Memusatkan checkbox di body */
+            display: block !important;
+            vertical-align: middle !important;
+        }
+
+
         /* Pastikan modal tidak lebih besar dari layar */
         @media (max-width: 768px) {
             .modal-dialog {
@@ -67,48 +100,28 @@
 
         <div class="card mt-3">
            <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
-            <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
-             <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
+                <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
+                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
-             @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs') ||
-                (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'General Service'))
-                
-                <a href="#" id="downloadExcel"
-                class="btn btn-success btn-sm d-flex align-items-center px-3"
-                style="height: 38px; white-space: nowrap;">
-                <i class="fas fa-file-excel fa-lg mr-2"></i>
-                <span>Export Excel</span>
-                </a>
-            @endif
-
+                @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs') ||
+                    (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'General Service'))
+                    
+                    <a href="#" id="downloadExcel"
+                    class="btn btn-success btn-sm d-flex align-items-center px-3"
+                    style="height: 38px; white-space: nowrap;">
+                    <i class="fas fa-file-excel fa-lg mr-2"></i>
+                    <span>Export Excel</span>
+                    </a>
+                @endif
             </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <script>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: '{{ session('success') }}',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    </script>
-                @endif
 
-                @if (session('error'))
-                    <script>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: '{{ session('error') }}',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    </script>
-                @endif
+            <div class="card-body">
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" class="form-check-input">
+                            </th>
                             <th>NO</th>
                             <th>No Surat Pengajuan Kendaraan Dinas</th>
                             <th>Tujuan</th>
@@ -121,12 +134,44 @@
                         <?php $i = 0; ?>
                         @foreach ($kendaraanDinas as $dataKD)
                             <tr>
+                                <td>
+                                    @php
+                                        $canApprove = false;
+                                        // Check if current user can approve this item
+                                        
+                                        // Ka.Dept dapat approve Level 1 dari departemen mereka sendiri
+                                        if ($dataKD->status === 'Level 1' && $user->level === 'Ka.Dept') {
+                                            // Untuk General Affairs, Ka.Dept hanya approve dari dept General Affairs
+                                            if ($user->departemen === 'General Affairs') {
+                                                $canApprove = ($dataKD->user->departemen === 'General Affairs');
+                                            } 
+                                            // Untuk departemen lain, Ka.Dept approve dari dept mereka kecuali General Affairs
+                                            else {
+                                                $canApprove = ($dataKD->user->departemen === $user->departemen);
+                                            }
+                                        }
+                                        
+                                        // Ka.Sie General Service dapat approve Level 2 dari semua departemen
+                                        elseif ($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->seksi === 'General Service') {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Security dapat approve Level 3
+                                        elseif ($dataKD->status === 'Level 3' && $user->level === 'Security') {
+                                            $canApprove = true;
+                                        }
+                                    @endphp
+                                    
+                                    @if($canApprove)
+                                        <input type="checkbox" 
+                                            class="form-check-input item-checkbox" 
+                                            value="{{ $dataKD->surat_kendaraan_dinas_id }}"
+                                            data-status="{{ $dataKD->status }}">
+                                    @endif
+                                </td>
+                                </td>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $dataKD->surat_kendaraan_dinas_id }}</td>
-                                {{-- <td>
-                                    {{ $dataKD->tujuan_penggunaan_1 ?? '-' }} > {{ $dataKD->tujuan_penggunaan_2 ?? '-' }}
-                                    > {{ $dataKD->tujuan_penggunaan_3 ?? '-' }}
-                                </td> --}}
                                 <td>
                                     @php
                                         $tujuanList = array_filter([
@@ -169,7 +214,7 @@
                                     @elseif ($dataKD->status == 'Level 2')
                                         Menunggu Persetujuan Ka.Sie Transportasi
                                     @elseif ($dataKD->status == 'Level 3')
-                                        Menunggu Persetujuan Security 
+                                        Menunggu Persetujuan Security
                                     @elseif ($dataKD->status == 'Level 4')
                                         Sudah Disetujui
                                     @elseif ($dataKD->status == 'Level 0')
@@ -180,71 +225,20 @@
                                 </td>
                                 <td>
                                     <div class="button-group d-flex">
-
-                
-                                        <!-- Button for Level 1 (Ka.Dept YBS) -->
-                                        @if($dataKD->status === 'Level 1' && $user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs')
+                                        <!-- Button Edit - Only for Ka.Sie with GA department and vehicle type 1 -->
+                                        @if(($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'General Affairs' && $dataKD->jenis_kendaraan == 1) ||
+                                            ($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'General Affairs'))
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
+                                                class="btn btn-warning btn-sm mr-2" 
+                                                data-toggle="modal" 
+                                                data-target="#editDataModal" 
                                                 data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
+                                                <i class="fas fa-edit"></i>
                                             </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-
                                         @endif
-                
-                                        <!-- Button for Level 2 (Ka.Dept GA) -->
-                                        @if($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'General Affairs')
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kasietransportasi" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button Edit -->
-                                            @if ($dataKD->jenis_kendaraan == 1)
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-warning btn-sm mr-2" 
-                                                    data-toggle="modal" 
-                                                    data-target="#editDataModal" 
-                                                    data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            @endif
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif                                        
-
-                                        @if($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'General Affairs')
-                                         
-                                            <!-- Button Edit -->
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-warning btn-sm mr-2" 
-                                                    data-toggle="modal" 
-                                                    data-target="#editDataModal" 
-                                                    data-id="{{ $dataKD->surat_kendaraan_dinas_id }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                        @endif 
                                         
-                                        <!-- Button detail -->
+                                        <!-- Button Detail -->
                                         <button 
                                             type="button" 
                                             class="btn btn-primary btn-sm mr-2" 
@@ -253,14 +247,42 @@
                                             data-nomor="{{ $dataKD->surat_kendaraan_dinas_id }}">
                                             <i class="fa-solid fa-circle-info"></i>
                                         </button>
-
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
-                </table>              
+                </table>
             </div>
+            
+            <!-- Card Footer with Bulk Action Buttons -->
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="selected-info" class="text-muted">
+                            <span id="selected-count">0</span> item dipilih
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button type="button" 
+                                id="bulk-approve-btn" 
+                                class="btn btn-success mr-2" 
+                                disabled>
+                            <i class="fa-solid fa-check-circle mr-1"></i>
+                            Setujui
+                        </button>
+                        
+                        <button type="button" 
+                                id="bulk-reject-btn" 
+                                class="btn btn-danger" 
+                                disabled>
+                            <i class="fa-solid fa-times-circle mr-1"></i>
+                            Tolak
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -548,10 +570,13 @@
                 emptyTable: "Tidak ada data di tabel"
             },
             columnDefs: [
-                { className: 'dt-body-center', targets: 0 },
-                { className: 'dt-head-center', targets: 0 },
-                { className: 'dt-body-center', targets: 5 },
-                { className: 'dt-head-center', targets: 5 }
+            {
+                className: 'dt-body-center dt-head-center', 
+                targets: 0, // Kolom pertama (checkbox)
+                orderable: false // Opsional: Matikan sorting untuk kolom checkbox
+            },
+                { className: 'dt-body-center', targets: 6 },
+                { className: 'dt-head-center', targets: 6 }
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             pageLength: 10,
@@ -881,98 +906,6 @@
         row.find(".keterangan-kendaraan").text(keterangan);
     }
 
-
-
-
-
-
-$(document).ready(function() {
-
-
-    // Gunakan delegation
-
-    $(document).on('click', '.update-status-kadeptybs', function() {
-        var dataKDId = $(this).data('id');
-        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kadeptybs');
-    });
-
-    $(document).on('click', '.update-status-kasietransportasi', function() {
-        var dataKDId = $(this).data('id');
-        confirmUpdate(dataKDId, '/pengajuanDinas/update-status-kasietransportasi');
-    });
-
-    // Common function to show confirmation and then update status
-    function confirmUpdate(dataKDId, url) {
-        Swal.fire({
-            title: 'Konfirmasi Persetujuan',
-            text: 'Apakah Anda menyetujui penggunaan kendaraan dinas dengan nomor ' + dataKDId + '?',
-            icon: 'info',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Setuju!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Tampilkan loading modal setelah klik "Ya, tolak!"
-                Swal.fire({
-                    title: 'Memproses...',
-                    html: 'sedang menyimpan persetujuan anda.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                updateStatus(dataKDId, url);
-            }
-        });
-    }
-
-    // Common function to handle status update
-    function updateStatus(dataKDId, url) {
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: {
-                    surat_kendaraan_dinas_id: dataKDId,
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Success alert using SweetAlert
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Surat Dinas dengan No: ' + dataKDId + ' telah disetujui.',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000,
-                        }).then(() => {
-                            location.reload(); // Reload the table after successful update
-                        });
-                    } else {
-                        // Error alert using SweetAlert
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: response.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                },
-                error: function(response) {
-                    // Handle any error response using SweetAlert
-                    Swal.fire({
-                        title: 'Error!',
-                        text: response.responseJSON.message,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-    });
-
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
@@ -1099,142 +1032,295 @@ $(document).ready(function() {
 
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Inisialisasi Selectize untuk elemen dengan class .select-tools
+        // Inisialisasi Selectize
         $('.select-tools').selectize({
-            create: true, // Memungkinkan pengguna menambahkan opsi baru
-            sortField: 'text' // Mengurutkan opsi berdasarkan teks
+            create: true,
+            sortField: 'text'
         });
 
-        // Handle event klik untuk tombol dengan class .reject-status
-        document.querySelectorAll('.reject-status').forEach(button => {
-            button.addEventListener('click', function () {
-                const surat_kendaraan_dinas_id = this.getAttribute('data-id');
+        // Variables for bulk operations
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        const selectedCountElement = document.getElementById('selected-count');
+        const bulkApproveBtn = document.getElementById('bulk-approve-btn');
+        const bulkRejectBtn = document.getElementById('bulk-reject-btn');
 
-                // Tampilkan SweetAlert dengan textarea input untuk alasan penolakan
-                Swal.fire({
-                    title: 'Tolak Pengajuan',
-                    html: `
-                        <p>Masukkan alasan penolakan untuk surat kendaraan dinas dengan nomor 
-                        <strong>${surat_kendaraan_dinas_id}</strong>:</p>
-                         <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
-                            <option value="">-- Pilih alasan penolakan cepat --</option>
-                            <option value="Data tidak lengkap">Data tidak lengkap</option>
-                            <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
-                            <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
-                        </select>
+        // Handle Select All functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateBulkActionButtons();
+        });
 
-                        <textarea id="alasanPenolakan" class="swal2-textarea"
-                            placeholder="Tuliskan alasan penolakan di sini..."
-                            style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
-                    `,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Kirim Penolakan',
-                    cancelButtonText: 'Batal',
-                    reverseButtons: true,
-                    didOpen: () => {
-                        const select = document.getElementById('alasanDropdown');
-                        const textarea = document.getElementById('alasanPenolakan');
-
-                        // Isi textarea otomatis saat opsi dipilih
-                        select.addEventListener('change', () => {
-                            textarea.value = select.value;
-                        });
-                    },
-                    preConfirm: () => {
-                        const alasanSelect = document.getElementById('alasanDropdown').value.trim();
-                        const alasanText = document.getElementById('alasanPenolakan').value.trim();
-
-                        const alasan = alasanText || alasanSelect;
-
-                        if (!alasan) {
-                            Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
-                        }
-
-                        return alasan;
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const alasanPenolakan = result.value;
-
-                        // Tampilkan loading modal
-                        Swal.fire({
-                            title: 'Menolak Pengajuan...',
-                            html: 'Mohon tunggu, sedang memproses penolakan.',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        // Kirim request ke backend
-                        fetch("{{ route('pengajuanDinas.rejectStatus') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                surat_kendaraan_dinas_id: surat_kendaraan_dinas_id,
-                                alasan: alasanPenolakan
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: data.message,
-                                    icon: 'success',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Gagal!',
-                                    text: data.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Terjadi Kesalahan!',
-                                text: 'Error: ' + error.message,
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        });
-                    }
-                });
+        // Handle individual checkbox changes
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectAllState();
+                updateBulkActionButtons();
             });
         });
-    });
 
-
-    $(document).ready(function () {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                columnDefs: [
-                    { className: 'dt-body-center', targets: 0 },
-                    { className: 'dt-head-center', targets: 0 },
-                    { className: 'dt-body-center', targets: 5 },
-                    { className: 'dt-head-center', targets: 5 }
-                ],
-                scrollX: false,
-                responsive: true
-            });
+        // Update Select All state based on individual checkboxes
+        function updateSelectAllState() {
+            const totalCheckboxes = itemCheckboxes.length;
+            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+            
+            if (checkedCheckboxes === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
         }
-    });
 
+        // Update bulk action buttons state
+        function updateBulkActionButtons() {
+            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+            selectedCountElement.textContent = checkedCheckboxes;
+            
+            const hasSelection = checkedCheckboxes > 0;
+            bulkApproveBtn.disabled = !hasSelection;
+            bulkRejectBtn.disabled = !hasSelection;
+        }
 
+        // Bulk Approve Handler
+        bulkApproveBtn.addEventListener('click', function() {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(cb => ({
+                    id: cb.value,
+                    status: cb.getAttribute('data-status')
+                }));
 
-    var $select = $('#select-tools').selectize({
-    
-    create: true
+            if (selectedItems.length === 0) {
+                Swal.fire('Peringatan!', 'Pilih minimal satu item untuk disetujui.', 'warning');
+                return;
+            }
+
+            // Group by status for different approval levels
+            const level1Items = selectedItems.filter(item => item.status === 'Level 1');
+            const level2Items = selectedItems.filter(item => item.status === 'Level 2');
+
+            Swal.fire({
+                title: 'Konfirmasi Persetujuan Massal',
+                html: `Apakah Anda yakin ingin menyetujui <strong>${selectedItems.length}</strong> pengajuan yang dipilih?`,
+                icon: 'question',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Setujui Semua!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processBulkApproval(level1Items, level2Items);
+                }
+            });
+        });
+
+        // Bulk Reject Handler
+        bulkRejectBtn.addEventListener('click', function() {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (selectedItems.length === 0) {
+                Swal.fire('Peringatan!', 'Pilih minimal satu item untuk ditolak.', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Tolak Pengajuan Massal',
+                html: `
+                    <p>Anda akan menolak <strong>${selectedItems.length}</strong> pengajuan yang dipilih.</p>
+                    <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
+                        <option value="">-- Pilih alasan penolakan cepat --</option>
+                        <option value="Data tidak lengkap">Data tidak lengkap</option>
+                        <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
+                        <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
+                    </select>
+                    <textarea id="alasanPenolakan" class="swal2-textarea"
+                        placeholder="Tuliskan alasan penolakan di sini..."
+                        style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Tolak Semua',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                didOpen: () => {
+                    const select = document.getElementById('alasanDropdown');
+                    const textarea = document.getElementById('alasanPenolakan');
+
+                    select.addEventListener('change', () => {
+                        textarea.value = select.value;
+                    });
+                },
+                preConfirm: () => {
+                    const alasanSelect = document.getElementById('alasanDropdown').value.trim();
+                    const alasanText = document.getElementById('alasanPenolakan').value.trim();
+                    const alasan = alasanText || alasanSelect;
+
+                    if (!alasan) {
+                        Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
+                    }
+                    return alasan;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processBulkRejection(selectedItems, result.value);
+                }
+            });
+        });
+
+        // Process bulk approval
+        function processBulkApproval(level1Items, level2Items) {
+            Swal.fire({
+                title: 'Memproses Persetujuan...',
+                html: 'Mohon tunggu, sedang memproses persetujuan massal.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const promises = [];
+
+            // Process Level 1 approvals
+            level1Items.forEach(item => {
+                promises.push(
+                    fetch("{{ route('pengajuanDinas.updateStatusKaDeptYBS') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            surat_kendaraan_dinas_id: item.id
+                        })
+                    }).then(response => response.json())
+                );
+            });
+
+            // Process Level 2 approvals
+            level2Items.forEach(item => {
+                promises.push(
+                    fetch("{{ route('pengajuanDinas.updateStatusKaSieTransport') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            surat_kendaraan_dinas_id: item.id
+                        })
+                    }).then(response => response.json())
+                );
+            });
+
+            Promise.all(promises)
+                .then(results => {
+                    const successCount = results.filter(result => result.success).length;
+                    const failCount = results.length - successCount;
+
+                    if (failCount === 0) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Semua ${successCount} pengajuan berhasil disetujui.`,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Sebagian Berhasil',
+                            html: `<strong>${successCount}</strong> pengajuan berhasil disetujui.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Error: ' + error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
+        // Process bulk rejection
+        function processBulkRejection(selectedItems, alasan) {
+            Swal.fire({
+                title: 'Memproses Penolakan...',
+                html: 'Mohon tunggu, sedang memproses penolakan massal.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const promises = selectedItems.map(itemId => {
+                return fetch("{{ route('pengajuanDinas.rejectStatus') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        surat_kendaraan_dinas_id: itemId,
+                        alasan: alasan
+                    })
+                }).then(response => response.json());
+            });
+
+            Promise.all(promises)
+                .then(results => {
+                    const successCount = results.filter(result => result.success).length;
+                    const failCount = results.length - successCount;
+
+                    if (failCount === 0) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Semua ${successCount} pengajuan berhasil ditolak.`,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Sebagian Berhasil',
+                            html: `<strong>${successCount}</strong> pengajuan berhasil ditolak.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Error: ' + error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
+        // Initialize state
+        updateBulkActionButtons();
     });
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

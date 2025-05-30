@@ -33,6 +33,40 @@ class ApprovalKendaraanDinasLivewire extends Component
         $this->dispatch('dataUpdated');
     }
 
+    // private function fetchKendaraanDinas()
+    // {
+    //     $user = Auth::user();
+    //     $query = SuratKendaraanDinas::with(['user', 'approval', 'pencatatanKendaraanDinas']);
+
+    //     $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
+    //     $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
+
+    //     if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'General Service') {
+    //         return (clone $query)->whereHas('user', function ($query) use ($user) {
+    //                 $query->where('departemen', $user->departemen);
+    //             })
+    //             ->whereBetween('created_date', [$start, $end])
+    //             ->get();
+    //     } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
+    //         return (clone $query)->whereHas('user', function ($query) use ($user) {
+    //                 $query->where('departemen', $user->departemen);
+    //             })
+    //             ->whereBetween('created_date', [$start, $end])
+    //             ->orderByRaw("FIELD(status, 'Level 1') DESC")
+    //             ->orderBy('status', 'asc')
+    //             ->get();
+    //     } elseif (
+    //         in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+    //         ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
+    //     ) {
+    //         return (clone $query)
+    //             ->whereBetween('created_date', [$start, $end])
+    //             ->orderByRaw("FIELD(status, 'Level 2') DESC")
+    //             ->get();
+    //     } else {
+    //         return collect();
+    //     }
+    // }
     private function fetchKendaraanDinas()
     {
         $user = Auth::user();
@@ -41,13 +75,16 @@ class ApprovalKendaraanDinasLivewire extends Component
         $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
         $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
 
+        // Ka.Sie (bukan General Service) - hanya melihat dari departemen sendiri
         if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'General Service') {
             return (clone $query)->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })
                 ->whereBetween('created_date', [$start, $end])
                 ->get();
-        } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
+        } 
+        // Ka.Dept (bukan General Affairs) - hanya melihat dari departemen sendiri
+        elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
             return (clone $query)->whereHas('user', function ($query) use ($user) {
                     $query->where('departemen', $user->departemen);
                 })
@@ -55,8 +92,20 @@ class ApprovalKendaraanDinasLivewire extends Component
                 ->orderByRaw("FIELD(status, 'Level 1') DESC")
                 ->orderBy('status', 'asc')
                 ->get();
-        } elseif (
-            in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
+        }
+        // Ka.Dept General Affairs - melihat dari departemen General Affairs saja
+        elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+            return (clone $query)->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen);
+                })
+                ->whereBetween('created_date', [$start, $end])
+                ->orderByRaw("FIELD(status, 'Level 1') DESC")
+                ->orderBy('status', 'asc')
+                ->get();
+        }
+        // Ka.Sie General Service, Security, atau Super Admin - melihat semua
+        elseif (
+            in_array($user->level, ['Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
         ) {
             return (clone $query)
@@ -67,6 +116,7 @@ class ApprovalKendaraanDinasLivewire extends Component
             return collect();
         }
     }
+
 
     public function render()
     {
