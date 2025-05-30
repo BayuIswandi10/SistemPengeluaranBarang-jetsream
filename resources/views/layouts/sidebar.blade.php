@@ -86,7 +86,7 @@
                                 @if(
                                     Auth::check() && 
                                     !in_array(Auth::user()->level, ['Security']) &&
-                                    !(Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi !== 'General Service')
+                                    !(Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi !== 'GENERAL SERVICES')
                                 )
                                     <li class="nav-item {{ request()->routeIs('approval-dinas') ? 'menu-open' : '' }}">
                                         <a href="{{ route('approval-dinas') }}" class="nav-link {{ request()->routeIs('approval-dinas') ? 'active' : '' }}">

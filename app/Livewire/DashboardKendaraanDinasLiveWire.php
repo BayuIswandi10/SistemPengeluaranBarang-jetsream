@@ -24,18 +24,18 @@ class DashboardKendaraanDinasLiveWire extends Component
             ->where('status', '!=', 'Expired');
 
         // Filter data berdasarkan level user
-        if ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+        if ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
             $suratKendaraanDinasList = $query->get();
-        }elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'General Service') {
+        }elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
             // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
         } elseif (
             in_array($user->level, ['Security', 'Super Admin']) ||
-            ($user->level === 'Ka.Sie' && $user->seksi === 'General Service')
+            ($user->level === 'Ka.Sie' && $user->seksi === 'GENERAL SERVICES')
         ) {
-            // Ka.Sie dengan seksi General Service → dapat semua data
+            // Ka.Sie dengan seksi GENERAL SERVICES → dapat semua data
             $suratKendaraanDinasList = $query->get();
         } else {
             // Selain itu, kosong
@@ -46,7 +46,7 @@ class DashboardKendaraanDinasLiveWire extends Component
         $userLevel = null;
         if ($user->level === 'Ka.Dept') {
             $userLevel = 2;
-        } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'General Affairs') {
+        } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'GENERAL AFFAIRS') {
             $userLevel = 3;
         } elseif ($user->level === 'Security') {
             $userLevel = 4;

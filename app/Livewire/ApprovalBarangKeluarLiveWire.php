@@ -43,7 +43,7 @@ class ApprovalBarangKeluarLiveWire extends Component
         $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
         $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
 
-        if ($user->departemen === 'Finance') {
+        if ($user->departemen === 'FINANCE') {
             return (clone $query)
                 ->whereBetween('created_date', [$start, $end])
                 ->where('kategori_pengeluaran', 1)
@@ -66,7 +66,7 @@ class ApprovalBarangKeluarLiveWire extends Component
             ->orderByRaw("FIELD(status, 'Level 1') DESC")
             ->orderBy('status', 'asc')
             ->get();
-        } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs') {
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'GENERAL AFFAIRS') {
             return (clone $query)->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })
@@ -74,12 +74,12 @@ class ApprovalBarangKeluarLiveWire extends Component
             ->orderByRaw("FIELD(status, 'Level 2') DESC")
             ->orderBy('status', 'asc')
             ->get();
-        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+        } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
             $level2FromGA = (clone $query)
                 ->whereBetween('created_date', [$start, $end])
                 ->where('status', 'Level 2')
                 ->whereHas('user', function ($q) {
-                    $q->where('departemen', 'General Affairs');
+                    $q->where('departemen', 'GENERAL AFFAIRS');
                 })
                 ->get();
 
@@ -88,7 +88,7 @@ class ApprovalBarangKeluarLiveWire extends Component
                 ->where(function ($q) {
                     $q->where('status', '!=', 'Level 2')
                     ->orWhereHas('user', function ($q2) {
-                        $q2->where('departemen', '!=', 'General Affairs');
+                        $q2->where('departemen', '!=', 'GENERAL AFFAIRS');
                     });
                 })
                 ->orderByRaw("FIELD(status, 'Level 3') DESC")

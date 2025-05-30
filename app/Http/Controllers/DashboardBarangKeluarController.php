@@ -34,9 +34,9 @@ class DashboardBarangKeluarController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Staff' && $user->departemen === 'Finance')  {
+            if ($user->level === 'Staff' && $user->departemen === 'FINANCE')  {
                 $pengeluaranBarangs = $query->where('kategori_pengeluaran', 1)->get();
-            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
                 $pengeluaranBarangs = $query->get();
             }elseif (in_array($user->level,['Ka.Sie','Ka.Dept'])) {
                 $pengeluaranBarangs = $query->whereHas('user', function ($query) use ($user) {
@@ -52,11 +52,11 @@ class DashboardBarangKeluarController extends Controller
             // Ekstrak angka dari level user
             if ($user->level === 'Super Admin') {
                 $userLevel = 5;
-            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'General Affairs') {
+            } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
                 $userLevel = 4;
             } elseif ($user->level === 'Ka.Dept') {
                 $userLevel = 3;
-            } elseif ($user->level === 'Staff' && $user->departemen === 'Finance') {
+            } elseif ($user->level === 'Staff' && $user->departemen === 'FINANCE') {
                 $userLevel = 5;
             } elseif ($user->level === 'Security') {
                 $userLevel = 5;

@@ -370,13 +370,13 @@ class ApprovalBarangKeluarController extends Controller
              $userDepartment = $this->getDepartmentName($levelKaryawan);
              $this->sendApprovalEmail($emailReceiver, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);
 
-            // Cari email Ka.Dept General Affairs
+            // Cari email Ka.Dept GENERAL AFFAIRS
             $emailKaDeptGA = User::where('level', 'Ka.Dept')
-            ->where('departemen', 'General Affairs')
+            ->where('departemen', 'GENERAL AFFAIRS')
             ->value('email');
 
             if (!$emailKaDeptGA) {
-                throw new \Exception('Email Ka.Dept General Affairs tidak ditemukan.');
+                throw new \Exception('Email Ka.Dept GENERAL AFFAIRS tidak ditemukan.');
             }
 
             // Kirim email ke Ka.Dept GA
@@ -462,7 +462,7 @@ class ApprovalBarangKeluarController extends Controller
 
             // Jika kategori = 1 (Scrap), kirim email ke user Finance
             if ((int) $pengeluaranBarang->kategori_pengeluaran === 1) {
-                $financeUsers = User::where('departemen', 'Finance')->pluck('email');
+                $financeUsers = User::where('departemen', 'FINANCE')->pluck('email');
 
                 foreach ($financeUsers as $financeEmail) {
                     $this->sendApprovalEmail($financeEmail, $pengeluaranBarangId, $user->name, $statusText, $userDepartment);

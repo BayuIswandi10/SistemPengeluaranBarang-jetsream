@@ -8,6 +8,30 @@
             }
         }
 
+        #dataTable thead th:first-child {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 8px 0 !important; /* Sesuaikan padding jika perlu */
+        }
+
+        #dataTable thead th:first-child input[type="checkbox"] {
+            margin: 0 auto !important; /* Memusatkan checkbox secara horizontal */
+            display: block !important;
+            vertical-align: middle !important;
+        }
+
+        #dataTable tbody td:first-child {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 8px 0 !important; /* Sesuaikan padding agar sesuai dengan header */
+        }
+
+        #dataTable tbody td:first-child input[type="checkbox"] {
+            margin: 0 auto !important; /* Memusatkan checkbox di body */
+            display: block !important;
+            vertical-align: middle !important;
+        }
+
         /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
         .modal-body {
             overflow-x: auto;
@@ -31,7 +55,7 @@
                 <div class="d-flex align-items-center" style="margin-left: auto; gap: 0.5rem;">
                   <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
-                    @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs')
+                    @if(Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'GENERAL AFFAIRS')
                         <a href="#" id="downloadExcel"
                         class="btn btn-success btn-sm d-flex align-items-center px-3"
                         style="height: 38px; white-space: nowrap;">
@@ -69,7 +93,10 @@
                 
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
-                        <tr>    
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" class="form-check-input">
+                            </th>
                             <th>NO</th>
                             <th>Nomor Pengeluaran Barang</th>
                             <th>Tujuan</th>
@@ -78,10 +105,56 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
                             <tr>
+                                <td>
+                                    @php
+                                        $canApprove = false;
+                                        // Check if current user can approve this item
+                                        
+                                        // Ka.Sie dapat approve Level 1
+                                        if ($pengeluaranBarang->status === 'Level 1' && $user->level === 'Ka.Sie') {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Ka.Dept YBS dapat approve Level 2 (kecuali dari GENERAL AFFAIRS)
+                                        elseif ($pengeluaranBarang->status === 'Level 2' && $user->level === 'Ka.Dept' && $user->departemen !== 'GENERAL AFFAIRS') {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Ka.Dept GA dapat approve Level 3 (dari departemen lain)
+                                        elseif ($pengeluaranBarang->status === 'Level 3' && $user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS' && $pengeluaranBarang->user->departemen !== 'GENERAL AFFAIRS') {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Ka.Dept GA dapat approve Level 2 (dari GENERAL AFFAIRS sendiri)
+                                        elseif ($pengeluaranBarang->status === 'Level 2' && $pengeluaranBarang->user->departemen === 'GENERAL AFFAIRS' && $user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Finance dapat approve Level 4 (kategori 1)
+                                        elseif ($pengeluaranBarang->status === 'Level 4' && $user->departemen === 'FINANCE' && $pengeluaranBarang->kategori_pengeluaran == 1) {
+                                            $canApprove = true;
+                                        }
+                                        
+                                        // Security dapat approve Level 4 (kategori selain 1) dan Level 5
+                                        elseif (($pengeluaranBarang->status === 'Level 4' && $user->level === 'Security' && $pengeluaranBarang->kategori_pengeluaran != 1) || 
+                                                ($pengeluaranBarang->status === 'Level 5' && $user->level === 'Security')) {
+                                            $canApprove = true;
+                                        }
+                                    @endphp
+                                    
+                                    @if($canApprove)
+                                        <input type="checkbox" 
+                                            class="form-check-input item-checkbox" 
+                                            value="{{ $pengeluaranBarang->pengeluaran_barang_id }}"
+                                            data-status="{{ $pengeluaranBarang->status }}"
+                                            data-dept="{{ $pengeluaranBarang->user->departemen }}">
+                                    @endif
+                                </td>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $pengeluaranBarang->pengeluaran_barang_id }}</td>
                                 <td>{{ $pengeluaranBarang->tujuan_pengeluaran_barang }}</td>
@@ -90,7 +163,11 @@
                                     @if ($pengeluaranBarang->status == 'Level 1')
                                         Menunggu Persetujuan PIC/Ka.Sie
                                     @elseif ($pengeluaranBarang->status == 'Level 2')
-                                        PIC/Ka.Sie Sudah Menyetujui
+                                        @if ($pengeluaranBarang->user->departemen === 'GENERAL AFFAIRS')
+                                            PIC/Ka.Sie Sudah Menyetujui - Menunggu Ka.Dept GA
+                                        @else
+                                            PIC/Ka.Sie Sudah Menyetujui - Menunggu Ka.Dept YBS
+                                        @endif
                                     @elseif ($pengeluaranBarang->status == 'Level 3')
                                         Menunggu Persetujuan Ka.Dept GA
                                     @elseif ($pengeluaranBarang->status == 'Level 4')
@@ -111,124 +188,19 @@
                                 </td>
                                 <td>
                                     <div class="button-group d-flex">
-                                        @if($user->level === 'Super Admin' && $user->departemen == 'General Affairs')
-                                         
-                                            <!-- Button Edit -->
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-warning btn-sm mr-2" 
-                                                    data-toggle="modal" 
-                                                    data-target="#editDataModal" 
-                                                    data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                        @endif 
-                                        <!-- Button for Level 1 (Ka.Sie) -->
-                                        @if($pengeluaranBarang->status === 'Level 1' && $user->level === 'Ka.Sie')
-                                            
+                                        <!-- Button Edit - Only for Super Admin with GA department -->
+                                        @if($user->level === 'Super Admin' && $user->departemen == 'GENERAL AFFAIRS')
                                             <button 
                                                 type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kasie" 
+                                                class="btn btn-warning btn-sm mr-2" 
+                                                data-toggle="modal" 
+                                                data-target="#editDataModal" 
                                                 data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
+                                                <i class="fas fa-edit"></i>
                                             </button>
                                         @endif
-                
-                                        <!-- Button for Level 2 (Ka.Dept YBS) -->
-                                        @if($pengeluaranBarang->status === 'Level 2' && $user->level === 'Ka.Dept' && $user->departemen !== 'General Affairs')
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptybs" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-
-                                        @endif
-                
-                                        <!-- Button for Level 3 (Ka.Dept GA) -->
-                                        @if(
-                                            $pengeluaranBarang->status === 'Level 3' &&
-                                            $user->level === 'Ka.Dept' &&
-                                            $user->departemen === 'General Affairs' &&
-                                            $pengeluaranBarang->user->departemen !== 'General Affairs'
-                                        )
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif
-
-                                        <!-- Tambahan: Jika yang mengajukan adalah dari General Affairs sendiri -->
-                                        @if(
-                                            $pengeluaranBarang->status === 'Level 2' &&
-                                            $pengeluaranBarang->user->departemen === 'General Affairs' &&
-                                            $user->level === 'Ka.Dept' &&
-                                            $user->departemen === 'General Affairs'
-                                        )
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-kadeptga" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif
-
-
-                                        <!-- Button for finance approval -->
-                                        @if($pengeluaranBarang->status === 'Level 4' && $user->departemen === 'Finance' && $pengeluaranBarang->kategori_pengeluaran == 1)
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-success btn-sm mr-2 update-status-finance" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                            </button>
-
-                                            <!-- Button reject -->
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-danger btn-sm mr-2 reject-status" 
-                                                data-id="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
-                                                <i class="fa-solid fa-times-circle"></i>
-                                            </button>
-                                        @endif
-
                                         
-
-                                        <!-- Button detail -->
+                                        <!-- Button Detail -->
                                         <button 
                                             type="button" 
                                             class="btn btn-primary btn-sm mr-2" 
@@ -237,13 +209,39 @@
                                             data-nomor="{{ $pengeluaranBarang->pengeluaran_barang_id }}">
                                             <i class="fa-solid fa-circle-info"></i>
                                         </button>
-
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>              
+            </div>
+
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="selected-info" class="text-muted">
+                            <span id="selected-count">0</span> item dipilih
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button type="button" 
+                                id="bulk-approve-btn" 
+                                class="btn btn-success mr-2" 
+                                disabled>
+                            <i class="fa-solid fa-check-circle mr-1"></i>
+                            Setujui
+                        </button>
+                        
+                        <button type="button" 
+                                id="bulk-reject-btn" 
+                                class="btn btn-danger" 
+                                disabled>
+                            <i class="fa-solid fa-times-circle mr-1"></i>
+                            Tolak
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -426,10 +424,13 @@
                 emptyTable: "Tidak ada data di tabel"
             },
             columnDefs: [
-                { className: 'dt-body-center', targets: 0 },
-                { className: 'dt-head-center', targets: 0 },
-                { className: 'dt-body-center', targets: 5 },
-                { className: 'dt-head-center', targets: 5 }
+            {
+                className: 'dt-body-center dt-head-center', 
+                targets: 0, // Kolom pertama (checkbox)
+                orderable: false // Opsional: Matikan sorting untuk kolom checkbox
+            },
+                { className: 'dt-body-center', targets: 6 },
+                { className: 'dt-head-center', targets: 6 }
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             pageLength: 10,
@@ -511,124 +512,6 @@
 @endscript
 
 <script>
-$(document).ready(function() {
-    // Button for Ka.Sie approval
-    $('.update-status-kasie').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
-    });
-
-    // Button for Ka.Dept YBS approval
-    $('.update-status-kadeptybs').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
-    });
-
-    // Button for Ka.Dept GA approval
-    $('.update-status-kadeptga').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
-    });
-
-    $('.update-status-finance').on('click', function() {
-        var pengeluaranBarangId = $(this).data('id');
-        confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
-    });
-
-   function initDataTable() {
-        const table = $('#dataTable');
-
-        // Cek apakah sudah diinisialisasi sebagai DataTable
-        if ($.fn.DataTable.isDataTable(table)) {
-            table.DataTable().clear().destroy(); // Hapus data dan destroy instance
-        }
-
-        // Inisialisasi ulang DataTable
-        table.DataTable({
-            columnDefs: [
-                { className: 'dt-body-center', targets: 0 },
-                { className: 'dt-head-center', targets: 0 },
-                { className: 'dt-body-center', targets: 5 },
-                { className: 'dt-head-center', targets: 5 }
-            ],
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            pageLength: 10,
-            scrollX: false,
-            responsive: true
-        });
-    }
-
-    // Common function to show confirmation and then update status
-    function confirmUpdate(pengeluaranBarangId, url) {
-        Swal.fire({
-            title: 'Konfirmasi Persetujuan',
-            text: 'Apakah Anda menyetujui penngeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
-            icon: 'info',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Setuju!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Tampilkan loading SweetAlert saat proses berlangsung
-                Swal.fire({
-                    title: 'Memproses...',
-                    text: 'Sedang menyimpan persetujuan Anda.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                updateStatus(pengeluaranBarangId, url);
-            }
-        });
-    }
-
-    // Common function to handle status update
-    function updateStatus(pengeluaranBarangId, url) {
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: {
-                    pengeluaran_barang_id: pengeluaranBarangId,
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Success alert using SweetAlert
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Pengeluaran barang dengan no: ' + pengeluaranBarangId + ' telah disetujui.',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => {
-                            location.reload(); // Reload the table after successful update
-                        });
-                    } else {
-                        // Error alert using SweetAlert
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: response.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                },
-                error: function(response) {
-                    // Handle any error response using SweetAlert
-                    Swal.fire({
-                        title: 'Error!',
-                        text: response.responseJSON.message,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-    });
 
     document.addEventListener('DOMContentLoaded', () => {
         $('#detailModal').on('show.bs.modal', function (event) {
@@ -731,125 +614,6 @@ $(document).ready(function() {
         }
     });
 
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Inisialisasi Selectize untuk elemen dengan class .select-tools
-        $('.select-tools').selectize({
-            create: true, // Memungkinkan pengguna menambahkan opsi baru
-            sortField: 'text' // Mengurutkan opsi berdasarkan teks
-        });
-
-        // Handle event klik untuk tombol dengan class .reject-status
-        document.querySelectorAll('.reject-status').forEach(button => {
-            button.addEventListener('click', function () {
-                const pengeluaranBarangId = this.getAttribute('data-id');
-
-                // Tampilkan SweetAlert dengan textarea input untuk alasan penolakan
-                Swal.fire({
-                    title: 'Tolak Pengajuan',
-                    html: `
-                        <p>Masukkan alasan penolakan untuk pengeluaran barang dengan nomor 
-                        <strong>${pengeluaranBarangId}</strong>:</p>
-                         <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
-                            <option value="">-- Pilih alasan penolakan cepat --</option>
-                            <option value="Data tidak lengkap">Data tidak lengkap</option>
-                            <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
-                            <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
-                        </select>
-
-                        <textarea id="alasanPenolakan" class="swal2-textarea"
-                            placeholder="Tuliskan alasan penolakan di sini..."
-                            style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
-                    `,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Kirim Penolakan',
-                    cancelButtonText: 'Batal',
-                    reverseButtons: true,
-                    didOpen: () => {
-                        const select = document.getElementById('alasanDropdown');
-                        const textarea = document.getElementById('alasanPenolakan');
-
-                        // Isi textarea otomatis saat opsi dipilih
-                        select.addEventListener('change', () => {
-                            textarea.value = select.value;
-                        });
-                    },
-                    preConfirm: () => {
-                        const alasanSelect = document.getElementById('alasanDropdown').value.trim();
-                        const alasanText = document.getElementById('alasanPenolakan').value.trim();
-
-                        const alasan = alasanText || alasanSelect;
-
-                        if (!alasan) {
-                            Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
-                        }
-
-                        return alasan;
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const alasanPenolakan = result.value;
-
-                        // Tampilkan loading modal
-                        Swal.fire({
-                            title: 'Menolak Pengajuan...',
-                            html: 'Mohon tunggu, sedang memproses penolakan.',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        // Kirim request ke backend
-                        fetch("{{ route('approval.rejectStatus') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                pengeluaran_barang_id: pengeluaranBarangId,
-                                alasan: alasanPenolakan
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: data.message,
-                                    icon: 'success',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Gagal!',
-                                    text: data.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Terjadi Kesalahan!',
-                                text: 'Error: ' + error.message,
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        });
-                    }
-                });
-            });
-        });
-    });
-
-
-
     $('#editDataModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget); 
         const pengeluaranBarangId = button.data('id'); 
@@ -909,6 +673,580 @@ $(document).ready(function() {
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        $(".select-tools").selectize({
+            create: true, 
+            sortField: 'text'
+        });
+
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        const selectedCountElement = document.getElementById('selected-count');
+        const bulkApproveBtn = document.getElementById('bulk-approve-btn');
+        const bulkRejectBtn = document.getElementById('bulk-reject-btn');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateBulkActionButtons();
+        });
+
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectAllState();
+                updateBulkActionButtons();
+            });
+        });
+
+        function updateSelectAllState() {
+            const totalCheckboxes = itemCheckboxes.length;
+            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+            
+            if (checkedCheckboxes === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
+        }
+
+        function updateBulkActionButtons() {
+            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+            selectedCountElement.textContent = checkedCheckboxes;
+            
+            const hasSelection = checkedCheckboxes > 0;
+            bulkApproveBtn.disabled = !hasSelection;
+            bulkRejectBtn.disabled = !hasSelection;
+        }
+
+        bulkApproveBtn.addEventListener('click', function() {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(cb => ({
+                    id: cb.value,
+                    status: cb.getAttribute('data-status')
+                }));
+
+            if (selectedItems.length === 0) {
+                Swal.fire('Peringatan!', 'Pilih minimal satu item untuk disetujui.', 'warning');
+                return;
+            }
+
+            // Group by status for different approval levels
+            const level1Items = selectedItems.filter(item => item.status === 'Level 1');
+            const level2Items = selectedItems.filter(item => item.status === 'Level 2');
+            const level3Items = selectedItems.filter(item => item.status === 'Level 3');
+            const level4Items = selectedItems.filter(item => item.status === 'Level 4');
+
+            Swal.fire({
+                title: 'Konfirmasi Persetujuan Massal',
+                html: `Apakah Anda yakin ingin menyetujui <strong>${selectedItems.length}</strong> pengajuan yang dipilih?`,
+                icon: 'question',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Setujui Semua!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processBulkApproval(level1Items, level2Items, level3Items, level4Items);
+                }
+            });
+        });
+
+        bulkRejectBtn.addEventListener('click', function() {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (selectedItems.length === 0) {
+                Swal.fire('Peringatan!', 'Pilih minimal satu item untuk ditolak.', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Tolak Pengajuan Massal',
+                html: `
+                    <p>Anda akan menolak <strong>${selectedItems.length}</strong> pengajuan yang dipilih.</p>
+                    <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
+                        <option value="">-- Pilih alasan penolakan cepat --</option>
+                        <option value="Data tidak lengkap">Data tidak lengkap</option>
+                        <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
+                        <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
+                    </select>
+                    <textarea id="alasanPenolakan" class="swal2-textarea"
+                        placeholder="Tuliskan alasan penolakan di sini..."
+                        style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Tolak Semua',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                didOpen: () => {
+                    const select = document.getElementById('alasanDropdown');
+                    const textarea = document.getElementById('alasanPenolakan');
+
+                    select.addEventListener('change', () => {
+                        textarea.value = select.value;
+                    });
+                },
+                preConfirm: () => {
+                    const alasanSelect = document.getElementById('alasanDropdown').value.trim();
+                    const alasanText = document.getElementById('alasanPenolakan').value.trim();
+                    const alasan = alasanText || alasanSelect;
+
+                    if (!alasan) {
+                        Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
+                    }
+                    return alasan;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processBulkRejection(selectedItems, result.value);
+                }
+            });
+        });
+
+        function processBulkApproval(level1Items, level2Items, level3Items, level4Items) {
+            Swal.fire({
+                title: 'Memproses Persetujuan...',
+                html: 'Mohon tunggu, sedang memproses persetujuan massal.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const promises = [];
+
+            // Process Level 1 approvals
+            level1Items.forEach(item => {
+                promises.push(
+                    fetch("{{ route('approval.updateStatusKaSie') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            pengeluaran_barang_id : item.id
+                        })
+                    }).then(response => response.json())
+                );
+            });
+
+            // Process Level 2 approvals
+            level2Items.forEach(item => {
+                // Check if the item is from GA department
+                const itemElement = document.querySelector(`input[value="${item.id}"]`);
+                const isDeptGA = itemElement.getAttribute('data-dept') === 'GENERAL AFFAIRS';
+                
+                if (isDeptGA) {
+                    // For GA department items, use KaDeptGA route (will handle Level 2 -> Level 4)
+                    promises.push(
+                        fetch("{{ route('approval.updateStatusKaDeptGA') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                pengeluaran_barang_id : item.id
+                            })
+                        }).then(response => response.json())
+                    );
+                } else {
+                    // For non-GA department items, use regular route
+                    promises.push(
+                        fetch("{{ route('approval.updateStatusKaDeptYBS') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                pengeluaran_barang_id : item.id
+                            })
+                        }).then(response => response.json())
+                    );
+                }
+            });
+
+            level3Items.forEach(item => {
+                promises.push(
+                    fetch("{{ route('approval.updateStatusKaDeptGA') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            pengeluaran_barang_id : item.id
+                        })
+                    }).then(response => response.json())
+                );
+            });
+
+            level4Items.forEach(item => {
+                promises.push(
+                    fetch("{{ route('approval.updateStatusFinance') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            pengeluaran_barang_id : item.id
+                        })
+                    }).then(response => response.json())
+                );
+            });
+
+            Promise.all(promises)
+                .then(results => {
+                    const successCount = results.filter(result => result.success).length;
+                    const failCount = results.length - successCount;
+
+                    if (failCount === 0) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Semua ${successCount} pengajuan berhasil disetujui.`,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Sebagian Berhasil',
+                            html: `<strong>${successCount}</strong> pengajuan berhasil disetujui.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Error: ' + error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
+        function processBulkRejection(selectedItems, alasan) {
+            Swal.fire({
+                title: 'Memproses Penolakan...',
+                html: 'Mohon tunggu, sedang memproses penolakan massal.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const promises = selectedItems.map(itemId => {
+                return fetch("{{ route('approval.rejectStatus') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        pengeluaran_barang_id : itemId,
+                        alasan: alasan
+                    })
+                }).then(response => response.json());
+            });
+
+            Promise.all(promises)
+                .then(results => {
+                    const successCount = results.filter(result => result.success).length;
+                    const failCount = results.length - successCount;
+
+                    if (failCount === 0) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Semua ${successCount} pengajuan berhasil ditolak.`,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Sebagian Berhasil',
+                            html: `<strong>${successCount}</strong> pengajuan berhasil ditolak.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Terjadi Kesalahan!',
+                        text: 'Error: ' + error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
+        updateBulkActionButtons();
+
+    });
+
+
+// $(document).ready(function() {
+//     // Button for Ka.Sie approval
+//     $('.update-status-kasie').on('click', function() {
+//         var pengeluaranBarangId = $(this).data('id');
+//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
+//     });
+
+//     // Button for Ka.Dept YBS approval
+//     $('.update-status-kadeptybs').on('click', function() {
+//         var pengeluaranBarangId = $(this).data('id');
+//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
+//     });
+
+//     // Button for Ka.Dept GA approval
+//     $('.update-status-kadeptga').on('click', function() {
+//         var pengeluaranBarangId = $(this).data('id');
+//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
+//     });
+
+//     $('.update-status-finance').on('click', function() {
+//         var pengeluaranBarangId = $(this).data('id');
+//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
+//     });
+
+//    function initDataTable() {
+//         const table = $('#dataTable');
+
+//         // Cek apakah sudah diinisialisasi sebagai DataTable
+//         if ($.fn.DataTable.isDataTable(table)) {
+//             table.DataTable().clear().destroy(); // Hapus data dan destroy instance
+//         }
+
+//         // Inisialisasi ulang DataTable
+//         table.DataTable({
+//             columnDefs: [
+//                 { className: 'dt-body-center', targets: 0 },
+//                 { className: 'dt-head-center', targets: 0 },
+//                 { className: 'dt-body-center', targets: 5 },
+//                 { className: 'dt-head-center', targets: 5 }
+//             ],
+//             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+//             pageLength: 10,
+//             scrollX: false,
+//             responsive: true
+//         });
+//     }
+
+//     // Common function to show confirmation and then update status
+//     function confirmUpdate(pengeluaranBarangId, url) {
+//         Swal.fire({
+//             title: 'Konfirmasi Persetujuan',
+//             text: 'Apakah Anda menyetujui penngeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
+//             icon: 'info',
+//             showCancelButton: true,
+//             reverseButtons: true,
+//             confirmButtonColor: '#3085d6',
+//             cancelButtonColor: '#d33',
+//             confirmButtonText: 'Ya, Setuju!',
+//             cancelButtonText: 'Batal'
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 // Tampilkan loading SweetAlert saat proses berlangsung
+//                 Swal.fire({
+//                     title: 'Memproses...',
+//                     text: 'Sedang menyimpan persetujuan Anda.',
+//                     allowOutsideClick: false,
+//                     didOpen: () => {
+//                         Swal.showLoading();
+//                     }
+//                 });
+//                 updateStatus(pengeluaranBarangId, url);
+//             }
+//         });
+//     }
+
+//     // Common function to handle status update
+//     function updateStatus(pengeluaranBarangId, url) {
+//             $.ajax({
+//                 url: url,
+//                 method: 'POST',
+//                 data: {
+//                     pengeluaran_barang_id: pengeluaranBarangId,
+//                     _token: $('meta[name="csrf-token"]').attr('content')
+//                 },
+//                 success: function(response) {
+//                     if (response.success) {
+//                         // Success alert using SweetAlert
+//                         Swal.fire({
+//                             title: 'Berhasil!',
+//                             text: 'Pengeluaran barang dengan no: ' + pengeluaranBarangId + ' telah disetujui.',
+//                             icon: 'success',
+//                             showConfirmButton: false,
+//                             timer: 2000
+//                         }).then(() => {
+//                             location.reload(); // Reload the table after successful update
+//                         });
+//                     } else {
+//                         // Error alert using SweetAlert
+//                         Swal.fire({
+//                             title: 'Gagal!',
+//                             text: response.message,
+//                             icon: 'error',
+//                             confirmButtonText: 'OK'
+//                         });
+//                     }
+//                 },
+//                 error: function(response) {
+//                     // Handle any error response using SweetAlert
+//                     Swal.fire({
+//                         title: 'Error!',
+//                         text: response.responseJSON.message,
+//                         icon: 'error',
+//                         confirmButtonText: 'OK'
+//                     });
+//                 }
+//             });
+//         }
+//     });
+
+
+
+
+//     document.addEventListener('DOMContentLoaded', function () {
+//         // Inisialisasi Selectize untuk elemen dengan class .select-tools
+//         $('.select-tools').selectize({
+//             create: true, // Memungkinkan pengguna menambahkan opsi baru
+//             sortField: 'text' // Mengurutkan opsi berdasarkan teks
+//         });
+
+//         // Handle event klik untuk tombol dengan class .reject-status
+//         document.querySelectorAll('.reject-status').forEach(button => {
+//             button.addEventListener('click', function () {
+//                 const pengeluaranBarangId = this.getAttribute('data-id');
+
+//                 // Tampilkan SweetAlert dengan textarea input untuk alasan penolakan
+//                 Swal.fire({
+//                     title: 'Tolak Pengajuan',
+//                     html: `
+//                         <p>Masukkan alasan penolakan untuk pengeluaran barang dengan nomor 
+//                         <strong>${pengeluaranBarangId}</strong>:</p>
+//                          <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
+//                             <option value="">-- Pilih alasan penolakan cepat --</option>
+//                             <option value="Data tidak lengkap">Data tidak lengkap</option>
+//                             <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
+//                             <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
+//                         </select>
+
+//                         <textarea id="alasanPenolakan" class="swal2-textarea"
+//                             placeholder="Tuliskan alasan penolakan di sini..."
+//                             style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
+//                     `,
+//                     icon: 'warning',
+//                     showCancelButton: true,
+//                     confirmButtonText: 'Kirim Penolakan',
+//                     cancelButtonText: 'Batal',
+//                     reverseButtons: true,
+//                     didOpen: () => {
+//                         const select = document.getElementById('alasanDropdown');
+//                         const textarea = document.getElementById('alasanPenolakan');
+
+//                         // Isi textarea otomatis saat opsi dipilih
+//                         select.addEventListener('change', () => {
+//                             textarea.value = select.value;
+//                         });
+//                     },
+//                     preConfirm: () => {
+//                         const alasanSelect = document.getElementById('alasanDropdown').value.trim();
+//                         const alasanText = document.getElementById('alasanPenolakan').value.trim();
+
+//                         const alasan = alasanText || alasanSelect;
+
+//                         if (!alasan) {
+//                             Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
+//                         }
+
+//                         return alasan;
+//                     }
+//                 }).then((result) => {
+//                     if (result.isConfirmed) {
+//                         const alasanPenolakan = result.value;
+
+//                         // Tampilkan loading modal
+//                         Swal.fire({
+//                             title: 'Menolak Pengajuan...',
+//                             html: 'Mohon tunggu, sedang memproses penolakan.',
+//                             allowOutsideClick: false,
+//                             didOpen: () => {
+//                                 Swal.showLoading();
+//                             }
+//                         });
+
+//                         // Kirim request ke backend
+//                         fetch("{{ route('approval.rejectStatus') }}", {
+//                             method: "POST",
+//                             headers: {
+//                                 "Content-Type": "application/json",
+//                                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+//                             },
+//                             body: JSON.stringify({
+//                                 pengeluaran_barang_id: pengeluaranBarangId,
+//                                 alasan: alasanPenolakan
+//                             })
+//                         })
+//                         .then(response => response.json())
+//                         .then(data => {
+//                             if (data.success) {
+//                                 Swal.fire({
+//                                     title: 'Berhasil!',
+//                                     text: data.message,
+//                                     icon: 'success',
+//                                     showConfirmButton: false,
+//                                     timer: 2000
+//                                 }).then(() => {
+//                                     location.reload();
+//                                 });
+//                             } else {
+//                                 Swal.fire({
+//                                     title: 'Gagal!',
+//                                     text: data.message,
+//                                     icon: 'error',
+//                                     confirmButtonText: 'OK'
+//                                 });
+//                             }
+//                         })
+//                         .catch(error => {
+//                             Swal.fire({
+//                                 title: 'Terjadi Kesalahan!',
+//                                 text: 'Error: ' + error.message,
+//                                 icon: 'error',
+//                                 confirmButtonText: 'OK'
+//                             });
+//                         });
+//                     }
+//                 });
+//             });
+//         });
+//     });
 
 
 

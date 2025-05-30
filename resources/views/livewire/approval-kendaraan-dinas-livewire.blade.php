@@ -103,8 +103,8 @@
                 <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
-                @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'General Affairs') ||
-                    (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'General Service'))
+                @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'GENERAL AFFAIRS') ||
+                    (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'GENERAL SERVICES'))
                     
                     <a href="#" id="downloadExcel"
                     class="btn btn-success btn-sm d-flex align-items-center px-3"
@@ -141,18 +141,18 @@
                                         
                                         // Ka.Dept dapat approve Level 1 dari departemen mereka sendiri
                                         if ($dataKD->status === 'Level 1' && $user->level === 'Ka.Dept') {
-                                            // Untuk General Affairs, Ka.Dept hanya approve dari dept General Affairs
-                                            if ($user->departemen === 'General Affairs') {
-                                                $canApprove = ($dataKD->user->departemen === 'General Affairs');
+                                            // Untuk GENERAL AFFAIRS, Ka.Dept hanya approve dari dept GENERAL AFFAIRS
+                                            if ($user->departemen === 'GENERAL AFFAIRS') {
+                                                $canApprove = ($dataKD->user->departemen === 'GENERAL AFFAIRS');
                                             } 
-                                            // Untuk departemen lain, Ka.Dept approve dari dept mereka kecuali General Affairs
+                                            // Untuk departemen lain, Ka.Dept approve dari dept mereka kecuali GENERAL AFFAIRS
                                             else {
                                                 $canApprove = ($dataKD->user->departemen === $user->departemen);
                                             }
                                         }
                                         
-                                        // Ka.Sie General Service dapat approve Level 2 dari semua departemen
-                                        elseif ($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->seksi === 'General Service') {
+                                        // Ka.Sie GENERAL SERVICES dapat approve Level 2 dari semua departemen
+                                        elseif ($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->seksi === 'GENERAL SERVICES') {
                                             $canApprove = true;
                                         }
                                         
@@ -226,8 +226,8 @@
                                 <td>
                                     <div class="button-group d-flex">
                                         <!-- Button Edit - Only for Ka.Sie with GA department and vehicle type 1 -->
-                                        @if(($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'General Affairs' && $dataKD->jenis_kendaraan == 1) ||
-                                            ($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'General Affairs'))
+                                        @if(($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'GENERAL AFFAIRS' && $dataKD->jenis_kendaraan == 1) ||
+                                            ($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'GENERAL AFFAIRS'))
                                             <button 
                                                 type="button" 
                                                 class="btn btn-warning btn-sm mr-2" 
