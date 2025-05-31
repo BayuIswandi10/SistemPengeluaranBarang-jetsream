@@ -21,10 +21,12 @@ use App\Http\Controllers\ApprovalKendaraanDinasController;
 use App\Http\Controllers\UserController;
 
 use App\Http\Middleware\CheckLevel;
-use App\Models\SuratKendaraanDinas;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::guard()->check()
+        ? redirect('/dashboard-barang-keluar')
+        : view('welcome');
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
