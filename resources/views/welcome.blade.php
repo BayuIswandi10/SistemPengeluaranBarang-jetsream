@@ -528,7 +528,17 @@
                                 
                                 <div class="form-group">
                                     <label for="tanggal_penggunaan">Tanggal Penggunaan <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="tanggal_penggunaan" name="tanggal_penggunaan" value="{{ old('tanggal_penggunaan') }}" required autocomplete="off" onchange="toggleJenisKendaraan()">
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="tanggal_penggunaan" 
+                                        name="tanggal_penggunaan" 
+                                        value="{{ old('tanggal_penggunaan') }}" 
+                                        required 
+                                        autocomplete="off"
+                                        readonly
+                                        onchange="toggleJenisKendaraan()"
+                                    />
                                 </div>
                                 
                                 <div class="form-group">
@@ -1267,6 +1277,33 @@
             updateNomorPeserta('pesertaTableTambahPeserta');
             saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
         }
+
+        //Web Scrapper Validation
+        function formatDateLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // bulan 0-based
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        $('#tanggal_penggunaan').on('change', function() {
+            const inputDate = new Date($(this).val());
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            inputDate.setHours(0,0,0,0);
+
+            if (inputDate < today) {
+                $(this).val(formatDateLocal(today));
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanggal Tidak Valid',
+                    text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
 
         // Remove participant row for tambahDinasModal
         function hapusComboBoxPeserta(button) {
@@ -2246,7 +2283,6 @@
         });
 
         $(document).ready(function () {  
-
             // Event untuk menangani klik elemen dengan id modalPengajuan
             $('#modalPengajuanTrigger').on('click', function () {
                 $('#modalPengajuan').modal('show');
