@@ -574,13 +574,13 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td> --}}
+                                                <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_regular" value="">
                                                 <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
 
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)" disabled>
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -728,12 +728,12 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td> --}}
+                                                <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_ikutserta" value="">
                                                 <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)" disabled>
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -1132,9 +1132,21 @@
                     setTimeout(() => {
                         $(`#${tableId} .nrp_karyawan`).each(function(idx) {
                             if (nrpList[idx] && this.selectize) {
-                                this.selectize.setValue(nrpList[idx]);
+                                this.selectize.setValue(nrpList[idx], true);
+                                const row = $(this).closest('tr');
+                                setParticipantData(row, nrpList[idx]);
+                                if (idx === 0) {
+                                    // Set nilai di hidden input untuk baris pertama
+                                    const hiddenInputId = tableId === 'pesertaTableTambahPeserta' 
+                                        ? '#hidden_nrp_peserta_0_ikutserta' 
+                                        : '#hidden_nrp_peserta_0_regular';
+                                    $(hiddenInputId).val(nrpList[idx]);
+                                    this.selectize.disable();
+                                }
                             }
                         });
+                        // Nonaktifkan tombol hapus untuk baris pertama
+                        $(`#${tableId} tbody tr:first .btn-hapus-peserta`).prop('disabled', true);
                     }, 100);
                 }
             } catch (e) {
@@ -1173,7 +1185,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Pilih Kendaraan Terlebih Dahulu',
-                        text: 'Silakan isi pilih kendaraan.',
+                        text: 'Silakan pilih kendaraan.',
                         confirmButtonText: 'OK'
                     });
                     return;
@@ -1192,19 +1204,23 @@
             }
 
             const newRow = document.createElement('tr');
+            const isFirstRow = rows.length === 0;
+            const nrpValue = isFirstRow ? $('select[name="created_by"]').val() : '';
             newRow.innerHTML = `
                 <td class="nomor">${++counterPeserta}</td>
                 <td>
-                    <select name="peserta[${counterPeserta - 1}][nrp_karyawan]" 
+                    <select ${isFirstRow ? '' : `name="peserta[${counterPeserta - 1}][nrp_karyawan]"`} 
                             class="form-control nrp_karyawan selectize-nrp" 
-                            required>
+                            required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
+                        ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
                     </select>
                 </td>
                 <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                 <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
+                    <button type="button" class="btn btn-danger btn-sm btn-hapus-peserta" 
+                            onclick="hapusComboBoxPeserta(this)" ${isFirstRow ? 'disabled' : ''}>
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1217,6 +1233,14 @@
                 const row = $(selectizeInstance.$input).closest('tr');
                 setParticipantData(row, value);
             });
+
+            // Jika baris pertama, set nilai di hidden input, Selectize, dan panggil setParticipantData
+            if (isFirstRow && nrpValue) {
+                $('#hidden_nrp_peserta_0_regular').val(nrpValue);
+                newNrpSelect.selectize.setValue(nrpValue, true);
+                setParticipantData(newRow, nrpValue);
+                newNrpSelect.selectize.disable();
+            }
             
             updateNomorPeserta('pesertaTableTambah');
             saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
@@ -1248,19 +1272,23 @@
             }
 
             const newRow = document.createElement('tr');
+            const isFirstRow = rows.length === 0;
+            const nrpValue = isFirstRow ? $('select[name="created_by"]').val() : '';
             newRow.innerHTML = `
                 <td class="nomor">${++counterIkutserta}</td>
                 <td>
-                    <select name="peserta[${counterIkutserta - 1}][nrp_karyawan]" 
+                    <select ${isFirstRow ? '' : `name="peserta[${counterIkutserta - 1}][nrp_karyawan]"`} 
                             class="form-control nrp_karyawan selectize-nrp" 
-                            required>
+                            required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
+                        ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
                     </select>
                 </td>
                 <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                 <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
+                    <button type="button" class="btn btn-danger btn-sm btn-hapus-peserta" 
+                            onclick="hapusIkutPeserta(this)" ${isFirstRow ? 'disabled' : ''}>
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1273,6 +1301,14 @@
                 const row = $(selectizeInstance.$input).closest('tr');
                 setParticipantData(row, value);
             });
+
+            // Jika baris pertama, set nilai di hidden input, Selectize, dan panggil setParticipantData
+            if (isFirstRow && nrpValue) {
+                $('#hidden_nrp_peserta_0_ikutserta').val(nrpValue);
+                newNrpSelect.selectize.setValue(nrpValue, true);
+                setParticipantData(newRow, nrpValue);
+                newNrpSelect.selectize.disable();
+            }
             
             updateNomorPeserta('pesertaTableTambahPeserta');
             saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
@@ -1406,7 +1442,6 @@
                 
             }).catch(function(error) {
                 console.error('Failed to load user data:', error);
-                // Provide fallback functionality
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal Memuat Data',
@@ -1455,7 +1490,27 @@
                     onChange: function(value) {
                         if (this.$input.attr('id') === 'created_by_dinas') {
                             const activeModal = determineActiveModal();
-                            setFirstParticipant(value, activeModal);
+                            if (value) {
+                                $('#hidden_nrp_peserta_0_regular').val(value);
+                                $('#hidden_nrp_peserta_0_ikutserta').val(value);
+                                setFirstParticipant(value, activeModal);
+                            } else {
+                                $('#hidden_nrp_peserta_0_regular').val('');
+                                $('#hidden_nrp_peserta_0_ikutserta').val('');
+                                const tables = ['pesertaTableTambah', 'pesertaTableTambahPeserta'];
+                                tables.forEach(tableId => {
+                                    const firstRow = $(`#${tableId} tbody tr:first`);
+                                    if (firstRow.length) {
+                                        const nrpInput = firstRow.find('.nrp_karyawan')[0];
+                                        if (nrpInput && nrpInput.selectize) {
+                                            nrpInput.selectize.setValue('', true);
+                                            firstRow.find('.nama').val('');
+                                            firstRow.find('.departemen').val('');
+                                            nrpInput.selectize.disable();
+                                        }
+                                    }
+                                });
+                            }
                         }
                     }
                 });
@@ -1473,12 +1528,14 @@
             function setFirstParticipant(nrpValue, modalType = 'regular') {
                 if (!nrpValue) return;
 
-                let firstRow, tableSelector;
+                let firstRow, tableSelector, hiddenInputId;
                 
                 if (modalType === 'ikutserta') {
                     tableSelector = '#pesertaTableTambahPeserta tbody tr:first';
+                    hiddenInputId = '#hidden_nrp_peserta_0_ikutserta';
                 } else {
                     tableSelector = '#pesertaTableTambah tbody tr:first';
+                    hiddenInputId = '#hidden_nrp_peserta_0_regular';
                 }
                 
                 firstRow = $(tableSelector);
@@ -1488,13 +1545,23 @@
                     return;
                 }
 
+                // Set nilai di hidden input
+                $(hiddenInputId).val(nrpValue);
+                
                 const nrpInput = firstRow.find('.nrp_karyawan')[0];
                 
                 if (nrpInput && nrpInput.selectize) {
-                    nrpInput.selectize.setValue(nrpValue);
+                    // Set nilai di Selectize untuk UI
+                    nrpInput.selectize.setValue(nrpValue, true);
+                    // Nonaktifkan Selectize untuk mencegah perubahan
+                    nrpInput.selectize.disable();
+                    // Isi nama dan departemen
+                    setParticipantData(firstRow, nrpValue);
+                } else {
+                    console.warn('Selectize not initialized for NRP input in modal type:', modalType);
                 }
                 
-                console.log(`Set first participant NRP from dropdown for ${modalType} modal:`, nrpValue);
+                console.log(`Set first participant NRP for ${modalType} modal:`, nrpValue);
             }
 
             // Modal event handlers
@@ -2272,11 +2339,14 @@
             $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
             $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
             $('#ikut_kendaraan_dinas_id').val(kendaraanDinasId);
+            $('#hidden_nrp_peserta_0_ikutserta').val(nrpValue); // Set hidden input awal
 
             $tambahIkutSertaModal.on('show.bs.modal', function() {
                 counterIkutserta = 0;
                 $pesertaTableBody.empty();
                 tambahPesertaIkutSerta();
+                // Pastikan baris pertama diisi dengan NRP
+                setFirstParticipant(nrpValue, 'ikutserta');
             });
 
             $tambahIkutSertaModal.modal('show');
