@@ -321,6 +321,7 @@ class KendaraanDinasController extends Controller
                         ->where('pkdd.status', '=', 'Aktif');
                 })
                 ->where('kd.jenis_kendaraan', $jenis)
+                ->where('kd.status_kendaraan', 1)
                 ->select(
                     'kd.kendaraan_dinas_id',
                     'kd.nomor_kendaraan',

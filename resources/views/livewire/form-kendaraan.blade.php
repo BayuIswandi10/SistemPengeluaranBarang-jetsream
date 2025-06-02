@@ -167,11 +167,20 @@
                         <div class="form-group">
                             <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                            <small id="nomor_kendaraan_error" class="text-danger" style="display: none;">
+                                Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
+                                - 1–2 huruf awal<br>
+                                - Spasi<br>
+                                - 1–4 angka<br>
+                                - Spasi<br>
+                                - 1–3 huruf akhir<br>
+                                Contoh lain: D 45 XY, AB 9876 A
+                            </small>
                         </div>  
 
                         <div class="form-group">
                             <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
+                            <input type="number" class="form-control input-kapasitas" id="kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
                         </div> 
     
                         <!-- Submit Button -->
@@ -220,11 +229,20 @@
                         <div class="form-group">
                             <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="edit_nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                            <small id="edit_nomor_kendaraan_error" class="text-danger" style="display: none;">
+                                Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
+                                - 1–2 huruf awal<br>
+                                - Spasi<br>
+                                - 1–4 angka<br>
+                                - Spasi<br>
+                                - 1–3 huruf akhir<br>
+                                Contoh lain: D 45 XY, AB 9876 A
+                            </small>
                         </div>  
 
                         <div class="form-group">
                             <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
+                            <input type="number" class="form-control input-kapasitas" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
                         </div> 
         
         
@@ -488,6 +506,59 @@
                 scrollX: false,
                 responsive: true
             });
+        }
+    });
+
+    function validateNomorPolisi(inputElement, errorElement) {
+        const input = inputElement.value.trim();
+        // Regex: 1-2 huruf, spasi, 1-4 angka, spasi, 1-3 huruf
+        const regex = /^[A-Z]{1,2}\s\d{1,4}\s[A-Z]{1,3}$/;
+
+        if (input === '') {
+            errorElement.style.display = 'none';
+        } else if (!regex.test(input.toUpperCase())) {
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.style.display = 'none';
+        }
+    }
+
+    // Event listener untuk field nomor_kendaraan (form tambah)
+    document.getElementById('nomor_kendaraan').addEventListener('input', function () {
+        const errorMsg = document.getElementById('nomor_kendaraan_error');
+        validateNomorPolisi(this, errorMsg);
+    });
+
+    // Event listener untuk field edit_nomor_kendaraan (form edit)
+    document.getElementById('edit_nomor_kendaraan').addEventListener('input', function () {
+        const errorMsg = document.getElementById('edit_nomor_kendaraan_error');
+        validateNomorPolisi(this, errorMsg);
+    });
+
+    // Auto uppercase untuk kedua field
+    document.getElementById('nomor_kendaraan').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('edit_nomor_kendaraan').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    document.addEventListener('input', function (e) {
+        if (e.target.classList.contains('input-kapasitas')) {
+            // Ambil angka, hapus karakter non-digit
+            let val = e.target.value.replace(/\D/g, '');
+
+            // Hapus semua 0 di depan, tapi tetap izinkan angka '0' tunggal
+            if (val.length > 1) {
+                val = val.replace(/^0+/, '');
+            }
+
+            // Jika hanya 0 saja, kosongkan (tidak valid)
+            if (val === '0') val = '';
+
+            // Maksimal 2 digit
+            e.target.value = val.slice(0, 2);
         }
     });
 
