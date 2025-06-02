@@ -574,13 +574,13 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td>
-                                                {{-- <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td> --}}
+                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td> --}}
+                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
 
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)" disabled>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -728,12 +728,12 @@
                                         <tbody>
                                             <tr>
                                                 <td class="nomor">1</td>
-                                                <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required readonly></td>
-                                                {{-- <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td> --}}
+                                                {{-- <td><input type="text" name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan" placeholder="NRP Karyawan" required autocomplete="off"></td> --}}
+                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)" disabled>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -1018,7 +1018,7 @@
             return userCache.find(user => user.nrp_karyawan === nrp);
         }
 
-        // Initialize Selectize for NRP input (only for non-first rows)
+        // Initialize Selectize for NRP input
         function initializeSelectizeForNRP(element, onChangeCallback) {
             if (!userCache) {
                 console.warn('User cache not loaded, cannot initialize Selectize');
@@ -1092,26 +1092,6 @@
             saveToLocalStoragePeserta(tableId, storageKey);
         }
 
-        // Set first participant data from input field
-        function setFirstParticipantData(row, nrp) {
-            const userData = getUserByNRP(nrp);
-            
-            if (userData) {
-                row.find('.nrp_karyawan').val(nrp);
-                row.find('.nama').val(userData.name);
-                row.find('.departemen').val(userData.departemen || '');
-            } else {
-                row.find('.nrp_karyawan').val(nrp);
-                row.find('.nama').val('');
-                row.find('.departemen').val('');
-            }
-            
-            // Save to localStorage
-            const tableId = row.closest('table').attr('id');
-            const storageKey = getStorageKeyByTableId(tableId);
-            saveToLocalStoragePeserta(tableId, storageKey);
-        }
-
         // Get storage key based on table ID
         function getStorageKeyByTableId(tableId) {
             switch(tableId) {
@@ -1151,16 +1131,8 @@
                     // Populate inputs with delay to ensure DOM is ready
                     setTimeout(() => {
                         $(`#${tableId} .nrp_karyawan`).each(function(idx) {
-                            if (nrpList[idx]) {
-                                if (idx === 0) {
-                                    // First row is input
-                                    $(this).val(nrpList[idx]);
-                                    const row = $(this).closest('tr');
-                                    setFirstParticipantData(row, nrpList[idx]);
-                                } else if (this.selectize) {
-                                    // Other rows are selectize
-                                    this.selectize.setValue(nrpList[idx]);
-                                }
+                            if (nrpList[idx] && this.selectize) {
+                                this.selectize.setValue(nrpList[idx]);
                             }
                         });
                     }, 100);
@@ -1239,7 +1211,7 @@
             `;
             container.appendChild(newRow);
             
-            // Initialize Selectize for the new NRP input (not for first row)
+            // Initialize Selectize for the new NRP input
             const newNrpSelect = newRow.querySelector('.nrp_karyawan');
             initializeSelectizeForNRP(newNrpSelect, function(value, selectizeInstance) {
                 const row = $(selectizeInstance.$input).closest('tr');
@@ -1295,7 +1267,7 @@
             `;
             tbody.appendChild(newRow);
             
-            // Initialize Selectize for the new NRP input (not for first row)
+            // Initialize Selectize for the new NRP input
             const newNrpSelect = newRow.querySelector('.nrp_karyawan');
             initializeSelectizeForNRP(newNrpSelect, function(value, selectizeInstance) {
                 const row = $(selectizeInstance.$input).closest('tr');
@@ -1332,6 +1304,7 @@
             }
         });
 
+
         // Remove participant row for tambahDinasModal
         function hapusComboBoxPeserta(button) {
             const tbody = document.querySelector('#pesertaTableTambah tbody');
@@ -1349,7 +1322,7 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Destroy selectize before removing row (only if not first row)
+                        // Destroy selectize before removing row
                         const selectizeInput = row.querySelector('.nrp_karyawan');
                         if (selectizeInput && selectizeInput.selectize) {
                             selectizeInput.selectize.destroy();
@@ -1388,7 +1361,7 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Destroy selectize before removing row (only if not first row)
+                        // Destroy selectize before removing row
                         const selectizeInput = row.querySelector('.nrp_karyawan');
                         if (selectizeInput && selectizeInput.selectize) {
                             selectizeInput.selectize.destroy();
@@ -1404,7 +1377,7 @@
                 Swal.fire({
                     icon: 'info',
                     title: 'Tidak bisa menghapus baris terakhir.',
-                    text: 'Harop tambahkan baris baru jika perlu.',
+                    text: 'Harap tambahkan baris baru jika perlu.',
                     confirmButtonText: 'OK'
                 });
             }
@@ -1419,17 +1392,12 @@
                 // Initialize existing selectize dropdowns
                 populateMainDropdowns(userData);
                 
-                // Initialize existing NRP selectize inputs (skip first rows)
+                // Initialize existing NRP selectize inputs if any
                 $('.selectize-nrp').each(function() {
-                    const row = $(this).closest('tr');
-                    const isFirstRow = row.index() === 0;
-                    
-                    if (!isFirstRow) {
-                        initializeSelectizeForNRP(this, function(value, selectizeInstance) {
-                            const row = $(selectizeInstance.$input).closest('tr');
-                            setParticipantData(row, value);
-                        });
-                    }
+                    initializeSelectizeForNRP(this, function(value, selectizeInstance) {
+                        const row = $(selectizeInstance.$input).closest('tr');
+                        setParticipantData(row, value);
+                    });
                 });
                 
                 // Load stored data from localStorage
@@ -1520,8 +1488,11 @@
                     return;
                 }
 
-                // Set the first row data (which should be input, not selectize)
-                setFirstParticipantData(firstRow, nrpValue);
+                const nrpInput = firstRow.find('.nrp_karyawan')[0];
+                
+                if (nrpInput && nrpInput.selectize) {
+                    nrpInput.selectize.setValue(nrpValue);
+                }
                 
                 console.log(`Set first participant NRP from dropdown for ${modalType} modal:`, nrpValue);
             }
@@ -1556,10 +1527,8 @@
             $('#created_by').on('input', function() {
                 const nrp = $(this).val();
                 const firstParticipantNrp = $("input[name='peserta[0][nrp_karyawan]']")[0];
-                if (firstParticipantNrp) {
-                    $(firstParticipantNrp).val(nrp);
-                    const row = $(firstParticipantNrp).closest('tr');
-                    setFirstParticipantData(row, nrp);
+                if (firstParticipantNrp && firstParticipantNrp.selectize) {
+                    firstParticipantNrp.selectize.setValue(nrp);
                 }
             });
         });
