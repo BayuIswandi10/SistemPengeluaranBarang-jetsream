@@ -116,6 +116,29 @@
             </div>
 
             <div class="card-body">
+                @if (session('success'))
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: '{{ session('success') }}',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    </script>
+                @endif
+
+                @if (session('error'))
+                    <script>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: '{{ session('error') }}',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    </script>
+                @endif
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
@@ -227,7 +250,9 @@
                                     <div class="button-group d-flex">
                                         <!-- Button Edit - Only for Ka.Sie with GA department and vehicle type 1 -->
                                         @if(($dataKD->status === 'Level 2' && $user->level === 'Ka.Sie' && $user->departemen == 'GENERAL AFFAIRS' && $dataKD->jenis_kendaraan == 1) ||
-                                            ($dataKD->status === 'Level 2' && $user->level === 'Super Admin' && $user->departemen == 'GENERAL AFFAIRS'))
+                                            (in_array($dataKD->status, ['Level 1', 'Level 2']) 
+                                            && $user->level === 'Super Admin' 
+                                            && $user->departemen === 'GENERAL AFFAIRS'))
                                             <button 
                                                 type="button" 
                                                 class="btn btn-warning btn-sm mr-2" 
@@ -441,7 +466,13 @@
 
                         <!-- Jenis Mobil -->
                         <label for="jenisMobil" class="mt-2">Jenis Mobil *</label>
-                        <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control">
+                        {{-- <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control"> --}}
+                        <select class="form-control" id="jenisMobil" name="jenis_kendaraan" required autocomplete="off">
+                            <option value="" disabled selected>Pilih Jenis Kendaraan</option>
+                            <option value="1">KANTOR</option>
+                            <option value="2">PRIBADI</option>
+                            <option value="3">TAXI</option>
+                        </select>
 
                         <!-- Digunakan Pada -->
                         <label for="tanggalPakai" class="mt-2">Digunakan Pada *</label>

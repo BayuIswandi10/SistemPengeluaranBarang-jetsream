@@ -189,7 +189,10 @@
                                 <td>
                                     <div class="button-group d-flex">
                                         <!-- Button Edit - Only for Super Admin with GA department -->
-                                        @if($user->level === 'Super Admin' && $user->departemen == 'GENERAL AFFAIRS')
+                                        @if(in_array($pengeluaranBarang->status, ['Level 1', 'Level 2', 'Level 3']) 
+                                            && $user->level === 'Super Admin' 
+                                            && $user->departemen === 'GENERAL AFFAIRS')
+
                                             <button 
                                                 type="button" 
                                                 class="btn btn-warning btn-sm mr-2" 
