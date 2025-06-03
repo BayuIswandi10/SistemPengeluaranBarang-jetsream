@@ -501,189 +501,209 @@
             $('.modal').modal('hide');
             document.getElementById('nomorSuratCard').innerText = nomor;
             $.ajax({
-                    url: "/pengajuan/detailSuratNonAuth",
-                    method: "POST",
-                    data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
-                    success: function (data) {
-                        const detailTable = $('#detaildataTableModal').DataTable();
+                url: "/pengajuan/detailSuratNonAuth",
+                method: "POST",
+                data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
+                success: function (data) {
+                    const detailTable = $('#detaildataTableModal').DataTable();
 
-                        const jenisKendraan = {
-                            1 : "Mengeluarkan"
-                        };
+                    const jenisKendraan = {
+                        1: "Mengeluarkan"
+                    };
 
-                        let statusBadgeHTML = '';
-                        const informasiTambahan = data.informasi_tambahan ?? [];
+                    let statusBadgeHTML = '';
+                    const informasiTambahan = data.informasi_tambahan ?? [];
 
-                        // Cek apakah ada yang menolak
-                        const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
+                    // Cek apakah ada yang menolak
+                    const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
 
-                        // Cek level tertinggi yang menyetujui
-                        const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                    // Cek level tertinggi yang menyetujui
+                    const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
 
-                       const tombolCetak = document.getElementById('cetakBukti');
+                    const tombolCetak = document.getElementById('cetakBukti');
 
-                        // Logika tampil/sembunyikan tombol
-                        if (tombolCetak) {
-                            if (adaYangMenolak || maxLevel < 3) {
-                                tombolCetak.style.display = "none";
-                            } else {
-                                tombolCetak.style.display = "inline-block"; 
-                            }
-                        }
-
-                        
-                        if (adaYangMenolak) {
-                            statusBadgeHTML = `
-                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                    <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
-                                </span>
-                            `;
-                        } else if (maxLevel >= 3) {
-                            statusBadgeHTML = `
-                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                    <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
-                                </span>
-                            `;
+                    // Logika tampil/sembunyikan tombol
+                    if (tombolCetak) {
+                        if (adaYangMenolak || maxLevel < 3) {
+                            tombolCetak.style.display = "none";
                         } else {
-                            statusBadgeHTML = `
-                                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                    <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                                </span>
-                            `;
+                            tombolCetak.style.display = "inline-block";
                         }
+                    }
 
-                        document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
+                    if (adaYangMenolak) {
+                        statusBadgeHTML = `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
+                            </span>
+                        `;
+                    } else if (maxLevel >= 3) {
+                        statusBadgeHTML = `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                                <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                            </span>
+                        `;
+                    } else {
+                        statusBadgeHTML = `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                            </span>
+                        `;
+                    }
 
-                        // Kosongkan data lama kendaraan
-                        document.getElementById('kendaraanInfoBody').innerHTML = "";
+                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
-                        if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
-                            $('#detaildataTableModal').DataTable().clear().destroy();
-                        }
+                    // Kosongkan data lama kendaraan
+                    document.getElementById('kendaraanInfoBody').innerHTML = "";
 
-                        // Validasi dan tampilkan data kendaraan
-                        if (data.data_kendaraan && data.data_kendaraan.length > 0) {
-                            data.data_kendaraan.forEach((item, index) => {
-                                let row = `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.nomor_kendaraan}</td>
-                                        <td>${item.keterangan}</td>
-                                        <td>${item.tanggal_penggunaan || '-'}</td>
-                                        <td>${item.tujuan_penggunaan_1 || '-'}</td>
-                                        <td>${item.tujuan_penggunaan_2 || '-'}</td>
-                                        <td>${item.tujuan_penggunaan_3 || '-'}</td>
-                                    </tr>
-                                `;
-                                document.getElementById('kendaraanInfoBody').innerHTML += row;
-                            });
-                        } else {
-                            document.getElementById('kendaraanInfoBody').innerHTML = `
-                                <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
-                            `;
-                        }
+                    if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                        $('#detaildataTableModal').DataTable().clear().destroy();
+                    }
 
-                        // Kosongkan data lama
-                        detailTable.clear();
-                        document.getElementById('addhistory').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
+                    // Simpan kilometer awal dan akhir untuk print
+                    let kilometerAwal = data.kilometer_awal || '-';
+                    let kilometerAkhir = data.kilometer_akhir || '-';
+                    let hasPrivateVehicle = data.has_private_vehicle || false;
 
-                        // Validasi data userDinas
-                        if (data.userDinas && data.userDinas.length > 0) {
-                            let newData = data.userDinas.map((item, index) => [
-                                index + 1,
-                                item.nrp_karyawan,
-                                item.name,
-                                item.departemen
-                            ]);
-                            detailTable.rows.add(newData).draw();
-                        } else {
-                            detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
-                        }
-
-                        // Mapping tingkatan dan status persetujuan
-                        const tingkatMapping = {
-                            "Level 1": "Civitas",
-                            "Level 2": "PIC/Ka.Sie",
-                            "Level 3": "Ka.Dept.Ybs",
-                            "Level 4": "Ka.Dept.GA",
-                            "Level 5": "Finance",
-                            "Level 6": "Security"
-                        };
-                        const approvMapping = {
-                            "Level 0": "Menolak",
-                            "Level 1": "Mengajukan",
-                            "Level 2": "Menyetujui",
-                            "Level 3": "Mengetahui",
-                            "Level 4": "Memeriksa"
-                        };
-
-                        // Validasi data informasi_tambahan
-                        const additionalInfoBody = document.getElementById('addhistory');
-
-                        if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                            data.informasi_tambahan.forEach((info, index) => {
-                                let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
-                                    ? info.alasan_penolakan 
-                                    : '-'; // hanya isi di baris terakhir
-
-                                let row = `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${info.nama}</td>
-                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                        <td>${info.departemen}</td>
-                                        <td>${approvMapping[info.status] || info.status}</td>
-                                        <td>${alasanPenolakan}</td>
-                                    </tr>
-                                `;
-                                additionalInfoBody.innerHTML += row;
-                            });
-                        } else {
-                            additionalInfoBody.innerHTML = `
+                    // Validasi dan tampilkan data kendaraan
+                    if (data.data_kendaraan && data.data_kendaraan.length > 0) {
+                        data.data_kendaraan.forEach((item, index) => {
+                            let row = `
                                 <tr>
-                                    <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                                    <td>${index + 1}</td>
+                                    <td>${item.nomor_kendaraan}</td>
+                                    <td>${item.keterangan}</td>
+                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                    <td>${item.tujuan_penggunaan_3 || '-'}</td>
                                 </tr>
                             `;
-                        }
-
-                           // Aktifkan DataTable setelah data ditambahkan
-                           $('#detaildataTableModal').DataTable({
-                            columnDefs: [
-                                { className: 'dt-body-center', targets: 0 },
-                                { className: 'dt-head-center', targets: 0 },
-                                { className: 'dt-body-center', targets: 3 },
-                                { className: 'dt-head-center', targets: 3 }
-                            ],
-
-                            responsive: true,
-                            scrollX: false,
-                            destroy: true,
-                            pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
-                            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                            document.getElementById('kendaraanInfoBody').innerHTML += row;
                         });
 
-                        // Pastikan modal terbuka setelah data dimuat
-                        $('#suratDinasModal').modal('show');
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data:", error);
-                        Swal.fire({
-                          title: 'Error!',
-                          text: 'Gagal mengambil data surat dinas.',
-                          icon: 'error',
-                          confirmButtonText: 'OK'
-                      });
+                        // Simpan kilometer data untuk print
+                        let kilometerElement = document.getElementById('kilometerData');
+                        if (!kilometerElement) {
+                            kilometerElement = document.createElement('div');
+                            kilometerElement.id = 'kilometerData';
+                            kilometerElement.style.display = 'none';
+                            document.body.appendChild(kilometerElement);
+                        }
+                        kilometerElement.setAttribute('data-kilometer-awal', kilometerAwal);
+                        kilometerElement.setAttribute('data-kilometer-akhir', kilometerAkhir);
+                        kilometerElement.setAttribute('data-has-private-vehicle', hasPrivateVehicle);
+                    } else {
+                        document.getElementById('kendaraanInfoBody').innerHTML = `
+                            <tr><td colspan="7" class="text-center">Tidak ada data kendaraan</td></tr>
+                        `;
                     }
-                });
+
+                    // Kosongkan data lama
+                    detailTable.clear();
+                    document.getElementById('addhistory').innerHTML = "";
+
+                    // Validasi data userDinas
+                    if (data.userDinas && data.userDinas.length > 0) {
+                        let newData = data.userDinas.map((item, index) => [
+                            index + 1,
+                            item.nrp_karyawan,
+                            item.name,
+                            item.departemen
+                        ]);
+                        detailTable.rows.add(newData).draw();
+                    } else {
+                        detailTable.rows.add([["", "", "Tidak ada data user", ""]]).draw();
+                    }
+
+                    // Mapping tingkatan dan status persetujuan
+                    const tingkatMapping = {
+                        "Level 1": "Civitas",
+                        "Level 2": "PIC/Ka.Sie",
+                        "Level 3": "Ka.Dept.Ybs",
+                        "Level 4": "Ka.Dept.GA",
+                        "Level 5": "Finance",
+                        "Level 6": "Security"
+                    };
+                    const approvMapping = {
+                        "Level 0": "Menolak",
+                        "Level 1": "Mengajukan",
+                        "Level 2": "Menyetujui",
+                        "Level 3": "Mengetahui",
+                        "Level 4": "Memeriksa"
+                    };
+
+                    // Validasi data informasi_tambahan
+                    const additionalInfoBody = document.getElementById('addhistory');
+
+                    if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                        data.informasi_tambahan.forEach((info, index) => {
+                            let alasanPenolakan = (index === data.informasi_tambahan.length - 1)
+                                ? info.alasan_penolakan
+                                : '-'; // hanya isi di baris terakhir
+
+                            let row = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${info.nama}</td>
+                                    <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                    <td>${info.departemen}</td>
+                                    <td>${approvMapping[info.status] || info.status}</td>
+                                    <td>${alasanPenolakan}</td>
+                                </tr>
+                            `;
+                            additionalInfoBody.innerHTML += row;
+                        });
+                    } else {
+                        additionalInfoBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada informasi tambahan</td>
+                            </tr>
+                        `;
+                    }
+
+                    // Aktifkan DataTable setelah data ditambahkan
+                    $('#detaildataTableModal').DataTable({
+                        columnDefs: [
+                            { className: 'dt-body-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 0 },
+                            { className: 'dt-body-center', targets: 3 },
+                            { className: 'dt-head-center', targets: 3 }
+                        ],
+                        responsive: true,
+                        scrollX: false,
+                        destroy: true,
+                        pageLength: 5,
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                    });
+
+                    // Pastikan modal terbuka setelah data dimuat
+                    $('#suratDinasModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Gagal mengambil data surat dinas.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         }
 
         function printSuratDinas() {
             // Ambil data dari modal
             const nomorSurat = document.getElementById('nomorSuratCard').innerText;
             const statusBadge = document.getElementById('approvalStatusBadgeDinas').innerHTML;
-            
+
             // Ambil data kendaraan
             let kendaraanRows = '';
+            const kilometerElement = document.getElementById('kilometerData');
+            const hasPrivateVehicle = kilometerElement ? kilometerElement.getAttribute('data-has-private-vehicle') === 'true' : false;
+            const kilometerAwal = kilometerElement ? kilometerElement.getAttribute('data-kilometer-awal') || '-' : '-';
+            const kilometerAkhir = kilometerElement ? kilometerElement.getAttribute('data-kilometer-akhir') || '-' : '-';
+
             const kendaraanTable = document.getElementById('kendaraanInfoBody');
             if (kendaraanTable) {
                 const rows = kendaraanTable.querySelectorAll('tr');
@@ -704,16 +724,12 @@
                     }
                 });
             }
-            
+
             // Ambil data peserta dari DataTable
             let pesertaRows = '';
-            
-            // Cek apakah DataTable sudah diinisialisasi
             if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
                 const dataTable = $('#detaildataTableModal').DataTable();
                 const data = dataTable.rows({ page: 'all' }).data();
-                
-                // Loop melalui semua data di DataTable
                 for (let i = 0; i < data.length; i++) {
                     const rowData = data[i];
                     if (rowData && rowData.length >= 4) {
@@ -728,7 +744,6 @@
                     }
                 }
             } else {
-                // Fallback ke cara lama jika DataTable belum diinisialisasi
                 const pesertaTable = document.getElementById('detailBody');
                 if (pesertaTable) {
                     const rows = pesertaTable.querySelectorAll('tr');
@@ -747,7 +762,7 @@
                     });
                 }
             }
-            
+
             // Ambil data historis persetujuan
             let historyRows = '';
             const historyTable = document.getElementById('addhistory');
@@ -768,10 +783,16 @@
                     }
                 });
             }
-            
+
+            // Buat section kilometer untuk kendaraan pribadi
+            const kilometerSection = hasPrivateVehicle ? `
+                <div style="margin-top: 5px;"><strong>Kilometer Awal:</strong> ${kilometerAwal} KM</div>
+                <div style="margin-top: 5px;"><strong>Kilometer Akhir:</strong> ${kilometerAkhir === '-' ? '.........................' : kilometerAkhir + ' KM'}</div>
+            ` : '';
+
             // Buat window baru untuk print
             const printWindow = window.open('', '_blank', 'width=800,height=600');
-            
+
             // HTML content untuk print dengan format formal
             const printContent = `
                 <!DOCTYPE html>
@@ -783,7 +804,6 @@
                             margin: 20mm;
                             size: A4;
                         }
-                        
                         body {
                             font-family: 'Times New Roman', serif;
                             font-size: 12px;
@@ -792,46 +812,39 @@
                             margin: 0;
                             padding: 0;
                         }
-                        
                         .header {
                             text-align: center;
                             border-bottom: 3px solid #000;
                             padding-bottom: 15px;
                             margin-bottom: 20px;
                         }
-                        
                         .company-name {
                             font-size: 20px;
                             font-weight: bold;
                             margin-bottom: 5px;
                             text-transform: uppercase;
                         }
-                        
                         .document-title {
                             font-size: 16px;
                             font-weight: bold;
                             margin-top: 15px;
                             text-decoration: underline;
                         }
-                        
                         .document-info {
                             margin: 20px 0;
                             font-size: 13px;
                         }
-                        
                         .status-info {
                             float: right;
                             font-weight: bold;
                             margin-bottom: 10px;
                         }
-                        
                         table {
                             width: 100%;
                             border-collapse: collapse;
                             margin: 15px 0;
                             font-size: 11px;
                         }
-                        
                         .section-title {
                             font-size: 14px;
                             font-weight: bold;
@@ -842,7 +855,6 @@
                             text-align: center;
                             text-transform: uppercase;
                         }
-                        
                         th {
                             background: #f8f8f8;
                             border: 1px solid #000;
@@ -851,55 +863,45 @@
                             font-weight: bold;
                             font-size: 11px;
                         }
-                        
                         td {
                             border: 1px solid #000;
                             padding: 8px;
                             vertical-align: top;
                         }
-                        
                         .text-center {
                             text-align: center;
                         }
-                        
                         .signature-section {
                             margin-top: 40px;
                             display: flex;
                             justify-content: space-between;
                         }
-                        
                         .signature-box {
                             width: 200px;
                             text-align: center;
                         }
-                        
                         .signature-line {
                             border-top: 1px solid #000;
                             margin-top: 60px;
                             padding-top: 5px;
                         }
-                        
                         .print-date {
                             font-size: 10px;
                             text-align: right;
                             margin-top: 20px;
                             font-style: italic;
                         }
-                        
                         @media print {
-                            body { 
+                            body {
                                 -webkit-print-color-adjust: exact;
                                 print-color-adjust: exact;
                             }
-                            
                             .page-break {
                                 page-break-before: always;
                             }
-                            
                             table {
                                 page-break-inside: avoid;
                             }
-                            
                             tr {
                                 page-break-inside: avoid;
                             }
@@ -912,14 +914,10 @@
                         <div style="font-size: 12px;">MM 2100-Industrial Town Jl. Halmahera Block EE-1 Cikarang Barat, Bekasi 17520 | Telepon: +62 21 8980769 | Fax: +62 21 8980770</div>
                         <div class="document-title">SURAT DINAS</div>
                     </div>
-                    
                     <div class="document-info">
-                        <div style="float: left;">
-                            <strong>Nomor Surat:</strong> ${nomorSurat}
-                        </div>
-                        <div style="clear: both;"></div>
+                        <div><strong>Nomor Surat:</strong> ${nomorSurat}</div>
+                        ${kilometerSection}
                     </div>
-                    
                     <div class="section-title">I. INFORMASI KENDARAAN</div>
                     <table>
                         <thead>
@@ -937,7 +935,6 @@
                             ${kendaraanRows || '<tr><td colspan="7" style="text-align: center; font-style: italic;">Tidak ada data kendaraan</td></tr>'}
                         </tbody>
                     </table>
-                    
                     <div class="section-title">II. INFORMASI PESERTA</div>
                     <table>
                         <thead>
@@ -952,7 +949,6 @@
                             ${pesertaRows || '<tr><td colspan="4" style="text-align: center; font-style: italic;">Tidak ada data peserta</td></tr>'}
                         </tbody>
                     </table>
-                    
                     <div class="section-title">III. HISTORIS PERSETUJUAN</div>
                     <table>
                         <thead>
@@ -968,8 +964,7 @@
                             ${historyRows || '<tr><td colspan="5" style="text-align: center; font-style: italic;">Tidak ada data historis</td></tr>'}
                         </tbody>
                     </table>
-                    
-                    <div class="signature-section" style="margin-top: 40px;">
+                    <div class="signature-section">
                         <div class="signature-box">
                             <div>Dibuat Oleh:</div>
                             <div class="signature-line">
@@ -977,7 +972,6 @@
                                 <div style="font-size: 10px;">Nama & Tanggal</div>
                             </div>
                         </div>
-                        
                         <div class="signature-box">
                             <div>Disetujui Oleh:</div>
                             <div class="signature-line">
@@ -986,12 +980,11 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="print-date">
-                        Dicetak pada: ${new Date().toLocaleDateString('id-ID', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
-                            month: 'long', 
+                        Dicetak pada: ${new Date().toLocaleDateString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
                             day: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit'
@@ -1000,11 +993,11 @@
                 </body>
                 </html>
             `;
-            
+
             // Tulis content ke window baru
             printWindow.document.write(printContent);
             printWindow.document.close();
-            
+
             // Tunggu sebentar untuk memastikan content dimuat, lalu print
             setTimeout(() => {
                 printWindow.focus();
