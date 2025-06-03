@@ -103,6 +103,7 @@
                                     <!-- Data akan diisi secara dinamis -->
                                 </tbody>
                             </table>
+                            </div>
                         </div>   
                         <div class="text-end mt-3">
                             <button type="button" class="btn btn-success" id="approveButton" data-id="">Setujui</button>

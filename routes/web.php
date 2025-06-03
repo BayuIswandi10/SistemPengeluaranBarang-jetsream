@@ -21,6 +21,7 @@ use App\Http\Controllers\ApprovalKendaraanDinasController;
 use App\Http\Controllers\UserController;
 
 use App\Http\Middleware\CheckLevel;
+use App\Http\Middleware\CheckKendaraanAccess;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -44,6 +45,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::middleware([CheckLevel::class . ':Super Admin'])->group(function () {
         Route::get('/kendaraan', KendaraanDinasLiveWire::class)->name('kendaraan');
     });
+    Route::middleware([CheckKendaraanAccess::class . ':GENERAL SERVICES'])->group(function () {
+        Route::get('/kendaraan', KendaraanDinasLiveWire::class)->name('kendaraan');
+    });
+
 
   
     Route::get('/approval', ApprovalBarangKeluarLiveWire::class)->name('approval');
