@@ -814,7 +814,7 @@
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
                                         <i class="fas fa-box-open text-primary h1" style="cursor: pointer;"></i>
-                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Pengeluaran Barang</h3>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Cetak Pengeluaran Barang</h3>
                                     </div>
                                 </div>
                             </div>
@@ -823,7 +823,7 @@
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
                                         <i class="fas fa-car-side text-primary h1" style="cursor: pointer;"></i>
-                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Penggunaan Kendaraan Dinas</h3>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Cetak Penggunaan Kendaraan Dinas</h3>
                                     </div>
                                 </div>
                             </div>
