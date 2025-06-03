@@ -400,7 +400,7 @@ class PengeluaranBarangController extends Controller
     
             DB::commit();
     
-            return redirect()->route('form')->with('success', 'Data berhasil diperbarui');
+            return redirect()->route('approval')->with('success', 'Data berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
