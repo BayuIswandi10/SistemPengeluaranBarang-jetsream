@@ -13,6 +13,8 @@ class ApprovalBarangKeluarLiveWire extends Component
     public $startDate;
     public $endDate;
     public $pengeluaranBarangs;
+    
+    protected $listeners = ['updateDateRange' => 'updateDateRange'];
 
     public function mount()
     {
@@ -20,8 +22,6 @@ class ApprovalBarangKeluarLiveWire extends Component
         $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
         $this->pengeluaranBarangs = $this->fetchPengeluaranBarangs();
     }
-
-   protected $listeners = ['updateDateRange' => 'updateDateRange'];
 
     public function updateDateRange($data = null)
     {

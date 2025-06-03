@@ -43,7 +43,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::middleware([CheckLevel::class . ':Super Admin'])->group(function () {
         Route::get('/kendaraan', KendaraanDinasLiveWire::class)->name('kendaraan');
-        // Route::get('/form', PengeluaranBarangLiveWire::class)->name('form');
     });
 
   
@@ -74,7 +73,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::put('/kendaraan/update', [KendaraanDinasController::class, 'update'])->name('kendaraan.update');
     Route::post('/kendaraan/nonAktif', [KendaraanDinasController::class, 'nonAktif'])->name('kendaraan.nonAktif');    
     Route::get('/kendaraan/{id}/riwayat-surat', [KendaraanDinasController::class, 'getRiwayatSurat']);
-    // Route::get('/kendaraan/booking-dates-all', [KendaraanDinasController::class, 'getAllBookingDates']);
 
     Route::post('/pengajuan/detailSurat', [SuratDinasController::class, 'getDetailSurat']);
     Route::post('/pengajuan/edit', [SuratDinasController::class, 'edit'])->name('pengajuan.edit');

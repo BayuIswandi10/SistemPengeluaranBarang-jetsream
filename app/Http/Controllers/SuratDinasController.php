@@ -210,15 +210,6 @@ class SuratDinasController extends Controller
         }
 
         // Cek apakah user sudah mengajukan atau sudah diajukan pada tanggal yang sama
-        // $existingRequest = SuratKendaraanDinas::where('created_by', $nrpKaryawan)
-        // ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
-        // ->exists();
-
-        // if ($existingRequest) {
-        //     return redirect()->back()->with('error', 'Anda sudah mengajukan kendaraan dinas pada tanggal ini.')->withInput();
-        // }
-
-        // Cek apakah user sudah mengajukan atau sudah diajukan pada tanggal yang sama
         $existingRequest = SuratKendaraanDinas::where('created_by', $nrpKaryawan)
             ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
             ->whereNotIn('status', ['Level 0', 'Expired']) // Tambahkan pengecualian status
@@ -228,20 +219,6 @@ class SuratDinasController extends Controller
             return redirect()->back()->with('error', 'Anda sudah mengajukan kendaraan dinas pada tanggal ini.')->withInput();
         }
 
-        // // Cek apakah peserta yang diajukan sudah memiliki pengajuan di tanggal yang sama
-        // if ($request->has('peserta') && is_array($request->peserta)) {
-        //     foreach ($request->peserta as $peserta) {
-        //         $existsAsParticipant = PencatatanKendaraanDinas::where('nrp_karyawan', $peserta['nrp_karyawan'])
-        //             ->whereHas('suratKendaraanDinas', function ($query) use ($tanggalPenggunaan) {
-        //                 $query->whereDate('tanggal_penggunaan', $tanggalPenggunaan);
-        //             })
-        //             ->exists();
-
-        //         if ($existsAsParticipant) {
-        //             return redirect()->back()->with('error', 'Peserta dengan NRP ' . $peserta['nrp_karyawan'] . ' sudah diajukan di tanggal yang sama.')->withInput();
-        //         }
-        //     }
-        // }
         // Cek apakah peserta yang diajukan sudah memiliki pengajuan di tanggal yang sama
         if ($request->has('peserta') && is_array($request->peserta)) {
             foreach ($request->peserta as $peserta) {
@@ -604,118 +581,71 @@ class SuratDinasController extends Controller
         }
     }
 
-
-
-    // public function editNonAuth(Request $request)
-    // {
-    //     try {
-    //         $suratDinasIds = explode(',', $request->surat_kendaraan_dinas_id); // Split comma-separated IDs
-
-    //         $suratDinas = SuratKendaraanDinas::with([
-    //             'pencatatanKendaraanDinas' => function($query) {
-    //                 $query->where('status', 'Aktif');
-    //             },
-    //             'pencatatanKendaraanDinas.user',
-    //             'suratDetail.kendaraan'
-    //         ])
-    //         ->whereIn('surat_kendaraan_dinas_id', $suratDinasIds)
-    //         ->get();
-
-    //         // Mapping data for each surat
-    //         $data = $suratDinas->map(function ($surat) {
-    //             $userDinasData = $surat->pencatatanKendaraanDinas->map(function ($user) {
-    //                 return [
-    //                     'nrp_karyawan' => $user->nrp_karyawan,
-    //                     'name' => $user->user->name ?? 'Tidak Diketahui',
-    //                     'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
-    //                 ];
-    //             });
-
-    //             return [
-    //                 'surat_kendaraan_dinas_id' => $surat->surat_kendaraan_dinas_id,
-    //                 'tujuan_penggunaan_1' => $surat->tujuan_penggunaan_1,
-    //                 'tujuan_penggunaan_2' => $surat->tujuan_penggunaan_2,
-    //                 'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
-    //                 'jenis_kendaraan' => $surat->jenis_kendaraan,
-    //                 'tanggal_penggunaan' => $surat->tanggal_penggunaan,
-    //                 'userDinas' => $userDinasData,
-    //             ];
-    //         });
-
-    //         return response()->json($data, 200);
-    //     } catch (\Throwable $e) {
-    //         return response()->json([
-    //             'message' => 'Terjadi kesalahan saat memuat data.',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function editNonAuth(Request $request)
-{
-    try {
-        // Validate input
-        $request->validate([
-            'surat_kendaraan_dinas_id' => 'required|string',
-            'kendaraan_dinas_id' => 'required|exists:tb_kendaraan_dinas,kendaraan_dinas_id',
-        ]);
+    {
+        try {
+            // Validate input
+            $request->validate([
+                'surat_kendaraan_dinas_id' => 'required|string',
+                'kendaraan_dinas_id' => 'required|exists:tb_kendaraan_dinas,kendaraan_dinas_id',
+            ]);
 
-        // Split comma-separated surat_kendaraan_dinas_id values
-        $suratDinasIds = explode(',', $request->surat_kendaraan_dinas_id);
-        $kendaraanDinasId = $request->kendaraan_dinas_id;
+            // Split comma-separated surat_kendaraan_dinas_id values
+            $suratDinasIds = explode(',', $request->surat_kendaraan_dinas_id);
+            $kendaraanDinasId = $request->kendaraan_dinas_id;
 
-        // Query SuratKendaraanDinas with related data, filtered by kendaraan_dinas_id
-        $suratDinas = SuratKendaraanDinas::with([
-            'pencatatanKendaraanDinas' => function ($query) {
-                $query->where('status', 'Aktif');
-            },
-            'pencatatanKendaraanDinas.user',
-            'suratDetail' => function ($query) use ($kendaraanDinasId) {
+            // Query SuratKendaraanDinas with related data, filtered by kendaraan_dinas_id
+            $suratDinas = SuratKendaraanDinas::with([
+                'pencatatanKendaraanDinas' => function ($query) {
+                    $query->where('status', 'Aktif');
+                },
+                'pencatatanKendaraanDinas.user',
+                'suratDetail' => function ($query) use ($kendaraanDinasId) {
+                    $query->where('kendaraan_dinas_id', $kendaraanDinasId);
+                },
+                'suratDetail.kendaraan'
+            ])
+            ->whereIn('surat_kendaraan_dinas_id', $suratDinasIds)
+            ->whereHas('suratDetail', function ($query) use ($kendaraanDinasId) {
                 $query->where('kendaraan_dinas_id', $kendaraanDinasId);
-            },
-            'suratDetail.kendaraan'
-        ])
-        ->whereIn('surat_kendaraan_dinas_id', $suratDinasIds)
-        ->whereHas('suratDetail', function ($query) use ($kendaraanDinasId) {
-            $query->where('kendaraan_dinas_id', $kendaraanDinasId);
-        })
-        ->get();
+            })
+            ->get();
 
-        // If no data is found, return an empty array
-        if ($suratDinas->isEmpty()) {
-            return response()->json([], 200);
-        }
+            // If no data is found, return an empty array
+            if ($suratDinas->isEmpty()) {
+                return response()->json([], 200);
+            }
 
-        // Map data for response
-        $data = $suratDinas->map(function ($surat) {
-            $userDinasData = $surat->pencatatanKendaraanDinas->map(function ($user) {
+            // Map data for response
+            $data = $suratDinas->map(function ($surat) {
+                $userDinasData = $surat->pencatatanKendaraanDinas->map(function ($user) {
+                    return [
+                        'nrp_karyawan' => $user->nrp_karyawan,
+                        'name' => $user->user->name ?? 'Tidak Diketahui',
+                        'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                    ];
+                });
+
                 return [
-                    'nrp_karyawan' => $user->nrp_karyawan,
-                    'name' => $user->user->name ?? 'Tidak Diketahui',
-                    'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+                    'surat_kendaraan_dinas_id' => $surat->surat_kendaraan_dinas_id,
+                    'tujuan_penggunaan_1' => $surat->tujuan_penggunaan_1,
+                    'tujuan_penggunaan_2' => $surat->tujuan_penggunaan_2,
+                    'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
+                    'jenis_kendaraan' => $surat->jenis_kendaraan,
+                    'tanggal_penggunaan' => $surat->tanggal_penggunaan,
+                    'kendaraan_dinas_id' => $surat->suratDetail->first()->kendaraan_dinas_id ?? null,
+                    'userDinas' => $userDinasData,
                 ];
             });
 
-            return [
-                'surat_kendaraan_dinas_id' => $surat->surat_kendaraan_dinas_id,
-                'tujuan_penggunaan_1' => $surat->tujuan_penggunaan_1,
-                'tujuan_penggunaan_2' => $surat->tujuan_penggunaan_2,
-                'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
-                'jenis_kendaraan' => $surat->jenis_kendaraan,
-                'tanggal_penggunaan' => $surat->tanggal_penggunaan,
-                'kendaraan_dinas_id' => $surat->suratDetail->first()->kendaraan_dinas_id ?? null,
-                'userDinas' => $userDinasData,
-            ];
-        });
-
-        return response()->json($data, 200);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'message' => 'Terjadi kesalahan saat memuat data.',
-            'error' => $e->getMessage(),
-        ], 500);
+            return response()->json($data, 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memuat data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
     public function updateNonAuth(Request $request)
     {
@@ -748,8 +678,6 @@ class SuratDinasController extends Controller
 
         return redirect()->back()->with('success', 'Peserta berhasil ditambahkan.');
     }
-
-    
 
     public function update(Request $request)
     {
@@ -802,7 +730,6 @@ class SuratDinasController extends Controller
         }
     }
     
-
     public function getSuratTujuan(Request $request)
     {
         $tanggal = $request->input('tanggal_penggunaan');
@@ -816,7 +743,6 @@ class SuratDinasController extends Controller
 
         return response()->json($list);
     }
-
 
     public function pindahkanPeserta(Request $request)
     {
@@ -859,9 +785,6 @@ class SuratDinasController extends Controller
 
         return response()->json(['status' => 'success']);
     }
-
-
-
 
     private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment)
     {
