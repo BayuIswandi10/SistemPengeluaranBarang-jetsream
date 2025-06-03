@@ -23,23 +23,6 @@ class ApprovalBarangKeluarController extends Controller
         $pengeluaranBarang = PengeluaranBarang::with('barangKeluar')->findOrFail($pengeluaranId);
         return response()->json($pengeluaranBarang,200);
     }
-    
-    private function generateApprovalId()
-    {
-        // Mendapatkan ID terakhir
-        $lastId = ApprovalBarangKeluar::max('approval_id');
-    
-        // Jika belum ada ID, mulai dari APR0001
-        if (!$lastId) {
-            return 'APR0001';
-        }
-    
-        // Ekstrak angka dari ID terakhir dan increment
-        $lastNumber = (int) substr($lastId, 3);
-        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-    
-        return 'APR' . $newNumber;
-    }
 
     public function updateStatus(Request $request)
     {
@@ -115,42 +98,6 @@ class ApprovalBarangKeluarController extends Controller
             ], 500);
         }
     }
-
-
-    public function updateNopolisi(Request $request)
-    {
-        DB::beginTransaction();
-    
-        try {
-            // Ambil data dari request
-            $pengeluaranBarangId = $request->input('pengeluaran_barang_id');
-            $noPolisi = $request->input('no_polisi');
-    
-            // Update hanya tabel tb_pencatatan_pengeluaran_barang
-            $updatePengeluaran = PengeluaranBarang::where('pengeluaran_barang_id', $pengeluaranBarangId)
-                ->update([
-                    'no_polisi' => $noPolisi,
-                ]);
-    
-            if (!$updatePengeluaran) {
-                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
-            }
-    
-            DB::commit();
-    
-            return response()->json([
-                'success' => true,
-                'message' => 'Data pengeluaran barang berhasil diperbarui!',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-    
 
     public function updateStatusSecurity(Request $request)
     {

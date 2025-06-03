@@ -814,7 +814,7 @@
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
                                         <i class="fas fa-box-open text-primary h1" style="cursor: pointer;"></i>
-                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Pengeluaran Barang</h3>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Cetak Pengeluaran Barang</h3>
                                     </div>
                                 </div>
                             </div>
@@ -823,7 +823,7 @@
                                 <div class="card shadow card-hover">
                                     <div class="card-body">
                                         <i class="fas fa-car-side text-primary h1" style="cursor: pointer;"></i>
-                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Penggunaan Kendaraan Dinas</h3>
+                                        <h3 class="mt-4 text-capitalize h5" style="cursor: pointer;">Cetak Penggunaan Kendaraan Dinas</h3>
                                     </div>
                                 </div>
                             </div>
@@ -1804,7 +1804,7 @@
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                        right: 'dayGridMonth,listMonth'
                     },
                     eventDidMount: function(info) {
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
@@ -2935,18 +2935,44 @@
             }
 
             // Handler untuk Form Penggunaan Kendaraan Dinas
-            if (submitButtonDinas && formDinas) {
+           if (submitButtonDinas && formDinas) {
                 submitButtonDinas.addEventListener('click', function (e) {
-                    // Cek validasi form terlebih dahulu
+                   // Cek validasi form terlebih dahulu
                     if (formDinas.checkValidity()) {
                         e.preventDefault(); // Cegah submit bawaan
-                        
+
+                        // Ambil semua elemen select NRP
+                        const nrpSelects = formDinas.querySelectorAll('select[name^="peserta"][name$="[nrp_karyawan]"]');
+                        const nrpValues = [];
+
+                        let duplicateFound = false;
+                        nrpSelects.forEach(select => {
+                            const value = select.value;
+                            if (value) {
+                                if (nrpValues.includes(value)) {
+                                    duplicateFound = true;
+                                } else {
+                                    nrpValues.push(value);
+                                }
+                            }
+                        });
+
+                        if (duplicateFound) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'NRP Duplikat',
+                                text: 'Terdapat NRP yang sama dalam daftar peserta. Mohon periksa kembali.',
+                            });
+                            return;
+                        }
+
+                        // Lanjut konfirmasi swal jika tidak ada duplikat
                         Swal.fire({
                             title: 'Apakah Anda Yakin?',
-                            text: "Pastikan seluruh data penggunaan kendaraan dinas telah diisi dengan benar.",
+                            text: "Pastikan seluruh data peserta telah diisi dengan benar.",
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonText: 'Ya, Ajukan',
+                            confirmButtonText: 'Ya, Tambahkan',
                             cancelButtonText: 'Tinjau Ulang',
                             reverseButtons: true,
                             confirmButtonColor: '#3085d6',
@@ -2969,7 +2995,33 @@
                     // Cek validasi form terlebih dahulu
                     if (formIkutSerta.checkValidity()) {
                         e.preventDefault(); // Cegah submit bawaan
-                        
+
+                        // Ambil semua elemen select NRP
+                        const nrpSelects = formIkutSerta.querySelectorAll('select[name^="peserta"][name$="[nrp_karyawan]"]');
+                        const nrpValues = [];
+
+                        let duplicateFound = false;
+                        nrpSelects.forEach(select => {
+                            const value = select.value;
+                            if (value) {
+                                if (nrpValues.includes(value)) {
+                                    duplicateFound = true;
+                                } else {
+                                    nrpValues.push(value);
+                                }
+                            }
+                        });
+
+                        if (duplicateFound) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'NRP Duplikat',
+                                text: 'Terdapat NRP yang sama dalam daftar peserta. Mohon periksa kembali.',
+                            });
+                            return;
+                        }
+
+                        // Lanjut konfirmasi swal jika tidak ada duplikat
                         Swal.fire({
                             title: 'Apakah Anda Yakin?',
                             text: "Pastikan seluruh data peserta telah diisi dengan benar.",
