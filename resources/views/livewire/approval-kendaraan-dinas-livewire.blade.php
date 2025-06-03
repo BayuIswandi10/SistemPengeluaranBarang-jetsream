@@ -101,18 +101,20 @@
         <div class="card mt-3">
            <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
                 <h6 class="m-0 font-weight-bold text-primary" style="flex-grow: 1;">Data Persetujuan</h6>
-                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
+                <div class="d-flex align-items-center" style="margin-left: auto; gap: 0.5rem;">
+                    <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
-                @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'GENERAL AFFAIRS') ||
-                    (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'GENERAL SERVICES'))
-                    
-                    <a href="#" id="downloadExcel"
-                    class="btn btn-success btn-sm d-flex align-items-center px-3"
-                    style="height: 38px; white-space: nowrap;">
-                    <i class="fas fa-file-excel fa-lg mr-2"></i>
-                    <span>Export Excel</span>
-                    </a>
-                @endif
+                    @if((Auth::check() && Auth::user()->level === 'Ka.Dept' && Auth::user()->departemen === 'GENERAL AFFAIRS') ||
+                        (Auth::check() && Auth::user()->level === 'Ka.Sie' && Auth::user()->seksi === 'GENERAL SERVICES'))
+                        
+                        <a href="#" id="downloadExcel"
+                        class="btn btn-success btn-sm d-flex align-items-center px-3"
+                        style="height: 38px; white-space: nowrap;">
+                        <i class="fas fa-file-excel fa-lg mr-2"></i>
+                        <span>Export Excel</span>
+                        </a>
+                    @endif
+                </div>
             </div>
 
             <div class="card-body">
