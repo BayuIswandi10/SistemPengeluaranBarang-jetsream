@@ -29,88 +29,89 @@
         </div>
     </div>
   
-  <!-- Modal untuk Menampilkan Detail -->
-  <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="d-flex justify-content-between align-items-center w-100">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                    <!-- Badge Status di Header -->
-                    <div id="approvalStatusBadge"></div>
-                </div>
-                <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-                <!-- Info Nomor Pengeluaran dan Kategori -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                    <div id="kategoriBarangCard"></div>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
-                    <button type="button" class="btn btn-success" id="approveButton" data-id="">Setuju</button>
-                </div>
-                
-                <!-- Card untuk Tabel Barang Keluar -->
-                <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Informasi Barang Keluar</h6>
+    <!-- Modal untuk Menampilkan Detail -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                        <!-- Badge Status di Header -->
+                        <div id="approvalStatusBadge"></div>
                     </div>
-                    <div class="card-body">
-                        <table id="dataTable" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nomor Pengeluaran Barang</th>
-                                    <th>Nama Barang</th>
-                                    <th>Jumlah</th>
-                                    <th>Satuan</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="detailBody">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <div class="modal-body">
 
-                <hr>
-
-                <!-- Card untuk Tabel Informasi Tambahan -->
-                <div class="card mt-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h6 class="mb-0">Informasi Tambahan</h6>
+                    <!-- Info Nomor Pengeluaran dan Kategori -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
+                        <div id="kategoriBarangCard"></div>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                        <table id="additionalInfoTable" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Tingkatan</th>
-                                    <th>Departemen</th>
-                                    <th>Status</th>
-                                    <th>Alasan Penolakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="additionalInfoBody">
-                                <!-- Data akan diisi secara dinamis -->
-                            </tbody>
-                        </table>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
+                    </div>
+                    
+                    <!-- Card untuk Tabel Barang Keluar -->
+                    <div class="card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Informasi Barang Keluar</h6>
+                        </div>
+                        <div class="card-body">
+                            <table id="dataTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nomor Pengeluaran Barang</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Card untuk Tabel Informasi Tambahan -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Informasi Tambahan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                            <table id="additionalInfoTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status</th>
+                                        <th>Alasan Penolakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="additionalInfoBody">
+                                    <!-- Data akan diisi secara dinamis -->
+                                </tbody>
+                            </table>
+                        </div>   
+                        <div class="text-end mt-3">
+                            <button type="button" class="btn btn-success" id="approveButton" data-id="">Setujui</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-  </div>
 
     {{-- Detail Dinas --}}
     <div class="modal fade" id="suratDinasModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
@@ -336,7 +337,7 @@
                             <td>${index + 1}</td>
                             <td>${nomor}</td>
                             <td>${item.nama_barang}</td>
-                            <td>${item.jumlah_barang}</td>
+                            <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                             <td>${item.satuan_barang}</td>
                             <td>${item.keterangan_barang ?? ''}</td>
                         </tr>

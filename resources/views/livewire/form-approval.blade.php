@@ -541,7 +541,7 @@
                             index + 1,
                             nomor,
                             item.nama_barang,
-                            item.jumlah_barang,
+                            Number(item.jumlah_barang).toLocaleString('id-ID'),
                             item.satuan_barang,
                             item.keterangan_barang
                         ]);

@@ -2459,7 +2459,7 @@
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${barangInfo.nama_barang}</td>
-                                    <td>${barangInfo.jumlah_barang}</td>
+                                    <td>${Number(barangInfo.jumlah_barang).toLocaleString('id-ID')}</td>
                                     <td>${barangInfo.satuan_barang}</td>
                                     <td>${barangInfo.keterangan_barang?.trim() ? barangInfo.keterangan_barang : '-'}</td>
 
@@ -2500,7 +2500,7 @@
                                 <tr>
                                     <td rowspan="2">${index + 1}</td>
                                     <td>${barang.nama_barang}</td>
-                                    <td>${barang.jumlah_barang}</td>
+                                    <td>${Number(barang.jumlah_barang).toLocaleString('id-ID')}</td>
                                     <td>${barang.satuan_barang}</td>
                                 </tr>
                                 <tr>
