@@ -838,7 +838,7 @@ class SuratDinasController extends Controller
                 ApprovalKendaraanDinas::create([
                     'surat_kendaraan_dinas_id' => $suratLamaId,
                     'created_by' => $nrpKaryawan,
-                    'status_approval' => 'Level 4',
+                    'status_approval' => 'Level 0',
                     'created_date' => now(),
                 ]);
             }
