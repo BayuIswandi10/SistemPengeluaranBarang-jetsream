@@ -1,10 +1,4 @@
 <aside class="main-sidebar sidebar-light-primary elevation-4">
-    <!-- Brand Logo -->
-    {{-- <a href="{{ url('Functions/Dashboard') }}" class="brand-link">
-        <img src="{{ asset('assets/adminlte3.2/dist/img/Logo.png') }}" alt="Logo Politeknik Astra" class="brand-image">
-        <span class="brand-text font-weight-light">Peminjaman Ruangan</span>
-    </a> --}}
-
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -29,7 +23,7 @@
                     with font-awesome or any other icon font library -->
                 <li class="nav-header">MENU</li>
                     <li class="nav-item {{ request()->routeIs('dashboard-barang-keluar') ? 'menu-open' : '' }}">
-                        <a href="{{ route('dashboard-barang-keluar') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard-barang-keluar') }}" class="nav-link {{ request()->routeIs('dashboard-barang-keluar') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
                                 Beranda
@@ -119,15 +113,12 @@
                         <p>Scan QR-Code Persetujuan</p> </a> </li> 
                     @endif
 
-                    <li class="nav-item">
+                    <li class="nav-item" style="border-top: 1px solid #ccc; margin-top: 10px;">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a href="#" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>
-                                    Keluar
-                                    <i class="right fas"></i>
-                                </p>
+                                <p>Keluar</p>
                             </a>
                         </form>
                     </li>
