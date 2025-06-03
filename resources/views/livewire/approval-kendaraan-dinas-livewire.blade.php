@@ -408,7 +408,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="editDataModalLabel">Edit Order Kendaraan Dinas</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -417,95 +417,57 @@
                         <p><strong>Nomor Surat:</strong> <span id="nomorSurat"></span></p>
                     </div>
 
-                    <!-- Form Edit -->
-                    <form id="editOrderForm" method="POST" action="{{route('pengajuan.update')}}" enctype="multipart/form-data" >
-                        @csrf
-                        @method('PUT')
-                        <div class="row">
-                            <div class="col-md-12">
-                                <!-- Yang Memesan -->
-                                <label for="pemesan">Yang Memesan *</label>
-                                <input type="hidden" name="surat_kendaraan_dinas_id" id="surat_kendaraan_dinas_id">
-                                <input type="text" name="nrp_karyawan" id="pemesan" class="form-control" disabled>
-                            </div>
+                    <!-- Yang Memesan -->
+                    <div class="col-md-12">
+                        <label for="pemesan">Yang Memesan *</label>
+                        <input type="hidden" id="surat_kendaraan_dinas_id">
+                        <input type="text" id="pemesan" class="form-control" disabled>
+                    </div>
 
-                            <div class="col-md-12 mt-3">
-                                <!-- Kendaraan Info -->
-                                <label for="kendaraan" class="mt-2">Kendaraan *</label>
-                                <div class="border p-2 table-responsive">
-                                    <table id="kendaraanInfo" class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>No Kendaraan</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <label class="mt-3">Tujuan *</label>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <input type="text" name="tujuan_penggunaan_1" id="tujuan_1" class="form-control" placeholder="Tujuan 1">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" name="tujuan_penggunaan_2" id="tujuan_2" class="form-control" placeholder="Tujuan 2">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" name="tujuan_penggunaan_3" id="tujuan_3" class="form-control" placeholder="Tujuan 3">
-                            </div>
-                        </div>
-
-
-                        <!-- Jenis Mobil -->
-                        <label for="jenisMobil" class="mt-2">Jenis Mobil *</label>
-                        {{-- <input type="text" name="jenis_kendaraan" id="jenisMobil" class="form-control"> --}}
-                        <select class="form-control" id="jenisMobil" name="jenis_kendaraan" required autocomplete="off">
-                            <option value="" disabled selected>Pilih Jenis Kendaraan</option>
-                            <option value="1">KANTOR</option>
-                            <option value="2">PRIBADI</option>
-                            <option value="3">TAXI</option>
-                        </select>
-
-                        <!-- Digunakan Pada -->
-                        <label for="tanggalPakai" class="mt-2">Digunakan Pada *</label>
-                        <input type="date" name="tanggal_penggunaan" id="tanggalPakai" class="form-control">
-
-                        <!-- Tabel Peserta -->
-                        <label class="mt-3">Peserta *</label>
-                        <table id="pesertaList" class="table table-bordered">
+                    <!-- Kendaraan Info -->
+                    <label for="kendaraan" class="mt-2">Kendaraan *</label>
+                    <div class="border p-2 table-responsive">
+                        <table id="kendaraanInfo" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>NRP</th>
-                                    <th>Nama Karyawan</th>
-                                    <th>Divisi Departemen</th>
-                                    <th>Pilih</th>
+                                    <th>No Kendaraan</th>
+                                    <th>Keterangan</th>
+                                    <th>Tanggal Penggunaan</th>
+                                    <th>Tujuan 1</th>
+                                    <th>Tujuan 2</th>
+                                    <th>Tujuan 3</th>
                                 </tr>
                             </thead>
                             <tbody>
-
                             </tbody>
                         </table>
+                    </div>
 
-                        <!-- Tombol Pindahkan Peserta & Simpan -->
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-success" id="pindahkanPeserta">Pindahkan Peserta</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                    </form>
+                    <!-- Tabel Peserta -->
+                    <label class="mt-3">Peserta *</label>
+                    <table id="pesertaList" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NRP</th>
+                                <th>Nama Karyawan</th>
+                                <th>Divisi Departemen</th>
+                                <th>Pilih</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <!-- Tombol Pindahkan Peserta -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-success" id="pindahkanPeserta">Pindahkan Peserta</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Modal Pindah Peserta -->
     <div class="modal fade" id="modalPindahPeserta" tabindex="-1" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
@@ -516,7 +478,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="nrpPesertaDipindah" />
-                
+                    <input type="hidden" id="tanggalPakai" class="form-control" disabled>
                     <!-- Tabel Peserta yang Dipindahkan -->
                     <h6><strong>Karyawan Yang Dipindahkan</strong></h6>
                     <div class="table-responsive">
@@ -544,6 +506,7 @@
                                     <th>No Surat</th>
                                     <th>Tujuan</th>
                                     <th>Jenis Mobil</th>
+                                    <th>No Kendaraan</th>
                                     <th>Status</th>
                                     <th>Pilih</th>
                                 </tr>
@@ -750,6 +713,7 @@
                             <td>${item.surat_kendaraan_dinas_id}</td>
                             <td>${item.tujuan_penggunaan_1}</td>
                             <td>${item.jenis_kendaraan}</td>
+                            <td>${item.nomor_kendaraan || '-'}</td>
                             <td>${item.status}</td>
                             <td>
                                 <input type="radio" name="surat_tujuan" value="${item.surat_kendaraan_dinas_id}">
@@ -839,10 +803,6 @@
 
         $('#nomorSurat').text('');
         $('#pemesan').val('');
-        $('#jenisMobil').val('');
-        $('#tanggalPakai').val('');
-        $('#jamMulai').val('');
-        $('#jamSelesai').val('');
         $('#kendaraanInfo tbody').empty();
         $('#pesertaList tbody').empty();
 
@@ -855,7 +815,6 @@
             },
             dataType: "json",
             success: function (response) {
-                
                 if (!response || !response.surat_kendaraan_dinas_id) {
                     alert("Data tidak valid.");
                     return;
@@ -863,27 +822,17 @@
 
                 const isSuperAdmin = currentUserRole === "Super Admin";
 
-                // Atur akses field
-                $("#jenisMobil").prop("readonly", !isSuperAdmin);
-                $("#tanggalPakai").prop("readonly", !isSuperAdmin);
-                $("#tujuan_1, #tujuan_2, #tujuan_3").prop("readonly", !isSuperAdmin);
-
                 // Simpan daftar kendaraan ke global
                 window.daftarKendaraanGlobal = response.daftar_kendaraan || [];
 
                 // Isi field form utama
                 $("#surat_kendaraan_dinas_id").val(response.surat_kendaraan_dinas_id);
                 $("#pemesan").val(response.userDinas?.[0]?.nrp_karyawan || '');
-                $("#jenisMobil").val(response.jenis_kendaraan || '');
+                $("#nomorSurat").text(response.surat_kendaraan_dinas_id || '');
                 $("#tanggalPakai").val(response.tanggal_penggunaan || '');
-                $("#jamMulai").val(response.waktu_keluar || '');
-                $("#jamSelesai").val(response.waktu_kembali || '');
-                $("#tujuan_1").val(response.tujuan_penggunaan_1 || '');
-                $("#tujuan_2").val(response.tujuan_penggunaan_2 || '');
-                $("#tujuan_3").val(response.tujuan_penggunaan_3 || '');
 
                 // Render Kendaraan
-                renderDaftarKendaraan(response.data_kendaraan || []);
+                renderDaftarKendaraan(response);
 
                 // Render Peserta
                 renderDaftarPeserta(response.userDinas || []);
@@ -894,19 +843,27 @@
         });
     });
 
-    function renderDaftarKendaraan(dataKendaraan) {
+    function renderDaftarKendaraan(response) {
         const tbody = $("#kendaraanInfo tbody");
         tbody.empty();
 
+        const dataKendaraan = response.data_kendaraan || [];
         dataKendaraan.forEach((item, index) => {
+            const jenisKendaraan = response.jenis_kendaraan || '';
+            const tanggalPenggunaan = response.tanggal_penggunaan || '';
+            const tujuan1 = response.tujuan_penggunaan_1 || '';
+            const tujuan2 = response.tujuan_penggunaan_2 || '';
+            const tujuan3 = response.tujuan_penggunaan_3 || '';
+
             tbody.append(`
                 <tr>
                     <td>${index + 1}</td>
-                    <td>
-                        <input type="text" name="nomor_kendaraan[]" class="form-control" 
-                            value="${item.nomor_kendaraan || ''}" readonly>
-                    </td>
+                    <td class="nomor-kendaraan">${item.nomor_kendaraan || ''}</td>
                     <td class="keterangan-kendaraan">${item.keterangan || ''}</td>
+                    <td>${tanggalPenggunaan}</td>
+                    <td>${tujuan1}</td>
+                    <td>${tujuan2}</td>
+                    <td>${tujuan3}</td>
                 </tr>
             `);
         });

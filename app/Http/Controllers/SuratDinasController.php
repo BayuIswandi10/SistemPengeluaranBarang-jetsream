@@ -808,10 +808,39 @@ class SuratDinasController extends Controller
         $tanggal = $request->input('tanggal_penggunaan');
         $currentSuratId = $request->input('current_surat_id');
 
-        $list = SuratKendaraanDinas::where('status', 'Level 2')
-            ->where('tanggal_penggunaan', $tanggal)
-            ->where('surat_kendaraan_dinas_id', '!=', $currentSuratId)
-            ->where('jenis_kendaraan', 1)
+        // Get the source surat details to match destinations
+        $sourceSurat = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $currentSuratId)->first();
+
+        if (!$sourceSurat) {
+            return response()->json([]);
+        }
+
+        // Get the kendaraan_dinas_id of the source surat
+        $sourceKendaraan = SuratKendaraanDinasDetail::where('surat_kendaraan_dinas_id', $currentSuratId)
+            ->pluck('kendaraan_dinas_id')
+            ->toArray();
+
+        $list = SuratKendaraanDinas::select(
+            'tb_surat_kendaraan_dinas.*',
+            'tb_kendaraan_dinas.nomor_kendaraan'
+        )
+            ->join('tb_surat_kendaraan_dinas_detail', 'tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id', '=', 'tb_surat_kendaraan_dinas_detail.surat_kendaraan_dinas_id')
+            ->join('tb_kendaraan_dinas', 'tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', '=', 'tb_kendaraan_dinas.kendaraan_dinas_id')
+            ->where('tb_surat_kendaraan_dinas.status', 'Level 2')
+            ->where('tb_surat_kendaraan_dinas.jenis_kendaraan', 1)
+            ->where('tb_surat_kendaraan_dinas.tanggal_penggunaan', $tanggal)
+            ->where('tb_surat_kendaraan_dinas.surat_kendaraan_dinas_id', '!=', $currentSuratId)
+            ->where('tb_surat_kendaraan_dinas.tujuan_penggunaan_1', $sourceSurat->tujuan_penggunaan_1)
+            ->where(function ($query) use ($sourceSurat) {
+                $query->where('tb_surat_kendaraan_dinas.tujuan_penggunaan_2', $sourceSurat->tujuan_penggunaan_2)
+                    ->orWhereNull('tb_surat_kendaraan_dinas.tujuan_penggunaan_2');
+            })
+            ->where(function ($query) use ($sourceSurat) {
+                $query->where('tb_surat_kendaraan_dinas.tujuan_penggunaan_3', $sourceSurat->tujuan_penggunaan_3)
+                    ->orWhereNull('tb_surat_kendaraan_dinas.tujuan_penggunaan_3');
+            })
+            ->whereNotIn('tb_surat_kendaraan_dinas_detail.kendaraan_dinas_id', $sourceKendaraan)
+            ->distinct()
             ->get();
 
         return response()->json($list);
@@ -820,9 +849,13 @@ class SuratDinasController extends Controller
 
     public function pindahkanPeserta(Request $request)
     {
+        $user = Auth::user();
+        $nrpKaryawan = $user->nrp_karyawan;
         $peserta = $request->peserta; // array NRP peserta
         $suratBaru = $request->surat_tujuan;
 
+        // Track the original surat IDs affected by the move
+        $affectedSuratLamaIds = [];
 
         foreach ($peserta as $nrp) {
             // Ambil semua pencatatan lama peserta yang belum dipindahkan
@@ -830,15 +863,18 @@ class SuratDinasController extends Controller
                 ->where('surat_kendaraan_dinas_id', '!=', $suratBaru)
                 ->where(function ($query) {
                     $query->where('status', '!=', 'Dipindahkan')
-                        ->orWhereNull('status');
+                          ->orWhereNull('status');
                 })
                 ->get();
 
             // Update semua pencatatan lama menjadi Dipindahkan
             foreach ($pencatatanLamaList as $pencatatanLama) {
                 $pencatatanLama->update([
-                    'status' => 'Dipindahkan'
+                    'status' => 'Dipindahkan',
+                    'update_date' => now(),
                 ]);
+                // Track the original surat ID
+                $affectedSuratLamaIds[] = $pencatatanLama->surat_kendaraan_dinas_id;
             }
 
             // Cek apakah peserta sudah ada di surat baru
@@ -853,6 +889,31 @@ class SuratDinasController extends Controller
                     'nrp_karyawan' => $nrp,
                     'update_date' => now(),
                     'status' => 'Aktif',
+                ]);
+            }
+        }
+
+        // Remove duplicates from affected surat IDs
+        $affectedSuratLamaIds = array_unique($affectedSuratLamaIds);
+
+        // Check each affected surat lama to see if all its participants are moved
+        foreach ($affectedSuratLamaIds as $suratLamaId) {
+            $activePencatatanCount = PencatatanKendaraanDinas::where('surat_kendaraan_dinas_id', $suratLamaId)
+                ->where('status', 'Aktif')
+                ->count();
+
+            // If no active participants remain, update the surat status to Level 0
+            if ($activePencatatanCount === 0) {
+                SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratLamaId)
+                    ->update([
+                        'status' => 'Level 0',
+                        'alasan_penolakan' => 'Semua peserta telah dipindahkan ke surat lain',
+                    ]);
+                ApprovalKendaraanDinas::create([
+                    'surat_kendaraan_dinas_id' => $suratLamaId,
+                    'created_by' => $nrpKaryawan,
+                    'status_approval' => 'Level 4',
+                    'created_date' => now(),
                 ]);
             }
         }
