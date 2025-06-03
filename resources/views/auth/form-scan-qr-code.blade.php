@@ -262,7 +262,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" onclick="printSuratDinas()">Print Surat Dinas</button>
+                    <button id="cetakBukti" type="button" class="btn btn-primary" onclick="printSuratDinas()">Print Surat Dinas</button>
                 </div>    
             </div>
         </div>
@@ -520,6 +520,18 @@
                         // Cek level tertinggi yang menyetujui
                         const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
 
+                       const tombolCetak = document.getElementById('cetakBukti');
+
+                        // Logika tampil/sembunyikan tombol
+                        if (tombolCetak) {
+                            if (adaYangMenolak || maxLevel < 3) {
+                                tombolCetak.style.display = "none";
+                            } else {
+                                tombolCetak.style.display = "inline-block"; 
+                            }
+                        }
+
+                        
                         if (adaYangMenolak) {
                             statusBadgeHTML = `
                                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
@@ -904,9 +916,6 @@
                     <div class="document-info">
                         <div style="float: left;">
                             <strong>Nomor Surat:</strong> ${nomorSurat}
-                        </div>
-                        <div class="status-info">
-                            ${statusBadge.replace(/badge-success|badge-danger|px-2|py-3/g, '').replace(/class="badge /g, 'style="padding: 5px 10px; border: 1px solid #000; ')}
                         </div>
                         <div style="clear: both;"></div>
                     </div>
