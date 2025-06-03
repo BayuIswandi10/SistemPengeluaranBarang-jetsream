@@ -1804,7 +1804,7 @@
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                        right: 'dayGridMonth,listMonth'
                     },
                     eventDidMount: function(info) {
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
