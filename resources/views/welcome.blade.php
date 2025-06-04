@@ -2806,13 +2806,11 @@
             const inputKm = document.getElementById("kilometer_awal");
 
             inputKm.addEventListener("input", function (e) {
-                let value = this.value.replace(/\D/g, ''); // hanya angka
-                this.value = formatRibuan(value);
+                let value = this.value.replace(/[^0-9]/g, ''); // Remove non-digits
+                if (value) {
+                    this.value = Number(value).toLocaleString('id-ID'); // Format with thousand separators
+                }
             });
-
-            function formatRibuan(angka) {
-                return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            }
         });
 
         document.addEventListener('input', function (e) {
