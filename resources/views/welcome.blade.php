@@ -1774,7 +1774,7 @@
 
                         return {
                             id: item.kendaraan_dinas_id,
-                            title: `<strong>${item.nomor_kendaraan}</strong><br>${item.merk_kendaraan} (Sisa: ${item.kapasitas_tersedia || 0})`,
+                            title: `<strong>${item.nomor_kendaraan}</strong><br>${item.merk_kendaraan} (${item.kapasitas_tersedia > 0 ? 'Sisa: ' + item.kapasitas_tersedia : 'Full'})`,
                             start: item.tanggal_penggunaan,
                             allDay: true,
                             backgroundColor: color,
@@ -1806,12 +1806,51 @@
                         center: 'title',
                         right: 'dayGridMonth,listMonth'
                     },
+                    dayCellDidMount: function(info) {
+                        const cellDate = new Date(info.date);
+                        const today = new Date();
+                        
+                        // Set waktu ke 00:00:00 untuk perbandingan yang akurat
+                        cellDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        
+                        const cell = info.el;
+                        
+                        if (cellDate.getTime() < today.getTime()) {
+                            // Tanggal yang sudah lewat - warna abu-abu
+                            cell.style.backgroundColor = '#f8f9fa';
+                            cell.style.color = '#6c757d';
+                            cell.style.opacity = '0.6';
+                        } else if (cellDate.getTime() === today.getTime()) {
+                            // Tanggal hari ini - warna biru
+                            cell.style.backgroundColor = '#e3f2fd';
+                            cell.style.color = '#1976d2';
+                            cell.style.fontWeight = 'bold';
+                            cell.style.border = '2px solid #1976d2';
+                        }
+                    },
+
                     eventDidMount: function(info) {
                         const kapasitas = info.event.extendedProps.kapasitas_tersedia || 0;
                         const bgColor = info.event.backgroundColor;
 
                         // Tambahkan cursor pointer
                         $(info.el).css('cursor', 'pointer');
+
+                        // Cek apakah event di tanggal yang sudah lewat
+                        const eventDate = new Date(info.event.start);
+                        const today = new Date();
+                        eventDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        
+                        if (eventDate.getTime() < today.getTime()) {
+                            // Event di tanggal yang sudah lewat - buat lebih transparan
+                            $(info.el).css({
+                                'opacity': '0.5',
+                                'filter': 'grayscale(50%)'
+                            });
+                        }
+
                     },
                     eventContent: function(arg) {
                         return { html: `<div class="fc-custom-event">${arg.event.title}</div>` };
