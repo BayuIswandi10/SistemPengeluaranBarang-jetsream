@@ -401,7 +401,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBox()">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="tambahComboBox()">
                                             <i class="fas fa-plus"></i> Tambah Barang
                                         </button>
                                     </div>
@@ -542,14 +542,14 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="tujuan_penggunaan">Tujuan Dinas <span class="text-danger">*</span></label>
+                                    <label for="tujuan_penggunaan">Rute Dinas <span class="text-danger">*</span></label>
                                     <div class="d-flex gap-2">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_1" 
-                                               value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Tujuan Ke-1" required autocomplete="off">
+                                               value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Rute Ke-1" required autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_2" 
-                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Tujuan Ke-2" autocomplete="off">
+                                               value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Rute Ke-2" autocomplete="off">
                                         <input type="text" class="form-control" name="tujuan_penggunaan_3" 
-                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Tujuan Ke-3" autocomplete="off">
+                                               value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Rute Ke-3" autocomplete="off">
                                     </div>
                                 </div>
 
@@ -587,7 +587,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahComboBoxPeserta()">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="tambahComboBoxPeserta()">
                                         <i class="fas fa-plus"></i> Tambah Peserta
                                     </button>
                                 </div>
@@ -629,9 +629,9 @@
                                             <th>No Polisi</th>
                                             <th>Jenis Mobil</th>
                                             <th>Tanggal Penggunaan</th>
-                                            <th>Tujuan 1</th>
-                                            <th>Tujuan 2</th>
-                                            <th>Tujuan 3</th>
+                                            <th>Rute 1</th>
+                                            <th>Rute 2</th>
+                                            <th>Rute 3</th>
                                         </tr>
                                     </thead>
                                     <tbody id="bookingTableBody">
@@ -740,7 +740,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="tambahPesertaIkutSerta()">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="tambahPesertaIkutSerta()">
                                         <i class="fas fa-plus"></i> Tambah Peserta
                                     </button>
                                 </div>
@@ -856,7 +856,7 @@
                                     <th>Asal Barang Keluar</th>
                                     <th>Tujuan Barang Keluar</th>
                                     <th>Jenis Kendaraan</th>
-                                    <th>Aksi</th>
+                                    <th>Detail</th>
                                 </tr>
                             </thead>
                             <tbody id="detailBody">
@@ -928,10 +928,10 @@
                                     <th>ID Surat</th>
                                     <th>Dibuat Oleh</th>
                                     <th>Tanggal Dibuat</th>
-                                    <th>Tujuan</th>
+                                    <th>Rute</th>
                                     <th>Jenis Kendaraan</th>
                                     <th>Tanggal Penggunaan</th>
-                                    <th>Aksi</th>
+                                    <th>Detail</th>
                                 </tr>
                             </thead>
                             <tbody id="suratKendaraanBody"></tbody>

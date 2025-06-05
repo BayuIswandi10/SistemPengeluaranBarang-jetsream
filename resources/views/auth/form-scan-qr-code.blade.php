@@ -65,16 +65,16 @@
                 <div class="input-group mt-3">
                     <input type="text" id="scanResult" class="form-control" placeholder="Scan QR atau ketik nomor pengeluaran" autocomplete="off">
                     <div class="input-group-append">
-                        <button id="btnCari" class="btn btn-primary" style="background-color: #4B687E; border-radius:8px;">Cari</button>
+                        <button id="btnCari" class="btn btn-primary ml-2" >Cari</button>
                     </div>
                 </div>
             </div>
             
             <div class="card-footer d-flex justify-content-center">
                <a href="{{ url('/') }}">
-                    <x-button type="button" class="btn btn-primary mr-2" style="background-color: #4B687E; border-radius:8px;">
+                    <button type="button" class="btn btn-secondary mr-2">
                         {{ __('Kembali') }}
-                    </x-button>
+                    <button>
                 </a>
             </div>
         </div>
@@ -134,7 +134,7 @@
 
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
-                        <div class="card-header bg-secondary text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                         </div>
                         <div class="card-body">
@@ -185,7 +185,7 @@
     
                     <!-- Card untuk Tabel Informasi Kendaraan -->
                     <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Kendaraan</h6>
                         </div>
                         <div class="card-body">
@@ -197,9 +197,9 @@
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
                                         <th>Tanggal Penggunaan</th>
-                                        <th>Tujuan 1</th>
-                                        <th>Tujuan 2</th>
-                                        <th>Tujuan 3</th>
+                                        <th>Rute 1</th>
+                                        <th>Rute 2</th>
+                                        <th>Rute 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -236,7 +236,7 @@
     
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
-                        <div class="card-header bg-secondary text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                         </div>
                         <div class="card-body">
