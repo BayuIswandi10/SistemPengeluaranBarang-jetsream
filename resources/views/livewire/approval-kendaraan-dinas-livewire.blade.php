@@ -8,28 +8,18 @@
         opacity: 1;
         }
 
-        #dataTable thead th:first-child {
+        /* Hanya untuk kolom checkbox */
+        #dataTable th:first-child,
+        #dataTable td:first-child {
             text-align: center !important;
             vertical-align: middle !important;
-            padding: 8px 0 !important; /* Sesuaikan padding jika perlu */
+            width: 50px !important;
         }
 
-        #dataTable thead th:first-child input[type="checkbox"] {
-            margin: 0 auto !important; /* Memusatkan checkbox secara horizontal */
+        #dataTable th:first-child .form-check-input,
+        #dataTable td:first-child .form-check-input {
+            margin: 0 auto !important;
             display: block !important;
-            vertical-align: middle !important;
-        }
-
-        #dataTable tbody td:first-child {
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 8px 0 !important; /* Sesuaikan padding agar sesuai dengan header */
-        }
-
-        #dataTable tbody td:first-child input[type="checkbox"] {
-            margin: 0 auto !important; /* Memusatkan checkbox di body */
-            display: block !important;
-            vertical-align: middle !important;
         }
 
         .button-group.d-flex {
@@ -148,7 +138,7 @@
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
-                            <th>
+                            <th class="text-center">
                                 <input type="checkbox" id="selectAll" class="form-check-input">
                             </th>
                             <th>NO</th>
@@ -163,7 +153,7 @@
                         <?php $i = 0; ?>
                         @foreach ($kendaraanDinas as $dataKD)
                             <tr>
-                                <td>
+                                <td class="text-center">
                                     @php
                                         $canApprove = false;
                                         // Check if current user can approve this item
@@ -547,7 +537,7 @@
     });
 
 
-   function initDataTable() {
+    function initDataTable() {
         const table = $('#dataTable');
 
         // sembunyikan dulu
@@ -571,9 +561,11 @@
             },
             columnDefs: [
             {
+                
                 className: 'dt-body-center dt-head-center', 
                 targets: 0, // Kolom pertama (checkbox)
-                orderable: false // Opsional: Matikan sorting untuk kolom checkbox
+                orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
+                width: '50px'
             },
                 { className: 'dt-body-center', targets: 1 },
                 { className: 'dt-head-center', targets: 1 },
@@ -973,8 +965,8 @@
                         "Level 0": "Menolak",
                         "Level 1": "Mengajukan",
                         "Level 2": "Menyetujui",
-                        "Level 3": "Mengetahui",
-                        "Level 4": "Memeriksa"
+                        "Level 3": "Menyetujui",
+                        "Level 4": "Menyetujui"
                     };
 
                     // Validasi data informasi_tambahan
