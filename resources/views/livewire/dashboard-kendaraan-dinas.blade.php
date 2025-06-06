@@ -147,10 +147,10 @@
                                                 <tr>
                                                     <th>NO</th>
                                                     <th>Nomor Surat Kendaraan Dinas</th>
-                                                    <th>Tujuan</th>
+                                                    <th>Rute</th>
                                                     <th>Jenis Kendaraan</th>
                                                     <th>Status</th>
-                                                    <th>Aksi</th>
+                                                    <th>Detail</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -227,7 +227,7 @@
 
                                         <!-- Card untuk Tabel Informasi Kendaraan -->
                                         <div class="card mb-4">
-                                            <div class="card-header bg-success text-white">
+                                            <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Kendaraan</h6>
                                             </div>
                                             <div class="card-body">
@@ -235,7 +235,7 @@
                                                     <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                                                         <thead>
                                                             <tr>
-                                                                <th>No</th>
+                                                                <th style="text-align: center">No</th>
                                                                 <th>No Kendaraan</th>
                                                                 <th>Keterangan</th>
                                                             </tr>
@@ -276,7 +276,7 @@
 
                                         <!-- Card untuk Tabel Informasi Tambahan -->
                                         <div class="card mt-4">
-                                            <div class="card-header bg-secondary text-white">
+                                            <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                                             </div>
                                             <div class="card-body">
@@ -284,7 +284,7 @@
                                                     <table id="additionalInfoTable" class="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th>No</th>
+                                                                <th style="text-align: center">No</th>
                                                                 <th>Nama</th>
                                                                 <th>Tingkatan</th>
                                                                 <th>Departemen</th>
@@ -580,13 +580,18 @@
 
                                     // Kosongkan data lama kendaraan
                                     document.getElementById('kendaraanInfoBody').innerHTML = "";
+
+                                     // Hapus DataTable sebelum menambahkan data baru
+                                    if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                                        $('#detaildataTableModal').DataTable().clear().destroy();
+                                    }
                                     
                                     // Validasi dan tampilkan data kendaraan
                                     if (data.data_kendaraan && data.data_kendaraan.length > 0) {
                                         data.data_kendaraan.forEach((item, index) => {
                                             let row = `
                                                 <tr>
-                                                    <td>${index + 1}</td>
+                                                    <td style="text-align: center">${index + 1}</td>
                                                     <td>${item.nomor_kendaraan}</td>
                                                     <td>${item.keterangan}</td>
                                                 </tr>
@@ -616,6 +621,21 @@
                                         detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
                                     }
 
+                                    // Inisialisasi ulang DataTable
+                                    $('#detaildataTableModal').DataTable({
+                                        columnDefs: [
+                                            { className: 'dt-body-center', targets: 0 },
+                                            { className: 'dt-head-center', targets: 0 },
+                                            { className: 'dt-body-left', targets: 3 },
+                                            { className: 'dt-head-left', targets: 3 },
+                                        ],
+                                        responsive: true,
+                                        scrollX: false,
+                                        pageLength: 5,
+                                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                                        destroy: true
+                                    });
+
                                     // Mapping tingkatan dan status persetujuan
                                     const tingkatMapping = {
                                         "Level 1": "Civitas",
@@ -640,7 +660,7 @@
                                         data.informasi_tambahan.forEach((info, index) => {
                                             let row = `
                                                 <tr>
-                                                    <td>${index + 1}</td>
+                                                    <td style="text-align: center">${index + 1}</td>
                                                     <td>${info.nama}</td>
                                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                                     <td>${info.departemen}</td>

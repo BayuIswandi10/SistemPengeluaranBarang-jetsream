@@ -15,7 +15,7 @@
 
         .btn-outline-primary.custom-color {
             color: #5A6ACF !important;
-            border-color: #5A6ACF !important;
+            border-color: #5a6acf !important;
             }
 
             .btn-outline-primary.custom-color:hover,
@@ -152,7 +152,7 @@
                                                     <th>Tujuan</th>
                                                     <th>Jenis Kendaraan</th>
                                                     <th>Status</th>
-                                                    <th>Aksi</th>
+                                                    <th>Detail</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -252,7 +252,7 @@
 
                                         <!-- Card untuk Tabel Informasi Tambahan -->
                                         <div class="card mt-4">
-                                            <div class="card-header bg-secondary text-white">
+                                            <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Tambahan</h6>
                                             </div>
                                             <div class="card-body">
@@ -260,7 +260,7 @@
                                                     <table class="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th>No</th>
+                                                                <th style="text-align: center">No</th>
                                                                 <th>Nama</th>
                                                                 <th>Tingkatan</th>
                                                                 <th>Departemen</th>
@@ -523,6 +523,12 @@
 
                             // Inisialisasi ulang DataTable
                             $('#detaildataTableModal').DataTable({
+                                columnDefs: [
+                                    { className: 'dt-body-center', targets: 0 },
+                                    { className: 'dt-head-center', targets: 0 },
+                                    { className: 'dt-body-left', targets: 5 },
+                                    { className: 'dt-head-left', targets: 5 },
+                                ],
                                 responsive: true,
                                 scrollX: false,
                                 pageLength: 5,
@@ -539,12 +545,12 @@
                                 "Level 6": "Security"
                             };
                             const approvMapping = {
-                                "Level 1": "Mengeluarkan",
-                                "Level 2": "Membawa",
+                                "Level 1": "Mengajukan",
+                                "Level 2": "Menyetujui",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Mengetahui",
-                                "Level 5": "Menerima",
-                                "Level 6": "Memeriksa"
+                                "Level 4": "Menyetujui",
+                                "Level 5": "Menyetujui",
+                                "Level 6": "Menyetujui"
                             };
 
 
@@ -552,7 +558,7 @@
                             if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
                                 additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
                                     <tr>
-                                        <td>${index + 1}</td>
+                                        <td style="text-align: center">${index + 1}</td>
                                         <td>${info.nama}</td>
                                         <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                         <td>${info.departemen}</td>
