@@ -26,6 +26,7 @@ class SuratKendaraanDinas extends Model
         'status',
         'kilometer_awal',
         'alasan_penolakan',
+        'alasan_penggunaan',
     ];
 
     public function user()

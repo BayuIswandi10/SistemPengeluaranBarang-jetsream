@@ -146,7 +146,8 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status</th>
+                                        <th>Status Persetujuan</th>
+                                        <th>Tanggal Persetujuan</th>
                                         <th>Alasan</th>
                                     </tr>
                                 </thead>
@@ -248,7 +249,8 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status</th>
+                                        <th>Status Persetujuan</th>
+                                        <th>Tanggal Persetujuan</th>
                                         <th>Alasan</th>
                                     </tr>
                                 </thead>
@@ -389,12 +391,12 @@
                         };
                         const approvMapping = {
                             "Level 0": "Menolak",
-                            "Level 1": "Mengeluarkan",
-                            "Level 2": "Membawa",
+                            "Level 1": "Mengajukan",
+                            "Level 2": "Menyetujui",
                             "Level 3": "Menyetujui",
-                            "Level 4": "Mengetahui",
-                            "Level 5": "Menerima",
-                            "Level 6": "Memeriksa"
+                            "Level 4": "Menyetujui",
+                            "Level 5": "Menyetujui",
+                            "Level 6": "Menyetujui"
                         };
 
                         if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
@@ -410,6 +412,7 @@
                                         <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                         <td>${info.departemen}</td>
                                         <td>${approvMapping[info.status] || info.status}</td>
+                                        <td>${info.created_date}</td>
                                         <td>${alasanPenolakan}</td>
                                     </tr>
                                 `;
@@ -629,8 +632,8 @@
                         "Level 0": "Menolak",
                         "Level 1": "Mengajukan",
                         "Level 2": "Menyetujui",
-                        "Level 3": "Mengetahui",
-                        "Level 4": "Memeriksa"
+                        "Level 3": "Menyetujui",
+                        "Level 4": "Menyetujui"
                     };
 
                     // Validasi data informasi_tambahan
@@ -649,6 +652,7 @@
                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                     <td>${info.departemen}</td>
                                     <td>${approvMapping[info.status] || info.status}</td>
+                                    <td>${info.created_date}</td>
                                     <td>${alasanPenolakan}</td>
                                 </tr>
                             `;
@@ -665,10 +669,10 @@
                     // Aktifkan DataTable setelah data ditambahkan
                     $('#detaildataTableModal').DataTable({
                         columnDefs: [
-                            { className: 'dt-body-center', targets: 0 },
-                            { className: 'dt-head-center', targets: 0 },
-                            { className: 'dt-body-center', targets: 3 },
-                            { className: 'dt-head-center', targets: 3 }
+                            { className: 'dt-body-center dt-head-center', targets: 0 }, // No: center-aligned
+                            { className: 'dt-body-center dt-head-center', targets: 1 }, // NRP Peserta: center-aligned
+                            { className: 'dt-body-left dt-head-left', targets: 2 },    // Nama Peserta: left-aligned
+                            { className: 'dt-body-left dt-head-left', targets: 3 }
                         ],
                         responsive: true,
                         scrollX: false,
@@ -777,7 +781,8 @@
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
-                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[4].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[4].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[5].innerText}</td>
                             </tr>
                         `;
                     }
@@ -926,9 +931,9 @@
                                 <th style="width: 15%;">No Kendaraan</th>
                                 <th style="width: 20%;">Keterangan</th>
                                 <th style="width: 15%;">Tanggal Penggunaan</th>
-                                <th style="width: 15%;">Tujuan 1</th>
-                                <th style="width: 15%;">Tujuan 2</th>
-                                <th style="width: 15%;">Tujuan 3</th>
+                                <th style="width: 15%;">Rute 1</th>
+                                <th style="width: 15%;">Rute 2</th>
+                                <th style="width: 15%;">Rute 3</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -954,10 +959,11 @@
                         <thead>
                             <tr>
                                 <th style="width: 8%;">No</th>
-                                <th style="width: 25%;">Nama</th>
-                                <th style="width: 20%;">Tingkatan</th>
-                                <th style="width: 25%;">Departemen</th>
-                                <th style="width: 22%;">Status</th>
+                                <th style="width: 20%;">Nama</th>
+                                <th style="width: 12%;">Tingkatan</th>
+                                <th style="width: 20%;">Departemen</th>
+                                <th style="width: 15%;">Status</th>
+                                <th style="width: 25%;">Tanggal Persetujuan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -968,15 +974,11 @@
                         <div class="signature-box">
                             <div>Dibuat Oleh:</div>
                             <div class="signature-line">
-                                <div>(...........................)</div>
-                                <div style="font-size: 10px;">Nama & Tanggal</div>
                             </div>
                         </div>
                         <div class="signature-box">
                             <div>Disetujui Oleh:</div>
                             <div class="signature-line">
-                                <div>(...........................)</div>
-                                <div style="font-size: 10px;">Nama & Tanggal</div>
                             </div>
                         </div>
                     </div>

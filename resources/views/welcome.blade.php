@@ -556,8 +556,11 @@
                                 <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
                                     <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
-                                </div>    
-            
+                                </div>
+
+                                <div class="form-group" id="alasan_penggunaan">
+                                    <label for="alasan_penggunaan">Tujuan Penggunaan <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="alasan_penggunaan" name="alasan_penggunaan" placeholder="Masukkan tujuan penggunaan" autocomplete="off" rows="4" required></textarea>                                </div>
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
                                     <label>Peserta Dinas <span class="text-danger">*</span></label>
@@ -703,6 +706,7 @@
                                 <input type="hidden" name="tanggal_penggunaan" id="ikut_tanggal_penggunaan">
                                 <input type="hidden" name="jenis_kendaraan" id="ikut_jenis_kendaraan">
                                 <input type="hidden" name="kendaraan_dinas_id" id="ikut_kendaraan_dinas_id">
+                                <input type="hidden" name="alasan_penggunaan" id="ikut_alasan_penggunaan">
 
                                 <!-- Input Fields -->
                                 <div class="form-group">
@@ -1914,6 +1918,7 @@
                                         acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
                                         acc.tujuan2 = acc.tujuan2 || booking.tujuan_penggunaan_2 || '-';
                                         acc.tujuan3 = acc.tujuan3 || booking.tujuan_penggunaan_3 || '-';
+                                        acc.alasan_penggunaan = acc.alasan_penggunaan || booking.alasan_penggunaan || '-';
                                         return acc;
                                     }, {});
                                     bookingTableBody.append(`
@@ -1925,6 +1930,7 @@
                                             <td>${uniqueBookings.tujuan1}</td>
                                             <td>${uniqueBookings.tujuan2}</td>
                                             <td>${uniqueBookings.tujuan3}</td>
+                                            <td hidden>${uniqueBookings.alasan_penggunaan}</td>
                                         </tr>
                                     `);
 
@@ -2352,6 +2358,7 @@
             const tujuan1 = $bookingRow.find('td').eq(4).text();
             const tujuan2 = $bookingRow.find('td').eq(5).text();
             const tujuan3 = $bookingRow.find('td').eq(6).text();
+            const alsanPenggunaan = $bookingRow.find('td').eq(7).text();
 
             const event = globalCalendar.getEventById(globalCalendar.currentEventId);
             const kendaraanDinasId = event?.extendedProps.kendaraan_dinas_id ?? null;
@@ -2377,6 +2384,7 @@
             $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
             $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
             $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
+            $('#ikut_alasan_penggunaan').val(alsanPenggunaan !== '-' ? alsanPenggunaan : '');
             $('#ikut_kendaraan_dinas_id').val(kendaraanDinasId);
             $('#hidden_nrp_peserta_0_ikutserta').val(nrpValue); // Set hidden input awal
 
@@ -2436,6 +2444,11 @@
 
                         // Inisialisasi ulang DataTable
                         $('#dataTable').DataTable({
+                            columnDefs: [
+                                { className: 'dt-body-center dt-head-center', targets: 0 }, 
+                                { className: 'dt-body-center dt-head-center', targets: 2 },
+                                { className: 'dt-body-center dt-head-center', targets: 7 }
+                            ],
                             scrollX: false,  
                             responsive: true
                         });
@@ -2511,6 +2524,10 @@
 
                     // Inisialisasi ulang DataTable setelah data diisi
                     $('#barangKeluarTable').DataTable({
+                        columnDefs: [
+                            { className: 'dt-head-center', targets: 0 }, 
+                            { className: 'dt-body-center', targets: 0 }
+                        ],
                         responsive: true,
                         autoWidth: false,
                         scrollX: false,
@@ -2643,6 +2660,12 @@
                         tbody.innerHTML = '';
 
                         tbody.innerHTML = suratData.map((item, index) => {
+                            const jenisKendaraanMapping = {
+                                1: 'KANTOR',
+                                2: 'PRIBADI',
+                                3: 'TAXI'
+                            };
+                            const jenisKendaraan = jenisKendaraanMapping[item.jenis_kendaraan] || '-';
                             return `
                                 <tr>
                                     <td>${index + 1}</td>
@@ -2650,7 +2673,7 @@
                                     <td>${item.created_by}</td>
                                     <td>${item.created_date}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'} ${item.tujuan_penggunaan_2 || ''} ${item.tujuan_penggunaan_3 || ''}</td>
-                                    <td>${item.jenis_kendaraan}</td>
+                                    <td>${jenisKendaraan}</td>
                                     <td>${item.tanggal_penggunaan}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-sm" onclick="getQrCodePenggunaanKendaraanDinas('${item.surat_kendaraan_dinas_id}')">
@@ -2666,6 +2689,11 @@
                         }
 
                         $('#suratKendaraanTable').DataTable({
+                            columnDefs: [
+                                { className: 'dt-body-center dt-head-center', targets: 0 }, 
+                                { className: 'dt-body-center dt-head-center', targets: 2 },
+                                { className: 'dt-body-center dt-head-center', targets: 7 },
+                            ],
                             scrollX: false,
                             responsive: true
                         });
@@ -2716,6 +2744,10 @@
 
                     // Inisialisasi ulang DataTable setelah data diisi
                     $('#pesertaTableDinas').DataTable({
+                        columnDefs: [
+                            { className: 'dt-body-center dt-head-center', targets: 0 }, 
+                            { className: 'dt-body-center dt-head-center', targets: 1 },
+                        ],
                         responsive: true,
                         autoWidth: false,
                         scrollX: false,

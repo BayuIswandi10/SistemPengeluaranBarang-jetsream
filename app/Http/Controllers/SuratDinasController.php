@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use BaconQrCode\Renderer\ImageRenderer;
 use Carbon\Carbon;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use DateTime;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Writer;
 use Maatwebsite\Excel\Facades\Excel;
@@ -156,6 +157,7 @@ class SuratDinasController extends Controller
             'tanggal_penggunaan' => 'required|date|after_or_equal:today',
             'jenis_kendaraan' => 'required|in:1,2,3',
             'created_by' => 'required|string',
+            'alasan_penggunaan' => 'required|string|max:500',
             'peserta' => 'nullable|array', // Memastikan peserta dikirim dalam bentuk array
             'peserta.*.nrp_karyawan' => 'required|string', // Validasi setiap peserta harus memiliki nrp_karyawan
 
@@ -256,6 +258,7 @@ class SuratDinasController extends Controller
                 'expired_status' => 'Aktif',
                 'status' => 'Level 1',
                 'kilometer_awal' => $request->kilometer_awal,
+                'alasan_penggunaan' => $request->alasan_penggunaan,
             ]);
     
             // Cek apakah ada peserta yang dikirim
@@ -460,6 +463,8 @@ class SuratDinasController extends Controller
                         'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
                         'status' => $approval->status_approval,
                         'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
+                        'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
+
                     ];
                 });
 
@@ -657,6 +662,7 @@ class SuratDinasController extends Controller
                     'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
                     'jenis_kendaraan' => $surat->jenis_kendaraan,
                     'tanggal_penggunaan' => $surat->tanggal_penggunaan,
+                    'alasan_penggunaan' => $surat->alasan_penggunaan,
                     'kendaraan_dinas_id' => $surat->suratDetail->first()->kendaraan_dinas_id ?? null,
                     'userDinas' => $userDinasData,
                 ];

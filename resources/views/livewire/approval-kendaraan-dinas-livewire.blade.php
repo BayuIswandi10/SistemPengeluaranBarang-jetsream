@@ -32,6 +32,10 @@
             vertical-align: middle !important;
         }
 
+        .button-group.d-flex {
+            justify-content: center;
+        }
+
 
         /* Pastikan modal tidak lebih besar dari layar */
         @media (max-width: 768px) {
@@ -149,10 +153,10 @@
                             </th>
                             <th>NO</th>
                             <th>No Surat Pengajuan Kendaraan Dinas</th>
-                            <th>Tujuan</th>
+                            <th>Rute</th>
                             <th>Jenis Mobil</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -329,7 +333,7 @@
                     </div>
                     <!-- Card untuk Tabel Informasi Kendaraan -->
                     <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Kendaraan</h6>
                         </div>
                         <div class="card-body">
@@ -340,9 +344,9 @@
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
                                         <th>Tanggal Penggunaan</th>
-                                        <th>Tujuan 1</th>
-                                        <th>Tujuan 2</th>
-                                        <th>Tujuan 3</th>
+                                        <th>Rute 1</th>
+                                        <th>Rute 2</th>
+                                        <th>Rute 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -378,7 +382,7 @@
 
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
-                        <div class="card-header bg-secondary text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                         </div>
                         <div class="card-body">
@@ -436,9 +440,9 @@
                                     <th>No Kendaraan</th>
                                     <th>Keterangan</th>
                                     <th>Tanggal Penggunaan</th>
-                                    <th>Tujuan 1</th>
-                                    <th>Tujuan 2</th>
-                                    <th>Tujuan 3</th>
+                                    <th>Rute 1</th>
+                                    <th>Rute 2</th>
+                                    <th>Rute 3</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -571,8 +575,9 @@
                 targets: 0, // Kolom pertama (checkbox)
                 orderable: false // Opsional: Matikan sorting untuk kolom checkbox
             },
-                { className: 'dt-body-center', targets: 6 },
-                { className: 'dt-head-center', targets: 6 }
+                { className: 'dt-body-center', targets: 1 },
+                { className: 'dt-head-center', targets: 1 },
+                { className: 'dt-body-center', targets: 6 }
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             pageLength: 10,
@@ -924,7 +929,7 @@
                                     <td>${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
-                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
@@ -1009,6 +1014,12 @@
         // Inisialisasi DataTable hanya untuk tabel barang keluar
         if (!$.fn.DataTable.isDataTable('#detaildataTableModal')) {
             $('#detaildataTableModal').DataTable({
+                columnDefs: [
+                    { className: 'dt-body-center dt-head-center', targets: 0 }, // No: center-aligned
+                    { className: 'dt-body-center dt-head-center', targets: 1 }, // NRP Peserta: center-aligned
+                    { className: 'dt-body-left dt-head-left', targets: 2 },    // Nama Peserta: left-aligned
+                    { className: 'dt-body-left dt-head-left', targets: 3 }
+                ],
                 responsive: true,
                 autoWidth: false,
                 scrollX: false,

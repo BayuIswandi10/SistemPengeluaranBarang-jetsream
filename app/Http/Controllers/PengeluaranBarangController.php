@@ -10,19 +10,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use DateTime;
 
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Writer\PngWriter;
+
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ApprovalNotification;
 use App\Exports\BarangKeluarExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Endroid\QrCode\QrCode as QrCodeQrCode;
 
 class PengeluaranBarangController extends Controller
 {
@@ -116,6 +115,7 @@ class PengeluaranBarangController extends Controller
                     'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
                     'status' => $approval->status_approval,
                     'alasan_penolakan' => $approval->pengeluaranBarang->alasan_penolakan ?? '-',
+                    'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
                 ];
             });
 
