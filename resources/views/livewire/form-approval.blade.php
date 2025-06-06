@@ -8,28 +8,18 @@
             }
         }
 
-        #dataTable thead th:first-child {
+        /* Hanya untuk kolom checkbox */
+        #dataTable th:first-child,
+        #dataTable td:first-child {
             text-align: center !important;
             vertical-align: middle !important;
-            padding: 8px 0 !important; /* Sesuaikan padding jika perlu */
+            width: 50px !important;
         }
 
-        #dataTable thead th:first-child input[type="checkbox"] {
-            margin: 0 auto !important; /* Memusatkan checkbox secara horizontal */
+        #dataTable th:first-child .form-check-input,
+        #dataTable td:first-child .form-check-input {
+            margin: 0 auto !important;
             display: block !important;
-            vertical-align: middle !important;
-        }
-
-        #dataTable tbody td:first-child {
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 8px 0 !important; /* Sesuaikan padding agar sesuai dengan header */
-        }
-
-        #dataTable tbody td:first-child input[type="checkbox"] {
-            margin: 0 auto !important; /* Memusatkan checkbox di body */
-            display: block !important;
-            vertical-align: middle !important;
         }
 
         /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
@@ -43,6 +33,10 @@
         }
         #dataTable.visible {
         opacity: 1;
+        }
+
+        .button-group.d-flex {
+            justify-content: center;
         }
 
     </style>
@@ -94,7 +88,7 @@
                 <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
                     <thead>
                         <tr>
-                            <th>
+                            <th class="text-center">
                                 <input type="checkbox" id="selectAll" class="form-check-input">
                             </th>
                             <th>NO</th>
@@ -102,7 +96,7 @@
                             <th>Tujuan</th>
                             <th>Jenis Kendaraan</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Detail</th>
                         </tr>
                     </thead>
 
@@ -110,7 +104,7 @@
                         <?php $i = 0; ?>
                         @foreach ($pengeluaranBarangs as $pengeluaranBarang)
                             <tr>
-                                <td>
+                                <td class="text-center">
                                     @php
                                         $canApprove = false;
                                         // Check if current user can approve this item
@@ -430,8 +424,11 @@
             {
                 className: 'dt-body-center dt-head-center', 
                 targets: 0, // Kolom pertama (checkbox)
-                orderable: false // Opsional: Matikan sorting untuk kolom checkbox
+                orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
+                width: '50px'
             },
+                { className: 'dt-body-center', targets: 1 },
+                { className: 'dt-head-center', targets: 1 },
                 { className: 'dt-body-center', targets: 6 },
                 { className: 'dt-head-center', targets: 6 }
             ],
@@ -561,12 +558,12 @@
                     };
                     const approvMapping = {
                         "Level 0":"Menolak",
-                        "Level 1": "Mengeluarkan",
-                        "Level 2": "Membawa",
+                        "Level 1": "Mengajukan",
+                        "Level 2": "Menyetujui",
                         "Level 3": "Menyetujui",
-                        "Level 4": "Mengetahui",
-                        "Level 5": "Menerima",
-                        "Level 6": "Memeriksa"
+                        "Level 4": "Menyetujui",
+                        "Level 5": "Menyetujui",
+                        "Level 6": "Menyetujui"
                     };
 
                     // Validasi data informasi_tambahan
@@ -1036,246 +1033,6 @@
         updateBulkActionButtons();
 
     });
-
-
-// $(document).ready(function() {
-//     // Button for Ka.Sie approval
-//     $('.update-status-kasie').on('click', function() {
-//         var pengeluaranBarangId = $(this).data('id');
-//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kasie');
-//     });
-
-//     // Button for Ka.Dept YBS approval
-//     $('.update-status-kadeptybs').on('click', function() {
-//         var pengeluaranBarangId = $(this).data('id');
-//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptybs');
-//     });
-
-//     // Button for Ka.Dept GA approval
-//     $('.update-status-kadeptga').on('click', function() {
-//         var pengeluaranBarangId = $(this).data('id');
-//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-kadeptga');
-//     });
-
-//     $('.update-status-finance').on('click', function() {
-//         var pengeluaranBarangId = $(this).data('id');
-//         confirmUpdate(pengeluaranBarangId, '/pengeluaran/update-status-finance');
-//     });
-
-//    function initDataTable() {
-//         const table = $('#dataTable');
-
-//         // Cek apakah sudah diinisialisasi sebagai DataTable
-//         if ($.fn.DataTable.isDataTable(table)) {
-//             table.DataTable().clear().destroy(); // Hapus data dan destroy instance
-//         }
-
-//         // Inisialisasi ulang DataTable
-//         table.DataTable({
-//             columnDefs: [
-//                 { className: 'dt-body-center', targets: 0 },
-//                 { className: 'dt-head-center', targets: 0 },
-//                 { className: 'dt-body-center', targets: 5 },
-//                 { className: 'dt-head-center', targets: 5 }
-//             ],
-//             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-//             pageLength: 10,
-//             scrollX: false,
-//             responsive: true
-//         });
-//     }
-
-//     // Common function to show confirmation and then update status
-//     function confirmUpdate(pengeluaranBarangId, url) {
-//         Swal.fire({
-//             title: 'Konfirmasi Persetujuan',
-//             text: 'Apakah Anda menyetujui penngeluaran barang dengan nomor ' + pengeluaranBarangId + '?',
-//             icon: 'info',
-//             showCancelButton: true,
-//             reverseButtons: true,
-//             confirmButtonColor: '#3085d6',
-//             cancelButtonColor: '#d33',
-//             confirmButtonText: 'Ya, Setuju!',
-//             cancelButtonText: 'Batal'
-//         }).then((result) => {
-//             if (result.isConfirmed) {
-//                 // Tampilkan loading SweetAlert saat proses berlangsung
-//                 Swal.fire({
-//                     title: 'Memproses...',
-//                     text: 'Sedang menyimpan persetujuan Anda.',
-//                     allowOutsideClick: false,
-//                     didOpen: () => {
-//                         Swal.showLoading();
-//                     }
-//                 });
-//                 updateStatus(pengeluaranBarangId, url);
-//             }
-//         });
-//     }
-
-//     // Common function to handle status update
-//     function updateStatus(pengeluaranBarangId, url) {
-//             $.ajax({
-//                 url: url,
-//                 method: 'POST',
-//                 data: {
-//                     pengeluaran_barang_id: pengeluaranBarangId,
-//                     _token: $('meta[name="csrf-token"]').attr('content')
-//                 },
-//                 success: function(response) {
-//                     if (response.success) {
-//                         // Success alert using SweetAlert
-//                         Swal.fire({
-//                             title: 'Berhasil!',
-//                             text: 'Pengeluaran barang dengan no: ' + pengeluaranBarangId + ' telah disetujui.',
-//                             icon: 'success',
-//                             showConfirmButton: false,
-//                             timer: 2000
-//                         }).then(() => {
-//                             location.reload(); // Reload the table after successful update
-//                         });
-//                     } else {
-//                         // Error alert using SweetAlert
-//                         Swal.fire({
-//                             title: 'Gagal!',
-//                             text: response.message,
-//                             icon: 'error',
-//                             confirmButtonText: 'OK'
-//                         });
-//                     }
-//                 },
-//                 error: function(response) {
-//                     // Handle any error response using SweetAlert
-//                     Swal.fire({
-//                         title: 'Error!',
-//                         text: response.responseJSON.message,
-//                         icon: 'error',
-//                         confirmButtonText: 'OK'
-//                     });
-//                 }
-//             });
-//         }
-//     });
-
-
-
-
-//     document.addEventListener('DOMContentLoaded', function () {
-//         // Inisialisasi Selectize untuk elemen dengan class .select-tools
-//         $('.select-tools').selectize({
-//             create: true, // Memungkinkan pengguna menambahkan opsi baru
-//             sortField: 'text' // Mengurutkan opsi berdasarkan teks
-//         });
-
-//         // Handle event klik untuk tombol dengan class .reject-status
-//         document.querySelectorAll('.reject-status').forEach(button => {
-//             button.addEventListener('click', function () {
-//                 const pengeluaranBarangId = this.getAttribute('data-id');
-
-//                 // Tampilkan SweetAlert dengan textarea input untuk alasan penolakan
-//                 Swal.fire({
-//                     title: 'Tolak Pengajuan',
-//                     html: `
-//                         <p>Masukkan alasan penolakan untuk pengeluaran barang dengan nomor 
-//                         <strong>${pengeluaranBarangId}</strong>:</p>
-//                          <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
-//                             <option value="">-- Pilih alasan penolakan cepat --</option>
-//                             <option value="Data tidak lengkap">Data tidak lengkap</option>
-//                             <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
-//                             <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
-//                         </select>
-
-//                         <textarea id="alasanPenolakan" class="swal2-textarea"
-//                             placeholder="Tuliskan alasan penolakan di sini..."
-//                             style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
-//                     `,
-//                     icon: 'warning',
-//                     showCancelButton: true,
-//                     confirmButtonText: 'Kirim Penolakan',
-//                     cancelButtonText: 'Batal',
-//                     reverseButtons: true,
-//                     didOpen: () => {
-//                         const select = document.getElementById('alasanDropdown');
-//                         const textarea = document.getElementById('alasanPenolakan');
-
-//                         // Isi textarea otomatis saat opsi dipilih
-//                         select.addEventListener('change', () => {
-//                             textarea.value = select.value;
-//                         });
-//                     },
-//                     preConfirm: () => {
-//                         const alasanSelect = document.getElementById('alasanDropdown').value.trim();
-//                         const alasanText = document.getElementById('alasanPenolakan').value.trim();
-
-//                         const alasan = alasanText || alasanSelect;
-
-//                         if (!alasan) {
-//                             Swal.showValidationMessage('Silakan pilih atau tulis alasan penolakan!');
-//                         }
-
-//                         return alasan;
-//                     }
-//                 }).then((result) => {
-//                     if (result.isConfirmed) {
-//                         const alasanPenolakan = result.value;
-
-//                         // Tampilkan loading modal
-//                         Swal.fire({
-//                             title: 'Menolak Pengajuan...',
-//                             html: 'Mohon tunggu, sedang memproses penolakan.',
-//                             allowOutsideClick: false,
-//                             didOpen: () => {
-//                                 Swal.showLoading();
-//                             }
-//                         });
-
-//                         // Kirim request ke backend
-//                         fetch("{{ route('approval.rejectStatus') }}", {
-//                             method: "POST",
-//                             headers: {
-//                                 "Content-Type": "application/json",
-//                                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
-//                             },
-//                             body: JSON.stringify({
-//                                 pengeluaran_barang_id: pengeluaranBarangId,
-//                                 alasan: alasanPenolakan
-//                             })
-//                         })
-//                         .then(response => response.json())
-//                         .then(data => {
-//                             if (data.success) {
-//                                 Swal.fire({
-//                                     title: 'Berhasil!',
-//                                     text: data.message,
-//                                     icon: 'success',
-//                                     showConfirmButton: false,
-//                                     timer: 2000
-//                                 }).then(() => {
-//                                     location.reload();
-//                                 });
-//                             } else {
-//                                 Swal.fire({
-//                                     title: 'Gagal!',
-//                                     text: data.message,
-//                                     icon: 'error',
-//                                     confirmButtonText: 'OK'
-//                                 });
-//                             }
-//                         })
-//                         .catch(error => {
-//                             Swal.fire({
-//                                 title: 'Terjadi Kesalahan!',
-//                                 text: 'Error: ' + error.message,
-//                                 icon: 'error',
-//                                 confirmButtonText: 'OK'
-//                             });
-//                         });
-//                     }
-//                 });
-//             });
-//         });
-//     });
-
 
 
     // Display validation errors in Swal
