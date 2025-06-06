@@ -12,6 +12,22 @@
         .modal-body {
             overflow-x: auto;
         }
+
+        .btn-outline-primary.custom-color {
+            color: #5A6ACF !important;
+            border-color: #5A6ACF !important;
+            }
+
+            .btn-outline-primary.custom-color:hover,
+            .btn-outline-primary.custom-color:focus,
+            .btn-outline-primary.custom-color:active,
+            .btn-outline-primary.custom-color.active {
+            background-color: #5A6ACF !important;
+            color: white !important;
+            border-color: #5A6ACF !important;
+            }
+
+
     </style>
     
     <div class="container-fluid">
@@ -273,9 +289,9 @@
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
                         <div class="btn-group" role="group" style="margin-left: 0;">
-                            <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
-                            <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
-                            <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
+                            <button type="button" class="btn btn-outline-primary custom-color active" data-filter="harian">Harian</button>
+                            <button type="button" class="btn btn-outline-primary custom-color" data-filter="bulanan">Bulanan</button>
+                            <button type="button" class="btn btn-outline-primary custom-color" data-filter="tahunan">Tahunan</button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -292,7 +308,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                        <h5 class="card-title text-center">Distribusi Pengeluaran Barang Berdasarkan Departemen</h5>
+                        <h5 class="card-title text-center">Pengeluaran Barang Berdasarkan Departemen</h5>
                     </div>
                     <div class="card-body">
                         <div class="chart">
@@ -366,18 +382,23 @@
 
 
             // 🔹 Cek apakah elemen pieChart ada sebelum membuat Pie Chart
-            const pieCanvas = document.getElementById('pieChart');
-
+           const pieCanvas = document.getElementById('pieChart');
             if (pieCanvas) {
                 try {
                     const ctxPie = pieCanvas.getContext('2d');
+
+                    // Ambil data dari backend
+                    const pieLabels = Object.keys(pieData);
+                    const pieValues = Object.values(pieData);
+                    const isEmpty = pieValues.every(val => val === 0);
+
                     let pieChart = new Chart(ctxPie, {
                         type: 'pie',
                         data: {
-                            labels: Object.keys(pieData),
+                            labels: pieLabels,
                             datasets: [{
                                 label: 'Departemen',
-                                data: Object.values(pieData),
+                                data: pieValues,
                                 backgroundColor: [
                                     'rgba(255, 99, 132, 0.6)',
                                     'rgba(54, 162, 235, 0.6)',
@@ -394,16 +415,33 @@
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: {
-                                    display: true,
+                                    display: !isEmpty,
                                     position: 'right'
                                 }
                             }
-                        }
+                        },
+                        plugins: [{
+                            id: 'emptyPieLabel',
+                            beforeDraw(chart) {
+                                if (isEmpty) {
+                                    const { width, height } = chart;
+                                    const ctx = chart.ctx;
+                                    ctx.save();
+                                    ctx.font = 'bold 16px sans-serif';
+                                    ctx.fillStyle = '#6c757d';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText('Belum Ada Data', width / 2, height / 2 + 20); // geser ke bawah
+                                    ctx.restore();
+                                }
+                            }
+                        }]
                     });
                 } catch (error) {
                     console.error("Pie Chart tidak dapat diinisialisasi:", error);
                 }
             }
+
 
             // 🔹 Filter untuk Bar Chart (Harian, Bulanan, Tahunan)
             document.querySelectorAll('.btn-group .btn').forEach(button => {

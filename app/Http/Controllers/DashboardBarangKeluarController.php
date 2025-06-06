@@ -34,7 +34,7 @@ class DashboardBarangKeluarController extends Controller
                 ->whereBetween('created_date', [$startDate, $endDate]);
 
             // Filter data berdasarkan level user
-            if ($user->level === 'Staff' && $user->departemen === 'FINANCE')  {
+            if ($user->departemen === 'FINANCE')  {
                 $pengeluaranBarangs = $query->where('kategori_pengeluaran', 1)->get();
             } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
                 $pengeluaranBarangs = $query->get();
@@ -50,28 +50,28 @@ class DashboardBarangKeluarController extends Controller
             }
 
             // Ekstrak angka dari level user
-            if ($user->level === 'Super Admin') {
+            if ($user->departemen === 'FINANCE') {
                 $userLevel = 5;
+            } elseif ($user->level === 'Ka.Sie') {
+                $userLevel = 2;
             } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
                 $userLevel = 4;
             } elseif ($user->level === 'Ka.Dept') {
                 $userLevel = 3;
-            } elseif ($user->level === 'Staff' && $user->departemen === 'FINANCE') {
-                $userLevel = 5;
             } elseif ($user->level === 'Security') {
                 $userLevel = 5;
-            } elseif ($user->level === 'Ka.Sie') {
-                $userLevel = 2;
+            } elseif ($user->level === 'Super Admin') {
+                $userLevel = 5;
             } else {
                 $userLevel = 1; // default fallback jika tidak dikenali
             }
 
-
             //Mengambil NRP yang login dan untuk mengambil persetujuan
-            $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', '!=', 'Level 0')
+           $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+            ->where('status_approval', '=', 'Level ' . $userLevel)
             ->pluck('pengeluaran_barang_id')
             ->toArray();
+
             $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(function ($item) use ($approvedIdsByUser) {
                 return in_array($item->pengeluaran_barang_id, $approvedIdsByUser);
             })->values();

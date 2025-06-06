@@ -12,6 +12,20 @@
     .modal-body {
         overflow-x: auto;
     }
+
+    .btn-outline-primary.custom-color {
+        color: #5A6ACF !important;
+        border-color: #5A6ACF !important;
+        }
+
+        .btn-outline-primary.custom-color:hover,
+        .btn-outline-primary.custom-color:focus,
+        .btn-outline-primary.custom-color:active,
+        .btn-outline-primary.custom-color.active {
+        background-color: #5A6ACF !important;
+        color: white !important;
+        border-color: #5A6ACF !important;
+        }
 </style>
     <div class="container-fluid">
         <body>
@@ -295,9 +309,9 @@
                     <div class="row">
                         <!-- Kotak Kendaraan Dinas Tersedia -->
                         <div class="col-lg-6 col-12">
-                            <div class="small-box" style="background-color: #2CB3B3; color: white;">
+                            <div class="small-box" style="background-color: #20c997; color: white;"> <!-- Teal -->
                                 <div class="inner">
-                                <h3  class="jumlah-kendaraan-tersedia">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
+                                    <h3 class="jumlah-kendaraan-tersedia">{{ $kendaraanDinasTersedia ?? 0 }}</h3>
                                     <p>Kendaraan Dinas Tersedia</p>
                                 </div>
                                 <div class="icon">
@@ -311,9 +325,9 @@
 
                         <!-- Kotak Kendaraan Dinas Digunakan -->
                         <div class="col-lg-6 col-12">
-                            <div class="small-box" style="background-color: #2C7DC3; color: white;">
+                            <div class="small-box" style="background-color: #6f42c1; color: white;"> <!-- Purple -->
                                 <div class="inner">
-                                    <h3  class="jumlah-kendaraan-digunakan">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
+                                    <h3 class="jumlah-kendaraan-digunakan">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
                                     <p>Kendaraan Dinas Digunakan</p>
                                 </div>
                                 <div class="icon">
@@ -366,9 +380,9 @@
                         <div class="card">
                             <div class="card-header" style="border-top: 5px solid #5A6ACF; padding-left: 10;">
                                 <div class="btn-group" role="group" style="margin-left: 0;">
-                                    <button type="button" class="btn btn-outline-primary active" data-filter="harian">Harian</button>
-                                    <button type="button" class="btn btn-outline-primary" data-filter="bulanan">Bulanan</button>
-                                    <button type="button" class="btn btn-outline-primary" data-filter="tahunan">Tahunan</button>
+                                       <button type="button" class="btn btn-outline-primary custom-color active" data-filter="harian">Harian</button>
+                                        <button type="button" class="btn btn-outline-primary custom-color" data-filter="bulanan">Bulanan</button>
+                                        <button type="button" class="btn btn-outline-primary custom-color" data-filter="tahunan">Tahunan</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -406,7 +420,7 @@
             // Ambil elemen canvas untuk Bar Chart
             const ctxBar = document.getElementById('barChart').getContext('2d');
 
-            // 🔹 Inisialisasi Bar Chart
+           // 🔹 Inisialisasi Bar Chart
             let barChart = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
@@ -414,8 +428,8 @@
                     datasets: [{
                         label: 'Jumlah Surat Penggunaan Kendaraan Dinas',
                         data: dailyData.data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(23, 162, 184, 0.6)', // bg-info dengan transparansi
+                        borderColor: 'rgba(23, 162, 184, 1)',       // bg-info solid
                         borderWidth: 1
                     }]
                 },
@@ -438,41 +452,65 @@
             const pieCanvas = document.getElementById('pieChart');
 
             if (pieCanvas) {
-                try {
-                    const ctxPie = pieCanvas.getContext('2d');
-                    let pieChart = new Chart(ctxPie, {
-                        type: 'pie',
-                        data: {
-                            labels: Object.keys(pieData),
-                            datasets: [{
-                                label: 'Departemen',
-                                data: Object.values(pieData),
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.6)',
-                                    'rgba(54, 162, 235, 0.6)',
-                                    'rgba(255, 206, 86, 0.6)',
-                                    'rgba(75, 192, 192, 0.6)',
-                                    'rgba(153, 102, 255, 0.6)',
-                                    'rgba(255, 159, 64, 0.6)'
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'right'
-                                }
+            try {
+                const ctxPie = pieCanvas.getContext('2d');
+
+                const labels = ['Kantor', 'Pribadi', 'Taxi'];
+                const colors = ['#28a745', '#007bff', '#ffc107'];
+
+                // Ambil nilai-nilai sesuai urutan label
+                const dataValues = labels.map(label => pieData[label] ?? 0);
+
+                // Cek jika semua data kosong (0)
+                const isEmpty = dataValues.every(val => val === 0);
+
+                // Plugin untuk menampilkan teks tengah jika data kosong
+                const centerTextPlugin = {
+                    id: 'centerText',
+                    beforeDraw(chart) {
+                        if (isEmpty) {
+                            const { width, height } = chart;
+                            const ctx = chart.ctx;
+                            ctx.save();
+                            ctx.font = 'bold 16px sans-serif';
+                            ctx.fillStyle = '#6c757d'; // abu-abu netral
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle'; 
+                            ctx.fillText('Belum Ada Data', width / 2, height / 2 + 20); 
+                            ctx.restore();
+                        }
+                    }
+                };
+
+                // Inisialisasi Pie Chart
+                const pieChart = new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jenis Penggunaan',
+                            data: dataValues,
+                            backgroundColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'right'
                             }
                         }
-                    });
-                } catch (error) {
-                    console.error("Pie Chart tidak dapat diinisialisasi:", error);
-                }
+                    },
+                    plugins: [centerTextPlugin]
+                });
+
+            } catch (error) {
+                console.error("Pie Chart tidak dapat diinisialisasi:", error);
             }
+        }
 
             // 🔹 Filter untuk Bar Chart (Harian, Bulanan, Tahunan)
             document.querySelectorAll('.btn-group .btn').forEach(button => {
@@ -640,15 +678,15 @@
                             return `${year}-${month}-${day}`; // Format YYYY-MM-DD
                         }
 
-                        // Fungsi untuk memformat tanggal ke awal hari
-                        function formatDateToStartOfDay(dateString) {
-                            return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
-                        }
+                            // Fungsi untuk memformat tanggal ke awal hari
+                            function formatDateToStartOfDay(dateString) {
+                                return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                            }
 
-                        // Fungsi untuk memformat tanggal ke akhir hari
-                        function formatDateToEndOfDay(dateString) {
-                            return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
-                        }
+                            // Fungsi untuk memformat tanggal ke akhir hari
+                            function formatDateToEndOfDay(dateString) {
+                                return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                            }
 
                         // Fungsi untuk memuat jumlah data
                         function loadCounts(startDate, endDate) {

@@ -17,20 +17,22 @@ class DashboardKendaraanDinasLiveWire extends Component
     {
         $user = Auth::user();
         $user->level = trim($user->level);
-        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-26 00:00:00
-        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-26 23:59:59
+         $startOfDay = Carbon::today()->startOfDay(); 
+        $endOfDay = Carbon::today()->endOfDay(); 
+
+
         $query = SuratKendaraanDinas::with(['user', 'approval'])
             ->whereBetween('created_date', [$startOfDay, $endOfDay])
             ->where('status', '!=', 'Expired');
 
         // Filter data berdasarkan level user
         if ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
-            $suratKendaraanDinasList = $query->get();
-        }elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
-            // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
             $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
                 $query->where('departemen', $user->departemen);
             })->get();
+        }elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
+            // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
+            $suratKendaraanDinasList = $query->get();
         } elseif (
             in_array($user->level, ['Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'GENERAL SERVICES')
@@ -44,25 +46,28 @@ class DashboardKendaraanDinasLiveWire extends Component
 
         // Ekstrak angka dari level user
         $userLevel = null;
-        if ($user->level === 'Ka.Dept') {
-            $userLevel = 2;
-        } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'GENERAL AFFAIRS') {
+        if ($user->departemen === 'GENERAL AFFAIRS' && $user->seksi === 'GENERAL SERVICES') {
             $userLevel = 3;
+        }elseif ($user->level === 'Ka.Dept') {
+            $userLevel = 2;
         } elseif ($user->level === 'Security') {
             $userLevel = 4;
         }
 
         $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', '!=', 'Level 0')
-            ->pluck('surat_kendaraan_dinas_id')
-            ->toArray();
+        ->where('status_approval', '=', 'Level ' . $userLevel)
+        ->pluck('surat_kendaraan_dinas_id')
+        ->toArray();
+
         $suratDisetujui = $suratKendaraanDinasList->filter(function ($item) use ($approvedIdsByUser) {
             return in_array($item->surat_kendaraan_dinas_id, $approvedIdsByUser);
         })->count();
 
-        $suratMenunggu = $suratKendaraanDinasList->filter(fn ($item) =>
+       $suratMenunggu = $suratKendaraanDinasList->filter(fn ($item) =>
+            $item->status !== 'Level 0' &&
             (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
         )->count();
+
 
         $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
             ->where('status_approval', 'Level 0')
@@ -188,9 +193,9 @@ class DashboardKendaraanDinasLiveWire extends Component
 
         return view('livewire.dashboard-kendaraan-dinas', [
             'suratKendaraanDinas' => $suratKendaraanDinasList,
-            'suratDisetujui' => $suratDisetujui,
-            'suratMenunggu' => $suratMenunggu,
-            'suratDitolak' => $suratDitolak,
+            'kendaraanDisetujui' => $suratDisetujui,
+            'kendaraanMenunggu' => $suratMenunggu,
+            'kendaraanDitolak' => $suratDitolak,
             'kendaraanDinasSedangDigunakan' => $kendaraanDinasSedangDigunakan,
             'kendaraanDinasTersedia' => $kendaraanDinasTersedia,
             'dailyData' => json_encode($dailyData),

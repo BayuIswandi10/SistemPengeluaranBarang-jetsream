@@ -15,14 +15,14 @@ class DashboardBarangKeluarLiveWire extends Component
     {
         $user = Auth::user();
         $user->level = trim($user->level);
-        $startOfDay = Carbon::today()->startOfDay(); // 2025-05-06 00:00:00
-        $endOfDay = Carbon::today()->endOfDay(); // 2025-05-06 23:59:59
+        $startOfDay = Carbon::today()->startOfDay(); 
+        $endOfDay = Carbon::today()->endOfDay(); 
 
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
             ->whereBetween('created_date', [$startOfDay, $endOfDay]);
 
          // Filter data berdasarkan level user
-         if ($user->level === 'Staff' && $user->departemen === 'FINANCE') {
+         if ($user->departemen === 'FINANCE') {
               $pengeluaranBarangs = $query->where('kategori_pengeluaran', 1)->get();
         } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
             $pengeluaranBarangs = $query->get();
@@ -38,14 +38,14 @@ class DashboardBarangKeluarLiveWire extends Component
         }
     
         // Ekstrak angka dari level user
-        if ($user->level === 'Ka.Sie') {
+        if ($user->departemen === 'FINANCE') {
+            $userLevel = 5;
+        } elseif ($user->level === 'Ka.Sie') {
             $userLevel = 2;
         } elseif ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
             $userLevel = 4;
         } elseif ($user->level === 'Ka.Dept') {
             $userLevel = 3;
-        } elseif ($user->level === 'Staff' && $user->departemen === 'FINANCE') {
-            $userLevel = 5;
         } elseif ($user->level === 'Security') {
             $userLevel = 5;
         } elseif ($user->level === 'Super Admin') {
@@ -53,10 +53,11 @@ class DashboardBarangKeluarLiveWire extends Component
         } else {
             $userLevel = 1; // default fallback jika tidak dikenali
         }
+
         
         // Mengambil data status yang disetujui (hanya dari data hari ini)
         $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-        ->where('status_approval', '!=', 'Level 0')
+        ->where('status_approval', '=', 'Level ' . $userLevel)
         ->pluck('pengeluaran_barang_id')
         ->toArray();
 

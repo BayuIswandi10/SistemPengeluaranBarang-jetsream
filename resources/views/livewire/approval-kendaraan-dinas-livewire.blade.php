@@ -293,7 +293,7 @@
                     <div class="col-md-6 text-right">
                         <button type="button" 
                                 id="bulk-approve-btn" 
-                                class="btn btn-success mr-2" 
+                                class="btn btn-primary mr-2" 
                                 disabled>
                             <i class="fa-solid fa-check-circle mr-1"></i>
                             Setujui
@@ -464,7 +464,7 @@
 
                     <!-- Tombol Pindahkan Peserta -->
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-success" id="pindahkanPeserta">Pindahkan Peserta</button>
+                        <button type="button" class="btn btn-primary" id="pindahkanPeserta">Pindahkan Peserta</button>
                     </div>
                 </div>
             </div>
@@ -1092,19 +1092,23 @@
                 return;
             }
 
+            const isMassal = selectedItems.length > 1;
+
             // Group by status for different approval levels
             const level1Items = selectedItems.filter(item => item.status === 'Level 1');
             const level2Items = selectedItems.filter(item => item.status === 'Level 2');
 
             Swal.fire({
-                title: 'Konfirmasi Persetujuan Massal',
-                html: `Apakah Anda yakin ingin menyetujui <strong>${selectedItems.length}</strong> pengajuan yang dipilih?`,
+                title: isMassal ? 'Konfirmasi Persetujuan Massal' : 'Konfirmasi Persetujuan',
+                html: isMassal
+                    ? `Apakah Anda yakin ingin menyetujui <strong>${selectedItems.length}</strong> pengajuan yang dipilih?`
+                    : `Apakah Anda yakin ingin menyetujui pengajuan ini?`,
                 icon: 'question',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Setujui Semua!',
+                confirmButtonColor: '#0d6efd',  
+                cancelButtonColor: '#6c757d',   
+                confirmButtonText: isMassal ? 'Ya, Setujui Semua!' : 'Ya, Setujui',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -1123,25 +1127,39 @@
                 return;
             }
 
+            // Tentukan judul dan pesan berdasarkan jumlah data
+            const isMassal = selectedItems.length > 1;
+            const title = isMassal ? 'Tolak Pengajuan Massal' : 'Tolak Pengajuan';
+            const message = isMassal
+                ? `Anda akan menolak <strong>${selectedItems.length}</strong> pengajuan yang dipilih.`
+                : 'Anda akan menolak 1 pengajuan yang dipilih.';
+
             Swal.fire({
-                title: 'Tolak Pengajuan Massal',
+                title: title,
                 html: `
-                    <p>Anda akan menolak <strong>${selectedItems.length}</strong> pengajuan yang dipilih.</p>
-                    <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px;">
+                    <p>${message}</p>
+                    <select id="alasanDropdown" class="swal2-select" style="width: 85%; margin-bottom: 10px; border-radius: 8px;">
                         <option value="">-- Pilih alasan penolakan cepat --</option>
                         <option value="Data tidak lengkap">Data tidak lengkap</option>
                         <option value="Tidak sesuai kebutuhan">Tidak sesuai kebutuhan</option>
                         <option value="Pengajuan tidak valid">Pengajuan tidak valid</option>
                     </select>
+
                     <textarea id="alasanPenolakan" class="swal2-textarea"
                         placeholder="Tuliskan alasan penolakan di sini..."
                         style="width: 85%; box-sizing: border-box; resize: vertical;"></textarea>
                 `,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Tolak Semua',
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: isMassal ? 'Tolak Semua' : 'Tolak',
                 cancelButtonText: 'Batal',
                 reverseButtons: true,
+
+                customClass: {
+                    confirmButton: 'btn-danger'  // Gunakan class btn-danger Bootstrap
+                },
+
                 didOpen: () => {
                     const select = document.getElementById('alasanDropdown');
                     const textarea = document.getElementById('alasanPenolakan');
@@ -1167,11 +1185,17 @@
             });
         });
 
+
         // Process bulk approval
-        function processBulkApproval(level1Items, level2Items) {
+       function processBulkApproval(level1Items, level2Items) {
+            const totalItems = level1Items.length + level2Items.length;
+            const isMassal = totalItems > 1;
+
             Swal.fire({
                 title: 'Memproses Persetujuan...',
-                html: 'Mohon tunggu, sedang memproses persetujuan massal.',
+                html: isMassal 
+                    ? 'Mohon tunggu, sedang memproses persetujuan massal.' 
+                    : 'Mohon tunggu, sedang memproses persetujuan.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -1220,7 +1244,9 @@
                     if (failCount === 0) {
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: `Semua ${successCount} pengajuan berhasil disetujui.`,
+                            text: isMassal
+                                ? `Semua ${successCount} pengajuan berhasil disetujui.`
+                                : `Pengajuan berhasil disetujui.`,
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000
@@ -1230,7 +1256,9 @@
                     } else {
                         Swal.fire({
                             title: 'Sebagian Berhasil',
-                            html: `<strong>${successCount}</strong> pengajuan berhasil disetujui.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            html: isMassal
+                                ? `<strong>${successCount}</strong> pengajuan berhasil disetujui.<br><strong>${failCount}</strong> pengajuan gagal diproses.`
+                                : `Pengajuan gagal diproses.`,
                             icon: 'warning',
                             confirmButtonText: 'OK'
                         }).then(() => {
@@ -1248,11 +1276,15 @@
                 });
         }
 
-        // Process bulk rejection
+
         function processBulkRejection(selectedItems, alasan) {
+            const isMassal = selectedItems.length > 1;
+
             Swal.fire({
                 title: 'Memproses Penolakan...',
-                html: 'Mohon tunggu, sedang memproses penolakan massal.',
+                html: isMassal 
+                    ? 'Mohon tunggu, sedang memproses penolakan massal.' 
+                    : 'Mohon tunggu, sedang memproses penolakan.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -1281,7 +1313,9 @@
                     if (failCount === 0) {
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: `Semua ${successCount} pengajuan berhasil ditolak.`,
+                            text: isMassal 
+                                ? `Semua ${successCount} pengajuan berhasil ditolak.` 
+                                : `Pengajuan berhasil ditolak.`,
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000
@@ -1291,7 +1325,9 @@
                     } else {
                         Swal.fire({
                             title: 'Sebagian Berhasil',
-                            html: `<strong>${successCount}</strong> pengajuan berhasil ditolak.<br><strong>${failCount}</strong> pengajuan gagal diproses.`,
+                            html: isMassal
+                                ? `<strong>${successCount}</strong> pengajuan berhasil ditolak.<br><strong>${failCount}</strong> pengajuan gagal diproses.`
+                                : `Pengajuan gagal diproses.`,
                             icon: 'warning',
                             confirmButtonText: 'OK'
                         }).then(() => {
@@ -1308,6 +1344,7 @@
                     });
                 });
         }
+
 
         // Initialize state
         updateBulkActionButtons();

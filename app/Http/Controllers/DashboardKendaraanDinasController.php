@@ -44,13 +44,13 @@ class DashboardKendaraanDinasController extends Controller
 
             // Filter data berdasarkan level user
             if ($user->level === 'Ka.Dept' && $user->departemen === 'GENERAL AFFAIRS') {
-                $suratKendaraan = $query->get();
+                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen);
+                })->get();
             }
             elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
                 // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
-                $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
-                    $query->where('departemen', $user->departemen);
-                })->get();
+                $suratKendaraan = $query->get();
             }
             elseif (
                 in_array($user->level, ['Security', 'Super Admin']) ||
@@ -64,18 +64,19 @@ class DashboardKendaraanDinasController extends Controller
             }
 
             $userLevel = null; 
-            // Ekstrak angka dari level user
-            if ($user->level === 'Ka.Dept') {
-                $userLevel = 2;
-            } elseif ($user->level === 'Ka.Sie' && $user->departemen === 'GENERAL AFFAIRS') {
+             // Ekstrak angka dari level user
+            $userLevel = null;
+            if ($user->departemen === 'GENERAL AFFAIRS' && $user->seksi === 'GENERAL SERVICES') {
                 $userLevel = 3;
+            }elseif ($user->level === 'Ka.Dept') {
+                $userLevel = 2;
             } elseif ($user->level === 'Security') {
                 $userLevel = 4;
             }
 
             // Mengambil data berdasarkan status
             $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
-                ->where('status_approval', '!=', 'Level 0')
+                ->where('status_approval', '=', 'Level ' . $userLevel)
                 ->pluck('surat_kendaraan_dinas_id')
                 ->toArray();
             $kendaraanDisetujui = $suratKendaraan->filter(function ($item) use ($approvedIdsByUser) {
