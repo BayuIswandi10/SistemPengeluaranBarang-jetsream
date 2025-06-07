@@ -396,6 +396,7 @@ class SuratDinasController extends Controller
                 'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
                 'status' => $approval->status_approval,
                 'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
+                'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
             ];
         });
     

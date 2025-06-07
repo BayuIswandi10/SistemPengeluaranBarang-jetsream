@@ -134,7 +134,7 @@
                             <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                    <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -215,16 +215,22 @@
                             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
+                                            <!-- Badge Status di Header -->
+                                            <div id="approvalStatusBadgeDinas"></div>
+                                        </div>
+                                        <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
-                                        </div>
 
+
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>    
+                                        </div>
+                        
                                         <!-- Card untuk Tabel Informasi Kendaraan -->
                                         <div class="card mb-4">
                                             <div class="card-header bg-primary text-white">
@@ -232,48 +238,50 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table id="dataTable" class="table table-striped table-bordered nowrap" style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style="text-align: center">No</th>
-                                                                <th>No Kendaraan</th>
-                                                                <th>Keterangan</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="kendaraanInfoBody">
-                                                            <!-- Data akan diisi secara dinamis -->
-                                                        </tbody>
-                                                    </table>
+                                                <table id="kendaraanInfoTable" class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>No Kendaraan</th>
+                                                            <th>Keterangan</th>
+                                                            <th>Tanggal Penggunaan</th>
+                                                            <th>Rute 1</th>
+                                                            <th>Rute 2</th>
+                                                            <th>Rute 3</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="kendaraanInfoBody">
+                                                        <!-- Data akan diisi secara dinamis -->
+                                                    </tbody>
+                                                </table>
                                                 </div>
                                             </div>
                                         </div>
-
+                        
                                         <!-- Card untuk Peserta Kendaraan Dinas -->
                                         <div class="card">
                                             <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Peserta</h6>
                                             </div>
                                             <div class="card-body">
-                                                <div class="table-responsive">
-                                                    <table id="detaildataTableModal" class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>No</th>
-                                                                <th>Nrp Peserta</th>
-                                                                <th>Nama Peserta</th>
-                                                                <th>Departemen</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="detailBody">
-                                                            <!-- Data akan diisi secara dinamis -->
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                <table id="detaildataTableModal" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Nrp Peserta</th>
+                                                            <th>Nama Peserta</th>
+                                                            <th>Departemen</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="detailBody">
+                                                        <!-- Data akan diisi secara dinamis -->
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
+                        
                                         <hr>
-
+                        
                                         <!-- Card untuk Tabel Informasi Tambahan -->
                                         <div class="card mt-4">
                                             <div class="card-header bg-primary text-white">
@@ -281,30 +289,31 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table id="additionalInfoTable" class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style="text-align: center">No</th>
-                                                                <th>Nama</th>
-                                                                <th>Tingkatan</th>
-                                                                <th>Departemen</th>
-                                                                <th>Status</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="additionalInfoBody">
-                                                            <!-- Data akan diisi secara dinamis -->
-                                                        </tbody>
-                                                    </table>
+                                                <table id="additionalInfoTable" class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Nama</th>
+                                                            <th>Tingkatan</th>
+                                                            <th>Departemen</th>
+                                                            <th>Status Persetujuan</th>
+                                                            <th>Tanggal Persetujuan</th>
+                                                            <th>Alasan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="addhistory">
+                                                        <!-- Data akan diisi secara dinamis -->
+                                                    </tbody>
+                                                </table>
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                    </div> <!-- /.modal-body -->
+                                    </div>  
                                 </div>
                             </div>
                         </div>
-
                     </div>
+                    
                     <!-- Row kedua -->
                     <div class="row">
                         <!-- Kotak Kendaraan Dinas Tersedia -->
@@ -399,7 +408,7 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                                <h5 class="card-title text-center">Penggunaan Kendaraan Dinas Berdasarkan Kategori</h5>
+                             <h6 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;" >Berdasarkan Kategori Kendaraan</h6>
                             </div>
                             <div class="card-body">
                                 <div class="chart">
@@ -571,42 +580,104 @@
                                 url: "/pengajuan/detailSurat",
                                 method: "POST",
                                 data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
-                                success: function (data) {
+                                    success: function (data) {
                                     const detailTable = $('#detaildataTableModal').DataTable();
 
                                     const jenisKendraan = {
-                                        1 : "Mengeluarkan"
+                                        1: "Mengeluarkan"
                                     };
+
+                                    let statusBadgeHTML = '';
+                                    const informasiTambahan = data.informasi_tambahan ?? [];
+
+                                    // Cek apakah ada yang menolak
+                                    const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
+
+                                    // Cek level tertinggi yang menyetujui
+                                    const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+
+                                    const tombolCetak = document.getElementById('cetakBukti');
+
+                                    // Logika tampil/sembunyikan tombol
+                                    if (tombolCetak) {
+                                        if (adaYangMenolak || maxLevel < 3) {
+                                            tombolCetak.style.display = "none";
+                                        } else {
+                                            tombolCetak.style.display = "inline-block";
+                                        }
+                                    }
+
+                                    if (adaYangMenolak) {
+                                        statusBadgeHTML = `
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
+                                            </span>
+                                        `;
+                                    } else if (maxLevel >= 3) {
+                                        statusBadgeHTML = `
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                                            </span>
+                                        `;
+                                    } else {
+                                        statusBadgeHTML = `
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                                            </span>
+                                        `;
+                                    }
+
+                                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
                                     // Kosongkan data lama kendaraan
                                     document.getElementById('kendaraanInfoBody').innerHTML = "";
 
-                                     // Hapus DataTable sebelum menambahkan data baru
                                     if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
                                         $('#detaildataTableModal').DataTable().clear().destroy();
                                     }
-                                    
+
+                                    // Simpan kilometer awal dan akhir untuk print
+                                    let kilometerAwal = data.kilometer_awal || '-';
+                                    let kilometerAkhir = data.kilometer_akhir || '-';
+                                    let hasPrivateVehicle = data.has_private_vehicle || false;
+
                                     // Validasi dan tampilkan data kendaraan
                                     if (data.data_kendaraan && data.data_kendaraan.length > 0) {
                                         data.data_kendaraan.forEach((item, index) => {
                                             let row = `
                                                 <tr>
-                                                    <td style="text-align: center">${index + 1}</td>
+                                                    <td>${index + 1}</td>
                                                     <td>${item.nomor_kendaraan}</td>
                                                     <td>${item.keterangan}</td>
+                                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                                    <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                                    <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                                    <td>${item.tujuan_penggunaan_3 || '-'}</td>
                                                 </tr>
                                             `;
                                             document.getElementById('kendaraanInfoBody').innerHTML += row;
                                         });
+
+                                        // Simpan kilometer data untuk print
+                                        let kilometerElement = document.getElementById('kilometerData');
+                                        if (!kilometerElement) {
+                                            kilometerElement = document.createElement('div');
+                                            kilometerElement.id = 'kilometerData';
+                                            kilometerElement.style.display = 'none';
+                                            document.body.appendChild(kilometerElement);
+                                        }
+                                        kilometerElement.setAttribute('data-kilometer-awal', kilometerAwal);
+                                        kilometerElement.setAttribute('data-kilometer-akhir', kilometerAkhir);
+                                        kilometerElement.setAttribute('data-has-private-vehicle', hasPrivateVehicle);
                                     } else {
                                         document.getElementById('kendaraanInfoBody').innerHTML = `
-                                            <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
+                                            <tr><td colspan="7" class="text-center">Tidak ada data kendaraan</td></tr>
                                         `;
                                     }
 
                                     // Kosongkan data lama
                                     detailTable.clear();
-                                    document.getElementById('additionalInfoBody').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
+                                    document.getElementById('addhistory').innerHTML = "";
 
                                     // Validasi data userDinas
                                     if (data.userDinas && data.userDinas.length > 0) {
@@ -618,23 +689,8 @@
                                         ]);
                                         detailTable.rows.add(newData).draw();
                                     } else {
-                                        detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
+                                        detailTable.rows.add([["", "", "Tidak ada data user", ""]]).draw();
                                     }
-
-                                    // Inisialisasi ulang DataTable
-                                    $('#detaildataTableModal').DataTable({
-                                        columnDefs: [
-                                            { className: 'dt-body-center', targets: 0 },
-                                            { className: 'dt-head-center', targets: 0 },
-                                            { className: 'dt-body-left', targets: 3 },
-                                            { className: 'dt-head-left', targets: 3 },
-                                        ],
-                                        responsive: true,
-                                        scrollX: false,
-                                        pageLength: 5,
-                                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                                        destroy: true
-                                    });
 
                                     // Mapping tingkatan dan status persetujuan
                                     const tingkatMapping = {
@@ -649,22 +705,28 @@
                                         "Level 0": "Menolak",
                                         "Level 1": "Mengajukan",
                                         "Level 2": "Menyetujui",
-                                        "Level 3": "Mengetahui",
-                                        "Level 4": "Memeriksa"
+                                        "Level 3": "Menyetujui",
+                                        "Level 4": "Menyetujui"
                                     };
-                                    
+
                                     // Validasi data informasi_tambahan
-                                    const additionalInfoBody = document.getElementById('additionalInfoBody');
-                                    
+                                    const additionalInfoBody = document.getElementById('addhistory');
+
                                     if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
                                         data.informasi_tambahan.forEach((info, index) => {
+                                            let alasanPenolakan = (index === data.informasi_tambahan.length - 1)
+                                                ? info.alasan_penolakan
+                                                : '-'; // hanya isi di baris terakhir
+
                                             let row = `
                                                 <tr>
-                                                    <td style="text-align: center">${index + 1}</td>
+                                                    <td>${index + 1}</td>
                                                     <td>${info.nama}</td>
                                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                                     <td>${info.departemen}</td>
                                                     <td>${approvMapping[info.status] || info.status}</td>
+                                                    <td>${info.created_date}</td>
+                                                    <td>${alasanPenolakan}</td>
                                                 </tr>
                                             `;
                                             additionalInfoBody.innerHTML += row;
@@ -672,15 +734,37 @@
                                     } else {
                                         additionalInfoBody.innerHTML = `
                                             <tr>
-                                                <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                                                <td colspan="6" class="text-center">Tidak ada informasi tambahan</td>
                                             </tr>
                                         `;
                                     }
-                                    
+
+                                    // Aktifkan DataTable setelah data ditambahkan
+                                    $('#detaildataTableModal').DataTable({
+                                        columnDefs: [
+                                            { className: 'dt-body-center dt-head-center', targets: 0 }, // No: center-aligned
+                                            { className: 'dt-body-center dt-head-center', targets: 1 }, // NRP Peserta: center-aligned
+                                            { className: 'dt-body-left dt-head-left', targets: 2 },    // Nama Peserta: left-aligned
+                                            { className: 'dt-body-left dt-head-left', targets: 3 }
+                                        ],
+                                        responsive: true,
+                                        scrollX: false,
+                                        destroy: true,
+                                        pageLength: 5,
+                                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                                    });
+
+                                    // Pastikan modal terbuka setelah data dimuat
+                                    $('#suratDinasModal').modal('show');
                                 },
                                 error: function (xhr, status, error) {
                                     console.error("Error fetching data:", error);
-                                    alert("Terjadi kesalahan saat mengambil data.");
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Gagal mengambil data surat dinas.',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
                                 }
                             });
                         });

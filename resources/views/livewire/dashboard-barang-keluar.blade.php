@@ -136,7 +136,7 @@
                          <div class="modal fade" id="modalPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                   <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -207,26 +207,37 @@
                         </div>
 
                         {{-- Detail Modal --}}
-                        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+                         <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
+                                            
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div id="approvalStatusBadge" style="padding-right: 1rem; border-right: 1px solid #ccc;"></div>
+                                                <div id="kategoriBarangCard" style="padding-left: 1rem;"></div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="d-flex justify-content-between align-items-center">
+
+                                        <!-- Info Nomor Pengeluaran dan Kategori -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
                                             <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                                            <p><strong>Kategori Pengeluaran:</strong> <span id="kategoriBarangCard"></span></p>
+                                            <div id="kategoriBarangCard"></div>
                                         </div>
+
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
-                                        </div>  
+                                        </div>
+                                        
                                         <!-- Card untuk Tabel Barang Keluar -->
                                         <div class="card">
-                                            <div class="card-header bg-primary text-white">
+                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3">
                                                 <h6 class="mb-0">Informasi Barang Keluar</h6>
                                             </div>
                                             <div class="card-body">
@@ -252,29 +263,29 @@
 
                                         <!-- Card untuk Tabel Informasi Tambahan -->
                                         <div class="card mt-4">
-                                            <div class="card-header bg-primary text-white">
+                                        <div class="card-header bg-primary text-white">
                                                 <h6 class="mb-0">Informasi Tambahan</h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table class="table table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style="text-align: center">No</th>
-                                                                <th>Nama</th>
-                                                                <th>Tingkatan</th>
-                                                                <th>Departemen</th>
-                                                                <th>Status</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="additionalInfoBody">
-                                                            <!-- Data akan diisi secara dinamis -->
-                                                        </tbody>
-                                                    </table>
+                                                <table id="additionalInfoTable" class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Nama</th>
+                                                            <th>Tingkatan</th>
+                                                            <th>Departemen</th>
+                                                            <th>Status</th>
+                                                            <th>Alasan Penolakan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="additionalInfoBody">
+                                                        <!-- Data akan diisi secara dinamis -->
+                                                    </tbody>
+                                                </table>
                                                 </div>
-                                            </div>
+                                            </div>   
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +319,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="border-top: 5px solid  #5A6ACF;">
-                        <h5 class="card-title text-center">Pengeluaran Barang Berdasarkan Departemen</h5>
+                        <h6 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;" >Berdasarkan Asal Departemen</h6>
                     </div>
                     <div class="card-body">
                         <div class="chart">
@@ -491,12 +502,54 @@
                         method: "POST",
                         data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                         success: function (data) {
-                            // console.log("Response dari server:", data); // Debugging
-                            document.getElementById('kategoriBarangCard').innerText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                            // Tampilkan badge kategori
+                            document.getElementById('kategoriBarangCard').innerHTML = 
+                                data.kategori_pengeluaran === 1 
+                                ? `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                        Scrap
+                                    </span>`
+                                : `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #17a2b8; color: white;">
+                                        Non Scrap
+                                    </span>`;
+
+                            // Badge besar status persetujuan
+                            const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                            const adaYangMenolak = (data.informasi_tambahan ?? []).some(x => x.status === 'Level 0');
+
+                            let statusBadgeHTML = '';
+
+                            if (adaYangMenolak) {
+                                // Status DITOLAK
+                                statusBadgeHTML = `
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                        <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 6px;"></i> Ditolak
+                                    </span>
+                                `;
+                            } else if (
+                                (data.kategori_pengeluaran === 1 && maxLevel >= 5) || 
+                                (data.kategori_pengeluaran === 0 && maxLevel >= 4)
+                            ) {
+                                // Status LENGKAP
+                                statusBadgeHTML = `
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                                        <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 6px;"></i> Lengkap
+                                    </span>
+                                `;
+                            } else {
+                                // Status BELUM LENGKAP
+                                statusBadgeHTML = `
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                                        <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                                    </span>
+                                `;
+                            }
+
+                            document.getElementById('approvalStatusBadge').innerHTML = statusBadgeHTML;
+                    
                             document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                             const tbody = document.getElementById('detailBody');
                             const additionalInfoBody = document.getElementById('additionalInfoBody');
-
+                            
                             tbody.innerHTML = '';
                             additionalInfoBody.innerHTML = '';
 
@@ -505,7 +558,12 @@
                                 $('#detaildataTableModal').DataTable().clear().destroy();
                             }
 
-                            // Validasi data barang_keluar
+                            let statusPengeluaran = data.status; // Pastikan API mengembalikan status
+                            let kategoriPengeluaran = data.kategori_pengeluaran;
+
+                            let nomorPolisi = data.no_polisi;
+                            
+                            // Menambahkan data ke tabel barang keluar
                             if (data.barang_keluar && data.barang_keluar.length > 0) {
                                 tbody.innerHTML = data.barang_keluar.map((item, index) => `
                                     <tr>
@@ -514,28 +572,14 @@
                                         <td>${item.nama_barang}</td>
                                         <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                                         <td>${item.satuan_barang}</td>
-                                        <td>${item.keterangan_barang ?? ""}</td>
+                                        <td>${item.keterangan_barang ?? ''}</td>
                                     </tr>
                                 `).join('');
                             } else {
                                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
                             }
 
-                            // Inisialisasi ulang DataTable
-                            $('#detaildataTableModal').DataTable({
-                                columnDefs: [
-                                    { className: 'dt-body-center', targets: 0 },
-                                    { className: 'dt-head-center', targets: 0 },
-                                    { className: 'dt-body-left', targets: 5 },
-                                    { className: 'dt-head-left', targets: 5 },
-                                ],
-                                responsive: true,
-                                scrollX: false,
-                                pageLength: 5,
-                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                                destroy: true
-                            });
-
+                            // Mapping tingkatan dan status persetujuan
                             const tingkatMapping = {
                                 "Level 1": "Civitas",
                                 "Level 2": "PIC/Ka.Sie",
@@ -545,36 +589,64 @@
                                 "Level 6": "Security"
                             };
                             const approvMapping = {
-                                "Level 1": "Mengajukan",
-                                "Level 2": "Menyetujui",
+                                "Level 0": "Menolak",
+                                "Level 1": "Mengeluarkan",
+                                "Level 2": "Membawa",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Menyetujui",
-                                "Level 5": "Menyetujui",
-                                "Level 6": "Menyetujui"
+                                "Level 4": "Mengetahui",
+                                "Level 5": "Menerima",
+                                "Level 6": "Memeriksa"
                             };
-
-
-                            // Validasi data informasi_tambahan
+                            
+                            // Menambahkan data ke tabel informasi tambahan
                             if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                                additionalInfoBody.innerHTML = data.informasi_tambahan.map((info, index) => `
-                                    <tr>
-                                        <td style="text-align: center">${index + 1}</td>
-                                        <td>${info.nama}</td>
-                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                        <td>${info.departemen}</td>
-                                        <td>${approvMapping[info.status] || info.status}</td>
-                                    </tr>
-                                `).join('');
+                                data.informasi_tambahan.forEach((info, index) => {
+                                    let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
+                                        ? info.alasan_penolakan 
+                                        : '-'; // hanya isi di baris terakhir
+
+                                    let row = `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${info.nama}</td>
+                                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                            <td>${info.departemen}</td>
+                                            <td>${approvMapping[info.status] || info.status}</td>
+                                            <td>${alasanPenolakan}</td>
+                                        </tr>
+                                    `;
+                                    additionalInfoBody.innerHTML += row;
+                                });
                             } else {
                                 additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
                             }
+                            
+                            // Aktifkan DataTable setelah data ditambahkan
+                            $('#detaildataTableModal').DataTable({
+                                    columnDefs: [
+                                        { className: 'dt-body-center', targets: 0 },
+                                        { className: 'dt-head-center', targets: 0 },
+                                        { className: 'dt-body-center', targets: 5 },
+                                        { className: 'dt-head-center', targets: 5 }
+                                    ],
 
-                            // Pastikan modal terbuka setelah data dimuat
+                                    responsive: true,
+                                    scrollX: false,
+                                    destroy: true,
+                                    pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                            }); 
+                            
                             $('#detailModal').modal('show');
                         },
                         error: function (xhr, status, error) {
                             console.error("Error fetching data:", error);
-                            alert("Terjadi kesalahan saat mengambil data.");
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Gagal mengambil data pengeluaran.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
                         }
                     });
                 });

@@ -22,8 +22,10 @@
             <div class="card-body">
               <div class="container">
                 <video id="preview" style="width: 100%; max-height: 250px; border-radius: 8px;"></video>
-                <input type="text" id="scanResult" class="form-control mt-3" placeholder="Masukkan atau scan barcode" autofocus autocomplete="off">
-                <button type="button" class="btn btn-success mt-2" id="searchButton">Cari</button>
+                <div class="d-flex mt-3 gap-2">
+                    <input type="text" id="scanResult" class="form-control me-2" placeholder="Scan QR-Code atau Ketik No Surat" autofocus autocomplete="off">
+                    <button type="button" class="btn btn-primary" id="searchButton">Cari</button>
+                </div>
               </div>
             </div>
         </div>
@@ -36,8 +38,11 @@
                 <div class="modal-header">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                        <!-- Badge Status di Header -->
-                        <div id="approvalStatusBadge"></div>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <div id="approvalStatusBadge" style="padding-right: 1rem; border-right: 1px solid #ccc;"></div>
+                            <div id="kategoriBarangCard" style="padding-left: 1rem;"></div>
+                        </div>
                     </div>
                     <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -83,7 +88,7 @@
 
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
-                        <div class="card-header bg-secondary text-white">
+                       <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Tambahan</h6>
                         </div>
                         <div class="card-body">
@@ -105,10 +110,13 @@
                             </table>
                             </div>
                         </div>   
-                        <div class="text-end mt-3">
-                            <button type="button" class="btn btn-success" id="approveButton" data-id="">Setujui</button>
-                        </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="approveButton" data-id="">
+                        <i class="fa-solid fa-check-circle mr-1"></i>
+                        Setujui
+                    </button>
                 </div>
             </div>
         </div>
@@ -132,13 +140,11 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
-                        <button type="button" class="btn btn-success" id="approveButtonDinas" data-id="">Setuju</button>
-
                     </div>
 
                     <!-- Card untuk Tabel Informasi Kendaraan -->
                     <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Kendaraan</h6>
                         </div>
                         <div class="card-body">
@@ -189,7 +195,7 @@
 
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
-                        <div class="card-header bg-secondary text-white">
+                         <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                         </div>
                         <div class="card-body">
@@ -212,6 +218,12 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="approveButtonDinas" data-id="">
+                        <i class="fa-solid fa-check-circle mr-1"></i>
+                        Setujui
+                    </button>
                 </div>
             </div>
         </div>
@@ -267,8 +279,12 @@
                  // Tampilkan badge kategori
                 document.getElementById('kategoriBarangCard').innerHTML = 
                     data.kategori_pengeluaran === 1 
-                    ? '<span class="badge badge-danger px-2 py-3">Scrap</span>' 
-                    : '<span class="badge badge-info px-2 py-3">Non Scrap</span>';
+                    ? `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                            Scrap
+                        </span>`
+                    : `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #17a2b8; color: white;">
+                            Non Scrap
+                        </span>`;
 
                 // Badge besar status persetujuan
                 const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
@@ -290,7 +306,7 @@
                     // Status LENGKAP
                     statusBadgeHTML = `
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                            <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 6px;"></i> Lengkap
+                            <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 6px;"></i> Lengkap
                         </span>
                     `;
                 } else {
@@ -628,7 +644,7 @@
                     } else if (maxLevel >= 3) {
                         statusBadgeHTML = `
                             <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
                             </span>
                         `;
                     } else {

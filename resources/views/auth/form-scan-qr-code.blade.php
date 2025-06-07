@@ -1,39 +1,113 @@
 <x-guest-layout>
   <head>
-      <style>
-          body {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              margin: 0;
-              background-repeat: no-repeat;
-              background-size: cover;
-          }
+        <style>
+            .custom-input,
+            .custom-select {
+            border-radius: 0.375rem; /* sama dengan rounded-md Bootstrap */
+            border: 1px solid #ced4da;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
 
-          .login-box {
-              width: 400px;
-          }
+            .custom-input:focus,
+            .custom-select:focus {
+            border-color: #5A6ACF;
+            box-shadow: 0 0 0 0.2rem rgba(90, 106, 207, 0.25);
+            outline: none;
+            }
+        </style>    
+        
+        <style>
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
 
-          .nav-static-top {
-              top: 0;
-              left: 0;
-              right: 0;
-              position: fixed;
-              height: 70px;
-              width: 100% !important;
-              box-shadow: 0px 2px 0px 0px #eee;
-              background-color: white;
-              z-index: 4;
-              opacity: 0.9;
-          }
+            .login-box {
+                width: 400px;
+            }
 
-          .login-card {
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              border-radius: 8px;
-          }
-      </style>
-         <style>
+            .nav-static-top {
+                top: 0;
+                left: 0;
+                right: 0;
+                position: fixed;
+                height: 70px;
+                width: 100% !important;
+                box-shadow: 0px 2px 0px 0px #eee;
+                background-color: white;
+                z-index: 4;
+                opacity: 0.9;
+            }
+
+            .login-card {
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+            }
+
+            .modal-slide-side {
+                    width: calc(100% - 2rem); /* Ubah menjadi 100% untuk memenuhi lebar penuh */
+                    max-width: 100%; /* Pastikan tidak dibatasi oleh max-width */
+                    margin: 1rem; /* Kurangi margin untuk lebih dekat ke tepi */
+                }
+
+                /* Pastikan modal-content dan modal-header mengisi lebar penuh */
+                .modal-slide-side .modal-content,
+                .modal-slide-side .modal-header {
+                    width: 100%;
+                    border-radius: 0; /* Hilangkan border-radius jika tidak diinginkan */
+                }
+
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem 1.25rem;
+                }
+
+                .modal-title {
+                    margin: 0;
+                    font-size: 1.25rem;
+                    font-weight: 500;
+                }
+
+                .modal-header .close {
+                    padding: 0.5rem 0.75rem;
+                    margin: -0.5rem -0.75rem -0.5rem auto;
+                }
+                /* Responsivitas */
+                @media (max-width: 767px) {
+                    .modal-slide-side {
+                        width: calc(100% - 1rem); /* Kurangi margin di mobile */
+                        margin: 0.5rem;
+                    }
+                    .modal-header {
+                        padding: 0.5rem 1rem;
+                    }
+                    .modal-title {
+                        font-size: 1rem;
+                    }
+                    #legendKendaraan .legend-color {
+                        width: 12px !important;
+                        height: 12px !important;
+                    }
+                    #legendKendaraan span:not(.legend-color) {
+                        font-size: 12px;
+                    }
+                    .modal-body {
+                        padding: 15px;
+                    }
+                }
+        </style>
+        <style>
             /* Pastikan modal tidak lebih besar dari layar */
             @media (max-width: 768px) {
                 .modal-dialog {
@@ -63,11 +137,12 @@
             <div class="card-body">
                 <video id="preview"></video>
                 <div class="input-group mt-3">
-                    <input type="text" id="scanResult" class="form-control" placeholder="Scan QR atau ketik nomor pengeluaran" autocomplete="off">
+                    <input type="text" id="scanResult" class="form-control custom-input" placeholder="Scan QR-Code atau Ketik No Surat" autocomplete="off">
                     <div class="input-group-append">
-                        <button id="btnCari" class="btn btn-primary ml-2" >Cari</button>
+                        <button id="btnCari" class="btn btn-primary" type="button">Cari</button>
                     </div>
                 </div>
+
             </div>
             
             <div class="card-footer d-flex justify-content-center">
@@ -88,19 +163,22 @@
                 <div class="modal-header">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                        <!-- Badge Status di Header -->
-                        <div id="approvalStatusBadge"></div>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <div id="approvalStatusBadge" style="padding-right: 1rem; border-right: 1px solid #ccc;"></div>
+                            <div id="kategoriBarangCard" style="padding-left: 1rem;"></div>
+                        </div>
                     </div>
+
                     <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
 
-                    <!-- Info Nomor Pengeluaran dan Kategori -->
+                    <!-- Info Nomor Pengeluaran-->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                        <div id="kategoriBarangCard"></div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -308,9 +386,14 @@
                     success: function (data) {
                         // Tampilkan badge kategori
                         document.getElementById('kategoriBarangCard').innerHTML = 
-                            data.kategori_pengeluaran === 1 
-                            ? '<span class="badge badge-danger px-2 py-3">Scrap</span>' 
-                            : '<span class="badge badge-info px-2 py-3">Non Scrap</span>';
+                           data.kategori_pengeluaran === 1 
+                            ? `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                                    Scrap
+                                </span>`
+                            : `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #17a2b8; color: white;">
+                                    Non Scrap
+                                </span>`;
+
 
                         // Ambil informasi tambahan
                         const informasiTambahan = data.informasi_tambahan ?? [];
@@ -338,7 +421,7 @@
                             if (isApproved) {
                                 statusBadgeHTML = `
                                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                        <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                                        <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
                                     </span>
                                 `;
                             } else {
@@ -543,7 +626,7 @@
                     } else if (maxLevel >= 3) {
                         statusBadgeHTML = `
                             <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                <i class="fas fa-check-circle" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
                             </span>
                         `;
                     } else {

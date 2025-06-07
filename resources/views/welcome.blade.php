@@ -228,7 +228,86 @@
         }
     </style>
 
-    
+    <style>
+        /* Semua tombol di FullCalendar */
+        .fc .fc-button {
+        background-color: #5A6ACF !important;
+        border-color: #5A6ACF !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        border-radius: 0.375rem;
+        }
+
+        /* Hover */
+        .fc .fc-button:hover,
+        .fc .fc-button:focus {
+        background-color: #4b5ac1 !important;
+        border-color: #4b5ac1 !important;
+        color: #ffffff !important;
+        }
+
+        /* Saat tombol aktif (diklik) */
+        .fc .fc-button:active,
+        .fc .fc-button.fc-button-active {
+        background-color: #3f4bb0 !important;
+        border-color: #3f4bb0 !important;
+        color: #ffffff !important;
+        }
+
+        /* Tombol "today" (sama warnanya juga) */
+        .fc .fc-today-button {
+        background-color: #5A6ACF !important;
+        border-color: #5A6ACF !important;
+        color: #ffffff !important;
+        }
+
+        /* Hover & klik untuk today juga */
+        .fc .fc-today-button:hover,
+        .fc .fc-today-button:focus,
+        .fc .fc-today-button:active {
+        background-color: #4b5ac1 !important;
+        border-color: #4b5ac1 !important;
+        color: #ffffff !important;
+        }
+
+
+    </style>
+
+    <style>
+        .custom-input,
+        .custom-select {
+            border-radius: 0.375rem; /* Sama dengan rounded-md Bootstrap */
+            border: 1px solid #ced4da;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            background-color: #fff;
+        }
+
+        .custom-input:focus,
+        .custom-select:focus {
+            border-color: #5A6ACF;
+            box-shadow: 0 0 0 0.2rem rgba(90, 106, 207, 0.25);
+            outline: none;
+        }
+
+        /* Untuk readonly input agar tampil mirip disabled select */
+       input[readonly].custom-input {
+            background-color: #f8f9fa; /* Tetap terang */
+            color: #6c757d;            /* Abu-abu redup */
+            cursor: not-allowed;
+        }
+
+
+        /* Jika input berada dalam tabel */
+        td .custom-input,
+        td .custom-select {
+            margin: 0;  /* Hindari spasi aneh di tabel */
+        }
+    </style>
+
 
     <body>
         @if (session('success'))
@@ -312,7 +391,7 @@
                                 
                                 <div class="form-group" id="pembawa_scrap_group">
                                     <label for="pembawa_scrap">Pembawa <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="pembawa_scrap" name="pembawa_scrap" placeholder="Masukkan Nama Pembawa Scrap" autocomplete="off">
+                                    <input type="text" class="custom-input" id="pembawa_scrap" name="pembawa_scrap" placeholder="Masukkan Nama Pembawa Scrap" autocomplete="off">
                                 </div>                                
             
                                 <div class="form-group">
@@ -328,7 +407,7 @@
 
                                 <div class="form-group">
                                     <label for="no_polisi">No Polisi <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="no_polisi" name="no_polisi" placeholder="Masukan No Polisi Kendaraan" required autocomplete="off">
+                                    <input type="text" class="custom-input" id="no_polisi" name="no_polisi" placeholder="Masukan No Polisi Kendaraan" required autocomplete="off">
                                     <small id="no_polisi_error" class="text-danger" style="display: none;">
                                         Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
                                         - 1–2 huruf awal<br>
@@ -380,11 +459,11 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="nomor">1</td>
-                                                    <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                                                    <td><input type="text" name="jumlah[]" class="form-control jumlah-input" placeholder="Jumlah"required autocomplete="off"></td>
+                                                    <td><input type="text" name="barang_ids[]" class="custom-input" placeholder="Nama Barang" required autocomplete="off"></td>
+                                                    <td><input type="text" name="jumlah[]" class="custom-input jumlah-input" placeholder="Jumlah"required autocomplete="off"></td>
                                                     <td>
-                                                        <select name="satuan[]" class="form-control" required>
-                                                            <option value="" disabled selected>Pilih Satuan</option>
+                                                        <select name="satuan[]" class="custom-input" required>
+                                                            <option value="" disabled selected>Satuan</option>
                                                             <option value="unit">Unit</option>
                                                             <option value="pcs">PCS</option>
                                                             <option value="kg">KG</option>
@@ -392,7 +471,7 @@
                                                             <option value="drum">DRUM</option>
                                                         </select>
                                                     </td>
-                                                    <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
+                                                    <td><input type="text" name="keterangan[]" class="custom-input" placeholder="Keterangan" autocomplete="off"></td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                                                             <i class="fas fa-trash"></i>
@@ -437,7 +516,7 @@
                                 <!-- Input bulan -->
                                 <div class="mb-3 mb-md-0">
                                     <label for="monthPickerGlobal">Pilih Bulan:</label>
-                                    <input type="month" id="monthPickerGlobal" class="form-control" style="max-width: 250px;">
+                                    <input type="month" id="monthPickerGlobal" class="custom-input" style="max-width: 250px;">
                                 </div>
 
                                 <!-- Legend kendaraan -->
@@ -517,10 +596,10 @@
                                             <tr>
                                                 <td>
                                                     <input type="hidden" name="kendaraan[0][kendaraan_dinas_id]" class="kendaraan_dinas_id">
-                                                    <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
+                                                    <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="custom-input select-nopol" data-index="0" required></select>
                                                 </td>
-                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" required></td>
-                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" required></td>
+                                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="custom-input merk_kendaraan" required></td>
+                                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="custom-input kapasitas_kendaraan input-kapasitas" min="1" required></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -530,7 +609,7 @@
                                     <label for="tanggal_penggunaan">Tanggal Penggunaan <span class="text-danger">*</span></label>
                                     <input 
                                         type="text" 
-                                        class="form-control" 
+                                        class="custom-input" 
                                         id="tanggal_penggunaan" 
                                         name="tanggal_penggunaan" 
                                         value="{{ old('tanggal_penggunaan') }}" 
@@ -544,23 +623,23 @@
                                 <div class="form-group">
                                     <label for="tujuan_penggunaan">Rute Dinas <span class="text-danger">*</span></label>
                                     <div class="d-flex gap-2">
-                                        <input type="text" class="form-control" name="tujuan_penggunaan_1" 
+                                        <input type="text" class="custom-input" name="tujuan_penggunaan_1" 
                                                value="{{ old('tujuan_penggunaan_1') }}" required autocomplete="off" placeholder="Rute Ke-1" required autocomplete="off">
-                                        <input type="text" class="form-control" name="tujuan_penggunaan_2" 
+                                        <input type="text" class="custom-input" name="tujuan_penggunaan_2" 
                                                value="{{ old('tujuan_penggunaan_2') }}" autocomplete="off" placeholder="Rute Ke-2" autocomplete="off">
-                                        <input type="text" class="form-control" name="tujuan_penggunaan_3" 
+                                        <input type="text" class="custom-input" name="tujuan_penggunaan_3" 
                                                value="{{ old('tujuan_penggunaan_3') }}" autocomplete="off" placeholder="Rute Ke-3" autocomplete="off">
                                     </div>
                                 </div>
 
                                 <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
                                     <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
+                                    <input type="number" class="custom-input" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">
                                 </div>
 
                                 <div class="form-group" id="alasan_penggunaan">
                                     <label for="alasan_penggunaan">Tujuan Penggunaan <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="alasan_penggunaan" name="alasan_penggunaan" placeholder="Masukkan tujuan penggunaan" autocomplete="off" rows="4" required></textarea>                                </div>
+                                    <textarea class="custom-input" id="alasan_penggunaan" name="alasan_penggunaan" placeholder="Masukkan tujuan penggunaan" autocomplete="off" rows="4" required></textarea>                                </div>
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
                                     <label>Peserta Dinas <span class="text-danger">*</span></label>
@@ -579,8 +658,8 @@
                                                 <td class="nomor">1</td>
                                                 <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_regular" value="">
                                                 <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
-                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
 
                                                 <td>
                                                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBoxPeserta(this)" disabled>
@@ -734,8 +813,8 @@
                                                 <td class="nomor">1</td>
                                                 <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_ikutserta" value="">
                                                 <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
-                                                <td><input type="text" name="peserta[0][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                                                <td><input type="text" name="peserta[0][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                                                <td><input type="text" name="peserta[0][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
+                                                <td><input type="text" name="peserta[0][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusIkutPeserta(this)" disabled>
                                                         <i class="fas fa-trash"></i>
@@ -841,7 +920,7 @@
         <div class="modal fade" id="modalPengajuan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -876,7 +955,7 @@
         <div class="modal fade" id="modalPengajuanBarangDetail" tabindex="-1" aria-labelledby="modalPengajuanBarangDetailLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header bg-light">
+                    <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="modalPengajuanBarangDetailLabel">Pemeriksaan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -917,7 +996,7 @@
         <div class="modal fade" id="modalSuratKendaraan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="modalSuratKendaraanLabel">Detail Jumlah Pengajuan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -950,7 +1029,7 @@
         <div class="modal fade" id="modalPenggunaanKendaraanDinasDetail" tabindex="-1" aria-labelledby="modalPenggunaanKendaraanDinasDetailLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header bg-light">
+                    <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="modalPenggunaanKendaraanDinasDetailLabel">Pemeriksaan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -1190,7 +1269,8 @@
                         icon: 'warning',
                         title: 'Pilih Kendaraan Terlebih Dahulu',
                         text: 'Silakan pilih kendaraan.',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0d6efd'
                     });
                     return;
                 }
@@ -1202,6 +1282,7 @@
                     icon: 'warning',
                     title: 'Kapasitas Penuh',
                     text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+                    confirmButtonColor: '#0d6efd',
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -1260,6 +1341,7 @@
                     icon: 'warning',
                     title: 'Kapasitas Kendaraan Tidak Diketahui',
                     text: 'Silakan pilih kendaraan terlebih dahulu.',
+                    confirmButtonColor: '#0d6efd',
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -1270,6 +1352,7 @@
                     icon: 'warning',
                     title: 'Kapasitas Penuh',
                     text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
+                    confirmButtonColor: '#0d6efd',
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -1339,6 +1422,7 @@
                     icon: 'warning',
                     title: 'Tanggal Tidak Valid',
                     text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
+                    confirmButtonColor: '#0d6efd',
                     confirmButtonText: 'OK'
                 });
             }
@@ -1357,8 +1441,10 @@
                     title: 'Apakah Anda yakin?',
                     text: 'Baris ini akan dihapus.',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: 'Ya, Hapus',
+                    confirmButtonColor: '#dc3545', 
+                    cancelButtonText: 'Tidak',
+                    cancelButtonColor: '#6c757d',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1379,7 +1465,8 @@
                     icon: 'info',
                     title: 'Tidak bisa menghapus baris terakhir.',
                     text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
             }
         }
@@ -1396,8 +1483,10 @@
                     title: 'Apakah Anda yakin?',
                     text: 'Baris ini akan dihapus.',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: 'Ya, Hapus',
+                    confirmButtonColor: '#dc3545', 
+                    cancelButtonText: 'Tidak',
+                    cancelButtonColor: '#6c757d',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1418,7 +1507,8 @@
                     icon: 'info',
                     title: 'Tidak bisa menghapus baris terakhir.',
                     text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
             }
         }
@@ -1450,7 +1540,8 @@
                     icon: 'error',
                     title: 'Gagal Memuat Data',
                     text: 'Tidak dapat memuat data karyawan. Silakan refresh halaman.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
             });
 
@@ -1671,8 +1762,10 @@
                     title: 'Apakah Anda yakin?',
                     text: 'Baris ini akan dihapus.',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: 'Ya, Hapus',
+                    confirmButtonColor: '#dc3545', 
+                    cancelButtonText: 'Tidak',
+                    cancelButtonColor: '#dc3545',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1686,7 +1779,8 @@
                     icon: 'info',
                     title: 'Tidak bisa menghapus baris terakhir.',
                     text: 'Harap tambahkan baris baru jika perlu.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
             }
         }
@@ -1809,6 +1903,11 @@
                         left: 'prev,next today',
                         center: 'title',
                         right: 'dayGridMonth,listMonth'
+                    },
+                    buttonText: {
+                        today: 'Hari Ini',
+                        month: 'Bulan',
+                        list: 'Daftar Data',
                     },
                     dayCellDidMount: function(info) {
                         const cellDate = new Date(info.date);
@@ -1962,7 +2061,8 @@
                                     icon: 'error',
                                     title: 'Gagal Memuat Data',
                                     text: 'Gagal mengambil data surat kendaraan dinas. Silakan coba lagi.',
-                                    confirmButtonText: 'OK'
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#0d6efd'
                                 });
                             },
                             complete: function() {
@@ -1981,7 +2081,8 @@
                                 icon: 'warning',
                                 title: 'Tanggal Tidak Valid',
                                 text: 'Anda tidak dapat melakukan pemesanan untuk tanggal hari ini atau yang sudah lewat.',
-                                confirmButtonText: 'OK'
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#0d6efd'
                             });
                             return;
                         }
@@ -2032,7 +2133,8 @@
                     icon: 'error',
                     title: 'Gagal Memuat Kalender',
                     text: 'Gagal mengambil data pemesanan kendaraan. Silakan coba lagi.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
             });
         });
@@ -2088,14 +2190,16 @@
                         icon: 'warning',
                         title: 'Tanggal Penggunaan Belum Dipilih',
                         text: 'Silakan pilih tanggal penggunaan terlebih dahulu.',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0d6efd'
                     });
                 } else if (!jenisKendaraan) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Jenis Kendaraan Belum Dipilih',
                         text: 'Silakan pilih jenis kendaraan terlebih dahulu.',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0d6efd'
                     });
                 }
                 return;
@@ -2142,8 +2246,8 @@
                                     <input type="hidden" name="kendaraan[0][kendaraan_dinas_id]" class="kendaraan_dinas_id">
                                     <select id="select_nopol_0" name="kendaraan[0][nomor_kendaraan]" class="form-control select-nopol" data-index="0" required></select>
                                 </td>
-                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="form-control merk_kendaraan" readonly required></td>
-                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="form-control kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
+                                <td><input type="text" name="kendaraan[0][merk_kendaraan]" class="custom-input merk_kendaraan" readonly required></td>
+                                <td><input type="number" name="kendaraan[0][kapasitas_kendaraan]" class="custom-input kapasitas_kendaraan input-kapasitas" min="1" readonly required></td>
                             </tr>
                         `;
 
@@ -2266,7 +2370,8 @@
                         icon: 'error',
                         title: 'Gagal Memuat Data',
                         text: 'Terjadi kesalahan saat mengambil data kendaraan. Silakan coba lagi.',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0d6efd'
                     });
                     kendaraanSelect.innerHTML = `<option value="" disabled>Gagal memuat data</option>`;
                     kendaraanSelect.disabled = true;
@@ -2371,7 +2476,8 @@
                     icon: 'warning',
                     title: !kendaraanDinasId ? 'Kendaraan Tidak Valid' : 'Kapasitas Penuh',
                     text: !kendaraanDinasId ? 'Kendaraan tidak ditemukan. Silakan pilih ulang.' : 'Kendaraan ini sudah penuh. Silakan pilih kendaraan lain.',
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
                 return;
             }
@@ -2862,7 +2968,8 @@
                     icon: 'warning',
                     title: 'Jumlah Peserta Melebihi Kapasitas',
                     text: `Kapasitas kendaraan adalah ${selectedVehicleCapacity}`,
-                    confirmButtonText: 'OK'
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
                 });
                 // Remove excess rows
                 while (pesertaTable.getElementsByTagName('tr').length > selectedVehicleCapacity) {
@@ -2989,8 +3096,8 @@
                             confirmButtonText: 'Ya, Ajukan',
                             cancelButtonText: 'Tinjau Ulang',
                             reverseButtons: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33'
+                            confirmButtonColor: '#0d6efd',
+                            cancelButtonColor: '#6c757d',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 form.submit(); // Submit form jika dikonfirmasi
@@ -3044,8 +3151,8 @@
                             confirmButtonText: 'Ya, Tambahkan',
                             cancelButtonText: 'Tinjau Ulang',
                             reverseButtons: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33'
+                            confirmButtonColor: '#0d6efd',
+                            cancelButtonColor: '#6c757d'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 formDinas.submit(); // Submit form jika dikonfirmasi
@@ -3099,8 +3206,8 @@
                             confirmButtonText: 'Ya, Tambahkan',
                             cancelButtonText: 'Tinjau Ulang',
                             reverseButtons: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33'
+                            confirmButtonColor: '#0d6efd',
+                            cancelButtonColor: '#6c757d'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 formIkutSerta.submit(); // Submit form jika dikonfirmasi
