@@ -308,12 +308,13 @@
                             <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Tingkatan</th>
-                                        <th>Departemen</th>
-                                        <th>Status</th>
-                                        <th>Alasan Penolakan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nama</th>
+                                        <th style="text-align: center">Tingkatan</th>
+                                        <th style="text-align: center">Departemen</th>
+                                        <th style="text-align: center">Status Persetujuan</th>
+                                        <th style="text-align: center">Tanggal Persetujuan</th>
+                                        <th style="text-align: center">Alasan Penolakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">
@@ -441,10 +442,17 @@
                 orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
                 width: '50px'
             },
-                { className: 'dt-body-center', targets: 1 },
+                { className: 'dt-head-center', targets: 0 },
+                { className: 'dt-head-center', targets: 5 },
                 { className: 'dt-head-center', targets: 1 },
-                { className: 'dt-body-center', targets: 6 },
-                { className: 'dt-head-center', targets: 6 }
+                { className: 'dt-head-center', targets: 2 },
+                { className: 'dt-head-center', targets: 3 },
+                { className: 'dt-head-center', targets: 4 },
+                { className: 'dt-head-center', targets: 6 },
+
+                { className: 'dt-body-center', targets: 1 },
+                { className: 'dt-body-center', targets: 0 },
+                { className: 'dt-body-center', targets: 6 }
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             pageLength: 10,
@@ -648,6 +656,7 @@
                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                     <td>${info.departemen}</td>
                                     <td>${approvMapping[info.status] || info.status}</td>
+                                    <td style="text-align: right">${info.created_date}
                                     <td>${alasanPenolakan}</td>
                                 </tr>
                             `;
@@ -660,10 +669,14 @@
                     // Aktifkan DataTable setelah data ditambahkan
                     $('#detaildataTableModal').DataTable({
                             columnDefs: [
-                                { className: 'dt-body-center', targets: 0 },
                                 { className: 'dt-head-center', targets: 0 },
-                                { className: 'dt-body-center', targets: 5 },
-                                { className: 'dt-head-center', targets: 5 }
+                                { className: 'dt-head-center', targets: 1 },
+                                { className: 'dt-head-center', targets: 2 },
+                                { className: 'dt-head-center', targets: 3 },
+                                { className: 'dt-head-center', targets: 4 },
+                                { className: 'dt-head-center', targets: 5 },
+
+                                { className: 'dt-body-center', targets: 0 }
                             ],
 
                             responsive: true,

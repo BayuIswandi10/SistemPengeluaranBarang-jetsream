@@ -276,6 +276,7 @@
                                                             <th style="text-align: center">Tingkatan</th>
                                                             <th style="text-align: center">Departemen</th>
                                                             <th style="text-align: center">Status Persetujuan</th>
+                                                            <th style="text-align: center">Tanggal Persetujuan</th>
                                                             <th style="text-align: center">Alasan Penolakan</th>
                                                         </tr>
                                                     </thead>
@@ -618,6 +619,7 @@
                                             <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                             <td>${info.departemen}</td>
                                             <td>${approvMapping[info.status] || info.status}</td>
+                                            <td style="text-align: right">${info.created_date}</td>
                                             <td>${alasanPenolakan}</td>
                                         </tr>
                                     `;
