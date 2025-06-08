@@ -94,7 +94,7 @@
 
         <div class="card mt-3">
            <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
-                <h6 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;">Data Persetujuan</h6>
+                <h5 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;">Data Persetujuan</h5>
                 <div class="d-flex align-items-center" style="margin-left: auto; gap: 0.5rem;">
                     <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
 
@@ -580,9 +580,16 @@
                 orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
                 width: '50px'
             },
-                { className: 'dt-body-center', targets: 1 },
                 { className: 'dt-head-center', targets: 1 },
-                { className: 'dt-body-center', targets: 6 }
+                { className: 'dt-head-center', targets: 2 },
+                { className: 'dt-head-center', targets: 3 },
+                { className: 'dt-head-center', targets: 4 },
+                { className: 'dt-head-center', targets: 5 },
+                { className: 'dt-head-center', targets: 6 },
+                
+                { className: 'dt-body-center', targets: 1 },
+                { className: 'dt-body-center', targets: 6 },
+                { className: 'dt-body-center', targets: 6 },
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             pageLength: 10,

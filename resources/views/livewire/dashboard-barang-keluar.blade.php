@@ -151,7 +151,7 @@
                                                     <th>Nomor Pengeluaran Barang</th>
                                                     <th>Tujuan</th>
                                                     <th>Jenis Kendaraan</th>
-                                                    <th>Status</th>
+                                                    <th>Status Persetujuan</th>
                                                     <th>Detail</th>
                                                 </tr>
                                             </thead>
@@ -271,12 +271,12 @@
                                                 <table id="additionalInfoTable" class="table table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th>No</th>
-                                                            <th>Nama</th>
-                                                            <th>Tingkatan</th>
-                                                            <th>Departemen</th>
-                                                            <th>Status</th>
-                                                            <th>Alasan Penolakan</th>
+                                                            <th style="text-align: center">No</th>
+                                                            <th style="text-align: center">Nama</th>
+                                                            <th style="text-align: center">Tingkatan</th>
+                                                            <th style="text-align: center">Departemen</th>
+                                                            <th style="text-align: center">Status Persetujuan</th>
+                                                            <th style="text-align: center">Alasan Penolakan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="additionalInfoBody">
@@ -484,10 +484,16 @@
             document.addEventListener('DOMContentLoaded', () => {
                 var table = $('#dataTable').DataTable({
                     columnDefs: [
-                        {className: 'dt-body-center', targets: 0},
                         {className: 'dt-head-center', targets: 0},
-                        {className: 'dt-body-center', targets: 5},
-                        {className: 'dt-head-center', targets: 5}
+                        {className: 'dt-head-center', targets: 1},
+                        {className: 'dt-head-center', targets: 2},
+                        {className: 'dt-head-center', targets: 3},
+                        {className: 'dt-head-center', targets: 4},
+                        {className: 'dt-head-center', targets: 5},
+
+                        {className: 'dt-body-center', targets: 0},
+                        {className: 'dt-body-center', targets: 5}
+                        
                     ],
                     scrollX: false,
                     responsive: true
@@ -567,10 +573,10 @@
                             if (data.barang_keluar && data.barang_keluar.length > 0) {
                                 tbody.innerHTML = data.barang_keluar.map((item, index) => `
                                     <tr>
-                                        <td>${index + 1}</td>
+                                        <td style="text-align: center">${index + 1}</td>
                                         <td>${nomor}</td>
                                         <td>${item.nama_barang}</td>
-                                        <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
+                                        <td style="text-align: right">${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                                         <td>${item.satuan_barang}</td>
                                         <td>${item.keterangan_barang ?? ''}</td>
                                     </tr>
@@ -590,12 +596,12 @@
                             };
                             const approvMapping = {
                                 "Level 0": "Menolak",
-                                "Level 1": "Mengeluarkan",
-                                "Level 2": "Membawa",
+                                "Level 1": "Mengajukan",
+                                "Level 2": "Menyetujui",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Mengetahui",
-                                "Level 5": "Menerima",
-                                "Level 6": "Memeriksa"
+                                "Level 4": "Menyetujui",
+                                "Level 5": "Menyetujui",
+                                "Level 6": "Menyetujui"
                             };
                             
                             // Menambahkan data ke tabel informasi tambahan
@@ -607,7 +613,7 @@
 
                                     let row = `
                                         <tr>
-                                            <td>${index + 1}</td>
+                                            <td style="text-align: center">${index + 1}</td>
                                             <td>${info.nama}</td>
                                             <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                             <td>${info.departemen}</td>
@@ -624,10 +630,15 @@
                             // Aktifkan DataTable setelah data ditambahkan
                             $('#detaildataTableModal').DataTable({
                                     columnDefs: [
-                                        { className: 'dt-body-center', targets: 0 },
-                                        { className: 'dt-head-center', targets: 0 },
-                                        { className: 'dt-body-center', targets: 5 },
-                                        { className: 'dt-head-center', targets: 5 }
+                                    {className: 'dt-head-center', targets: 0},
+                                    {className: 'dt-head-center', targets: 1},
+                                    {className: 'dt-head-center', targets: 2},
+                                    {className: 'dt-head-center', targets: 3},
+                                    {className: 'dt-head-center', targets: 4},
+                                    {className: 'dt-head-center', targets: 5},
+
+                                    {className: 'dt-body-center', targets: 0},
+                                    {className: 'dt-body-left', targets: 5}
                                     ],
 
                                     responsive: true,

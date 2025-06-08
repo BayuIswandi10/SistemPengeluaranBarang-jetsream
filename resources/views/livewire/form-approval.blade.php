@@ -44,7 +44,7 @@
 
         <div class="card mt-3">
             <div class="card-header" style="border-top: 5px solid #5A6ACF; display: flex; align-items: center; padding: 0.75rem 1.25rem;">
-                <h6 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;" >Data Persetujuan</h6>
+                <h5 class="m-0 font-weight-bold" style="flex-grow: 1; color: #5A6ACF;" >Data Persetujuan</h5>
 
                 <div class="d-flex align-items-center" style="margin-left: auto; gap: 0.5rem;">
                   <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal" style="max-width: 220px;">
