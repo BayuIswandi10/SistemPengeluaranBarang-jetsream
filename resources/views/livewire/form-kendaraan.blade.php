@@ -172,8 +172,8 @@
       
 
     {{-- Tambah Modal --}}
-    <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+    <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="tambahDataModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data Pengeluaran Barang</h5>
@@ -202,7 +202,7 @@
                         
                         <div class="form-group">
                             <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                            <input type="text" class="form-control" id="nomor_kendaraan" name="nomor_kendaraan" placeholder="Contoh Valid: B 1234 ACD, D 45 XY, AB 9876 A" required autocomplete="off">
                             <small id="nomor_kendaraan_error" class="text-danger" style="display: none;">
                                 Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
                                 - 1–2 huruf awal<br>
@@ -307,10 +307,10 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>ID Surat</th>
-                                <th>Tujuan Penggunaan</th>
+                                <th>No Surat Dians</th>
+                                <th>Rute</th>
                                 <th>Tanggal Penggunaan</th>
-                                <th>Status</th>
+                                <th>Status Persetujuan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -417,10 +417,13 @@
                 // Inisialisasi DataTable hanya jika ada data
                 $('#tableRiwayat').DataTable({
                     columnDefs: [
-                        { className: 'dt-body-center', targets: 0 },
                         { className: 'dt-head-center', targets: 0 },
-                        { className: 'dt-body-center', targets: 4 },
-                        { className: 'dt-head-center', targets: 4 }
+                        { className: 'dt-head-center', targets: 1 },
+                        { className: 'dt-head-center', targets: 2 },
+                        { className: 'dt-head-center', targets: 3 },
+                        { className: 'dt-head-center', targets: 4 },
+
+                        { className: 'dt-body-center', targets: 0 }
                     ],
                     language: {
                         processing: "Memproses...",
@@ -545,10 +548,16 @@
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
             $('#dataTable').DataTable({
                 columnDefs: [
-                    { className: 'dt-body-center', targets: 0 },
                     { className: 'dt-head-center', targets: 0 },
-                    { className: 'dt-body-center', targets: 5 },
-                    { className: 'dt-head-center', targets: 5 }
+                    { className: 'dt-head-center', targets: 1 },
+                    { className: 'dt-head-center', targets: 2 },
+                    { className: 'dt-head-center', targets: 3 },
+                    { className: 'dt-head-center', targets: 4 },
+                    { className: 'dt-head-center', targets: 5 },
+
+                    { className: 'dt-body-center', targets: 0 },
+                    { className: 'dt-body-center', targets: 5 }
+                    
                 ],
                 scrollX: false,
                 responsive: true

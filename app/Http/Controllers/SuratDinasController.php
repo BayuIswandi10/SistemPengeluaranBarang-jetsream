@@ -393,6 +393,158 @@ class SuratDinasController extends Controller
         }
     }
 
+    public function ikutSerta(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'tujuan_penggunaan_1' => 'required|string|max:35',
+            'tujuan_penggunaan_2' => 'nullable|string|max:35',
+            'tujuan_penggunaan_3' => 'nullable|string|max:35',
+            'tanggal_penggunaan' => 'required|date|after_or_equal:today',
+            'jenis_kendaraan' => 'required|in:1,2,3',
+            'created_by' => 'required|string',
+            'alasan_penggunaan' => 'required|string|max:500',
+            'peserta' => 'nullable|array',
+            'peserta.*.nrp_karyawan' => 'required|string',
+            'kendaraan' => 'nullable|array',
+            'kendaraan.*.nomor_kendaraan' => ['required', 'regex:/^[A-Z]{1,2} \d{1,4} [A-Z]{1,3}$/'],
+            'kendaraan.*.merk_kendaraan' => 'required|string|max:50',
+            'kendaraan.*.kapasitas_kendaraan' => 'required|integer|min:1|max:100',
+        ], [
+            // Pesan error tetap sama
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->with('error', implode('<br>', $validator->errors()->all()))
+                ->withInput();
+        }
+
+        $nrpKaryawan = $request->input('created_by');
+        $tanggalPenggunaan = $request->input('tanggal_penggunaan');
+
+        $user = User::where('nrp_karyawan', $nrpKaryawan)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'NRP tidak terdaftar!')->withInput();
+        }
+
+        // Cek apakah user sudah mengajukan atau sudah diajukan pada tanggal yang sama
+        $existingRequest = SuratKendaraanDinas::where('created_by', $nrpKaryawan)
+            ->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
+            ->whereNotIn('status', ['Level 0', 'Expired'])
+            ->exists();
+
+        if ($existingRequest) {
+            return redirect()->back()->with('error', 'Anda sudah mengajukan kendaraan dinas pada tanggal ini.')->withInput();
+        }
+
+        // Cek apakah peserta yang diajukan sudah memiliki pengajuan di tanggal yang sama
+        if ($request->has('peserta') && is_array($request->peserta)) {
+            foreach ($request->peserta as $peserta) {
+                $existsAsParticipant = PencatatanKendaraanDinas::where('nrp_karyawan', $peserta['nrp_karyawan'])
+                    ->whereHas('suratKendaraanDinas', function ($query) use ($tanggalPenggunaan) {
+                        $query->whereDate('tanggal_penggunaan', $tanggalPenggunaan)
+                            ->whereNotIn('status', ['Level 0', 'Expired']);
+                    })
+                    ->exists();
+
+                if ($existsAsParticipant) {
+                    return redirect()->back()->with('error', 'Peserta dengan NRP ' . $peserta['nrp_karyawan'] . ' sudah diajukan di tanggal yang sama.')->withInput();
+                }
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // Generate surat_dinas_id
+            $suratDinasID = $this->generateSuratDinasID($request->jenis_kendaraan, $request->tanggal_penggunaan);
+
+            // Simpan ke database tb_surat_kendaraan_dinas
+            $suratDinas = SuratKendaraanDinas::create([
+                'surat_kendaraan_dinas_id' => $suratDinasID,
+                'tujuan_penggunaan_1' => $request->tujuan_penggunaan_1,
+                'tujuan_penggunaan_2' => $request->tujuan_penggunaan_2,
+                'tujuan_penggunaan_3' => $request->tujuan_penggunaan_3,
+                'waktu_pergi' => $request->waktu_pergi,
+                'tanggal_penggunaan' => $request->tanggal_penggunaan,
+                'jenis_kendaraan' => $request->jenis_kendaraan,
+                'created_by' => $nrpKaryawan,
+                'created_date' => \Carbon\Carbon::now('Asia/Jakarta'),
+                'expired_date' => \Carbon\Carbon::now('Asia/Jakarta')->addHours(2),
+                'expired_status' => 'Aktif',
+                'status' => 'Level 1',
+                'kilometer_awal' => $request->kilometer_awal,
+                'alasan_penggunaan' => $request->alasan_penggunaan,
+            ]);
+
+            // Cek apakah ada peserta yang dikirim
+            if ($request->has('peserta') && is_array($request->peserta)) {
+                foreach ($request->peserta as $peserta) {
+                    $nrp = $peserta['nrp_karyawan'];
+                    $userExists = User::where('nrp_karyawan', $nrp)->exists();
+
+                    if (!$userExists) {
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'NRP peserta ' . $nrp . ' tidak terdaftar!')->withInput();
+                    }
+                    if (!empty($peserta['nrp_karyawan'])) {
+                        PencatatanKendaraanDinas::create([
+                            'nrp_karyawan' => $peserta['nrp_karyawan'],
+                            'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+                            'status' => 'Aktif',
+                            'update_date' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            // Simpan ke tb_surat_kendaraan_dinas_detail
+            if ($request->has('kendaraan_dinas_id') && is_numeric($request->kendaraan_dinas_id)) {
+                $kendaraanDinasID = $request->kendaraan_dinas_id;
+
+                // Pastikan kendaraan_dinas_id valid
+                $kendaraanDinas = KendaraanDinas::find($kendaraanDinasID);
+                if (!$kendaraanDinas) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Kendaraan tidak ditemukan!')->withInput();
+                }
+
+                // Simpan ke tabel tb_surat_kendaraan_dinas_detail
+                SuratKendaraanDinasDetail::create([
+                    'kendaraan_dinas_id' => $kendaraanDinasID,
+                    'surat_kendaraan_dinas_id' => $suratDinas->surat_kendaraan_dinas_id,
+                ]);
+            }
+            // Insert ke tabel tb_approval_barang_keluar
+            ApprovalKendaraanDinas::create([
+                'surat_kendaraan_dinas_id' => $suratDinasID,
+                'created_by' => $nrpKaryawan,
+                'created_date' => \Carbon\Carbon::now('Asia/Jakarta'),
+                'status_approval' => 'Level 1',
+            ]);
+
+            // Kirim email ke pengaju
+            $statusText = $this->getStatusText('Level 1');
+            $userDepartment = $this->getDepartmentName($user->level);
+            $this->sendApprovalEmail($user->email, $suratDinasID, $user->name, $statusText, $userDepartment);
+
+            // Cari kepala seksi dari departemen pengaju
+            $kepalaDept = User::where('departemen', $user->departemen)
+                ->where('level', 'Ka.Dept')
+                ->first();
+
+            if ($kepalaDept) {
+                $this->sendApprovalEmail($kepalaDept->email, $suratDinasID, $user->name, $statusText, $userDepartment);
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Pengajuan Penggunaan Kendaraan Dinas berhasil disimpan dengan Nomor: ' . $suratDinasID)
+                ->with('clear_local_storage', true);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menyimpan Pengajuan Penggunaan Kendaraan Dinas ' . $e->getMessage());
+        }
+    }
+
     public function getDetailSurat(Request $request)
     {
         $suratDinasId = $request->surat_kendaraan_dinas_id;
@@ -482,6 +634,8 @@ class SuratDinasController extends Controller
             ->where('tujuan_penggunaan_2', $suratDinas->tujuan_penggunaan_2)
             ->where('tujuan_penggunaan_3', $suratDinas->tujuan_penggunaan_3)
             ->whereIn('status', ['Level 3', 'Level 4'])
+            ->where('tanggal_penggunaan', $suratDinas->tanggal_penggunaan)
+            ->where('jenis_kendaraan', $suratDinas->jenis_kendaraan)
             ->get();
 
         $pesertaData = [];

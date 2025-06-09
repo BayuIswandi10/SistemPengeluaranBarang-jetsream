@@ -358,7 +358,7 @@
             </div>
             
             {{-- Tambah Pengeluaran Barang Modal --}}
-            <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+            <div class="modal fade" id="tambahDataModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
@@ -407,7 +407,7 @@
 
                                 <div class="form-group">
                                     <label for="no_polisi">No Polisi <span class="text-danger">*</span></label>
-                                    <input type="text" class="custom-input" id="no_polisi" name="no_polisi" placeholder="Masukan No Polisi Kendaraan" required autocomplete="off">
+                                    <input type="text" class="custom-input" id="no_polisi" name="no_polisi" placeholder="Contoh Valid: B 1234 ACD, D 45 XY, AB 9876 A" required autocomplete="off">
                                     <small id="no_polisi_error" class="text-danger" style="display: none;">
                                         Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
                                         - 1–2 huruf awal<br>
@@ -787,7 +787,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form id="formTambahikutserta" method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data">
+                            <form id="formTambahikutserta" method="POST" action="{{ route('ikutSerta_dinas.ikutSerta')}}" enctype="multipart/form-data">
                                 @csrf
                                 <!-- Hidden Inputs for Pre-filled Data -->
                                 <input type="hidden" name="tujuan_penggunaan_1" id="ikut_tujuan_penggunaan_1">

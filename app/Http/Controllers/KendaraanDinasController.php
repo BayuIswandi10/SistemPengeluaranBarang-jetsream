@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class KendaraanDinasController extends Controller
 {
@@ -272,14 +273,14 @@ class KendaraanDinasController extends Controller
                 ->get();
 
             // Log hasil untuk debugging
-            \Log::info('getAllBookingDates Response:', [
+            Log::info('getAllBookingDates Response:', [
                 'data_count' => $data->count(),
                 'data' => $data->toArray()
             ]);
 
             return response()->json($data);
         } catch (\Exception $e) {
-            \Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            Log::error('AllBookingDates Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
             return response()->json([
                 'error' => 'Terjadi kesalahan di server',
                 'debug' => $e->getMessage(),
@@ -342,7 +343,7 @@ class KendaraanDinasController extends Controller
 
             return response()->json($kendaraan);
         } catch (\Exception $e) {
-            \Log::error('getKendaraanByJenis Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            Log::error('getKendaraanByJenis Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
             return response()->json([
                 'error' => 'Terjadi kesalahan di server',
                 'debug' => $e->getMessage(),
