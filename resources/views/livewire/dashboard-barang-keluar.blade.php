@@ -275,7 +275,7 @@
                                                             <th style="text-align: center">Nama</th>
                                                             <th style="text-align: center">Tingkatan</th>
                                                             <th style="text-align: center">Departemen</th>
-                                                            <th style="text-align: center">Status Persetujuan Persetujuan</th>
+                                                            <th style="text-align: center">Status Persetujuan</th>
                                                             <th style="text-align: center">Tanggal Persetujuan</th>
                                                             <th style="text-align: center">Alasan Penolakan</th>
                                                         </tr>
