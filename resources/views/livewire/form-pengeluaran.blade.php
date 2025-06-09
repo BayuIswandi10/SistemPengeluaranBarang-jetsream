@@ -500,6 +500,17 @@
                 {className: 'dt-body-center', targets: 5},
                 {className: 'dt-head-center', targets: 5}
             ],
+            language: {
+                processing: "Memproses...",
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Tidak ada data",
+                infoFiltered: "(difilter dari _MAX_ total entri)",
+                loadingRecords: "Memuat...",
+                zeroRecords: "Tidak ditemukan data yang cocok",
+                emptyTable: "Tidak ada data di tabel"
+            },
             scrollX: false,
             responsive: true
         });

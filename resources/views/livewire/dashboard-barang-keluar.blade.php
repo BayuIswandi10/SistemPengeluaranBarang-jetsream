@@ -393,16 +393,44 @@
             });
 
 
-            // 🔹 Cek apakah elemen pieChart ada sebelum membuat Pie Chart
-           const pieCanvas = document.getElementById('pieChart');
+           function generateColors(count) {
+                const forbiddenHueRanges = [
+                    [340, 10],  // sekitar merah
+                    [200, 220], // sekitar biru
+                ];
+
+                const isForbiddenHue = (hue) => {
+                    return forbiddenHueRanges.some(([start, end]) => {
+                        if (start < end) return hue >= start && hue <= end;
+                        return hue >= start || hue <= end; // untuk wrap around (misalnya 350-10)
+                    });
+                };
+
+                const colors = [];
+                let i = 0;
+
+                while (colors.length < count) {
+                    const hue = (i * 47) % 360; // angka primitif untuk variasi menyebar
+                    if (!isForbiddenHue(hue)) {
+                        colors.push(`hsla(${hue}, 70%, 60%, 0.6)`);
+                    }
+                    i++;
+                }
+
+                return colors;
+            }
+
+
+            const pieCanvas = document.getElementById('pieChart');
             if (pieCanvas) {
                 try {
                     const ctxPie = pieCanvas.getContext('2d');
 
-                    // Ambil data dari backend
                     const pieLabels = Object.keys(pieData);
                     const pieValues = Object.values(pieData);
                     const isEmpty = pieValues.every(val => val === 0);
+
+                    const dynamicColors = generateColors(pieLabels.length);
 
                     let pieChart = new Chart(ctxPie, {
                         type: 'pie',
@@ -411,14 +439,7 @@
                             datasets: [{
                                 label: 'Departemen',
                                 data: pieValues,
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.6)',
-                                    'rgba(54, 162, 235, 0.6)',
-                                    'rgba(255, 206, 86, 0.6)',
-                                    'rgba(75, 192, 192, 0.6)',
-                                    'rgba(153, 102, 255, 0.6)',
-                                    'rgba(255, 159, 64, 0.6)'
-                                ],
+                                backgroundColor: dynamicColors,
                                 borderWidth: 1
                             }]
                         },
@@ -443,7 +464,7 @@
                                     ctx.fillStyle = '#6c757d';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'middle';
-                                    ctx.fillText('Belum Ada Data', width / 2, height / 2 + 20); // geser ke bawah
+                                    ctx.fillText('Belum Ada Data', width / 2, height / 2 + 20);
                                     ctx.restore();
                                 }
                             }
@@ -453,7 +474,6 @@
                     console.error("Pie Chart tidak dapat diinisialisasi:", error);
                 }
             }
-
 
             // 🔹 Filter untuk Bar Chart (Harian, Bulanan, Tahunan)
             document.querySelectorAll('.btn-group .btn').forEach(button => {
@@ -496,6 +516,17 @@
                         {className: 'dt-body-center', targets: 5}
                         
                     ],
+                    language: {
+                        processing: "Memproses...",
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ entri",
+                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        infoEmpty: "Tidak ada data",
+                        infoFiltered: "(difilter dari _MAX_ total entri)",
+                        loadingRecords: "Memuat...",
+                        zeroRecords: "Tidak ditemukan data yang cocok",
+                        emptyTable: "Tidak ada data di tabel"
+                    },
                     scrollX: false,
                     responsive: true
                 });
@@ -642,7 +673,17 @@
                                     {className: 'dt-body-center', targets: 0},
                                     {className: 'dt-body-left', targets: 5}
                                     ],
-
+                                    language: {
+                                        processing: "Memproses...",
+                                        search: "Cari:",
+                                        lengthMenu: "Tampilkan _MENU_ entri",
+                                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                        infoEmpty: "Tidak ada data",
+                                        infoFiltered: "(difilter dari _MAX_ total entri)",
+                                        loadingRecords: "Memuat...",
+                                        zeroRecords: "Tidak ditemukan data yang cocok",
+                                        emptyTable: "Tidak ada data di tabel"
+                                    },
                                     responsive: true,
                                     scrollX: false,
                                     destroy: true,

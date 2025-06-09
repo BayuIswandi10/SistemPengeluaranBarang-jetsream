@@ -637,7 +637,7 @@
                     barChart.data.datasets[0].data = selectedData.data;
 
                     // 🔄 Update Chart
-                    barChart.update();
+                    barChart.update();S
                 });
             });
 
@@ -654,6 +654,17 @@
                                 {className: 'dt-body-center', targets: 0},
                                 {className: 'dt-body-center', targets: 5}
                         ],
+                        language: {
+                            processing: "Memproses...",
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ entri",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            infoEmpty: "Tidak ada data",
+                            infoFiltered: "(difilter dari _MAX_ total entri)",
+                            loadingRecords: "Memuat...",
+                            zeroRecords: "Tidak ditemukan data yang cocok",
+                            emptyTable: "Tidak ada data di tabel"
+                        },
                         scrollX: false,
                         responsive: true
                     });
@@ -669,6 +680,17 @@
                             
                             {className: 'dt-body-center', targets: 0}
                         ],
+                        language: {
+                            processing: "Memproses...",
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ entri",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            infoEmpty: "Tidak ada data",
+                            infoFiltered: "(difilter dari _MAX_ total entri)",
+                            loadingRecords: "Memuat...",
+                            zeroRecords: "Tidak ditemukan data yang cocok",
+                            emptyTable: "Tidak ada data di tabel"
+                        },
                         scrollX: false,
                         responsive: true
                     });
@@ -855,6 +877,17 @@
                                             {className: 'dt-body-center', targets: 0},
                                             {className: 'dt-body-left', targets: 1},
                                         ],
+                                        language: {
+                                            processing: "Memproses...",
+                                            search: "Cari:",
+                                            lengthMenu: "Tampilkan _MENU_ entri",
+                                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                            infoEmpty: "Tidak ada data",
+                                            infoFiltered: "(difilter dari _MAX_ total entri)",
+                                            loadingRecords: "Memuat...",
+                                            zeroRecords: "Tidak ditemukan data yang cocok",
+                                            emptyTable: "Tidak ada data di tabel"
+                                        },
                                         responsive: true,
                                         scrollX: false,
                                         destroy: true,
