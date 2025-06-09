@@ -193,12 +193,12 @@
                             <table id="dataTable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nomor Pengeluaran Barang</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                        <th>Satuan</th>
-                                        <th>Keterangan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nomor Pengeluaran Barang</th>
+                                        <th style="text-align: center">Nama Barang</th>
+                                        <th style="text-align: center">Jumlah</th>
+                                        <th style="text-align: center">Satuan</th>
+                                        <th style="text-align: center">Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detailBody">
@@ -220,13 +220,13 @@
                             <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Tingkatan</th>
-                                        <th>Departemen</th>
-                                        <th>Status Persetujuan</th>
-                                        <th>Tanggal Persetujuan</th>
-                                        <th>Alasan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nama</th>
+                                        <th style="text-align: center">Tingkatan</th>
+                                        <th style="text-align: center">Departemen</th>
+                                        <th style="text-align: center">Status Persetujuan</th>
+                                        <th style="text-align: center">Tanggal Persetujuan</th>
+                                        <th style="text-align: center">Alasan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">
@@ -272,13 +272,13 @@
                             <table id="kendaraanInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>No Kendaraan</th>
-                                        <th>Keterangan</th>
-                                        <th>Tanggal Penggunaan</th>
-                                        <th>Rute 1</th>
-                                        <th>Rute 2</th>
-                                        <th>Rute 3</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">No Kendaraan</th>
+                                        <th style="text-align: center">Keterangan</th>
+                                        <th style="text-align: center">Tanggal Penggunaan</th>
+                                        <th style="text-align: center">Rute 1</th>
+                                        <th style="text-align: center">Rute 2</th>
+                                        <th style="text-align: center">Rute 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -298,10 +298,10 @@
                             <table id="detaildataTableModal" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nrp Peserta</th>
-                                        <th>Nama Peserta</th>
-                                        <th>Departemen</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nrp Peserta</th>
+                                        <th style="text-align: center">Nama Peserta</th>
+                                        <th style="text-align: center">Departemen</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detailBody">
@@ -323,13 +323,13 @@
                             <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Tingkatan</th>
-                                        <th>Departemen</th>
-                                        <th>Status Persetujuan</th>
-                                        <th>Tanggal Persetujuan</th>
-                                        <th>Alasan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nama</th>
+                                        <th style="text-align: center">Tingkatan</th>
+                                        <th style="text-align: center">Departemen</th>
+                                        <th style="text-align: center">Status Persetujuan</th>
+                                        <th style="text-align: center">Tanggal Persetujuan</th>
+                                        <th style="text-align: center">Alasan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="addhistory">
@@ -455,7 +455,7 @@
                                     <td>${index + 1}</td>
                                     <td>${nomor}</td>
                                     <td>${item.nama_barang}</td>
-                                    <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
+                                    <td style="text-align: right">${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                                     <td>${item.satuan_barang}</td>
                                     <td>${item.keterangan_barang ?? ""}</td>
                                 </tr>
@@ -490,12 +490,12 @@
 
                                 let row = `
                                     <tr>
-                                        <td>${index + 1}</td>
+                                        <td style="text-align: center">${index + 1}</td>
                                         <td>${info.nama}</td>
                                         <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                         <td>${info.departemen}</td>
                                         <td>${approvMapping[info.status] || info.status}</td>
-                                        <td>${info.created_date}</td>
+                                        <td style="text-align: right">${info.created_date}</td>
                                         <td>${alasanPenolakan}</td>
                                     </tr>
                                 `;
@@ -510,8 +510,16 @@
                                 columnDefs: [
                                     { className: 'dt-body-center', targets: 0 },
                                     { className: 'dt-head-center', targets: 0 },
-                                    { className: 'dt-body-center', targets: 5 },
-                                    { className: 'dt-head-center', targets: 5 }
+                                    { className: 'dt-body-left', targets: 1 },
+                                    { className: 'dt-head-center', targets: 1 },
+                                    { className: 'dt-body-left', targets: 2 },
+                                    { className: 'dt-head-center', targets: 2 },
+                                    { className: 'dt-body-right', targets: 3 },
+                                    { className: 'dt-head-center', targets: 3 },
+                                    { className: 'dt-body-left', targets: 4 },
+                                    { className: 'dt-head-center', targets: 4 },
+                                    { className: 'dt-body-left', targets: 5 },
+                                    { className: 'dt-head-center', targets: 5 },
                                 ],
 
                                 responsive: true,
@@ -656,10 +664,10 @@
                         data.data_kendaraan.forEach((item, index) => {
                             let row = `
                                 <tr>
-                                    <td>${index + 1}</td>
+                                    <td style="text-align: center">${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
-                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
@@ -730,12 +738,12 @@
 
                             let row = `
                                 <tr>
-                                    <td>${index + 1}</td>
+                                    <td style="text-align: center">${index + 1}</td>
                                     <td>${info.nama}</td>
                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                     <td>${info.departemen}</td>
                                     <td>${approvMapping[info.status] || info.status}</td>
-                                    <td>${info.created_date}</td>
+                                    <td style="text-align: right">${info.created_date}</td>
                                     <td>${alasanPenolakan}</td>
                                 </tr>
                             `;
@@ -752,10 +760,9 @@
                     // Aktifkan DataTable setelah data ditambahkan
                     $('#detaildataTableModal').DataTable({
                         columnDefs: [
-                            { className: 'dt-body-center dt-head-center', targets: 0 }, // No: center-aligned
-                            { className: 'dt-body-center dt-head-center', targets: 1 }, // NRP Peserta: center-aligned
-                            { className: 'dt-body-left dt-head-left', targets: 2 },    // Nama Peserta: left-aligned
-                            { className: 'dt-body-left dt-head-left', targets: 3 }
+                            { className: 'dt-body-center dt-head-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-body-left', targets: 1 }
                         ],
                         responsive: true,
                         scrollX: false,
@@ -802,7 +809,7 @@
                                 <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
-                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[3].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${cells[3].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[4].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[5].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[6].innerText}</td>
@@ -823,7 +830,7 @@
                         pesertaRows += `
                             <tr>
                                 <td style="border: 1px solid #000; padding: 8px; text-align: center;">${rowData[0] || '-'}</td>
-                                <td style="border: 1px solid #000; padding: 8px; text-align: center;">${rowData[1] || '-'}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${rowData[1] || '-'}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${rowData[2] || '-'}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${rowData[3] || '-'}</td>
                             </tr>
@@ -840,7 +847,7 @@
                             pesertaRows += `
                                 <tr>
                                     <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
-                                    <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[1].innerText}</td>
+                                    <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
                                     <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
                                     <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
                                 </tr>
@@ -865,7 +872,7 @@
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[4].innerText}</td>
-                                <td style="border: 1px solid #000; padding: 8px;">${cells[5].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${cells[5].innerText}</td>
                             </tr>
                         `;
                     }

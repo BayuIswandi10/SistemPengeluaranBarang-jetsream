@@ -707,13 +707,13 @@
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>No Polisi</th>
-                                            <th>Jenis Mobil</th>
-                                            <th>Tanggal Penggunaan</th>
-                                            <th>Rute 1</th>
-                                            <th>Rute 2</th>
-                                            <th>Rute 3</th>
+                                            <th style="text-align: center">No</th>
+                                            <th style="text-align: center">No Polisi</th>
+                                            <th style="text-align: center">Jenis Mobil</th>
+                                            <th style="text-align: center">Tanggal Penggunaan</th>
+                                            <th style="text-align: center">Rute 1</th>
+                                            <th style="text-align: center">Rute 2</th>
+                                            <th style="text-align: center">Rute 3</th>
                                         </tr>
                                     </thead>
                                     <tbody id="bookingTableBody">
@@ -736,11 +736,11 @@
                                 <table id="pesertaIkut" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>No Surat</th>
-                                            <th>NRP</th>
-                                            <th>Nama</th>
-                                            <th>Departemen</th>
+                                            <th style="text-align: center">No</th>
+                                            <th style="text-align: center">No Surat Dinas</th>
+                                            <th style="text-align: center">NRP</th>
+                                            <th style="text-align: center">Nama</th>
+                                            <th style="text-align: center">Departemen</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pesertaTableBody">
@@ -921,7 +921,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="modalPengajuanLabel">Detail Jumlah Pengajuan</h5>
+                        <h5 class="modal-title" id="modalPengajuanLabel">Pengajuan Pengeluaran Barang</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -956,7 +956,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="modalPengajuanBarangDetailLabel">Pemeriksaan</h5>
+                        <h5 class="modal-title" id="modalPengajuanBarangDetailLabel">Detail Pengajuan Pengeluaran Barang</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -997,7 +997,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="modalSuratKendaraanLabel">Detail Jumlah Pengajuan</h5>
+                        <h5 class="modal-title" id="modalSuratKendaraanLabel">Pengajuan Penggunaan Kendaraan Dinas</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -1008,8 +1008,8 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>ID Surat</th>
-                                    <th>Dibuat Oleh</th>
+                                    <th>No Surat Dinas</th>
+                                    <th>Diajukan Oleh</th>
                                     <th>Tanggal Dibuat</th>
                                     <th>Rute</th>
                                     <th>Jenis Kendaraan</th>
@@ -1030,7 +1030,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="modalPenggunaanKendaraanDinasDetailLabel">Pemeriksaan</h5>
+                        <h5 class="modal-title" id="modalPenggunaanKendaraanDinasDetailLabel">Detail Pengajuan Penggunaan Kendaraan Dinas</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -2022,10 +2022,10 @@
                                     }, {});
                                     bookingTableBody.append(`
                                         <tr>
-                                            <td>1</td>
+                                            <td style="text-align: center">1</td>
                                             <td>${noPolisi || '-'}</td>
                                             <td>${uniqueBookings.jenis}</td>
-                                            <td>${uniqueBookings.tanggal}</td>
+                                            <td style="text-align: right">${uniqueBookings.tanggal}</td>
                                             <td>${uniqueBookings.tujuan1}</td>
                                             <td>${uniqueBookings.tujuan2}</td>
                                             <td>${uniqueBookings.tujuan3}</td>
@@ -2041,7 +2041,7 @@
                                             booking.userDinas.forEach(user => {
                                                 pesertaTableBody.append(`
                                                     <tr>
-                                                        <td>${participantIndex}</td>
+                                                        <td style="text-align: center">${participantIndex}</td>
                                                         <td>${booking.surat_kendaraan_dinas_id || '-'}</td>
                                                         <td>${user.nrp_karyawan || '-'}</td>
                                                         <td>${user.name || '-'}</td>
@@ -2552,7 +2552,16 @@
                         $('#dataTable').DataTable({
                             columnDefs: [
                                 { className: 'dt-body-center dt-head-center', targets: 0 }, 
-                                { className: 'dt-body-center dt-head-center', targets: 2 },
+                                { className: 'dt-head-center', targets: 2 },
+                                { className: 'dt-body-left', targets: 2},
+                                { className: 'dt-head-center', targets: 3 },
+                                { className: 'dt-body-right', targets: 3},
+                                { className: 'dt-head-center', targets: 4 },
+                                { className: 'dt-body-left', targets: 4},
+                                { className: 'dt-head-center', targets: 5 },
+                                { className: 'dt-body-left', targets: 5},
+                                { className: 'dt-head-center', targets: 6 },
+                                { className: 'dt-body-left', targets: 6},
                                 { className: 'dt-body-center dt-head-center', targets: 7 }
                             ],
                             scrollX: false,  
@@ -2797,7 +2806,16 @@
                         $('#suratKendaraanTable').DataTable({
                             columnDefs: [
                                 { className: 'dt-body-center dt-head-center', targets: 0 }, 
-                                { className: 'dt-body-center dt-head-center', targets: 2 },
+                                { className: 'dt-head-center', targets: 2 },
+                                { className: 'dt-body-left', targets: 2},
+                                { className: 'dt-head-center', targets: 3 },
+                                { className: 'dt-body-right', targets: 3},
+                                { className: 'dt-head-center', targets: 4 },
+                                { className: 'dt-body-left', targets: 4},
+                                { className: 'dt-head-center', targets: 5 },
+                                { className: 'dt-body-left', targets: 5},
+                                { className: 'dt-head-center', targets: 6 },
+                                { className: 'dt-body-right', targets: 6},
                                 { className: 'dt-body-center dt-head-center', targets: 7 },
                             ],
                             scrollX: false,

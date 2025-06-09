@@ -17,7 +17,7 @@
   
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center" style="border-top: 5px solid #5A6ACF;">
-                <h6 class="m-0 font-weight-bold text-primary">Pemeriksaan</h6>
+                <h5 class="m-0 font-weight-bold text-primary">Pemeriksaan</h5>
             </div>
             <div class="card-body">
               <div class="container">
@@ -96,12 +96,13 @@
                             <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Tingkatan</th>
-                                        <th>Departemen</th>
-                                        <th>Status</th>
-                                        <th>Alasan Penolakan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nama</th>
+                                        <th style="text-align: center">Tingkatan</th>
+                                        <th style="text-align: center">Departemen</th>
+                                        <th style="text-align: center">Status Persetujuan</th>
+                                        <th style="text-align: center">Tanggal Persetujuan</th>
+                                        <th style="text-align: center">Alasan Penolakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">
@@ -152,13 +153,13 @@
                             <table id="kendaraanInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>No Kendaraan</th>
-                                        <th>Keterangan</th>
-                                        <th>Tanggal Penggunaan</th>
-                                        <th>Tujuan 1</th>
-                                        <th>Tujuan 2</th>
-                                        <th>Tujuan 3</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">No Kendaraan</th>
+                                        <th style="text-align: center">Keterangan</th>
+                                        <th style="text-align: center">Tanggal Penggunaan</th>
+                                        <th style="text-align: center">Rute 1</th>
+                                        <th style="text-align: center">Rute 2</th>
+                                        <th style="text-align: center">Rute 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -203,12 +204,13 @@
                             <table id="additionalInfoTable" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Tingkatan</th>
-                                        <th>Departemen</th>
-                                        <th>Status</th>
-                                        <th>Alasan Penolakan</th>
+                                        <th style="text-align: center">No</th>
+                                        <th style="text-align: center">Nama</th>
+                                        <th style="text-align: center">Tingkatan</th>
+                                        <th style="text-align: center">Departemen</th>
+                                        <th style="text-align: center">Status Persetujuan</th>
+                                        <th style="text-align: center">Tanggal Persetujuan</th>
+                                        <th style="text-align: center">Alasan Penolakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="addhistory">
@@ -396,6 +398,7 @@
                                 <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                 <td>${info.departemen}</td>
                                 <td>${approvMapping[info.status] || info.status}</td>
+                                <td style="text-align: right">${info.created_date}</td>
                                 <td>${alasanPenolakan}</td>
                             </tr>
                         `;
@@ -408,10 +411,16 @@
                   // Aktifkan DataTable setelah data ditambahkan
                   $('#dataTable').DataTable({
                         columnDefs: [
-                            { className: 'dt-body-center', targets: 0 },
                             { className: 'dt-head-center', targets: 0 },
-                            { className: 'dt-body-center', targets: 5 },
-                            { className: 'dt-head-center', targets: 5 }
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 2 },
+                            { className: 'dt-head-center', targets: 3 },
+                            { className: 'dt-head-center', targets: 4 },
+                            { className: 'dt-head-center', targets: 5 },
+                            { className: 'dt-head-center', targets: 5 },
+
+                            { className: 'dt-body-center', targets: 0 }
+                            
                         ],
 
                         responsive: true,
@@ -681,10 +690,10 @@
                         data.data_kendaraan.forEach((item, index) => {
                             let row = `
                                 <tr>
-                                    <td>${index + 1}</td>
+                                    <td style="text-align: center">${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
-                                    <td>${item.tanggal_penggunaan || '-'}</td>
+                                    <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
@@ -743,11 +752,12 @@
 
                                 let row = `
                                     <tr>
-                                        <td>${index + 1}</td>
+                                        <td style="text-align: center">${index + 1}</td>
                                         <td>${info.nama}</td>
                                         <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                         <td>${info.departemen}</td>
                                         <td>${approvMapping[info.status] || info.status}</td>
+                                        <td style="text-align: right">${info.created_date}</td>
                                         <td>${alasanPenolakan}</td>
                                     </tr>
                                 `;
@@ -764,10 +774,13 @@
                     // Aktifkan DataTable setelah data ditambahkan
                     $('#detaildataTableModal').DataTable({
                         columnDefs: [
-                            { className: 'dt-body-center', targets: 0 },
                             { className: 'dt-head-center', targets: 0 },
-                            { className: 'dt-body-center', targets: 3 },
-                            { className: 'dt-head-center', targets: 3 }
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 2 },
+                            { className: 'dt-head-center', targets: 3 },
+
+                            { className: 'dt-body-center', targets: 0 },
+                            { className: 'dt-body-left', targets: 1 },
                         ],
 
                         responsive: true,
