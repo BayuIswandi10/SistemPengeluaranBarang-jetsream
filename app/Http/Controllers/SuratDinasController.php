@@ -396,47 +396,66 @@ class SuratDinasController extends Controller
     {
         $suratDinasId = $request->surat_kendaraan_dinas_id;
 
+        // Ambil surat utama
+        $suratDinas = SuratKendaraanDinas::with('user')->findOrFail($suratDinasId);
+
         $jenisKendaraanMapping = [
             1 => 'KANTOR',
-            2 => 'PRIBADI', 
+            2 => 'PRIBADI',
             3 => 'TAXI'
         ];
-    
-        // Mengambil data surat dinas beserta pencatatan kendaraan dinas
-        $suratDinas = SuratKendaraanDinas::with([
-            'pencatatanKendaraanDinas' => function($query) {
-                $query->where('status', 'Aktif');
-            },
+
+        // Cari surat lain yang matching tujuan dan status Level 3
+        $matchingSurats = SuratKendaraanDinas::with([
             'pencatatanKendaraanDinas.user',
-            'suratDetail.kendaraan'
-        ])->findOrFail($suratDinasId);
+            'suratDetail.kendaraan',
+            'approval.user'
+        ])
+            ->where('tujuan_penggunaan_1', $suratDinas->tujuan_penggunaan_1)
+            ->where('tujuan_penggunaan_2', $suratDinas->tujuan_penggunaan_2)
+            ->where('tujuan_penggunaan_3', $suratDinas->tujuan_penggunaan_3)
+            ->where('status', 'Level 3')
+            ->get();
 
-       // Mengambil informasi tambahan terkait persetujuan
-        $approvalData = ApprovalKendaraanDinas::with('user', 'suratKendaraanDinas')
-        ->where('surat_kendaraan_dinas_id', $suratDinasId)
-        ->get()
-        ->map(function ($approval, $index) {
-            return [
-                'no' => $index + 1,
-                'nama' => $approval->user->name ?? 'Tidak Diketahui',
-                'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
-                'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
-                'status' => $approval->status_approval,
-                'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
-                'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
-            ];
-        });
-    
-        // Mapping data user dinas dengan nama & departemen
-        $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
-            return [
-                'nrp_karyawan' => $user->nrp_karyawan,
-                'name' => $user->user->name ?? 'Tidak Diketahui',
-                'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
-            ];
-        });
+        $pesertaData = [];
 
-        // Ambil data kendaraan dinas dengan informasi tambahan
+        foreach ($matchingSurats as $matchingSurat) {
+            foreach ($matchingSurat->pencatatanKendaraanDinas as $userDinas) {
+                $approvalData = $matchingSurat->approval->map(function ($approval, $index) use ($matchingSurat) {
+                    return [
+                        'no' => $index + 1,
+                        'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                        'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                        'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                        'status' => $approval->status_approval,
+                        'alasan_penolakan' => $matchingSurat->alasan_penolakan ?? '-',
+                        'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
+                    ];
+                });
+
+                $pesertaData[] = [
+                    'no_surat' => $matchingSurat->surat_kendaraan_dinas_id ?? 'Tidak Diketahui',
+                    'nrp_karyawan' => $userDinas->nrp_karyawan,
+                    'name' => $userDinas->user->name ?? 'Tidak Diketahui',
+                    'departemen' => $userDinas->user->departemen ?? 'Tidak Diketahui',
+                    'riwayat_persetujuan' => $approvalData,
+                    'informasi_tambahan' => $matchingSurat->approval->map(function ($approval, $index) use ($matchingSurat) {
+                        return [
+                            'no' => $index + 1,
+                            'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                            'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                            'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                            'status' => $approval->status_approval,
+                            'alasan_penolakan' => $matchingSurat->alasan_penolakan ?? '-',
+                            'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
+                        ];
+                    }),
+                ];
+
+            }
+        }
+
+        // Data kendaraan dari surat utama
         $kendaraanData = $suratDinas->suratDetail->map(function ($detail) use ($suratDinas, $jenisKendaraanMapping) {
             $jenisKendaraanText = $jenisKendaraanMapping[$detail->kendaraan->jenis_kendaraan] ?? 'Tidak Diketahui';
             return [
@@ -449,14 +468,14 @@ class SuratDinasController extends Controller
                 'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
             ];
         });
-    
+
         return response()->json([
-            'userDinas' => $userDinasData,
-            'informasi_tambahan' => $approvalData,
-            'data_kendaraan' => $kendaraanData,
-            'status' => $suratDinas->status ?? 'Tidak Diketahui',
+            'peserta' => $pesertaData,
+            'data_kendaraan' => $kendaraanData
         ], 200);
     }
+
+
     
     public function getDetailSuratNonAuth(Request $request)
     {
