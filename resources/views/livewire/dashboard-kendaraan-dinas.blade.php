@@ -26,6 +26,78 @@
         color: white !important;
         border-color: #5A6ACF !important;
         }
+
+        .badge {
+            margin-right: 4px;
+            font-size: 90%;
+        }
+        .badge.bg-pink {
+            background-color: #e83e8c;
+            color: white;
+        }
+        .badge.bg-purple {
+            background-color: #6f42c1;
+            color: white;
+        }
+        .badge.bg-orange {
+            background-color: #fd7e14;
+            color: white;
+        }
+        .badge.bg-brown {
+            background-color: #795548;
+            color: white;
+        }
+
+        .tujuan-container-minimal {
+            /* border-left: 4px solid #007bff; */
+            /* background: #f8f9fa; */
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .tujuan-container-minimal:hover {
+            background: #e9ecef;
+            border-left-color: #0056b3;
+        }
+
+        .tujuan-list-minimal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .tujuan-item-minimal {
+            background: #007bff;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .tujuan-item-minimal:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .tujuan-number-minimal {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
 </style>
     <div class="container-fluid">
         <body>
@@ -160,9 +232,31 @@
                                                     <td>{{ ++$i }}</td>
                                                     <td>{{ $a->surat_kendaraan_dinas_id }}</td>
                                                     <td>
-                                                        {{ $a->tujuan_penggunaan_1 ?? '-' }} > 
-                                                        {{ $a->tujuan_penggunaan_2 ?? '-' }} > 
-                                                        {{ $a->tujuan_penggunaan_3 ?? '-' }}
+                                                        @php
+                                                            $tujuanList = array_filter([
+                                                                $a->tujuan_penggunaan_1,
+                                                                $a->tujuan_penggunaan_2,
+                                                                $a->tujuan_penggunaan_3
+                                                            ]);
+                                                        @endphp
+                                                        
+                                                        @if(count($tujuanList) > 0)
+                                                            <div class="tujuan-container-minimal">
+                                                                <div class="tujuan-list-minimal">
+                                                                    @foreach($tujuanList as $index => $tujuan)
+                                                                        <span class="tujuan-item-minimal">
+                                                                            <span class="tujuan-number-minimal">{{ $index + 1 }}</span>
+                                                                            {{ $tujuan }}
+                                                                        </span>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                            <div class="no-tujuan">
+                                                                <i class="fas fa-map-marker-alt"></i>
+                                                                <span>Tidak ada tujuan</span>
+                                                            </div>
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         {{ $a->jenis_kendaraan }}
@@ -334,7 +428,7 @@
 
                         <!-- Kotak Kendaraan Dinas Digunakan -->
                         <div class="col-lg-6 col-12">
-                            <div class="small-box" style="background-color: #6f42c1; color: white;"> <!-- Purple -->
+                            <div class="small-box" style="background-color: #117864; color: white;"> <!-- Purple -->
                                 <div class="inner">
                                     <h3 class="jumlah-kendaraan-digunakan">{{ $kendaraanDinasSedangDigunakan ?? 0 }}</h3>
                                     <p>Kendaraan Dinas Digunakan</p>
@@ -354,7 +448,7 @@
                     <div class="modal fade" id="modalKendaraan" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-xl" role="document"> <!-- Ganti dari modal-xl ke modal-lg -->
                             <div class="modal-content">
-                                <div class="modal-header">
+                                <div class="modal-header bg-primary text-white">
                                     <h5 class="modal-title">Data Kendaraan</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
@@ -782,15 +876,33 @@
                             return `${year}-${month}-${day}`; // Format YYYY-MM-DD
                         }
 
-                            // Fungsi untuk memformat tanggal ke awal hari
-                            function formatDateToStartOfDay(dateString) {
-                                return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
-                            }
+                        // Fungsi untuk memformat tanggal ke awal hari
+                        function formatDateToStartOfDay(dateString) {
+                            return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                        }
 
-                            // Fungsi untuk memformat tanggal ke akhir hari
-                            function formatDateToEndOfDay(dateString) {
-                                return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                        // Fungsi untuk memformat tanggal ke akhir hari
+                        function formatDateToEndOfDay(dateString) {
+                            return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                        }
+
+                            // Fungsi utama untuk memformat waktu lokal dengan opsi jam kustom
+                        function formatLocalDate(date, type = 'default') {
+                            if (type === 'start') {
+                                date.setHours(0, 0, 0, 0); // Awal hari
+                            } else if (type === 'end') {
+                                date.setHours(23, 59, 59, 999); // Akhir hari
                             }
+                            
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const hours = String(date.getHours()).padStart(2, '0');
+                            const minutes = String(date.getMinutes()).padStart(2, '0');
+                            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+                            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                        }
 
                         // Fungsi untuk memuat jumlah data
                         function loadCounts(startDate, endDate) {
@@ -879,8 +991,8 @@
                             },
                             onChange: function (selectedDates, dateStr, instance) {
                                 if (selectedDates.length === 2) {
-                                    const startDate = selectedDates[0].toISOString().split('T')[0];
-                                    const endDate = selectedDates[1].toISOString().split('T')[0];
+                                    const startDate = formatLocalDate(selectedDates[0], 'start'); 
+                                    const endDate = formatLocalDate(selectedDates[1], 'end'); 
 
                                     console.log("Start Date:", startDate);
                                     console.log("End Date:", endDate);
@@ -891,6 +1003,23 @@
                             },
                         });
 
+                        // Peta warna berdasarkan nilai
+                        const badgeColorMap = {};
+                        // Custom palett
+                        const badgeColors = [
+                            'danger', 'secondary', 'dark', 'pink', 'purple', 'orange', 'brown'
+                        ];
+
+                        let badgeColorIndex = 0;
+
+                        // Fungsi generate warna konsisten untuk teks tertentu
+                        function getBadgeColor(value) {
+                            if (!badgeColorMap[value]) {
+                                badgeColorMap[value] = badgeColors[badgeColorIndex % badgeColors.length];
+                                badgeColorIndex++;
+                            }
+                            return badgeColorMap[value];
+                        }
 
                         // Fungsi untuk memuat data tabel kendaraan dinas
                         function loadTableDataKendaraan(statusFilter, startDate, endDate) {
@@ -929,28 +1058,33 @@
                                     console.log("Filtered Data:", filteredData);
 
                                     filteredData.forEach(function (item, index) {
-                                        // Map jenis_kendaraan to readable text
                                         const jenisKendaraan = jenisKendaraanMapping[item.jenis_kendaraan] || item.jenis_kendaraan;
 
-                                        // Handle surat_details for Tanggal Digunakan and Surat Kendaraan Dinas
                                         let tanggalDigunakan = '-';
                                         let suratKendaraanDinas = '-';
-                                        
+
                                         if (item.surat_details && item.surat_details.length > 0) {
-                                            // Assuming created_date comes from the related SuratKendaraanDinas in surat_details
-                                            // Join all created_date values (if multiple) or take the first one
-                                            tanggalDigunakan = item.surat_details.map(surat => surat.tanggal_penggunaan || '-').join(', ');
-                                            // Join all no_surat values (if multiple)
-                                            suratKendaraanDinas = item.surat_details.map(surat => surat.no_surat).join(', ');
+                                            tanggalDigunakan = item.surat_details.map(surat => {
+                                                const tgl = surat.tanggal_penggunaan || '-';
+                                                const badgeClass = getBadgeColor(tgl);
+                                                return `<span class="badge badge-${badgeClass}">${tgl}</span>`;
+                                            }).join(' ');
+
+                                            suratKendaraanDinas = item.surat_details.map(surat => {
+                                                const no = surat.no_surat || '-';
+                                                const tgl = surat.tanggal_penggunaan || '-';
+                                                const badgeClass = getBadgeColor(tgl); // warna mengikuti tanggal
+                                                return `<span class="badge badge-${badgeClass}">${no}</span>`;
+                                            }).join(' ');
                                         }
 
                                         table.row.add([
-                                            index + 1, // NO
-                                            jenisKendaraan, // Jenis Kendaraan
-                                            item.nomor_kendaraan, // Nomor Kendaraan
-                                            item.kapasitas_kendaraan, // Kapasitas Penumpang
-                                            tanggalDigunakan, // Tanggal Digunakan (from surat_details.created_date)
-                                            suratKendaraanDinas // Surat Kendaraan Dinas (from surat_details.no_surat)
+                                            index + 1,
+                                            jenisKendaraan,
+                                            item.nomor_kendaraan,
+                                            item.kapasitas_kendaraan,
+                                            tanggalDigunakan,
+                                            suratKendaraanDinas
                                         ]);
                                     });
 
@@ -1014,25 +1148,54 @@
                                         // Masukkan data ke dalam DataTable
                                         if (filteredData.length > 0) {
                                             filteredData.forEach(function (item, index) {
-                                                const mappedStatus = statusMapping[item.status] || item.status; // Gunakan mapping jika status dikenali
-                                                table.row.add([
-                                                    index + 1,
-                                                    item.surat_kendaraan_dinas_id,
-                                                    `${item.tujuan_penggunaan_1 || '-'} > ${item.tujuan_penggunaan_2 || '-'} > ${item.tujuan_penggunaan_3 || '-'}`,
-                                                    item.jenis_kendaraan == 1 ? 'Kantor' :
-                                                    item.jenis_kendaraan == 2 ? 'Pribadi' :
-                                                    item.jenis_kendaraan == 3 ? 'Taxi' :
-                                                    item.jenis_kendaraan,
-                                                    mappedStatus,
-                                                    `<button type="button" 
-                                                        class="btn btn-primary btn-sm" 
-                                                        data-toggle="modal" 
-                                                        data-target="#detailModalPenggunaan" 
-                                                        data-nomor="${item.surat_kendaraan_dinas_id}">
-                                                        <i class="fa-solid fa-circle-info"></i>
-                                                    </button>`
-                                                ]);
-                                            });
+                                            // Mapping status level ke tampilan
+                                            const mappedStatus = statusMapping[item.status] || item.status;
+
+                                            // Ambil tujuan dan filter yang valid (tidak null/empty)
+                                            const tujuanList = [item.tujuan_penggunaan_1, item.tujuan_penggunaan_2, item.tujuan_penggunaan_3]
+                                                                .filter(tujuan => tujuan && tujuan.trim() !== '');
+
+                                            // Render tujuan jadi HTML seperti badge / span dengan nomor
+                                            let tujuanHTML = '';
+                                            if (tujuanList.length > 0) {
+                                                tujuanHTML += `<div class="tujuan-container-minimal"><div class="tujuan-list-minimal">`;
+                                                tujuanList.forEach((tujuan, i) => {
+                                                    tujuanHTML += `
+                                                        <span class="tujuan-item-minimal">
+                                                            <span class="tujuan-number-minimal">${i + 1}</span>
+                                                            ${tujuan}
+                                                        </span>
+                                                    `;
+                                                });
+                                                tujuanHTML += `</div></div>`;
+                                            } else {
+                                                tujuanHTML = `
+                                                    <div class="no-tujuan">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                        <span>Tidak ada tujuan</span>
+                                                    </div>
+                                                `;
+                                            }
+
+                                            table.row.add([
+                                                index + 1,
+                                                item.surat_kendaraan_dinas_id,
+                                                tujuanHTML,
+                                                item.jenis_kendaraan == 1 ? 'Kantor' :
+                                                item.jenis_kendaraan == 2 ? 'Pribadi' :
+                                                item.jenis_kendaraan == 3 ? 'Taxi' :
+                                                item.jenis_kendaraan,
+                                                mappedStatus,
+                                                `<button type="button" 
+                                                    class="btn btn-primary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#detailModalPenggunaan" 
+                                                    data-nomor="${item.surat_kendaraan_dinas_id}">
+                                                    <i class="fa-solid fa-circle-info"></i>
+                                                </button>`
+                                            ]);
+                                        });
+
                                         } else {
                                             console.warn('Tidak ada data ditemukan untuk filter yang diterapkan.');
                                         }

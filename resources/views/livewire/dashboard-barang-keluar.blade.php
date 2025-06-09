@@ -275,7 +275,8 @@
                                                             <th>Nama</th>
                                                             <th>Tingkatan</th>
                                                             <th>Departemen</th>
-                                                            <th>Status</th>
+                                                            <th>Status Persetujuan</th>
+                                                            <th>Tanggal Persetujuan</th>
                                                             <th>Alasan Penolakan</th>
                                                         </tr>
                                                     </thead>
@@ -612,6 +613,7 @@
                                             <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                             <td>${info.departemen}</td>
                                             <td>${approvMapping[info.status] || info.status}</td>
+                                            <td>${info.created_date}</td>
                                             <td>${alasanPenolakan}</td>
                                         </tr>
                                     `;
@@ -671,6 +673,25 @@
                     function formatDateToEndOfDay(dateString) {
                         return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
                     }
+
+                    // Fungsi utama untuk memformat waktu lokal dengan opsi jam kustom
+                    function formatLocalDate(date, type = 'default') {
+                        if (type === 'start') {
+                            date.setHours(0, 0, 0, 0); // Awal hari
+                        } else if (type === 'end') {
+                            date.setHours(23, 59, 59, 999); // Akhir hari
+                        }
+                        
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+                        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                    }
+
 
                     // Fungsi untuk memuat jumlah data
                     function loadCounts(startDate, endDate) {
@@ -750,8 +771,8 @@
                         },
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
-                                const startDate = selectedDates[0].toISOString().split('T')[0];
-                                const endDate = selectedDates[1].toISOString().split('T')[0];
+                                const startDate = formatLocalDate(selectedDates[0], 'start'); 
+                                const endDate = formatLocalDate(selectedDates[1], 'end'); 
 
                                 console.log("Start Date:", startDate);
                                 console.log("End Date:", endDate);

@@ -13,6 +13,42 @@
             overflow-x: auto;
         }
     </style>
+
+    <style>
+        .custom-input,
+        .custom-select {
+            border-radius: 0.375rem; /* Sama dengan rounded-md Bootstrap */
+            border: 1px solid #ced4da;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            background-color: #fff;
+        }
+
+        .custom-input:focus,
+        .custom-select:focus {
+            border-color: #5A6ACF;
+            box-shadow: 0 0 0 0.2rem rgba(90, 106, 207, 0.25);
+            outline: none;
+        }
+
+        /* Untuk readonly input agar tampil mirip disabled select */
+       input[readonly].custom-input {
+            background-color: #f8f9fa; /* Tetap terang */
+            color: #6c757d;            /* Abu-abu redup */
+            cursor: not-allowed;
+        }
+
+
+        /* Jika input berada dalam tabel */
+        td .custom-input,
+        td .custom-select {
+            margin: 0;  /* Hindari spasi aneh di tabel */
+        }
+    </style>
+
     <div class="container-fluid">
 
         <div class="card mt-3">
@@ -213,7 +249,7 @@
 
                         <div class="form-group">
                             <label for="merk_kendaraan">Merk Kendaraan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_merk_kendaraan" name="merk_kendaraan" required autocomplete="off">
+                            <input type="custom-input" class="form-control" id="edit_merk_kendaraan" name="merk_kendaraan" required autocomplete="off">
                         </div> 
         
                         <div class="form-group">
@@ -228,7 +264,7 @@
                         
                         <div class="form-group">
                             <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                            <input type="custom-input" class="form-control" id="edit_nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
                             <small id="edit_nomor_kendaraan_error" class="text-danger" style="display: none;">
                                 Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
                                 - 1–2 huruf awal<br>
@@ -242,7 +278,7 @@
 
                         <div class="form-group">
                             <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control input-kapasitas" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
+                            <input type="custom-input number" class="form-control input-kapasitas" id="edit_kapasitas_kendaraan" name="kapasitas_kendaraan" min="1" placeholder="Masukan Kapasitas Kendaraan" required autocomplete="off">
                         </div> 
         
         

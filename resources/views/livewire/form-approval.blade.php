@@ -312,7 +312,8 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status</th>
+                                        <th>Status Persetujuan</th>
+                                        <th>Tanggal Persetujuan</th>
                                         <th>Alasan Penolakan</th>
                                     </tr>
                                 </thead>
@@ -457,8 +458,7 @@
         });
     }
 
-
-     function formatDate(date) {
+    function formatDate(date) {
         const wibOffset = 7 * 60; // offset WIB dalam menit
         const localTime = new Date(date.getTime() + (wibOffset - date.getTimezoneOffset()) * 60000);
 
@@ -469,7 +469,7 @@
         return `${year}-${month}-${day}`;
     }
 
-   const today = new Date();
+    const today = new Date();
     // Awal bulan sebelumnya
     const defaultStartDate = new Date(today.getFullYear(), today.getMonth() - 1, 1, 0, 0, 0);
     // Akhir bulan ini
@@ -648,6 +648,7 @@
                                     <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
                                     <td>${info.departemen}</td>
                                     <td>${approvMapping[info.status] || info.status}</td>
+                                    <td>${info.created_date}</td>
                                     <td>${alasanPenolakan}</td>
                                 </tr>
                             `;
