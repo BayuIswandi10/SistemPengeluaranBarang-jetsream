@@ -714,10 +714,13 @@
                                             <th style="text-align: center">Rute 1</th>
                                             <th style="text-align: center">Rute 2</th>
                                             <th style="text-align: center">Rute 3</th>
+                                            <th style="text-align: center">Keperluan</th>
                                         </tr>
+                                        
                                     </thead>
                                     <tbody id="bookingTableBody">
                                         <tr>
+                                            <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
@@ -2029,7 +2032,7 @@
                                             <td>${uniqueBookings.tujuan1}</td>
                                             <td>${uniqueBookings.tujuan2}</td>
                                             <td>${uniqueBookings.tujuan3}</td>
-                                            <td hidden>${uniqueBookings.alasan_penggunaan}</td>
+                                            <td>${uniqueBookings.alasan_penggunaan}</td>
                                         </tr>
                                     `);
 
@@ -2564,6 +2567,17 @@
                                 { className: 'dt-body-left', targets: 6},
                                 { className: 'dt-body-center dt-head-center', targets: 7 }
                             ],
+                            language: {
+                                processing: "Memproses...",
+                                search: "Cari:",
+                                lengthMenu: "Tampilkan _MENU_ entri",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                infoEmpty: "Tidak ada data",
+                                infoFiltered: "(difilter dari _MAX_ total entri)",
+                                loadingRecords: "Memuat...",
+                                zeroRecords: "Tidak ditemukan data yang cocok",
+                                emptyTable: "Tidak ada data di tabel"
+                            },
                             scrollX: false,  
                             responsive: true
                         });
@@ -2640,9 +2654,24 @@
                     // Inisialisasi ulang DataTable setelah data diisi
                     $('#barangKeluarTable').DataTable({
                         columnDefs: [
-                            { className: 'dt-head-center', targets: 0 }, 
+                            { className: 'dt-head-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 2 }, 
+                            { className: 'dt-head-center', targets: 3 },
+                            { className: 'dt-head-center', targets: 4 },
                             { className: 'dt-body-center', targets: 0 }
                         ],
+                        language: {
+                                processing: "Memproses...",
+                                search: "Cari:",
+                                lengthMenu: "Tampilkan _MENU_ entri",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                infoEmpty: "Tidak ada data",
+                                infoFiltered: "(difilter dari _MAX_ total entri)",
+                                loadingRecords: "Memuat...",
+                                zeroRecords: "Tidak ditemukan data yang cocok",
+                                emptyTable: "Tidak ada data di tabel"
+                        },
                         responsive: true,
                         autoWidth: false,
                         scrollX: false,
@@ -2818,6 +2847,17 @@
                                 { className: 'dt-body-right', targets: 6},
                                 { className: 'dt-body-center dt-head-center', targets: 7 },
                             ],
+                            language: {
+                                processing: "Memproses...",
+                                search: "Cari:",
+                                lengthMenu: "Tampilkan _MENU_ entri",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                infoEmpty: "Tidak ada data",
+                                infoFiltered: "(difilter dari _MAX_ total entri)",
+                                loadingRecords: "Memuat...",
+                                zeroRecords: "Tidak ditemukan data yang cocok",
+                                emptyTable: "Tidak ada data di tabel"
+                            },
                             scrollX: false,
                             responsive: true
                         });
@@ -2870,8 +2910,23 @@
                     $('#pesertaTableDinas').DataTable({
                         columnDefs: [
                             { className: 'dt-body-center dt-head-center', targets: 0 }, 
-                            { className: 'dt-body-center dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 2 },
+                            { className: 'dt-head-center', targets: 3 },
+
+                            { className: 'dt-body-left', targets: 1}
                         ],
+                        language: {
+                                processing: "Memproses...",
+                                search: "Cari:",
+                                lengthMenu: "Tampilkan _MENU_ entri",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                infoEmpty: "Tidak ada data",
+                                infoFiltered: "(difilter dari _MAX_ total entri)",
+                                loadingRecords: "Memuat...",
+                                zeroRecords: "Tidak ditemukan data yang cocok",
+                                emptyTable: "Tidak ada data di tabel"
+                        },
                         responsive: true,
                         autoWidth: false,
                         scrollX: false,
