@@ -1049,7 +1049,8 @@
                         <table id="pesertaTableDinas" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>NO</th>
+                                    <th>No</th>
+                                    <th>Nomor Surat Kendaraan Dinas</th>
                                     <th>NRP</th>
                                     <th>Nama</th>
                                     <th>Departemen</th>
@@ -2891,20 +2892,22 @@
                     let tbody = $('#pesertaTableDinas tbody');
                     tbody.empty();
 
-                    if (response.userDinas && response.userDinas.length > 0) {
-                        $.each(response.userDinas, function(index, userInfo) {
+                    if (response.peserta_sama_tujuan && response.peserta_sama_tujuan.length > 0) {
+                        $.each(response.peserta_sama_tujuan, function(index, peserta) {
                             tbody.append(`
                                 <tr>
                                     <td>${index + 1}</td>
-                                    <td>${userInfo.user?.nrp_karyawan}</td>
-                                    <td>${userInfo.user?.name}</td>
-                                    <td>${userInfo.user?.departemen}</td>
+                                    <td>${peserta.surat_kendaraan_dinas_id}</td>
+                                    <td>${peserta.nrp}</td>
+                                    <td>${peserta.nama}</td>
+                                    <td>${peserta.departemen}</td>
                                 </tr>
                             `);
                         });
                     } else {
                         tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta dinas</td></tr>');
                     }
+
 
                     // Inisialisasi ulang DataTable setelah data diisi
                     $('#pesertaTableDinas').DataTable({
@@ -2940,26 +2943,30 @@
                     $('#qrcodeDinasContainer').html(response.qr_code_dinas);
 
                     let userDinasContent = '';
-                    if (response.userDinas && response.userDinas.length > 0) {
-                        userDinasContent += '<table style="width:100%; border-collapse: collapse;" border="1">';
+                    if (response.peserta_sama_tujuan && response.peserta_sama_tujuan.length > 0) {
+                        userDinasContent += '<table style="width:100%; border-collapse: collapse; font-size: 8pt;" border="1">';
                         userDinasContent += '<thead><tr>';
-                        userDinasContent += '<th>No</th>';
-                        userDinasContent += '<th>NRP</th>';
-                        userDinasContent += '<th>Nama</th>';
-                        userDinasContent += '<th>Departemen</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">No</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">Nomor Surat Kendaraan Dinas</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">NRP</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">Nama</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">Departemen</th>';
                         userDinasContent += '</tr></thead><tbody>';
-                        response.userDinas.forEach((userItem, index) => {
+                        response.peserta_sama_tujuan.forEach((peserta, index) => {
                             userDinasContent += `<tr>
                                 <td>${index + 1}</td>
-                                <td>${userItem.nrp_karyawan}</td>
-                                <td>${userItem.user?.name}</td>
-                                <td>${userItem.user?.departemen}</td>
+                                <td>${peserta.surat_kendaraan_dinas_id}</td>
+                                <td>${peserta.nrp}</td>
+                                <td>${peserta.nama}</td>
+                                <td>${peserta.departemen}</td>
                             </tr>`;
                         });
                         userDinasContent += '</tbody></table>';
                     } else {
-                        userDinasContent = '<p>Tidak ada data peserta dinas.</p>';
+                        userDinasContent = '<p style="font-size: 8pt;">Tidak ada data peserta dinas.</p>';
                     }
+
+
                     // Perbarui isi srcdoc pada iframe dengan data terbaru
                     let iframePenggunaanKendaraanDinas = `
                         <!DOCTYPE html>

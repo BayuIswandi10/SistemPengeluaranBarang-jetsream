@@ -111,6 +111,8 @@ class SuratDinasController extends Controller
     public function generateQrCodeSuratKendaraan(Request $request)
     {
         $suratId = $request->surat_kendaraan_dinas_id;
+
+        // Ambil surat saat ini
         $surat = SuratKendaraanDinas::with([
             'user',
             'pencatatanKendaraanDinas' => function($query) {
@@ -119,9 +121,32 @@ class SuratDinasController extends Controller
             'pencatatanKendaraanDinas.user'
         ])->findOrFail($suratId);
 
+        // Cari surat lain dengan 3 tujuan sama dan status Level 3
+        $matchingSurat = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas.user',
+            'user',
+        ])->where('tujuan_penggunaan_1', $surat->tujuan_penggunaan_1)
+        ->where('tujuan_penggunaan_2', $surat->tujuan_penggunaan_2)
+        ->where('tujuan_penggunaan_3', $surat->tujuan_penggunaan_3)
+        ->where('status', 'Level 3')
+        ->get();
+
+        // Ambil semua user dinas yang relevan + nomor suratnya
+        $pesertaSamaTujuan = [];
+        foreach ($matchingSurat as $item) {
+            foreach ($item->pencatatanKendaraanDinas as $pencatatan) {
+                $pesertaSamaTujuan[] = [
+                    'nrp' => $pencatatan->user->nrp_karyawan ?? null,
+                    'nama' => $pencatatan->user->name ?? null,
+                    'departemen' => $pencatatan->user->departemen ?? null,
+                    'surat_kendaraan_dinas_id' => $item->surat_kendaraan_dinas_id,
+                ];
+            }
+        }
+
         // Generate QR Code menggunakan BaconQrCode
         $renderer = new ImageRenderer(
-            new RendererStyle(140), // Ukuran QR Code
+            new RendererStyle(140),
             new SvgImageBackEnd()
         );
         $writer = new Writer($renderer);
@@ -140,10 +165,12 @@ class SuratDinasController extends Controller
             'kilometer_awal'           => $surat->kilometer_awal,
             'kilometer_akhir'          => $surat->kilometer_akhir,
             'created_by'               => $surat->user ? $surat->user->name : null,
-            'userDinas'               => $surat->pencatatanKendaraanDinas,
-            'qr_code_dinas'                  => $qrCode
+            'userDinas'                => $surat->pencatatanKendaraanDinas,
+            'peserta_sama_tujuan'      => $pesertaSamaTujuan,
+            'qr_code_dinas'            => $qrCode
         ]);
     }
+
 
     /**
      * Store Surat Dinas
