@@ -632,6 +632,12 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group" id="waktu_pergi">
+                                    <label for="waktu_pergi_input">Jam Keberangkatan <span class="text-danger">*</span></label>
+                                    <input type="time" class="custom-input" id="waktu_pergi" name="waktu_pergi" placeholder="Pilih jam keberangkatan" autocomplete="off">
+                                </div>
+
+
                                 <div class="form-group" id="kendaraan_pribadi_group" style="display: none;">
                                     <label for="kilometer_awal">Kilometer Awal <span class="text-danger">*</span></label>
                                     <input type="number" class="custom-input" id="kilometer_awal" name="kilometer_awal" placeholder="Masukkan kilometer awal" autocomplete="off">

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('tujuan_penggunaan_1', 35);
             $table->string('tujuan_penggunaan_2', 35)->nullable();
             $table->string('tujuan_penggunaan_3', 35)->nullable();
+            $table->time('waktu_pergi');
+            $table->time('waktu_pulang')->nullable();
             $table->date('tanggal_penggunaan');
             $table->integer('jenis_kendaraan');
             $table->string('status', 35);
@@ -25,6 +27,7 @@ return new class extends Migration
             $table->string('expired_status', 15);
             $table->string('kilometer_awal', 35)->nullable();
             $table->string('alasan_penolakan', 500)->nullable();
+            $table->string('alasan_penggunaan', 500);
 
             $table->foreign('created_by')
                 ->references('nrp_karyawan')->on('users')

@@ -18,6 +18,8 @@ class SuratKendaraanDinas extends Model
         'tujuan_penggunaan_2',
         'tujuan_penggunaan_3',
         'tanggal_penggunaan',
+        'waktu_pergi',
+        'waktu_pulang',
         'jenis_kendaraan',
         'created_by',
         'created_date',

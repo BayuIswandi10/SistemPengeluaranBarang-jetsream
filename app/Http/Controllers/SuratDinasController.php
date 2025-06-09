@@ -277,6 +277,7 @@ class SuratDinasController extends Controller
                 'tujuan_penggunaan_1' => $request->tujuan_penggunaan_1,
                 'tujuan_penggunaan_2' => $request->tujuan_penggunaan_2,
                 'tujuan_penggunaan_3' => $request->tujuan_penggunaan_3,
+                'waktu_pergi' => $request->waktu_pergi,
                 'tanggal_penggunaan' => $request->tanggal_penggunaan,
                 'jenis_kendaraan' => $request->jenis_kendaraan,
                 'created_by' => $nrpKaryawan,
