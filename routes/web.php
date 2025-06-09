@@ -85,6 +85,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/pengajuan/surat-tujuan', [SuratDinasController::class, 'getSuratTujuan']);
     Route::post('/pengajuan/pindahkan-peserta', [SuratDinasController::class, 'pindahkanPeserta']);
     Route::get('/pengajuan/getDataDinasRange', [SuratDinasController::class, 'getSuratDinasData']);
+    Route::post('/pengajuan/scanSecuritySuratDinas', [SuratDinasController::class, 'scanSecuritySuratDinas']);
 
 
     Route::post('/pengajuanDinas/update-status-kadeptybs', [ApprovalKendaraanDinasController::class, 'updateStatusKaDeptYBS'])->name('pengajuanDinas.updateStatusKaDeptYBS');

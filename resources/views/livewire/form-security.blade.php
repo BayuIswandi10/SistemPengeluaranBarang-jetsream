@@ -551,74 +551,103 @@
     });
 
     document.getElementById('approveButtonDinas').addEventListener('click', function () {
-          let suratDinasId = this.getAttribute('data-id');
+        let suratListJson = this.getAttribute('data-surat-list');
 
-          if (!suratDinasId) {
-              Swal.fire({
-                  title: 'Error!',
-                  text: 'Nomor pengeluaran tidak ditemukan.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-              });
-              return;
-          }
+        if (!suratListJson) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Tidak ada surat yang dapat disetujui.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
-          Swal.fire({
-              title: 'Konfirmasi Persetujuan',
-              text: 'Apakah Anda menyetujui penggunaan kendaraan dinas dengan nomor ' + suratDinasId + '?',
-              icon: 'info',
-              showCancelButton: true,
-              reverseButtons: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Ya, setuju!',
-              cancelButtonText: 'Batal'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Memproses...',
-                        html: 'sedang menyimpan persetujuan anda.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                  $.ajax({
-                      url: "/approval-dinas/update-status-security",
-                      method: "POST",
-                      data: {
-                        surat_kendaraan_dinas_id: suratDinasId,
-                          "_token": "{{ csrf_token() }}"
-                      },
-                      success: function (response) {
-                          Swal.fire({
-                              title: 'Berhasil!',
-                              text: response.message,
-                              icon: 'success',
-                              confirmButtonText: 'OK'
-                          }).then(() => {
-                              $('#suratDinasModal').modal('hide');
-                              location.reload();
-                          });
-                      },
-                      error: function (xhr, status, error) {
-                          Swal.fire({
-                              title: 'Gagal!',
-                              text: xhr.responseJSON?.message || 'Terjadi kesalahan.',
-                              icon: 'error',
-                              confirmButtonText: 'OK'
-                          });
-                      }
-                  });
-              }
-          });
+        let suratList = [];
+        try {
+            suratList = JSON.parse(suratListJson);
+        } catch (e) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Format data surat tidak valid.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        if (suratList.length === 0) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Tidak ada surat yang dapat disetujui.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Tampilkan daftar surat yang akan di-approve
+        const suratListText = suratList.length === 1 
+            ? `surat nomor ${suratList[0]}`
+            : `${suratList.length} surat berikut:\n${suratList.map((s, i) => `${i+1}. ${s}`).join('\n')}`;
+
+        Swal.fire({
+            title: 'Konfirmasi Persetujuan',
+            html: `Apakah Anda menyetujui penggunaan kendaraan dinas untuk ${suratListText}?`,
+            icon: 'info',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, setuju!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    html: 'Sedang menyimpan persetujuan anda.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // KIRIM SEMUA NOMOR SURAT UNTUK DI-APPROVE
+                $.ajax({
+                    url: "/approval-dinas/update-status-security",
+                    method: "POST",
+                    data: {
+                        surat_kendaraan_dinas_ids: suratList,
+                        "_token": "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            $('#suratDinasModal').modal('hide');
+                            location.reload();
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
     });
 
     function fetchDetailKendaraan(nomor) {
-
         // Mulai AJAX request ke endpoint untuk mengambil detail surat
         $.ajax({
-            url: "/pengajuan/detailSurat",
+            url: "/pengajuan/scanSecuritySuratDinas",
             method: "POST",
             data: {
                 surat_kendaraan_dinas_id: nomor,
@@ -676,15 +705,38 @@
                     $('#detaildataTableModal').DataTable().clear().destroy();
                 }
 
-                // Tampilkan tombol approve jika status terakhir Level 3 dan tidak ada penolakan
-                const statusTerakhir = informasiTambahan.length > 0
-                    ? informasiTambahan[informasiTambahan.length - 1].status
-                    : null;
+                // KUMPULKAN SEMUA NOMOR SURAT YANG BISA DI-APPROVE
+                const approveableSuratNumbers = [];
+                
+                data.peserta.forEach(pesertaItem => {
+                    const informasiTambahanItem = pesertaItem.informasi_tambahan || [];
+                    const adaYangMenolakItem = informasiTambahanItem.some(info => info.status === 'Level 0');
+                    const statusTerakhirItem = informasiTambahanItem.length > 0
+                        ? informasiTambahanItem[informasiTambahanItem.length - 1].status
+                        : null;
+                        
+                    // Jika status terakhir Level 3 dan tidak ada penolakan, masukkan ke list
+                    if (statusTerakhirItem === "Level 3" && !adaYangMenolakItem) {
+                        approveableSuratNumbers.push(pesertaItem.no_surat);
+                    }
+                });
 
-                if (statusTerakhir === "Level 3" && !adaYangMenolak) {
-                    document.getElementById('approveButtonDinas').style.display = "inline-block";
+                // Tampilkan tombol approve jika ada surat yang bisa di-approve
+                const approveButton = document.getElementById('approveButtonDinas');
+                if (approveableSuratNumbers.length > 0) {
+                    approveButton.style.display = "inline-block";
+                    // SIMPAN SEMUA NOMOR SURAT YANG BISA DI-APPROVE
+                    approveButton.setAttribute('data-surat-list', JSON.stringify(approveableSuratNumbers));
+                    
+                    // Update text button untuk menunjukkan jumlah surat
+                    if (approveableSuratNumbers.length === 1) {
+                        approveButton.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i>Setujui';
+                    } else {
+                        approveButton.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i>Setujui ${approveableSuratNumbers.length} Surat`;
+                    }
                 } else {
-                    document.getElementById('approveButtonDinas').style.display = "none";
+                    approveButton.style.display = "none";
+                    approveButton.removeAttribute('data-surat-list');
                 }
 
                 // Tampilkan data kendaraan pada tabel
@@ -718,10 +770,9 @@
                         p.name,          // Nama Peserta
                         p.departemen     // Departemen
                     ]);
-                    detailTable.clear(); // Bersihkan data lama (optional tapi disarankan)
+                    detailTable.clear();
                     detailTable.rows.add(pesertaData).draw();
                 } else {
-                    // Jika tidak ada data, buat baris kosong dengan 5 kolom
                     detailTable.clear();
                     detailTable.rows.add([["", "", "", "Tidak ada data peserta", ""]]).draw();
                 }
@@ -739,13 +790,10 @@
                     "Level 0": "Menolak",
                     "Level 1": "Mengajukan",
                     "Level 2": "Menyetujui",
-                    "Level 3": "Mengetahui",
-                    "Level 4": "Memeriksa"
+                    "Level 3": "Menyetujui",
+                    "Level 4": "Menyetujui"
                 };
 
-                // Kosongkan tbody riwayat persetujuan dengan id addhistory
-                const additionalInfoBody = document.getElementById('addhistory');
-                // Asumsikan response dari backend sudah disimpan di variable `data`
                 const pesertaList = data.peserta;
                 const container = document.getElementById("approvalContainer"); 
 
@@ -808,13 +856,12 @@
                     container.innerHTML += tableHTML;
                 });
 
-
-
-                // Inisialisasi ulang DataTable untuk riwayat persetujuan jika diperlukan
+                // Inisialisasi ulang DataTable
                 $('#detaildataTableModal').DataTable({
                     columnDefs: [
                         { className: 'dt-head-center', targets: [0, 1, 2, 3, 4] },
-                        { className: 'dt-body-center', targets: [0] }
+                        { className: 'dt-body-center', targets: [0] },
+                        { className: 'dt-body-left', targets: [1, 2, 3, 4] }
                     ],
                     language: {
                         processing: "Memproses...",

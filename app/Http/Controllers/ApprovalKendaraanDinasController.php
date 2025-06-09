@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class ApprovalKendaraanDinasController extends Controller
 {
@@ -210,6 +211,71 @@ class ApprovalKendaraanDinasController extends Controller
         }
     }
 
+    // public function updateStatusSecurity(Request $request)
+    // {
+    //     DB::beginTransaction();
+
+    //     $user = Auth::user();
+    //     $nrpKaryawan = $user->nrp_karyawan;
+    //     $levelKaryawan = $user->level;
+
+    //     try {
+    //         // Ambil ID pengeluaran_barang dari request
+    //         $suratDinasId = $request->input('surat_kendaraan_dinas_id');
+    
+    //         // Update status pada tb_pencatatan_pengeluaran_barang
+    //         $updatePengajuan = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+    //             ->update(['status' => 'Level 4']);
+    
+    //         if (!$updatePengajuan) {
+    //             throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+    //         }
+    
+    //         // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
+    //         // $approvalId = $this->generateApprovalId();
+    //         $approval = ApprovalKendaraanDinas::create([
+    //             'surat_kendaraan_dinas_id' => $suratDinasId,
+    //             'created_by' => $nrpKaryawan,
+    //             'status_approval' => 'Level 4',
+    //             'created_date' => now(),
+    //         ]);
+         
+    //          if (!$approval) {
+    //              throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $suratDinasId);
+    //          }
+
+    //         //Mencari Email Pembawa
+    //         $approval = ApprovalKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+    //         ->where('status_approval', 'Level 1')
+    //         ->value('created_by');
+         
+    //          // Ambil email penerima berdasarkan created_by yang ditemukan
+    //          $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
+             
+    //          if (!$emailReceiver) {
+    //              throw new \Exception('Email penerima tidak ditemukan.');
+    //          }
+         
+    //          // Kirim email ke penerima
+    //          $statusText = $this->getStatusText('Level 3');
+    //          $userDepartment = $this->getDepartmentName($levelKaryawan);
+    //          $this->sendApprovalEmail($emailReceiver, $suratDinasId, $user->name, $statusText, $userDepartment);
+
+    //         DB::commit();
+    
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Pengajuan penggunaan kendaraan dinas telah disetujui. Data persetujuan berhasil dicatat.'
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function updateStatusSecurity(Request $request)
     {
         DB::beginTransaction();
@@ -219,53 +285,109 @@ class ApprovalKendaraanDinasController extends Controller
         $levelKaryawan = $user->level;
 
         try {
-            // Ambil ID pengeluaran_barang dari request
-            $suratDinasId = $request->input('surat_kendaraan_dinas_id');
-    
-            // Update status pada tb_pencatatan_pengeluaran_barang
-            $updatePengajuan = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
-                ->update(['status' => 'Level 4']);
-    
-            if (!$updatePengajuan) {
-                throw new \Exception('Pengeluaran barang tidak ditemukan atau gagal diperbarui.');
+            // Ambil array ID surat dari request
+            $suratDinasIds = $request->input('surat_kendaraan_dinas_ids');
+            
+            if (!is_array($suratDinasIds) || empty($suratDinasIds)) {
+                throw new \Exception('Tidak ada surat yang dipilih untuk disetujui.');
             }
-    
-            // Tambahkan data ke tb_approval_barang_keluar untuk tracking record
-            // $approvalId = $this->generateApprovalId();
-            $approval = ApprovalKendaraanDinas::create([
-                'surat_kendaraan_dinas_id' => $suratDinasId,
-                'created_by' => $nrpKaryawan,
-                'status_approval' => 'Level 4',
-                'created_date' => now(),
-            ]);
-         
-             if (!$approval) {
-                 throw new \Exception("Data approval dengan Level 1 tidak ditemukan untuk ID : " . $suratDinasId);
-             }
 
-            //Mencari Email Pembawa
-            $approval = ApprovalKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
-            ->where('status_approval', 'Level 1')
-            ->value('created_by');
-         
-             // Ambil email penerima berdasarkan created_by yang ditemukan
-             $emailReceiver = User::where('nrp_karyawan', (string) $approval)->value('email');
-             
-             if (!$emailReceiver) {
-                 throw new \Exception('Email penerima tidak ditemukan.');
-             }
-         
-             // Kirim email ke penerima
-             $statusText = $this->getStatusText('Level 3');
-             $userDepartment = $this->getDepartmentName($levelKaryawan);
-             $this->sendApprovalEmail($emailReceiver, $suratDinasId, $user->name, $statusText, $userDepartment);
+            $successCount = 0;
+            $failedSurats = [];
+            $emailData = []; // Array untuk menyimpan data email per pengaju
+
+            // Loop untuk setiap surat yang akan di-approve
+            foreach ($suratDinasIds as $suratDinasId) {
+                try {
+                    // Update status pada tb_surat_kendaraan_dinas
+                    $updatePengajuan = SuratKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+                        ->update(['status' => 'Level 4']);
+
+                    if (!$updatePengajuan) {
+                        $failedSurats[] = $suratDinasId;
+                        continue;
+                    }
+
+                    // Tambahkan data ke tb_approval_kendaraan_dinas untuk tracking record
+                    $approval = ApprovalKendaraanDinas::create([
+                        'surat_kendaraan_dinas_id' => $suratDinasId,
+                        'created_by' => $nrpKaryawan,
+                        'status_approval' => 'Level 4',
+                        'created_date' => now(),
+                    ]);
+
+                    if (!$approval) {
+                        $failedSurats[] = $suratDinasId;
+                        continue;
+                    }
+
+                    // Mencari Email Pembawa (yang mengajukan - Level 1)
+                    $approvalLevel1 = ApprovalKendaraanDinas::where('surat_kendaraan_dinas_id', $suratDinasId)
+                        ->where('status_approval', 'Level 1')
+                        ->value('created_by');
+
+                    if ($approvalLevel1) {
+                        // Ambil email penerima berdasarkan created_by yang ditemukan
+                        $emailReceiver = User::where('nrp_karyawan', (string) $approvalLevel1)->value('email');
+                        
+                        if ($emailReceiver) {
+                            // Grouping email data per penerima
+                            if (!isset($emailData[$emailReceiver])) {
+                                $emailData[$emailReceiver] = [];
+                            }
+                            $emailData[$emailReceiver][] = $suratDinasId;
+                        }
+                    }
+
+                    $successCount++;
+                    
+                } catch (\Exception $e) {
+                    $failedSurats[] = $suratDinasId;
+                    continue;
+                }
+            }
+
+            // Kirim email ke masing-masing penerima dengan detail surat mereka
+            foreach ($emailData as $emailReceiver => $suratIds) {
+                try {
+                    $statusText = $this->getStatusText('Level 4');
+                    $userDepartment = $this->getDepartmentName($levelKaryawan);
+                    
+                    // Kirim email untuk setiap surat ID secara individual
+                    foreach ($suratIds as $suratId) {
+                        $this->sendApprovalEmail($emailReceiver, $suratId, $user->name, $statusText, $userDepartment);
+                    }
+                } catch (\Exception $e) {
+                    // Log error tapi jangan gagalkan proses
+                    Log::error('Gagal mengirim email approval ke ' . $emailReceiver . ': ' . $e->getMessage());
+                }
+            }
 
             DB::commit();
-    
+
+            // Prepare response message
+            $message = '';
+            if ($successCount > 0) {
+                $message = "Berhasil menyetujui {$successCount} surat kendaraan dinas.";
+            }
+            
+            if (!empty($failedSurats)) {
+                $failedList = implode(', ', $failedSurats);
+                $message .= " Gagal memproses surat: {$failedList}.";
+            }
+
+            if ($successCount === 0) {
+                throw new \Exception('Tidak ada surat yang berhasil diproses.');
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Pengajuan penggunaan kendaraan dinas telah disetujui. Data persetujuan berhasil dicatat.'
+                'message' => $message,
+                'processed_count' => $successCount,
+                'failed_count' => count($failedSurats),
+                'emails_sent' => count($emailData)
             ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -274,6 +396,7 @@ class ApprovalKendaraanDinasController extends Controller
             ], 500);
         }
     }
+
 
     private function sendApprovalEmail($userEmail, $suratDinasId, $approvedBy, $status, $fromDepartment, $reason = null)
     {

@@ -397,6 +397,72 @@ class SuratDinasController extends Controller
     {
         $suratDinasId = $request->surat_kendaraan_dinas_id;
 
+        $jenisKendaraanMapping = [
+            1 => 'KANTOR',
+            2 => 'PRIBADI', 
+            3 => 'TAXI'
+        ];
+    
+        // Mengambil data surat dinas beserta pencatatan kendaraan dinas
+        $suratDinas = SuratKendaraanDinas::with([
+            'pencatatanKendaraanDinas' => function($query) {
+                $query->where('status', 'Aktif');
+            },
+            'pencatatanKendaraanDinas.user',
+            'suratDetail.kendaraan'
+        ])->findOrFail($suratDinasId);
+
+       // Mengambil informasi tambahan terkait persetujuan
+        $approvalData = ApprovalKendaraanDinas::with('user', 'suratKendaraanDinas')
+        ->where('surat_kendaraan_dinas_id', $suratDinasId)
+        ->get()
+        ->map(function ($approval, $index) {
+            return [
+                'no' => $index + 1,
+                'nama' => $approval->user->name ?? 'Tidak Diketahui',
+                'tingkatan' => $approval->user->level ?? 'Tidak Diketahui',
+                'departemen' => $approval->user->departemen ?? 'Tidak Diketahui',
+                'status' => $approval->status_approval,
+                'alasan_penolakan' => $approval->suratKendaraanDinas->alasan_penolakan ?? '-',
+                'created_date' => $approval->created_date ? (new DateTime($approval->created_date))->format('d-m-Y H:i') : '-',
+            ];
+        });
+    
+        // Mapping data user dinas dengan nama & departemen
+        $userDinasData = $suratDinas->pencatatanKendaraanDinas->map(function ($user) {
+            return [
+                'nrp_karyawan' => $user->nrp_karyawan,
+                'name' => $user->user->name ?? 'Tidak Diketahui',
+                'departemen' => $user->user->departemen ?? 'Tidak Diketahui',
+            ];
+        });
+
+        // Ambil data kendaraan dinas dengan informasi tambahan
+        $kendaraanData = $suratDinas->suratDetail->map(function ($detail) use ($suratDinas, $jenisKendaraanMapping) {
+            $jenisKendaraanText = $jenisKendaraanMapping[$detail->kendaraan->jenis_kendaraan] ?? 'Tidak Diketahui';
+            return [
+                'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
+                'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
+                'keterangan' => ($detail->kendaraan->merk_kendaraan ?? 'Tidak Diketahui') . ' - ' . $jenisKendaraanText,
+                'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan ?? '-',
+                'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1 ?? '-',
+                'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
+                'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
+            ];
+        });
+    
+        return response()->json([
+            'userDinas' => $userDinasData,
+            'informasi_tambahan' => $approvalData,
+            'data_kendaraan' => $kendaraanData,
+            'status' => $suratDinas->status ?? 'Tidak Diketahui',
+        ], 200);
+    }
+
+    public function scanSecuritySuratDinas(Request $request)
+    {
+        $suratDinasId = $request->surat_kendaraan_dinas_id;
+
         // Ambil surat utama
         $suratDinas = SuratKendaraanDinas::with('user')->findOrFail($suratDinasId);
 
@@ -415,7 +481,7 @@ class SuratDinasController extends Controller
             ->where('tujuan_penggunaan_1', $suratDinas->tujuan_penggunaan_1)
             ->where('tujuan_penggunaan_2', $suratDinas->tujuan_penggunaan_2)
             ->where('tujuan_penggunaan_3', $suratDinas->tujuan_penggunaan_3)
-            ->where('status', 'Level 3')
+            ->whereIn('status', ['Level 3', 'Level 4'])
             ->get();
 
         $pesertaData = [];
@@ -709,6 +775,7 @@ class SuratDinasController extends Controller
                     'tujuan_penggunaan_2' => $surat->tujuan_penggunaan_2,
                     'tujuan_penggunaan_3' => $surat->tujuan_penggunaan_3,
                     'jenis_kendaraan' => $surat->jenis_kendaraan,
+                    'waktu_pergi' => $surat->waktu_pergi,
                     'tanggal_penggunaan' => $surat->tanggal_penggunaan,
                     'alasan_penggunaan' => $surat->alasan_penggunaan,
                     'kendaraan_dinas_id' => $surat->suratDetail->first()->kendaraan_dinas_id ?? null,
