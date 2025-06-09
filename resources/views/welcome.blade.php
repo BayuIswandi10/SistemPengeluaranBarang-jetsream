@@ -1381,8 +1381,8 @@
                         ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
                     </select>
                 </td>
-                <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterIkutserta - 1}][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm btn-hapus-peserta" 
                             onclick="hapusIkutPeserta(this)" ${isFirstRow ? 'disabled' : ''}>

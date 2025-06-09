@@ -139,10 +139,6 @@
                 </div>
                 <div class="modal-body">
 
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>
-                    </div>
-
                     <!-- Card untuk Tabel Informasi Kendaraan -->
                     <div class="card mb-4">
                         <div class="card-header bg-primary text-white">
@@ -180,6 +176,7 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>Nomor Surat Kendaraan Dinas</th>
                                         <th>Nrp Peserta</th>
                                         <th>Nama Peserta</th>
                                         <th>Departemen</th>
@@ -201,22 +198,8 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                            <table id="additionalInfoTable" class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: center">No</th>
-                                        <th style="text-align: center">Nama</th>
-                                        <th style="text-align: center">Tingkatan</th>
-                                        <th style="text-align: center">Departemen</th>
-                                        <th style="text-align: center">Status Persetujuan</th>
-                                        <th style="text-align: center">Tanggal Persetujuan</th>
-                                        <th style="text-align: center">Alasan Penolakan</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="addhistory">
-                                    <!-- Data akan diisi secara dinamis -->
-                                </tbody>
-                            </table>
+                            {{-- Tabel Baru Jika Surat Persetujuan Ganda --}}
+                            <div id="approvalContainer"></div>
                             </div>
                         </div>
                     </div>
@@ -632,200 +615,239 @@
     });
 
     function fetchDetailKendaraan(nomor) {
-        document.getElementById('nomorSuratCard').innerText = nomor;
-        document.getElementById('approveButtonDinas').setAttribute('data-id', nomor);
+
+        // Mulai AJAX request ke endpoint untuk mengambil detail surat
         $.ajax({
-                url: "/pengajuan/detailSurat",
-                method: "POST",
-                data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
-                success: function (data) {
-                    const detailTable = $('#detaildataTableModal').DataTable();
+            url: "/pengajuan/detailSurat",
+            method: "POST",
+            data: {
+                surat_kendaraan_dinas_id: nomor,
+                "_token": "{{ csrf_token() }}"
+            },
+            success: function (data) {
+                const detailTable = $('#detaildataTableModal').DataTable();
 
-                    const jenisKendraan = {
-                        1 : "Mengeluarkan"
-                    };
+                // Karena ada banyak peserta, cari peserta yang no_surat-nya sesuai nomor
+                const peserta = data.peserta.find(p => p.no_surat === nomor);
 
-                    let statusBadgeHTML = '';
-                    const informasiTambahan = data.informasi_tambahan ?? [];
+                // Ambil informasi tambahan dari peserta tersebut
+                const informasiTambahan = peserta?.informasi_tambahan ?? [];
 
-                    // Cek apakah ada yang menolak
-                    const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
+                // Cek apakah ada yang menolak (status "Level 0")
+                const adaYangMenolak = informasiTambahan.some(info => info.status === 'Level 0');
 
-                    // Cek level tertinggi yang menyetujui
-                    const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
-
-                    if (adaYangMenolak) {
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
-                            </span>
-                        `;
-                    } else if (maxLevel >= 3) {
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
-                            </span>
-                        `;
-                    } else {
-                        statusBadgeHTML = `
-                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                            </span>
-                        `;
+                // Cari level approval tertinggi (Level 1, 2, 3, dst)
+                const maxLevel = informasiTambahan.reduce((max, info) => {
+                    let level = 0;
+                    if (info.status && info.status.startsWith('Level ')) {
+                        level = parseInt(info.status.replace('Level ', '')) || 0;
                     }
+                    return level > max ? level : max;
+                }, 0);
 
-                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
+                // Buat tampilan badge status approval
+                let statusBadgeHTML = '';
+                if (adaYangMenolak) {
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
+                            <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
+                        </span>
+                    `;
+                } else if (maxLevel >= 3) {
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
+                            <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
+                        </span>
+                    `;
+                } else {
+                    statusBadgeHTML = `
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
+                        </span>
+                    `;
+                }
+                document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
-                    // Kosongkan data lama kendaraan
-                    document.getElementById('kendaraanInfoBody').innerHTML = "";
+                // Kosongkan dulu tabel kendaraan (tbody dengan id kendaraanInfoBody)
+                document.getElementById('kendaraanInfoBody').innerHTML = "";
 
-                    if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
-                            $('#detaildataTableModal').DataTable().clear().destroy();
-                    }
+                // Jika DataTable peserta sudah ada, reset dulu agar tidak duplicate
+                if ($.fn.DataTable.isDataTable('#detaildataTableModal')) {
+                    $('#detaildataTableModal').DataTable().clear().destroy();
+                }
 
-                    // Ambil status terakhir (item terakhir dalam array informasi_tambahan)
-                    const statusTerakhir = informasiTambahan.length > 0
-                        ? informasiTambahan[informasiTambahan.length - 1].status
-                        : null;
+                // Tampilkan tombol approve jika status terakhir Level 3 dan tidak ada penolakan
+                const statusTerakhir = informasiTambahan.length > 0
+                    ? informasiTambahan[informasiTambahan.length - 1].status
+                    : null;
 
-                    // Cek tombol hanya muncul kalau level terakhir tepat "Level 3"
-                    if (statusTerakhir === "Level 3" && !adaYangMenolak) {
-                        document.getElementById('approveButtonDinas').style.display = "inline-block";
-                    } else {
-                        document.getElementById('approveButtonDinas').style.display = "none";
-                    }
+                if (statusTerakhir === "Level 3" && !adaYangMenolak) {
+                    document.getElementById('approveButtonDinas').style.display = "inline-block";
+                } else {
+                    document.getElementById('approveButtonDinas').style.display = "none";
+                }
 
-                    // Validasi dan tampilkan data kendaraan
-                    if (data.data_kendaraan && data.data_kendaraan.length > 0) {
-                        data.data_kendaraan.forEach((item, index) => {
-                            let row = `
+                // Tampilkan data kendaraan pada tabel
+                if (data.data_kendaraan && data.data_kendaraan.length > 0) {
+                    data.data_kendaraan.forEach((item, index) => {
+                        let row = `
+                            <tr>
+                                <td style="text-align: center;">${index + 1}</td>
+                                <td>${item.nomor_kendaraan}</td>
+                                <td>${item.keterangan}</td>
+                                <td style="text-align: right;">${item.tanggal_penggunaan || '-'}</td>
+                                <td>${item.tujuan_penggunaan_1 || '-'}</td>
+                                <td>${item.tujuan_penggunaan_2 || '-'}</td>
+                                <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                            </tr>`;
+                        document.getElementById('kendaraanInfoBody').innerHTML += row;
+                    });
+                } else {
+                    document.getElementById('kendaraanInfoBody').innerHTML = `
+                        <tr><td colspan="7" style="text-align:center;">Tidak ada data kendaraan</td></tr>`;
+                }
+
+                // Kosongkan tabel peserta dulu
+                detailTable.clear();
+
+                if (data.peserta && data.peserta.length > 0) {
+                    const pesertaData = data.peserta.map((p, i) => [
+                        i + 1,           // No urut
+                        p.no_surat,      // Nomor Surat Kendaraan Dinas dari peserta
+                        p.nrp_karyawan,  // NRP Peserta
+                        p.name,          // Nama Peserta
+                        p.departemen     // Departemen
+                    ]);
+                    detailTable.clear(); // Bersihkan data lama (optional tapi disarankan)
+                    detailTable.rows.add(pesertaData).draw();
+                } else {
+                    // Jika tidak ada data, buat baris kosong dengan 5 kolom
+                    detailTable.clear();
+                    detailTable.rows.add([["", "", "", "Tidak ada data peserta", ""]]).draw();
+                }
+
+                // Mapping untuk tampilan tingkat dan status approval agar user friendly
+                const tingkatMapping = {
+                    "Ka.Sie": "PIC/Ka.Sie",
+                    "Ka.Dept": "Ka.Dept.Ybs",
+                    "GA": "Ka.Dept.GA",
+                    "Finance": "Finance",
+                    "Security": "Security"
+                };
+
+                const approvMapping = {
+                    "Level 0": "Menolak",
+                    "Level 1": "Mengajukan",
+                    "Level 2": "Menyetujui",
+                    "Level 3": "Mengetahui",
+                    "Level 4": "Memeriksa"
+                };
+
+                // Kosongkan tbody riwayat persetujuan dengan id addhistory
+                const additionalInfoBody = document.getElementById('addhistory');
+                // Asumsikan response dari backend sudah disimpan di variable `data`
+                const pesertaList = data.peserta;
+                const container = document.getElementById("approvalContainer"); 
+
+                // Bersihkan container lebih dulu
+                container.innerHTML = "";
+
+                // Loop setiap peserta
+                pesertaList.forEach(peserta => {
+                    const informasiTambahan = peserta.informasi_tambahan;
+
+                    // Buat heading dan table baru
+                    let tableHTML = `
+                        <div style="margin-bottom: 30px;">
+                            <h5>No Surat: ${peserta.no_surat}</h5>
+                            <table border="1" style="width:100%; border-collapse: collapse;"  class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status Persetujuan</th>
+                                        <th>Tanggal Persetujuan</th>
+                                        <th>Alasan Penolakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    if (informasiTambahan && informasiTambahan.length > 0) {
+                        informasiTambahan.forEach((info, index) => {
+                            const alasanPenolakan = (index === informasiTambahan.length - 1) ? info.alasan_penolakan || "-" : "-";
+
+                            tableHTML += `
                                 <tr>
-                                    <td style="text-align: center">${index + 1}</td>
-                                    <td>${item.nomor_kendaraan}</td>
-                                    <td>${item.keterangan}</td>
-                                    <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
-                                    <td>${item.tujuan_penggunaan_1 || '-'}</td>
-                                    <td>${item.tujuan_penggunaan_2 || '-'}</td>
-                                    <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                                    <td style="text-align:center;">${index + 1}</td>
+                                    <td>${info.nama}</td>
+                                    <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                    <td>${info.departemen}</td>
+                                    <td>${approvMapping[info.status] || info.status}</td>
+                                    <td style="text-align:right;">${info.created_date}</td>
+                                    <td>${alasanPenolakan}</td>
                                 </tr>
                             `;
-                            document.getElementById('kendaraanInfoBody').innerHTML += row;
                         });
                     } else {
-                        document.getElementById('kendaraanInfoBody').innerHTML = `
-                            <tr><td colspan="4" class="text-center">Tidak ada data kendaraan</td></tr>
-                        `;
-                    }
-
-                    // Kosongkan data lama
-                    detailTable.clear();
-                    document.getElementById('addhistory').innerHTML = ""; // Kosongkan tabel Informasi Tambahan
-
-                    // Validasi data userDinas
-                    if (data.userDinas && data.userDinas.length > 0) {
-                        let newData = data.userDinas.map((item, index) => [
-                            index + 1,
-                            item.nrp_karyawan,
-                            item.name,
-                            item.departemen
-                        ]);
-                        detailTable.rows.add(newData).draw();
-                    } else {
-                        detailTable.rows.add([["", "", "Tidak ada data user", "", "", ""]]).draw();
-                    }
-
-                    // Mapping tingkatan dan status persetujuan
-                    const tingkatMapping = {
-                        "Level 1": "Civitas",
-                        "Level 2": "PIC/Ka.Sie",
-                        "Level 3": "Ka.Dept.Ybs",
-                        "Level 4": "Ka.Dept.GA",
-                        "Level 5": "Finance",
-                        "Level 6": "Security"
-                    };
-                    const approvMapping = {
-                        "Level 0": "Menolak",
-                        "Level 1": "Mengajukan",
-                        "Level 2": "Menyetujui",
-                        "Level 3": "Mengetahui",
-                        "Level 4": "Memeriksa"
-                    };
-
-                    // Validasi data informasi_tambahan
-                    const additionalInfoBody = document.getElementById('addhistory');
-
-                        if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                            data.informasi_tambahan.forEach((info, index) => {
-                                let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
-                                    ? info.alasan_penolakan 
-                                    : '-'; // hanya isi di baris terakhir
-
-                                let row = `
-                                    <tr>
-                                        <td style="text-align: center">${index + 1}</td>
-                                        <td>${info.nama}</td>
-                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                        <td>${info.departemen}</td>
-                                        <td>${approvMapping[info.status] || info.status}</td>
-                                        <td style="text-align: right">${info.created_date}</td>
-                                        <td>${alasanPenolakan}</td>
-                                    </tr>
-                                `;
-                                additionalInfoBody.innerHTML += row;
-                            });
-                        } else {
-                        additionalInfoBody.innerHTML = `
+                        tableHTML += `
                             <tr>
-                                <td colspan="5" class="text-center">Tidak ada informasi tambahan</td>
+                                <td colspan="7" style="text-align:center;">Tidak ada informasi tambahan</td>
                             </tr>
                         `;
                     }
 
-                    // Aktifkan DataTable setelah data ditambahkan
-                    $('#detaildataTableModal').DataTable({
-                        columnDefs: [
-                            { className: 'dt-head-center', targets: 0 },
-                            { className: 'dt-head-center', targets: 1 },
-                            { className: 'dt-head-center', targets: 2 },
-                            { className: 'dt-head-center', targets: 3 },
+                    tableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
 
-                            { className: 'dt-body-center', targets: 0 },
-                            { className: 'dt-body-left', targets: 1 },
-                        ],
-                        language: {
-                            processing: "Memproses...",
-                            search: "Cari:",
-                            lengthMenu: "Tampilkan _MENU_ entri",
-                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                            infoEmpty: "Tidak ada data",
-                            infoFiltered: "(difilter dari _MAX_ total entri)",
-                            loadingRecords: "Memuat...",
-                            zeroRecords: "Tidak ditemukan data yang cocok",
-                            emptyTable: "Tidak ada data di tabel"
-                        },
-                        responsive: true,
-                        scrollX: false,
-                        destroy: true,
-                        pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
-                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
-                    });
+                    container.innerHTML += tableHTML;
+                });
 
-                    // Pastikan modal terbuka setelah data dimuat
-                    $('#suratDinasModal').modal('show');
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching data:", error);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Gagal mengambil data surat dinas.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
+
+
+                // Inisialisasi ulang DataTable untuk riwayat persetujuan jika diperlukan
+                $('#detaildataTableModal').DataTable({
+                    columnDefs: [
+                        { className: 'dt-head-center', targets: [0, 1, 2, 3, 4] },
+                        { className: 'dt-body-center', targets: [0] }
+                    ],
+                    language: {
+                        processing: "Memproses...",
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ entri",
+                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        infoEmpty: "Tidak ada data",
+                        infoFiltered: "(difilter dari _MAX_ total entri)",
+                        loadingRecords: "Memuat...",
+                        zeroRecords: "Tidak ditemukan data yang cocok",
+                        emptyTable: "Tidak ada data di tabel"
+                    },
+                    responsive: true,
+                    scrollX: false,
+                    destroy: true,
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                });
+
+                // Tampilkan modal popup dengan id suratDinasModal
+                $('#suratDinasModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error("Gagal mengambil data:", error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Gagal mengambil data surat dinas.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
     }
 
-
-  
 </script>
 
