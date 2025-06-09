@@ -231,8 +231,8 @@
     <style>
         /* Semua tombol di FullCalendar */
         .fc .fc-button {
-        background-color: #5A6ACF !important;
-        border-color: #5A6ACF !important;
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
         color: #ffffff !important;
         font-weight: bold;
         border-radius: 0.375rem;
@@ -241,23 +241,24 @@
         /* Hover */
         .fc .fc-button:hover,
         .fc .fc-button:focus {
-        background-color: #4b5ac1 !important;
-        border-color: #4b5ac1 !important;
+        background-color: #0b5ed7 !important;
+        border-color: #0a58ca !important;
         color: #ffffff !important;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
         }
 
         /* Saat tombol aktif (diklik) */
         .fc .fc-button:active,
         .fc .fc-button.fc-button-active {
-        background-color: #3f4bb0 !important;
-        border-color: #3f4bb0 !important;
+        background-color: #084298 !important;
+        border-color: #084298 !important;
         color: #ffffff !important;
         }
 
         /* Tombol "today" (sama warnanya juga) */
         .fc .fc-today-button {
-        background-color: #5A6ACF !important;
-        border-color: #5A6ACF !important;
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
         color: #ffffff !important;
         }
 
