@@ -276,7 +276,6 @@
                                                             <th style="text-align: center">Tingkatan</th>
                                                             <th style="text-align: center">Departemen</th>
                                                             <th style="text-align: center">Status Persetujuan Persetujuan</th>
-                                                            <th>Tanggal Persetujuan</th>
                                                             <th style="text-align: center">Tanggal Persetujuan</th>
                                                             <th style="text-align: center">Alasan Penolakan</th>
                                                         </tr>
@@ -580,7 +579,7 @@
                                         <td>${item.nama_barang}</td>
                                         <td style="text-align: right">${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                                         <td>${item.satuan_barang}</td>
-                                        <td>${item.keterangan_barang ?? ''}</td>
+                                        <td>${item.keterangan_barang?.trim() ? item.keterangan_barang : '-'}</td>
                                     </tr>
                                 `).join('');
                             } else {

@@ -1004,7 +1004,7 @@
                     </div>
                     <div class="modal-body">
         
-                        <table id="suratKendaraanTable" class="table table-striped">
+                        <table id="suratKendaraanTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>No</th>
