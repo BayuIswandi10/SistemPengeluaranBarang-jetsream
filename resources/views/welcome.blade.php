@@ -720,7 +720,7 @@
                                             <tr>
                                                 <td class="nomor">1</td>
                                                 <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_regular" value="">
-                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
+                                                <td><select name="peserta[0][nrp_karyawan]" class="custom-input nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
 
@@ -1365,14 +1365,14 @@
                 <td class="nomor">${++counterPeserta}</td>
                 <td>
                     <select ${isFirstRow ? '' : `name="peserta[${counterPeserta - 1}][nrp_karyawan]"`} 
-                            class="form-control nrp_karyawan selectize-nrp" 
+                            class="custom-input nrp_karyawan selectize-nrp" 
                             required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
                         ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
                     </select>
                 </td>
-                <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="form-control nama" placeholder="Nama" readonly></td>
-                <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="form-control departemen" placeholder="Departemen" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
+                <td><input type="text" name="peserta[${counterPeserta - 1}][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm btn-hapus-peserta" 
                             onclick="hapusComboBoxPeserta(this)" ${isFirstRow ? 'disabled' : ''}>
@@ -2770,12 +2770,12 @@
                             barangContent += `
                                 <tr>
                                     <td rowspan="2">${index + 1}</td>
-                                    <td>${barang.nama_barang}</td>
-                                    <td>${Number(barang.jumlah_barang).toLocaleString('id-ID')}</td>
-                                    <td>${barang.satuan_barang}</td>
+                                    <td style="text-align: left;">${barang.nama_barang}</td>
+                                    <td style="text-align: right;">${Number(barang.jumlah_barang).toLocaleString('id-ID')}</td>
+                                    <td style="text-align: left;">${barang.satuan_barang}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="3">
+                                    <td style="text-align: left;" colspan="3">
                                         ${barang.keterangan_barang?.trim() ? barang.keterangan_barang : '-'}
                                     </td>
                                 </tr>
@@ -3017,7 +3017,7 @@
                         userDinasContent += '<table style="width:100%; border-collapse: collapse; font-size: 8pt;" border="1">';
                         userDinasContent += '<thead><tr>';
                         userDinasContent += '<th style="white-space: nowrap;">No</th>';
-                        userDinasContent += '<th style="white-space: nowrap;">Nomor Surat Kendaraan Dinas</th>';
+                        userDinasContent += '<th style="white-space: nowrap;">No Surat Dinas</th>';
                         userDinasContent += '<th style="white-space: nowrap;">NRP</th>';
                         userDinasContent += '<th style="white-space: nowrap;">Nama</th>';
                         userDinasContent += '<th style="white-space: nowrap;">Departemen</th>';
@@ -3025,10 +3025,10 @@
                         response.peserta_sama_tujuan.forEach((peserta, index) => {
                             userDinasContent += `<tr>
                                 <td>${index + 1}</td>
-                                <td>${peserta.surat_kendaraan_dinas_id}</td>
-                                <td>${peserta.nrp}</td>
-                                <td>${peserta.nama}</td>
-                                <td>${peserta.departemen}</td>
+                                <td style="text-align: left;">${peserta.surat_kendaraan_dinas_id}</td>
+                                <td style="text-align: left;">${peserta.nrp}</td>
+                                <td style="text-align: left;">${peserta.nama}</td>
+                                <td style="text-align: left;">${peserta.departemen}</td>
                             </tr>`;
                         });
                         userDinasContent += '</tbody></table>';
