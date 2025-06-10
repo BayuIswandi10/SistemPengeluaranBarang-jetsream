@@ -215,7 +215,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                            <table id="additionalInfoTable" class="table table-bordered">
+                            <table id="additionalInfoTable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th style="text-align: center">No</th>
@@ -321,7 +321,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                            <table id="additionalInfoTable" class="table table-bordered">
+                            <table id="additionalInfoTable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th style="text-align: center">No</th>

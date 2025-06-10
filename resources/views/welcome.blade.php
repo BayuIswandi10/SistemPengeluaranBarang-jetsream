@@ -390,7 +390,7 @@
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="tambahDataModalLabel">Ajukan Pengeluaran Barang</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -566,7 +566,7 @@
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="tambahDinasModalLabel">Lihat Kalender Pemakaian Kendaraan</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -606,7 +606,7 @@
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="tambahDinasModalLabel">Ajukan Penggunaan Kendaraan Dinas</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff;">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
