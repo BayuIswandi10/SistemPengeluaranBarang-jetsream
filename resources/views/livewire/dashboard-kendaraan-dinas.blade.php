@@ -98,6 +98,13 @@
             font-weight: bold;
         }
 
+        /* FIXED: Ensure all body cells are vertically centered */
+        #dataTable td {
+            vertical-align: middle !important;
+            line-height: 1 !important;
+            display: table-cell !important;
+        }
+
 </style>
     <div class="container-fluid">
         <body>
@@ -334,12 +341,12 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align: center">No</th>
-                                                            <th style="text-align: center">No Kendaraan</th>
-                                                            <th style="text-align: center">Keterangan</th>
-                                                            <th style="text-align: center">Tanggal Penggunaan</th>
-                                                            <th style="text-align: center">Rute 1</th>
-                                                            <th style="text-align: center">Rute 2</th>
-                                                            <th style="text-align: center">Rute 3</th>
+                                                            <th>No Kendaraan</th>
+                                                            <th>Keterangan</th>
+                                                            <th>Tanggal Penggunaan</th>
+                                                            <th>Rute 1</th>
+                                                            <th>Rute 2</th>
+                                                            <th>Rute 3</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="kendaraanInfoBody">
@@ -385,12 +392,12 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align: center">No</th>
-                                                            <th style="text-align: center">Nama</th>
-                                                            <th style="text-align: center">Tingkatan</th>
-                                                            <th style="text-align: center">Departemen</th>
-                                                            <th style="text-align: center">Status Persetujuan</th>
-                                                            <th style="text-align: center">Tanggal Persetujuan</th>
-                                                            <th style="text-align: center">Alasan</th>
+                                                            <th>Nama</th>
+                                                            <th>Tingkatan</th>
+                                                            <th>Departemen</th>
+                                                            <th>Status Persetujuan</th>
+                                                            <th>Tanggal Persetujuan</th>
+                                                            <th>Alasan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="addhistory">
@@ -643,10 +650,6 @@
                     var table = $('#dataTable').DataTable({
                         columnDefs: [
                                 {className: 'dt-head-center', targets: 0},
-                                {className: 'dt-head-center', targets: 1},
-                                {className: 'dt-head-center', targets: 2},
-                                {className: 'dt-head-center', targets: 3},
-                                {className: 'dt-head-center', targets: 4},
                                 {className: 'dt-head-center', targets: 5},
 
                                 {className: 'dt-body-center', targets: 0},
@@ -670,13 +673,10 @@
                     var table = $('#dataTableKendaraan').DataTable({
                         columnDefs: [
                             {className: 'dt-head-center', targets: 0},
-                            {className: 'dt-head-center', targets: 1},
-                            {className: 'dt-head-center', targets: 2},
-                            {className: 'dt-head-center', targets: 3},
-                            {className: 'dt-head-center', targets: 4},
-                            {className: 'dt-head-center', targets: 5},
+                            {className: 'dt-head-left', targets: 3},
                             
-                            {className: 'dt-body-center', targets: 0}
+                            {className: 'dt-body-center', targets: 0},
+                            {className: 'dt-body-left', targets: 3}
                         ],
                         language: {
                             processing: "Memproses...",
@@ -849,9 +849,8 @@
                                     $('#detaildataTableModal').DataTable({
                                         columnDefs: [
                                             {className: 'dt-head-center', targets: 0},
-                                            {className: 'dt-head-center', targets: 1},
-                                            {className: 'dt-head-center', targets: 2},
-                                            {className: 'dt-head-center', targets: 3},
+                                            {className: 'dt-head-left', targets: 1},
+
                                             {className: 'dt-body-center', targets: 0},
                                             {className: 'dt-body-left', targets: 1},
                                         ],

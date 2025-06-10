@@ -264,12 +264,12 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align: center">No</th>
-                                                            <th style="text-align: center">Nama</th>
-                                                            <th style="text-align: center">Tingkatan</th>
-                                                            <th style="text-align: center">Departemen</th>
-                                                            <th style="text-align: center">Status Persetujuan</th>
-                                                            <th style="text-align: center">Tanggal Persetujuan</th>
-                                                            <th style="text-align: center">Alasan Penolakan</th>
+                                                            <th>Nama</th>
+                                                            <th>Tingkatan</th>
+                                                            <th>Departemen</th>
+                                                            <th>Status Persetujuan</th>
+                                                            <th>Tanggal Persetujuan</th>
+                                                            <th>Alasan Penolakan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="additionalInfoBody">
@@ -498,10 +498,6 @@
                 var table = $('#dataTable').DataTable({
                     columnDefs: [
                         {className: 'dt-head-center', targets: 0},
-                        {className: 'dt-head-center', targets: 1},
-                        {className: 'dt-head-center', targets: 2},
-                        {className: 'dt-head-center', targets: 3},
-                        {className: 'dt-head-center', targets: 4},
                         {className: 'dt-head-center', targets: 5},
 
                         {className: 'dt-body-center', targets: 0},
@@ -643,31 +639,29 @@
                             
                             // Aktifkan DataTable setelah data ditambahkan
                             $('#detaildataTableModal').DataTable({
-                                columnDefs: [
-                                    { className: 'dt-head-center', targets: 0 },
-                                    { className: 'dt-head-center', targets: 1 },
-                                    { className: 'dt-head-center', targets: 2 },
-                                    { className: 'dt-head-center', targets: 3 },
-                                    { className: 'dt-head-center', targets: 4 },
-                                    { className: 'dt-head-center', targets: 5 },
-                                    { className: 'dt-body-center', targets: 0 }
-                                ],
-                                language: {
-                                    processing: "Memproses...",
-                                    search: "Cari:",
-                                    lengthMenu: "Tampilkan _MENU_ entri",
-                                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                                    infoEmpty: "Tidak ada data",
-                                    infoFiltered: "(difilter dari _MAX_ total entri)",
-                                    loadingRecords: "Memuat...",
-                                    zeroRecords: "Tidak ditemukan data yang cocok",
-                                    emptyTable: "Tidak ada data di tabel"
-                                },
-                                responsive: true,
-                                scrollX: false,
-                                destroy: true,
-                                pageLength: 5,
-                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                                    columnDefs: [
+                                    {className: 'dt-head-center', targets: 0},
+                                    {className: 'dt-head-center', targets: 5},
+
+                                    {className: 'dt-body-center', targets: 0},
+                                    {className: 'dt-body-left', targets: 5}
+                                    ],
+                                    language: {
+                                        processing: "Memproses...",
+                                        search: "Cari:",
+                                        lengthMenu: "Tampilkan _MENU_ entri",
+                                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                        infoEmpty: "Tidak ada data",
+                                        infoFiltered: "(difilter dari _MAX_ total entri)",
+                                        loadingRecords: "Memuat...",
+                                        zeroRecords: "Tidak ditemukan data yang cocok",
+                                        emptyTable: "Tidak ada data di tabel"
+                                    },
+                                    responsive: true,
+                                    scrollX: false,
+                                    destroy: true,
+                                    pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
+                                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
                             }); 
                             
                             $('#detailModal').modal('show');
