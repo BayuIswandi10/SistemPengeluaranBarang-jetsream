@@ -923,33 +923,34 @@
                             return `${year}-${month}-${day}`; // Format YYYY-MM-DD
                         }
 
-                        // Fungsi untuk memformat tanggal ke awal hari
-                        function formatDateToStartOfDay(dateString) {
-                            return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                        function formatDateToStartOfDay(date) {
+                            const d = new Date(date);
+                            d.setHours(0, 0, 0, 0);
+                            return formatLocalDate(d, 'start');
                         }
 
-                        // Fungsi untuk memformat tanggal ke akhir hari
-                        function formatDateToEndOfDay(dateString) {
-                            return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                        function formatDateToEndOfDay(date) {
+                            const d = new Date(date);
+                            d.setHours(23, 59, 59, 999);
+                            return formatLocalDate(d, 'end');
                         }
+
 
                             // Fungsi utama untuk memformat waktu lokal dengan opsi jam kustom
                         function formatLocalDate(date, type = 'default') {
-                            if (type === 'start') {
-                                date.setHours(0, 0, 0, 0); // Awal hari
-                            } else if (type === 'end') {
-                                date.setHours(23, 59, 59, 999); // Akhir hari
-                            }
-                            
-                            const year = date.getFullYear();
-                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                            const day = String(date.getDate()).padStart(2, '0');
-                            const hours = String(date.getHours()).padStart(2, '0');
-                            const minutes = String(date.getMinutes()).padStart(2, '0');
-                            const seconds = String(date.getSeconds()).padStart(2, '0');
+                            const localDate = new Date(date); // aman karena ini sudah Date, bukan string
+
+                            const year = localDate.getFullYear();
+                            const month = String(localDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(localDate.getDate()).padStart(2, '0');
+                            const hours = String(localDate.getHours()).padStart(2, '0');
+                            const minutes = String(localDate.getMinutes()).padStart(2, '0');
+                            const seconds = String(localDate.getSeconds()).padStart(2, '0');
 
                             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
                         }
+
+
 
                         // Fungsi untuk memuat jumlah data
                         function loadCounts(startDate, endDate) {
@@ -1268,33 +1269,31 @@
 
                             if (!statusFilter) {
                                 console.warn('Data status tidak ditemukan. Pastikan elemen yang di-klik memiliki atribut data-status.');
-                                return; // Jika tidak ada status, hentikan
+                                return;
                             }
 
-                            // Ambil instance Flatpickr yang sudah ada
+                            // Ambil instance Flatpickr
                             const dateRangeInstance = document.getElementById("date-range-picker")._flatpickr;
 
                             if (!dateRangeInstance) {
                                 console.error('Flatpickr tidak ditemukan pada elemen #date-range-picker.');
-                                return; // Jika Flatpickr belum diinisialisasi, hentikan
+                                return;
                             }
 
                             let startDate, endDate;
-                            const selectedDates = dateRangeInstance.selectedDates; // Ambil tanggal yang dipilih
+                            const selectedDates = dateRangeInstance.selectedDates;
 
                             if (selectedDates.length === 2) {
-                                // Format tanggal menjadi YYYY-MM-DD jika ada yang dipilih
-                                startDate = selectedDates[0].toISOString().split('T')[0];
-                                endDate = selectedDates[1].toISOString().split('T')[0];
+                                startDate = formatLocalDate(selectedDates[0], 'start');
+                                endDate = formatLocalDate(selectedDates[1], 'end');
                             } else {
-                                // Default ke hari ini jika tidak ada tanggal yang dipilih
                                 const today = new Date();
-                                startDate = today.toISOString().split('T')[0];
-                                endDate = today.toISOString().split('T')[0];
+                                startDate = formatLocalDate(today, 'start');
+                                endDate = formatLocalDate(today, 'end');
                             }
 
-                            console.log('Start Date:', startDate); // Debug tanggal mulai
-                            console.log('End Date:', endDate); // Debug tanggal akhir
+                            console.log('Start Date:', startDate);
+                            console.log('End Date:', endDate);
 
                             // Panggil fungsi untuk memuat data tabel
                             loadTableData(statusFilter, startDate, endDate);
@@ -1307,35 +1306,32 @@
 
                             if (!statusFilter) {
                                 console.warn('Data status tidak ditemukan. Pastikan elemen yang di-klik memiliki atribut data-status.');
-                                return; // Jika tidak ada status, hentikan
+                                return;
                             }
 
-                            // Ambil instance Flatpickr yang sudah ada
+                            // Ambil instance Flatpickr
                             const dateRangeInstance = document.getElementById("date-range-picker")._flatpickr;
 
                             if (!dateRangeInstance) {
                                 console.error('Flatpickr tidak ditemukan pada elemen #date-range-picker.');
-                                return; // Jika Flatpickr belum diinisialisasi, hentikan
+                                return;
                             }
 
                             let startDate, endDate;
-                            const selectedDates = dateRangeInstance.selectedDates; // Ambil tanggal yang dipilih
+                            const selectedDates = dateRangeInstance.selectedDates;
 
                             if (selectedDates.length === 2) {
-                                // Format tanggal menjadi YYYY-MM-DD jika ada yang dipilih
-                                startDate = selectedDates[0].toISOString().split('T')[0];
-                                endDate = selectedDates[1].toISOString().split('T')[0];
+                                startDate = formatLocalDate(selectedDates[0], 'start');
+                                endDate = formatLocalDate(selectedDates[1], 'end');
                             } else {
-                                // Default ke hari ini jika tidak ada tanggal yang dipilih
                                 const today = new Date();
-                                startDate = today.toISOString().split('T')[0];
-                                endDate = today.toISOString().split('T')[0];
+                                startDate = formatLocalDate(today, 'start');
+                                endDate = formatLocalDate(today, 'end');
                             }
 
-                            console.log('Start Date:', startDate); // Debug tanggal mulai
-                            console.log('End Date:', endDate); // Debug tanggal akhir
+                            console.log('Start Date:', startDate);
+                            console.log('End Date:', endDate);
 
-                            // Panggil fungsi untuk memuat data tabel
                             loadTableDataKendaraan(statusFilter, startDate, endDate);
                         });
 
@@ -1350,15 +1346,15 @@
                         locale: "id",
                         onValueUpdate: function(selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
-                                const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
-                                const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                const start = flatpickr.formatLocalDate(selectedDates[0], 'start');
+                                const end = flatpickr.formatLocalDate(selectedDates[1], 'end');
                                 instance._input.value = `${start} s/d ${end}`;
                             }
                         },
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
-                                const startDate = selectedDates[0].toISOString().split('T')[0];
-                                const endDate = selectedDates[1].toISOString().split('T')[0];
+                                const startDate = formatLocalDate(selectedDates[0], 'start');
+                                const endDate = formatLocalDate(selectedDates[1], 'end');
 
                                 // Panggil fungsi setelah pengguna memilih 2 tanggal
                                 loadCounts(startDate, endDate);
@@ -1366,20 +1362,31 @@
                         },
                     });
 
-                    function formatDateToStartOfDay(dateString) {
-                        return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                    function formatDateToStartOfDay(date) {
+                        const d = new Date(date);
+                        d.setHours(0, 0, 0, 0);
+                        return formatLocalDate(d, 'start');
                     }
 
-                    // Fungsi untuk memformat tanggal ke akhir hari
-                    function formatDateToEndOfDay(dateString) {
-                        return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                    function formatDateToEndOfDay(date) {
+                        const d = new Date(date);
+                        d.setHours(23, 59, 59, 999);
+                        return formatLocalDate(d, 'end');
+                    }
+
+
+                    function stripTimeFromDatetime(datetimeStr) {
+                        return datetimeStr.split('T')[0];
                     }
 
                     function fetchData() {
-                        const startDate = startDateInput.val();
-                        const endDate = endDateInput.val();
+                        const rawStartDate = startDateInput.val();
+                        const rawEndDate = endDateInput.val();
 
-                        if (startDate && endDate) {
+                        if (rawStartDate && rawEndDate) {
+                            const startDate = stripTimeFromDatetime(rawStartDate);
+                            const endDate = stripTimeFromDatetime(rawEndDate);
+
                             const formattedStartDate = formatDateToStartOfDay(startDate);
                             const formattedEndDate = formatDateToEndOfDay(endDate);
 
@@ -1389,16 +1396,14 @@
                                 dataType: 'json',
                                 success: function (response) {
                                     if (response.success) {
-                                        // Update elemen card dengan data dari response
-                                        $('.jumlah-pengajuan').text(response.data.suratKendaraan.length || 0);
-                                        $('.jumlah-disetujui').text(response.data.suratKendaraanDisetujui || 0);
-                                        $('.jumlah-menunggu').text(response.data.suratKendaraanMenunggu || 0);
-                                        $('.jumlah-ditolak').text(response.data.suratKendaraanDitolak || 0);
+                                        $('.jumlah-pengajuan').text(response.data.suratKendaraan?.length ?? 0);
+                                        $('.jumlah-disetujui').text(response.data.suratKendaraanDisetujui ?? 0);
+                                        $('.jumlah-menunggu').text(response.data.suratKendaraanMenunggu ?? 0);
+                                        $('.jumlah-ditolak').text(response.data.suratKendaraanDitolak ?? 0);
                                     }
                                 },
                                 error: function (xhr) {
                                     console.error('Error:', xhr.responseText);
-                                    // Pastikan tetap menampilkan 0 jika terjadi kesalahan
                                     $('.jumlah-pengajuan').text(0);
                                     $('.jumlah-disetujui').text(0);
                                     $('.jumlah-menunggu').text(0);
@@ -1407,6 +1412,7 @@
                             });
                         }
                     }
+
 
                     // Event listener untuk perubahan pada input tanggal
                     startDateInput.change(fetchData);
@@ -1424,16 +1430,16 @@
                     locale: "id", // Opsional: Locale Indonesia
                     onValueUpdate: function(selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
-                                const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
-                                const end = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                                const start = flatpickr.formatLocalDate(selectedDates[0], 'start');
+                                const end = flatpickr.formatLocalDate(selectedDates[1], 'end');
                                 instance._input.value = `${start} s/d ${end}`;
                             }
                         },
                     onClose: function (selectedDates, dateStr, instance) {
                         if (selectedDates.length === 2) { // Pastikan ada dua tanggal yang dipilih
                             // Format tanggal menjadi YYYY-MM-DD
-                            const formattedStartDate = selectedDates[0].toISOString().split('T')[0];
-                            const formattedEndDate = selectedDates[1].toISOString().split('T')[0];
+                            const formattedStartDate = formatLocalDate(selectedDates[0], 'start');
+                            const formattedEndDate = formatLocalDate(selectedDates[1], 'end');
 
                             // Tampilkan hasil format pada konsol
                             console.log("Start Date:", formattedStartDate); // Contoh: 2025-01-31
