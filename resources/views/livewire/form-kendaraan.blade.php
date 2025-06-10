@@ -482,10 +482,6 @@
                 $('#tableRiwayat').DataTable({
                     columnDefs: [
                         { className: 'dt-head-center', targets: 0 },
-                        { className: 'dt-head-center', targets: 1 },
-                        { className: 'dt-head-center', targets: 2 },
-                        { className: 'dt-head-center', targets: 3 },
-                        { className: 'dt-head-center', targets: 4 },
 
                         { className: 'dt-body-center', targets: 0 }
                     ],
@@ -621,10 +617,6 @@
             $('#dataTable').DataTable({
                 columnDefs: [
                     { className: 'dt-head-center', targets: 0 },
-                    { className: 'dt-head-center', targets: 1 },
-                    { className: 'dt-head-center', targets: 2 },
-                    { className: 'dt-head-center', targets: 3 },
-                    { className: 'dt-head-center', targets: 4 },
                     { className: 'dt-head-center', targets: 5 },
 
                     { className: 'dt-body-center', targets: 0 },

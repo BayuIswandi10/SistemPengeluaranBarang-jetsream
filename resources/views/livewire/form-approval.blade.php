@@ -17,23 +17,25 @@
             padding: 8px !important; /* Add consistent padding */
         }
 
-        /* FIXED: Center the checkbox input itself */
+        /* FIXED: Center the checkbox input itself and increase size */
         #dataTable th:first-child .form-check-input,
         #dataTable td:first-child .form-check-input {
             margin: 0 auto !important;
             display: block !important;
             position: relative !important;
-            /* Remove any default margins/padding that might offset the checkbox */
             top: 0 !important;
             left: 0 !important;
             transform: none !important;
+            width: 20px !important; /* Increased checkbox size */
+            height: 20px !important; /* Increased checkbox size */
+            transform: scale(1.5); /* Scale for better visibility */
         }
 
-        /* FIXED: Ensure the cell content is perfectly centered */
-        #dataTable td:first-child {
+        /* FIXED: Ensure all body cells are vertically centered */
+        #dataTable td {
+            vertical-align: middle !important;
             line-height: 1 !important;
             display: table-cell !important;
-            vertical-align: middle !important;
         }
 
         /* Additional fix for form-check wrapper if it exists */
@@ -247,7 +249,7 @@
                     <div class="col-md-6 text-right">
                         <button type="button" 
                                 id="bulk-approve-btn" 
-                                class="btn btn-primary mr-2" 
+                                class="btn btn-success mr-2" 
                                 disabled>
                             <i class="fa-solid fa-check-circle mr-1"></i>
                             Setujui
@@ -332,12 +334,12 @@
                                 <thead>
                                     <tr>
                                         <th style="text-align: center">No</th>
-                                        <th style="text-align: center">Nama</th>
-                                        <th style="text-align: center">Tingkatan</th>
-                                        <th style="text-align: center">Departemen</th>
-                                        <th style="text-align: center">Status Persetujuan</th>
-                                        <th style="text-align: center">Tanggal Persetujuan</th>
-                                        <th style="text-align: center">Alasan Penolakan</th>
+                                        <th>Nama</th>
+                                        <th>Tingkatan</th>
+                                        <th>Departemen</th>
+                                        <th>Status Persetujuan</th>
+                                        <th>Tanggal Persetujuan</th>
+                                        <th>Alasan Penolakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">
@@ -465,16 +467,10 @@
                 orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
                 width: '50px'
             },
-                { className: 'dt-head-center', targets: 0 },
-                { className: 'dt-head-center', targets: 5 },
                 { className: 'dt-head-center', targets: 1 },
-                { className: 'dt-head-center', targets: 2 },
-                { className: 'dt-head-center', targets: 3 },
-                { className: 'dt-head-center', targets: 4 },
                 { className: 'dt-head-center', targets: 6 },
 
                 { className: 'dt-body-center', targets: 1 },
-                { className: 'dt-body-center', targets: 0 },
                 { className: 'dt-body-center', targets: 6 }
             ],
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
@@ -693,11 +689,6 @@
                     $('#detaildataTableModal').DataTable({
                             columnDefs: [
                                 { className: 'dt-head-center', targets: 0 },
-                                { className: 'dt-head-center', targets: 1 },
-                                { className: 'dt-head-center', targets: 2 },
-                                { className: 'dt-head-center', targets: 3 },
-                                { className: 'dt-head-center', targets: 4 },
-                                { className: 'dt-head-center', targets: 5 },
 
                                 { className: 'dt-body-center', targets: 0 }
                             ],
@@ -888,7 +879,7 @@
                 icon: 'question',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonColor: '#0d6efd',
+                confirmButtonColor: '#28a745',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: selectedItems.length === 1 ? 'Ya, Setujui' : 'Ya, Setujui Semua!',
                 cancelButtonText: 'Batal'

@@ -272,12 +272,12 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align: center">No</th>
-                                                            <th style="text-align: center">Nama</th>
-                                                            <th style="text-align: center">Tingkatan</th>
-                                                            <th style="text-align: center">Departemen</th>
-                                                            <th style="text-align: center">Status Persetujuan</th>
-                                                            <th style="text-align: center">Tanggal Persetujuan</th>
-                                                            <th style="text-align: center">Alasan Penolakan</th>
+                                                            <th>Nama</th>
+                                                            <th>Tingkatan</th>
+                                                            <th>Departemen</th>
+                                                            <th>Status Persetujuan</th>
+                                                            <th>Tanggal Persetujuan</th>
+                                                            <th>Alasan Penolakan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="additionalInfoBody">
@@ -506,10 +506,6 @@
                 var table = $('#dataTable').DataTable({
                     columnDefs: [
                         {className: 'dt-head-center', targets: 0},
-                        {className: 'dt-head-center', targets: 1},
-                        {className: 'dt-head-center', targets: 2},
-                        {className: 'dt-head-center', targets: 3},
-                        {className: 'dt-head-center', targets: 4},
                         {className: 'dt-head-center', targets: 5},
 
                         {className: 'dt-body-center', targets: 0},
@@ -664,10 +660,6 @@
                             $('#detaildataTableModal').DataTable({
                                     columnDefs: [
                                     {className: 'dt-head-center', targets: 0},
-                                    {className: 'dt-head-center', targets: 1},
-                                    {className: 'dt-head-center', targets: 2},
-                                    {className: 'dt-head-center', targets: 3},
-                                    {className: 'dt-head-center', targets: 4},
                                     {className: 'dt-head-center', targets: 5},
 
                                     {className: 'dt-body-center', targets: 0},
