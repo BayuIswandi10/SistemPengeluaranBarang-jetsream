@@ -8,18 +8,41 @@
             }
         }
 
-        /* Hanya untuk kolom checkbox */
+        /* FIXED: Proper checkbox alignment - vertical and horizontal center */
         #dataTable th:first-child,
         #dataTable td:first-child {
             text-align: center !important;
             vertical-align: middle !important;
             width: 50px !important;
+            padding: 8px !important; /* Add consistent padding */
         }
 
+        /* FIXED: Center the checkbox input itself */
         #dataTable th:first-child .form-check-input,
         #dataTable td:first-child .form-check-input {
             margin: 0 auto !important;
             display: block !important;
+            position: relative !important;
+            /* Remove any default margins/padding that might offset the checkbox */
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+        }
+
+        /* FIXED: Ensure the cell content is perfectly centered */
+        #dataTable td:first-child {
+            line-height: 1 !important;
+            display: table-cell !important;
+            vertical-align: middle !important;
+        }
+
+        /* Additional fix for form-check wrapper if it exists */
+        #dataTable td:first-child .form-check {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
 
         /* Pastikan isi modal bisa di-scroll jika terlalu panjang */
@@ -458,6 +481,7 @@
             pageLength: 10,
             scrollX: false,
             responsive: true,
+            order: [[1, 'asc']],
             initComplete: function() {
                 // tampilkan setelah selesai inisialisasi
                 table.addClass('visible');

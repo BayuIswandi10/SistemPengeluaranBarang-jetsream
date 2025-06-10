@@ -8,18 +8,41 @@
         opacity: 1;
         }
 
-        /* Hanya untuk kolom checkbox */
+         /* FIXED: Proper checkbox alignment - vertical and horizontal center */
         #dataTable th:first-child,
         #dataTable td:first-child {
             text-align: center !important;
             vertical-align: middle !important;
             width: 50px !important;
+            padding: 8px !important; /* Add consistent padding */
         }
 
+        /* FIXED: Center the checkbox input itself */
         #dataTable th:first-child .form-check-input,
         #dataTable td:first-child .form-check-input {
             margin: 0 auto !important;
             display: block !important;
+            position: relative !important;
+            /* Remove any default margins/padding that might offset the checkbox */
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+        }
+
+        /* FIXED: Ensure the cell content is perfectly centered */
+        #dataTable td:first-child {
+            line-height: 1 !important;
+            display: table-cell !important;
+            vertical-align: middle !important;
+        }
+
+        /* Additional fix for form-check wrapper if it exists */
+        #dataTable td:first-child .form-check {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
 
         .button-group.d-flex {
@@ -440,13 +463,13 @@
                         <table id="kendaraanInfo" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>No</th>
-                                    <th>No Kendaraan</th>
-                                    <th>Keterangan</th>
-                                    <th>Tanggal Penggunaan</th>
-                                    <th>Rute 1</th>
-                                    <th>Rute 2</th>
-                                    <th>Rute 3</th>
+                                    <th style="text-align: center">No</th>
+                                    <th style="text-align: center">No Kendaraan</th>
+                                    <th style="text-align: center">Keterangan</th>
+                                    <th style="text-align: center">Tanggal Penggunaan</th>
+                                    <th style="text-align: center">Rute 1</th>
+                                    <th style="text-align: center">Rute 2</th>
+                                    <th style="text-align: center">Rute 3</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -459,11 +482,11 @@
                     <table id="pesertaList" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>NRP</th>
-                                <th>Nama Karyawan</th>
-                                <th>Divisi Departemen</th>
-                                <th>Pilih</th>
+                                <th style="text-align: center">No</th>
+                                <th style="text-align: center">NRP</th>
+                                <th style="text-align: center">Nama Karyawan</th>
+                                <th style="text-align: center">Departemen</th>
+                                <th style="text-align: center">Pilih</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -495,9 +518,9 @@
                         <table class="table table-bordered" id="tabelPesertaDipindah">
                             <thead>
                                 <tr>
-                                    <th>NRP</th>
-                                    <th>Nama Karyawan</th>
-                                    <th>Nama Departemen</th>
+                                    <th style="text-align: center">NRP</th>
+                                    <th style="text-align: center">Nama Karyawan</th>
+                                    <th style="text-align: center">Nama Departemen</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -512,13 +535,13 @@
                         <table class="table table-bordered" id="tabelTujuanSurat">
                             <thead>
                                 <tr>
-                                    <th>No</th>
-                                    <th>No Surat</th>
-                                    <th>Tujuan</th>
-                                    <th>Jenis Mobil</th>
-                                    <th>No Kendaraan</th>
-                                    <th>Status</th>
-                                    <th>Pilih</th>
+                                    <th style="text-align: center">No</th>
+                                    <th style="text-align: center">No Surat</th>
+                                    <th style="text-align: center">Rute</th>
+                                    <th style="text-align: center">Jenis Mobil</th>
+                                    <th style="text-align: center">No Kendaraan</th>
+                                    <th style="text-align: center">Status</th>
+                                    <th style="text-align: center">Pilih</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -596,6 +619,7 @@
             pageLength: 10,
             scrollX: false,
             responsive: true,
+            order: [[1, 'asc']],
             initComplete: function() {
                 // tampilkan setelah selesai inisialisasi
                 table.addClass('visible');
@@ -729,13 +753,13 @@
                 data.forEach((item, index) => {
                     tbody.append(`
                         <tr>
-                            <td>${index + 1}</td>
+                            <td style="text-align: center">${index + 1}</td>
                             <td>${item.surat_kendaraan_dinas_id}</td>
                             <td>${item.tujuan_penggunaan_1}</td>
                             <td>${item.jenis_kendaraan}</td>
                             <td>${item.nomor_kendaraan || '-'}</td>
                             <td>${item.status}</td>
-                            <td>
+                            <td style="text-align: center">
                                 <input type="radio" name="surat_tujuan" value="${item.surat_kendaraan_dinas_id}">
                             </td>
                         </tr>
@@ -877,10 +901,10 @@
 
             tbody.append(`
                 <tr>
-                    <td>${index + 1}</td>
+                    <td style="text-align: center">${index + 1}</td>
                     <td class="nomor-kendaraan">${item.nomor_kendaraan || ''}</td>
                     <td class="keterangan-kendaraan">${item.keterangan || ''}</td>
-                    <td>${tanggalPenggunaan}</td>
+                    <td style="text-align: right">${tanggalPenggunaan}</td>
                     <td>${tujuan1}</td>
                     <td>${tujuan2}</td>
                     <td>${tujuan3}</td>
@@ -896,11 +920,11 @@
         dataPeserta.forEach((user, index) => {
             tbody.append(`
                 <tr>
-                    <td>${index + 1}</td>
+                    <td style="text-align: center">${index + 1}</td>
                     <td>${user.nrp_karyawan}</td>
                     <td>${user.name}</td>
                     <td>${user.departemen}</td>
-                    <td><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
+                    <td style="text-align: center"><input type="checkbox" name="peserta[]" value="${user.nrp_karyawan}"></td>
                 </tr>
             `);
         });
