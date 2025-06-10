@@ -1,15 +1,16 @@
 <x-guest-layout>
   <head>
         <style>
-            .custom-input,
-            .custom-select {
-            border-radius: 0.375rem; /* sama dengan rounded-md Bootstrap */
-            border: 1px solid #ced4da;
-            padding: 0.5rem 0.75rem;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            .form-area .custom-input,
+            .form-area .custom-select {
+                border-radius: 0.375rem;
+                border: 1px solid #ced4da;
+                padding: 0.5rem 0.75rem;
+                font-size: 1rem;
+                width: 100%;
+                box-sizing: border-box;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                background-color: #fff;
             }
 
             .custom-input:focus,
@@ -136,13 +137,10 @@
         <div class="card card-outline card-primary login-card">
             <div class="card-body">
                 <video id="preview"></video>
-                <div class="input-group mt-3">
-                    <input type="text" id="scanResult" class="form-control custom-input" placeholder="Scan QR-Code atau Ketik No Surat" autocomplete="off">
-                    <div class="input-group-append">
-                        <button id="btnCari" class="btn btn-primary" type="button">Cari</button>
-                    </div>
+                <div class="form-area mt-3 d-flex">
+                    <input type="text" id="scanResult" class="form-control me-2 custom-input" placeholder="Scan QR-Code atau Ketik No Surat" autocomplete="off">
+                    <button id="btnCari" class="btn btn-primary" type="button">Cari</button>
                 </div>
-
             </div>
             
             <div class="card-footer d-flex justify-content-center">

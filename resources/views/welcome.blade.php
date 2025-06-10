@@ -275,9 +275,9 @@
     </style>
 
     <style>
-        .custom-input,
-        .custom-select {
-            border-radius: 0.375rem; /* Sama dengan rounded-md Bootstrap */
+        .form-area .custom-input,
+        .form-area .custom-select {
+            border-radius: 0.375rem;
             border: 1px solid #ced4da;
             padding: 0.5rem 0.75rem;
             font-size: 1rem;
@@ -286,6 +286,7 @@
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             background-color: #fff;
         }
+
 
         .custom-input:focus,
         .custom-select:focus {
@@ -307,6 +308,7 @@
         td .custom-select {
             margin: 0;  /* Hindari spasi aneh di tabel */
         }
+        
     </style>
 
     <style>
@@ -392,7 +394,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="form-area modal-body">
                             <form method="POST" action="{{ route('pengeluaran_barang.store') }}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
                                 @csrf
             
@@ -568,7 +570,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="form-area modal-body">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                                 <!-- Input bulan -->
                                 <div class="mb-3 mb-md-0">
@@ -608,7 +610,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="form-area modal-body">
                             <form method="POST" action="{{ route('pengajuan_dinas.store')}}" enctype="multipart/form-data" id="tambah_penggunaan_kendaraan_dinas">
                                 @csrf
             
@@ -720,7 +722,7 @@
                                             <tr>
                                                 <td class="nomor">1</td>
                                                 <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_regular" value="">
-                                                <td><select name="peserta[0][nrp_karyawan]" class="custom-input nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
+                                                <td><select name="peserta[0][nrp_karyawan]" class="nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
 
@@ -763,7 +765,7 @@
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="form-area modal-body">
                             <!-- Bookings Table -->
                             <div class="mb-4">
                                 <h6>Kendaraan</h6>
@@ -843,7 +845,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="form-area modal-body">
                             <form id="formTambahikutserta" method="POST" action="{{ route('ikutSerta_dinas.ikutSerta')}}" enctype="multipart/form-data">
                                 @csrf
                                 <!-- Hidden Inputs for Pre-filled Data -->
@@ -881,7 +883,7 @@
                                             <tr>
                                                 <td class="nomor">1</td>
                                                 <input type="hidden" name="peserta[0][nrp_karyawan]" id="hidden_nrp_peserta_0_ikutserta" value="">
-                                                <td><select name="peserta[0][nrp_karyawan]" class="form-control nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
+                                                <td><select name="peserta[0][nrp_karyawan]" class="nrp_karyawan selectize-nrp" required><option value="">Pilih NRP Karyawan</option></select></td>
                                                 <td><input type="text" name="peserta[0][nama]" class="custom-input nama" placeholder="Nama" readonly></td>
                                                 <td><input type="text" name="peserta[0][departemen]" class="custom-input departemen" placeholder="Departemen" readonly></td>
                                                 <td>
@@ -1036,8 +1038,6 @@
                             Browser Anda tidak mendukung iframe.
                         </iframe>
                         
-                        
-                        <h6 class="mt-4">Detail Barang</h6>
                         <table id="barangKeluarTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -1072,7 +1072,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-        
+
                         <table id="suratKendaraanTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -1110,8 +1110,6 @@
                             Browser Anda tidak mendukung iframe.
                         </iframe>
                         
-                        
-                        <h6 class="mt-4">Peserta Dinas</h6>
                         <table id="pesertaTableDinas" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -1365,7 +1363,7 @@
                 <td class="nomor">${++counterPeserta}</td>
                 <td>
                     <select ${isFirstRow ? '' : `name="peserta[${counterPeserta - 1}][nrp_karyawan]"`} 
-                            class="custom-input nrp_karyawan selectize-nrp" 
+                            class="nrp_karyawan selectize-nrp" 
                             required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
                         ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
@@ -1435,7 +1433,7 @@
                 <td class="nomor">${++counterIkutserta}</td>
                 <td>
                     <select ${isFirstRow ? '' : `name="peserta[${counterIkutserta - 1}][nrp_karyawan]"`} 
-                            class="form-control nrp_karyawan selectize-nrp" 
+                            class=" nrp_karyawan selectize-nrp" 
                             required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
                         ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
@@ -1774,8 +1772,6 @@
             var iframe = document.getElementById('pesertaDinasQrFrame');
             iframe.contentWindow.print(); // Cetak isi dalam iframe
         }
-  
-        
 
         function saveToLocalStorage() {
             const rows = document.querySelectorAll('#barangTableTambah tbody tr');

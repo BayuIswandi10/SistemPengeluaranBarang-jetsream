@@ -15,12 +15,12 @@
     </style>
 
     <style>
-        .custom-input,
-        .custom-select {
-            border-radius: 0.375rem; /* Sama dengan rounded-md Bootstrap */
+        .form-area .custom-input,
+        .form-area .custom-select {
+            border-radius: 0.375rem;
             border: 1px solid #ced4da;
             padding: 0.5rem 0.75rem;
-            font-size: 1rem;
+            font-size: 16px;
             width: 100%;
             box-sizing: border-box;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -181,7 +181,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="form-area modal-body">
                     <form method="POST" action="{{ route('kendaraan.store')}}" enctype="multipart/form-data" id="tambah_pengeluaran_barang">
                         @csrf
     
@@ -272,7 +272,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="form-area modal-body">
                     <form method="POST" action="{{ route('kendaraan.update') }}" enctype="multipart/form-data" id="editForm">
                         @csrf
                         @method('PUT')
@@ -631,6 +631,17 @@
                     { className: 'dt-body-center', targets: 5 }
                     
                 ],
+                language: {
+                    processing: "Memproses...",
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Tidak ada data",
+                    infoFiltered: "(difilter dari _MAX_ total entri)",
+                    loadingRecords: "Memuat...",
+                    zeroRecords: "Tidak ditemukan data yang cocok",
+                    emptyTable: "Tidak ada data di tabel"
+                },
                 scrollX: false,
                 responsive: true
             });
