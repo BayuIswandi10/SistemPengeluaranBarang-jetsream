@@ -66,7 +66,7 @@
                             <h6 class="mb-0">Informasi Barang Keluar</h6>
                         </div>
                         <div class="card-body">
-                            <table id="dataTable" class="table table-bordered">
+                            <table id="dataTable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -93,7 +93,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                            <table id="additionalInfoTable" class="table table-bordered">
+                            <table id="additionalInfoTable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th style="text-align: center">No</th>
@@ -172,7 +172,7 @@
                             <h6 class="mb-0">Informasi Peserta</h6>
                         </div>
                         <div class="card-body">
-                            <table id="detaildataTableModal" class="table table-bordered">
+                            <table id="detaildataTableModal" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -808,7 +808,7 @@
                     let tableHTML = `
                         <div style="margin-bottom: 30px;">
                             <h5>No Surat: ${peserta.no_surat}</h5>
-                            <table border="1" style="width:100%; border-collapse: collapse;"  class="table table-bordered">
+                            <table border="1" style="width:100%; border-collapse: collapse;"  class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>No</th>
