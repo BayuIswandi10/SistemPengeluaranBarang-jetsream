@@ -64,7 +64,7 @@
                         <!-- Input Tanggal, ditampilkan untuk semua user -->
                         <div class="col-md-4 col-12">
                             <div class="input-group">
-                                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih Rentang Tanggal">
+                                <input type="text" id="date-range-picker" class="form-control" placeholder="Pilih rentang tanggal surat dibuat">
                             </div>
                         </div>
                     </div>
