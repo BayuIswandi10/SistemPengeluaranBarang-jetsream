@@ -345,6 +345,7 @@
                                         <th style="text-align: center">Rute 1</th>
                                         <th style="text-align: center">Rute 2</th>
                                         <th style="text-align: center">Rute 3</th>
+                                        <th style="text-align: center">Keperluan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -996,6 +997,7 @@
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                                    <td>${item.alasan_penggunaan || '-'}</td>
                                 </tr>
                             `;
                             document.getElementById('kendaraanInfoBody').innerHTML += row;

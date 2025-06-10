@@ -309,6 +309,30 @@
         }
     </style>
 
+    <style>
+        /* Additional CSS for license plate fields */
+        .license-plate-container .custom-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        @media (max-width: 576px) {
+            .license-plate-container {
+                justify-content: center;
+                gap: 6px;
+            }
+            
+            .license-plate-container .custom-input {
+                width: 50px !important;
+                font-size: 14px;
+            }
+            
+            .license-plate-container input[id="number_part"] {
+                width: 65px !important;
+            }
+        }
+    </style>
+
 
     <body>
         @if (session('success'))
@@ -408,15 +432,47 @@
 
                                 <div class="form-group">
                                     <label for="no_polisi">No Polisi <span class="text-danger">*</span></label>
-                                    <input type="text" class="custom-input" id="no_polisi" name="no_polisi" placeholder="Contoh Valid: B 1234 ACD, D 45 XY, AB 9876 A" required autocomplete="off">
+                                    
+                                    <!-- License Plate Separated Fields -->
+                                    <div class="license-plate-container" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <input type="text" 
+                                            class="custom-input" 
+                                            id="area_code" 
+                                            name="area_code" 
+                                            placeholder="B" 
+                                            maxlength="2"
+                                            style="width: 60px; text-align: center; text-transform: uppercase;"
+                                            required>
+                                        
+                                        <span style="font-size: 18px; color: #666;">-</span>
+                                        
+                                        <input type="text" 
+                                            class="custom-input" 
+                                            id="number_part" 
+                                            name="number_part" 
+                                            placeholder="1234" 
+                                            maxlength="4"
+                                            style="width: 80px; text-align: center;"
+                                            required>
+                                        
+                                        <span style="font-size: 18px; color: #666;">-</span>
+                                        
+                                        <input type="text" 
+                                            class="custom-input" 
+                                            id="letter_code" 
+                                            name="letter_code" 
+                                            placeholder="ACD" 
+                                            maxlength="3"
+                                            style="width: 70px; text-align: center; text-transform: uppercase;"
+                                            required>
+                                    </div>
+                                    
+                                    <!-- Hidden input for complete license plate -->
+                                    <input type="hidden" id="no_polisi" name="no_polisi" value="">
+                                    
+                                    <!-- Error message -->
                                     <small id="no_polisi_error" class="text-danger" style="display: none;">
-                                        Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
-                                        - 1–2 huruf awal<br>
-                                        - Spasi<br>
-                                        - 1–4 angka<br>
-                                        - Spasi<br>
-                                        - 1–3 huruf akhir<br>
-                                        Contoh lain: D 45 XY, AB 9876 A
+                                        Mohon lengkapi semua bagian nomor polisi dengan benar.
                                     </small>
                                 </div>
                                 
@@ -464,7 +520,7 @@
                                                     <td><input type="text" name="jumlah[]" class="custom-input jumlah-input" placeholder="Jumlah"required autocomplete="off"></td>
                                                     <td>
                                                         <select name="satuan[]" class="custom-input" required>
-                                                            <option value="" disabled selected>Satuan</option>
+                                                            <option value="" disabled selected>Pilih Satuan</option>
                                                             <option value="unit">Unit</option>
                                                             <option value="pcs">PCS</option>
                                                             <option value="kg">KG</option>
@@ -645,8 +701,8 @@
                                 </div>
 
                                 <div class="form-group" id="alasan_penggunaan">
-                                    <label for="alasan_penggunaan">Tujuan Penggunaan <span class="text-danger">*</span></label>
-                                    <textarea class="custom-input" id="alasan_penggunaan" name="alasan_penggunaan" placeholder="Masukkan tujuan penggunaan" autocomplete="off" rows="4" required></textarea>                                </div>
+                                    <label for="alasan_penggunaan">Keperluan <span class="text-danger">*</span></label>
+                                    <textarea class="custom-input" id="alasan_penggunaan" name="alasan_penggunaan" placeholder="Masukkan keperluan penggunaan" autocomplete="off" rows="4" required></textarea>                                </div>
                                 <!-- Peserta Dinas Table -->
                                 <div class="form-group">
                                     <label>Peserta Dinas <span class="text-danger">*</span></label>
@@ -1740,10 +1796,10 @@
 
             newRow.innerHTML = `
                 <td class="nomor">${++counter}</td>
-                <td><input type="text" name="barang_ids[]" class="form-control" placeholder="Nama Barang" required autocomplete="off"></td>
-                <td><input type="text" name="jumlah[]" class="form-control jumlah-input" placeholder="Jumlah" required autocomplete="off"></td>
+                <td><input type="text" name="barang_ids[]" class="custom-input" placeholder="Nama Barang" required autocomplete="off"></td>
+                <td><input type="text" name="jumlah[]" class="custom-input jumlah-input" placeholder="Jumlah" required autocomplete="off"></td>
                 <td>
-                    <select name="satuan[]" class="form-control" required>
+                    <select name="satuan[]" class="custom-input" required>
                         <option value="" disabled selected>Pilih Satuan</option>
                         <option value="unit">Unit</option>
                         <option value="pcs">PCS</option>
@@ -1752,7 +1808,7 @@
                         <option value="drum">DRUM</option>
                     </select>
                 </td>
-                <td><input type="text" name="keterangan[]" class="form-control" placeholder="Keterangan" autocomplete="off"></td>
+                <td><input type="text" name="keterangan[]" class="custom-input" placeholder="Keterangan" autocomplete="off"></td>
                 <td>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                         <i class="fas fa-trash"></i>
@@ -1779,7 +1835,7 @@
                     confirmButtonText: 'Ya, Hapus',
                     confirmButtonColor: '#dc3545', 
                     cancelButtonText: 'Tidak',
-                    cancelButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1826,10 +1882,10 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="nomor">${++counter}</td>
-                    <td><input type="text" name="barang_ids[]" class="form-control" value="${item.barang_id}" placeholder="Nama Barang" required autocomplete="off"></td>
-                    <td><input type="text" name="jumlah[]" class="form-control jumlah-input" value="${item.jumlah}" placeholder="Jumlah" required autocomplete="off"></td>
+                    <td><input type="text" name="barang_ids[]" class="custom-input" value="${item.barang_id}" placeholder="Nama Barang" required autocomplete="off"></td>
+                    <td><input type="text" name="jumlah[]" class="custom-input jumlah-input" value="${item.jumlah}" placeholder="Jumlah" required autocomplete="off"></td>
                     <td>
-                        <select name="satuan[]" class="form-control" required>
+                        <select name="satuan[]" class="custom-input" required>
                             <option value="" disabled ${item.satuan === '' ? 'selected' : ''}>Pilih Satuan</option>
                             <option value="unit" ${item.satuan === 'unit' ? 'selected' : ''}>Unit</option>
                             <option value="pcs" ${item.satuan === 'pcs' ? 'selected' : ''}>PCS</option>
@@ -1838,7 +1894,7 @@
                             <option value="drum" ${item.satuan === 'drum' ? 'selected' : ''}>DRUM</option>
                         </select>
                     </td>
-                    <td><input type="text" name="keterangan[]" class="form-control" value="${item.keterangan}" placeholder="Keterangan" autocomplete="off"></td>
+                    <td><input type="text" name="keterangan[]" class="custom-input" value="${item.keterangan}" placeholder="Keterangan" autocomplete="off"></td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm" onclick="hapusComboBox(this)">
                             <i class="fas fa-trash"></i>
@@ -3121,19 +3177,99 @@
             }
         });
 
-        document.getElementById('no_polisi').addEventListener('input', function () {
-            const input = this.value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get input elements
+            const areaCode = document.getElementById('area_code');
+            const numberPart = document.getElementById('number_part');
+            const letterCode = document.getElementById('letter_code');
+            const hiddenInput = document.getElementById('no_polisi');
             const errorMsg = document.getElementById('no_polisi_error');
-            // Regex: 1 huruf, spasi, 1-4 angka, spasi, 1-3 huruf
-            const regex = /^[A-Z]{1,2}\s\d{1,4}\s[A-Z]{1,3}$/;
 
-            if (input === '') {
-                errorMsg.style.display = 'none';
-            } else if (!regex.test(input.toUpperCase())) {
-                errorMsg.style.display = 'block';
-            } else {
-                errorMsg.style.display = 'none';
+            // Function to update hidden input
+            function updateHiddenInput() {
+                const area = areaCode.value.toUpperCase().trim();
+                const number = numberPart.value.trim();
+                const letter = letterCode.value.toUpperCase().trim();
+                
+                // Update hidden input only if all fields are filled
+                if (area && number && letter) {
+                    const fullPlate = `${area} ${number} ${letter}`;
+                    hiddenInput.value = fullPlate;
+                    errorMsg.style.display = 'none';
+                } else {
+                    hiddenInput.value = '';
+                }
             }
+
+            // Validation and auto-focus for area code (letters only)
+            areaCode.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+                updateHiddenInput();
+                
+                // Auto focus to next field when max length reached
+                if (e.target.value.length === 2) {
+                    numberPart.focus();
+                }
+            });
+
+            // Validation and auto-focus for number part (numbers only)
+            numberPart.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                updateHiddenInput();
+                
+                // Auto focus to next field when max length reached
+                if (e.target.value.length === 4) {
+                    letterCode.focus();
+                }
+            });
+
+            // Validation for letter code (letters only)
+            letterCode.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+                updateHiddenInput();
+            });
+
+            // Handle backspace for auto focus to previous field
+            [areaCode, numberPart, letterCode].forEach((input, index) => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                        const prevInput = [areaCode, numberPart, letterCode][index - 1];
+                        prevInput.focus();
+                    }
+                });
+            });
+
+            // Form validation before submit
+            const form = document.getElementById('tambah_pengeluaran_barang');
+            if (form) {
+                // Override the default validation to include license plate check
+                const originalCheckValidity = form.checkValidity;
+                form.checkValidity = function() {
+                    const area = areaCode.value.trim();
+                    const number = numberPart.value.trim();
+                    const letter = letterCode.value.trim();
+                    
+                    // Check if license plate is complete
+                    if (!area || !number || !letter) {
+                        errorMsg.style.display = 'block';
+                        errorMsg.textContent = 'Mohon lengkapi semua bagian nomor polisi.';
+                        
+                        // Focus on first empty field
+                        if (!area) areaCode.focus();
+                        else if (!number) numberPart.focus();
+                        else if (!letter) letterCode.focus();
+                        
+                        return false;
+                    } else {
+                        errorMsg.style.display = 'none';
+                        // Call original checkValidity for other form elements
+                        return originalCheckValidity.call(this);
+                    }
+                };
+            }
+
+            // Initial update
+            updateHiddenInput();
         });
 
         $(document).ready(function () {

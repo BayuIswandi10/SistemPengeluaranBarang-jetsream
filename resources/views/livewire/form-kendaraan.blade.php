@@ -199,20 +199,52 @@
                                 <option value="3">TAXI</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nomor_kendaraan" name="nomor_kendaraan" placeholder="Contoh Valid: B 1234 ACD, D 45 XY, AB 9876 A" required autocomplete="off">
+                            <label for="nomor_kendaraan">No Polisi <span class="text-danger">*</span></label>
+                            
+                            <!-- License Plate Separated Fields -->
+                            <div class="license-plate-container" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="area_code" 
+                                    name="area_code" 
+                                    placeholder="B" 
+                                    maxlength="2"
+                                    style="width: 60px; text-align: center; text-transform: uppercase;"
+                                    required>
+                                
+                                <span style="font-size: 18px; color: #666;">-</span>
+                                
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="number_part" 
+                                    name="number_part" 
+                                    placeholder="1234" 
+                                    maxlength="4"
+                                    style="width: 80px; text-align: center;"
+                                    required>
+                                
+                                <span style="font-size: 18px; color: #666;">-</span>
+                                
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="letter_code" 
+                                    name="letter_code" 
+                                    placeholder="ACD" 
+                                    maxlength="3"
+                                    style="width: 70px; text-align: center; text-transform: uppercase;"
+                                    required>
+                            </div>
+                            
+                            <!-- Hidden input for complete license plate -->
+                            <input type="hidden" id="nomor_kendaraan" name="nomor_kendaraan" value="">
+                            
+                            <!-- Error message -->
                             <small id="nomor_kendaraan_error" class="text-danger" style="display: none;">
-                                Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
-                                - 1–2 huruf awal<br>
-                                - Spasi<br>
-                                - 1–4 angka<br>
-                                - Spasi<br>
-                                - 1–3 huruf akhir<br>
-                                Contoh lain: D 45 XY, AB 9876 A
+                                Mohon lengkapi semua bagian nomor polisi dengan benar.
                             </small>
-                        </div>  
+                        </div>
 
                         <div class="form-group">
                             <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
@@ -263,18 +295,50 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="nomor_kendaraan">Nomor Kendaraan <span class="text-danger">*</span></label>
-                            <input type="custom-input" class="form-control" id="edit_nomor_kendaraan" name="nomor_kendaraan" required autocomplete="off">
+                            <label for="nomor_kendaraan">No Polisi <span class="text-danger">*</span></label>
+                            
+                            <!-- License Plate Separated Fields -->
+                            <div class="license-plate-container" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="edit_area_code" 
+                                    name="edit_area_code" 
+                                    placeholder="B" 
+                                    maxlength="2"
+                                    style="width: 60px; text-align: center; text-transform: uppercase;"
+                                    required>
+                                
+                                <span style="font-size: 18px; color: #666;">-</span>
+                                
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="edit_number_part" 
+                                    name="edit_number_part" 
+                                    placeholder="1234" 
+                                    maxlength="4"
+                                    style="width: 80px; text-align: center;"
+                                    required>
+                                
+                                <span style="font-size: 18px; color: #666;">-</span>
+                                
+                                <input type="text" 
+                                    class="custom-input" 
+                                    id="edit_letter_code" 
+                                    name="edit_letter_code" 
+                                    placeholder="ACD" 
+                                    maxlength="3"
+                                    style="width: 70px; text-align: center; text-transform: uppercase;"
+                                    required>
+                            </div>
+                            
+                            <!-- Hidden input for complete license plate -->
+                            <input type="hidden" id="edit_nomor_kendaraan" name="nomor_kendaraan" value="">
+                            
+                            <!-- Error message -->
                             <small id="edit_nomor_kendaraan_error" class="text-danger" style="display: none;">
-                                Format nomor polisi tidak valid. Gunakan format seperti: <strong>B 1234 CD</strong><br>
-                                - 1–2 huruf awal<br>
-                                - Spasi<br>
-                                - 1–4 angka<br>
-                                - Spasi<br>
-                                - 1–3 huruf akhir<br>
-                                Contoh lain: D 45 XY, AB 9876 A
+                                Mohon lengkapi semua bagian nomor polisi dengan benar.
                             </small>
-                        </div>  
+                        </div>
 
                         <div class="form-group">
                             <label for="kapasitas_kendaraan">Kapasitas Kendaraan <span class="text-danger">*</span></label>
@@ -473,8 +537,16 @@
                 $('#edit_kendaraan_dinas_id').val(response.kendaraan_dinas_id);
                 $('#edit_merk_kendaraan').val(response.merk_kendaraan);
                 $('#edit_jenis_kendaraan').val(response.jenis_kendaraan);
-                $('#edit_nomor_kendaraan').val(response.nomor_kendaraan);
                 $('#edit_kapasitas_kendaraan').val(response.kapasitas_kendaraan);
+
+                // Parse license plate and populate separated fields
+                const licenseParts = parseLicensePlate(response.nomor_kendaraan);
+                $('#edit_area_code').val(licenseParts.area);
+                $('#edit_number_part').val(licenseParts.number);
+                $('#edit_letter_code').val(licenseParts.letter);
+                
+                // Update hidden field
+                $('#edit_nomor_kendaraan').val(response.nomor_kendaraan);
             },
             error: function (xhr, status, error) {
                 console.error(`Error: ${error}`);
@@ -565,40 +637,126 @@
         }
     });
 
-    function validateNomorPolisi(inputElement, errorElement) {
-        const input = inputElement.value.trim();
-        // Regex: 1-2 huruf, spasi, 1-4 angka, spasi, 1-3 huruf
-        const regex = /^[A-Z]{1,2}\s\d{1,4}\s[A-Z]{1,3}$/;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Add Modal License Plate Fields
+        setupLicensePlateFields('area_code', 'number_part', 'letter_code', 'nomor_kendaraan', 'nomor_kendaraan_error', 'tambahDataModal');
+        
+        // Handle Edit Modal License Plate Fields
+        setupLicensePlateFields('edit_area_code', 'edit_number_part', 'edit_letter_code', 'edit_nomor_kendaraan', 'edit_nomor_kendaraan_error', 'editForm');
+    });
 
-        if (input === '') {
-            errorElement.style.display = 'none';
-        } else if (!regex.test(input.toUpperCase())) {
-            errorElement.style.display = 'block';
-        } else {
-            errorElement.style.display = 'none';
+    // Function to setup license plate fields (reusable for both modals)
+    function setupLicensePlateFields(areaId, numberId, letterId, hiddenId, errorId, formId) {
+        const areaCode = document.getElementById(areaId);
+        const numberPart = document.getElementById(numberId);
+        const letterCode = document.getElementById(letterId);
+        const hiddenInput = document.getElementById(hiddenId);
+        const errorMsg = document.getElementById(errorId);
+
+        // Function to update hidden input
+        function updateHiddenInput() {
+            const area = areaCode.value.toUpperCase().trim();
+            const number = numberPart.value.trim();
+            const letter = letterCode.value.toUpperCase().trim();
+            
+            // Update hidden input only if all fields are filled
+            if (area && number && letter) {
+                const fullPlate = `${area} ${number} ${letter}`;
+                hiddenInput.value = fullPlate;
+                errorMsg.style.display = 'none';
+            } else {
+                hiddenInput.value = '';
+            }
         }
+
+        // Validation and auto-focus for area code (letters only)
+        areaCode.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+            updateHiddenInput();
+            
+            // Auto focus to next field when max length reached
+            if (e.target.value.length === 2) {
+                numberPart.focus();
+            }
+        });
+
+        // Validation and auto-focus for number part (numbers only)
+        numberPart.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            updateHiddenInput();
+            
+            // Auto focus to next field when max length reached
+            if (e.target.value.length === 4) {
+                letterCode.focus();
+            }
+        });
+
+        // Validation for letter code (letters only)
+        letterCode.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+            updateHiddenInput();
+        });
+
+        // Handle backspace for auto focus to previous field
+        [areaCode, numberPart, letterCode].forEach((input, index) => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    const prevInput = [areaCode, numberPart, letterCode][index - 1];
+                    prevInput.focus();
+                }
+            });
+        });
+
+        // Form validation before submit
+        const form = document.getElementById(formId);
+        if (form) {
+            // Override the default validation to include license plate check
+            const originalCheckValidity = form.checkValidity;
+            form.checkValidity = function() {
+                const area = areaCode.value.trim();
+                const number = numberPart.value.trim();
+                const letter = letterCode.value.trim();
+                
+                // Check if license plate is complete
+                if (!area || !number || !letter) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Mohon lengkapi semua bagian nomor polisi.';
+                    
+                    // Focus on first empty field
+                    if (!area) areaCode.focus();
+                    else if (!number) numberPart.focus();
+                    else if (!letter) letterCode.focus();
+                    
+                    return false;
+                } else {
+                    errorMsg.style.display = 'none';
+                    // Call original checkValidity for other form elements
+                    return originalCheckValidity.call(this);
+                }
+            };
+        }
+
+        // Initial update
+        updateHiddenInput();
     }
 
-    // Event listener untuk field nomor_kendaraan (form tambah)
-    document.getElementById('nomor_kendaraan').addEventListener('input', function () {
-        const errorMsg = document.getElementById('nomor_kendaraan_error');
-        validateNomorPolisi(this, errorMsg);
-    });
-
-    // Event listener untuk field edit_nomor_kendaraan (form edit)
-    document.getElementById('edit_nomor_kendaraan').addEventListener('input', function () {
-        const errorMsg = document.getElementById('edit_nomor_kendaraan_error');
-        validateNomorPolisi(this, errorMsg);
-    });
-
-    // Auto uppercase untuk kedua field
-    document.getElementById('nomor_kendaraan').addEventListener('input', function () {
-        this.value = this.value.toUpperCase();
-    });
-
-    document.getElementById('edit_nomor_kendaraan').addEventListener('input', function () {
-        this.value = this.value.toUpperCase();
-    });
+    // Function to parse license plate string into parts
+    function parseLicensePlate(licensePlate) {
+        if (!licensePlate) return { area: '', number: '', letter: '' };
+        
+        // Parse format like "B 1234 ACD" or "AB 123 C"
+        const parts = licensePlate.trim().split(/\s+/);
+        
+        if (parts.length === 3) {
+            return {
+                area: parts[0],
+                number: parts[1],
+                letter: parts[2]
+            };
+        }
+        
+        return { area: '', number: '', letter: '' };
+    }
 
     document.addEventListener('input', function (e) {
         if (e.target.classList.contains('input-kapasitas')) {

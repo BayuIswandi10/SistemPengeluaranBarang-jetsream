@@ -600,6 +600,7 @@ class SuratDinasController extends Controller
                 'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1 ?? '-',
                 'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
                 'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
+                'alasan_penggunaan' => $suratDinas->alasan_penggunaan ?? '-',
             ];
         });
     
