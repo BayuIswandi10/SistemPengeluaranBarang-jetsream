@@ -158,26 +158,18 @@
     <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" id="modalHeader" style="position: relative;">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                        
-                        <div class="d-flex align-items-center gap-3">
-                            <div id="approvalStatusBadge" style="padding-right: 1rem; border-right: 1px solid #ccc;"></div>
-                            <div id="kategoriBarangCard" style="padding-left: 1rem;"></div>
-                        </div>
                     </div>
-
+                    <div style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px;">
+                        <i id="statusIcon" style="font-size: 1.8rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"></i>
+                    </div>
                     <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
-
-                    <!-- Info Nomor Pengeluaran-->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                    </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
@@ -246,14 +238,13 @@
     <div class="modal fade" id="suratDinasModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" id="modalHeaderKendaraan" style="position: relative;">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
-                        <!-- Badge Status di Header -->
-                        <div id="approvalStatusBadgeDinas"></div>
                     </div>
+                    <i id="statusIconKendaraan" style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"></i>
                     <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -378,170 +369,163 @@
 
             function fetchDetailPengeluaran(nomor) {
                 $('.modal').modal('hide');
-                document.getElementById('nomorPengeluaranCard').innerText = nomor;
 
-                $.ajax({
-                    url: "/pengeluaran/detailNonAuth",
-                    method: "POST",
-                    data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
-                    success: function (data) {
-                        // Tampilkan badge kategori
-                        document.getElementById('kategoriBarangCard').innerHTML = 
-                           data.kategori_pengeluaran === 1 
-                            ? `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                    Scrap
-                                </span>`
-                            : `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #17a2b8; color: white;">
-                                    Non Scrap
-                                </span>`;
+                 $.ajax({
+                        url: "/pengeluaran/detailNonAuth",
+                        method: "POST",
+                        data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
+                        success: function (data) {
+                            // Set judul modal berdasarkan kategori
+                            const kategoriText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                            document.getElementById('detailModalLabel').innerText = `Detail Barang Keluar Kategori ${kategoriText}`;
 
-
-                        // Ambil informasi tambahan
-                        const informasiTambahan = data.informasi_tambahan ?? [];
-
-                        // Cek apakah ada yang menolak
-                        const adaYangMenolak = informasiTambahan.some(x => x.status === 'Level 0');
-
-                        // Cek level tertinggi yang menyetujui
-                        const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
-
-                        let statusBadgeHTML = '';
-
-                        // Logika berbeda berdasarkan kategori pengeluaran
-                        if (adaYangMenolak) {
-                            statusBadgeHTML = `
-                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                    <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
-                                </span>
-                            `;
-                        } else {
-                            const isApproved = data.kategori_pengeluaran === 1 
-                                ? maxLevel >= 5 // Scrap cukup sampai Level 5
-                                : maxLevel >= 4; // Non Scrap harus sampai Level 4
-
-                            if (isApproved) {
-                                statusBadgeHTML = `
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                        <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
-                                    </span>
-                                `;
+                            // Warna header dan ikon berdasarkan status persetujuan
+                            const modalHeader = document.getElementById('modalHeader');
+                            const statusIcon = document.getElementById('statusIcon');
+                            const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
+                            const adaYangMenolak = (data.informasi_tambahan ?? []).some(x => x.status === 'Level 0');
+                            
+                            if (adaYangMenolak) {
+                                // Status DITOLAK
+                                modalHeader.style.backgroundColor = '#dc3545';
+                                modalHeader.style.color = 'white';
+                                statusIcon.className = 'fas fa-times-circle';
+                                statusIcon.style.color = 'white';
+                                statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                            } else if (
+                                (data.kategori_pengeluaran === 1 && maxLevel >= 5) || 
+                                (data.kategori_pengeluaran === 0 && maxLevel >= 4)
+                            ) {
+                                // Status LENGKAP
+                                modalHeader.style.backgroundColor = '#28a745';
+                                modalHeader.style.color = 'white';
+                                statusIcon.className = 'fas fa-clipboard-check';
+                                statusIcon.style.color = 'white';
+                                statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                             } else {
-                                statusBadgeHTML = `
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                        <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                                    </span>
-                                `;
+                                // Status BELUM LENGKAP
+                                modalHeader.style.backgroundColor = '#ffe107';
+                                modalHeader.style.color = 'black';
+                                statusIcon.className = 'fas fa-exclamation-circle';
+                                statusIcon.style.color = 'black';
+                                statusIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                             }
-                        }
 
-                        // Tampilkan badge status persetujuan
-                        document.getElementById('approvalStatusBadge').innerHTML = statusBadgeHTML;
+                            document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
+                            const tbody = document.getElementById('detailBody');
+                            const additionalInfoBody = document.getElementById('additionalInfoBody');
+                            
+                            tbody.innerHTML = '';
+                            additionalInfoBody.innerHTML = '';
 
+                            // Hapus DataTable sebelum menambahkan data baru
+                            if ($.fn.DataTable.isDataTable('#dataTable')) {
+                                $('#dataTable').DataTable().clear().destroy();
+                            }
 
-                        document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
-                        document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
-                        const tbody = document.getElementById('detailBody');
-                        const additionalInfoBody = document.getElementById('additionalInfoBody');
-
-                        tbody.innerHTML = '';
-                        additionalInfoBody.innerHTML = '';
-
-                        if ($.fn.DataTable.isDataTable('#dataTable')) {
-                            $('#dataTable').DataTable().clear().destroy();
-                        }
-
-                        if (data.barang_keluar && data.barang_keluar.length > 0) {
-                            tbody.innerHTML = data.barang_keluar.map((item, index) => `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${nomor}</td>
-                                    <td>${item.nama_barang}</td>
-                                    <td style="text-align: right">${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
-                                    <td>${item.satuan_barang}</td>
-                                    <td>${item.keterangan_barang ?? ""}</td>
-                                </tr>
-                            `).join('');
-                        } else {
-                            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
-                        }
-
-                        const tingkatMapping = {
-                            "Level 1": "Civitas",
-                            "Level 2": "PIC/Ka.Sie",
-                            "Level 3": "Ka.Dept.Ybs",
-                            "Level 4": "Ka.Dept.GA",
-                            "Level 5": "Finance",
-                            "Level 6": "Security"
-                        };
-                        const approvMapping = {
-                            "Level 0": "Menolak",
-                            "Level 1": "Mengajukan",
-                            "Level 2": "Menyetujui",
-                            "Level 3": "Menyetujui",
-                            "Level 4": "Menyetujui",
-                            "Level 5": "Menyetujui",
-                            "Level 6": "Menyetujui"
-                        };
-
-                        if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
-                            data.informasi_tambahan.forEach((info, index) => {
-                                let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
-                                    ? info.alasan_penolakan 
-                                    : '-'; // hanya isi di baris terakhir
-
-                                let row = `
+                            let statusPengeluaran = data.status;
+                            let kategoriPengeluaran = data.kategori_pengeluaran;
+                            let nomorPolisi = data.no_polisi;
+                            
+                            // Menambahkan data ke tabel barang keluar
+                            if (data.barang_keluar && data.barang_keluar.length > 0) {
+                                tbody.innerHTML = data.barang_keluar.map((item, index) => `
                                     <tr>
-                                        <td style="text-align: center">${index + 1}</td>
-                                        <td>${info.nama}</td>
-                                        <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
-                                        <td>${info.departemen}</td>
-                                        <td>${approvMapping[info.status] || info.status}</td>
-                                        <td style="text-align: right">${info.created_date}</td>
-                                        <td>${alasanPenolakan}</td>
+                                        <td>${index + 1}</td>
+                                        <td>${nomor}</td>
+                                        <td>${item.nama_barang}</td>
+                                        <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
+                                        <td>${item.satuan_barang}</td>
+                                        <td>${item.keterangan_barang ?? ''}</td>
                                     </tr>
-                                `;
-                                additionalInfoBody.innerHTML += row;
-                            });
-                        } else {
-                            additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
-                        }
+                                `).join('');
+                            } else {
+                                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data barang keluar</td></tr>';
+                            }
 
-                        // Aktifkan DataTable setelah data ditambahkan
-                        $('#dataTable').DataTable({
+                            // Mapping tingkatan dan status persetujuan
+                            const tingkatMapping = {
+                                "Level 1": "Civitas",
+                                "Level 2": "PIC/Ka.Sie",
+                                "Level 3": "Ka.Dept.Ybs",
+                                "Level 4": "Ka.Dept.GA",
+                                "Level 5": "Finance",
+                                "Level 6": "Security"
+                            };
+                            const approvMapping = {
+                                "Level 0": "Menolak",
+                                "Level 1": "Mengeluarkan",
+                                "Level 2": "Membawa",
+                                "Level 3": "Menyetujui",
+                                "Level 4": "Mengetahui",
+                                "Level 5": "Menerima",
+                                "Level 6": "Memeriksa"
+                            };
+                            
+                            // Menambahkan data ke tabel informasi tambahan
+                            if (data.informasi_tambahan && data.informasi_tambahan.length > 0) {
+                                data.informasi_tambahan.forEach((info, index) => {
+                                    let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
+                                        ? info.alasan_penolakan 
+                                        : '-';
+                                    let row = `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${info.nama}</td>
+                                            <td>${tingkatMapping[info.tingkatan] || info.tingkatan}</td>
+                                            <td>${info.departemen}</td>
+                                            <td>${approvMapping[info.status] || info.status}</td>
+                                            <td style="text-align: right">${info.created_date}</td>
+                                            <td>${alasanPenolakan}</td>
+                                        </tr>
+                                    `;
+                                    additionalInfoBody.innerHTML += row;
+                                });
+                            } else {
+                                additionalInfoBody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada informasi tambahan</td></tr>';
+                            }
+                            
+                            // Aktifkan DataTable setelah data ditambahkan
+                            $('#dataTable').DataTable({
                                 columnDefs: [
-                                    { className: 'dt-body-center', targets: 0 },
                                     { className: 'dt-head-center', targets: 0 },
-                                    { className: 'dt-body-left', targets: 1 },
                                     { className: 'dt-head-center', targets: 1 },
-                                    { className: 'dt-body-left', targets: 2 },
                                     { className: 'dt-head-center', targets: 2 },
-                                    { className: 'dt-body-right', targets: 3 },
                                     { className: 'dt-head-center', targets: 3 },
-                                    { className: 'dt-body-left', targets: 4 },
                                     { className: 'dt-head-center', targets: 4 },
-                                    { className: 'dt-body-left', targets: 5 },
                                     { className: 'dt-head-center', targets: 5 },
+                                    { className: 'dt-body-center', targets: 0 }
                                 ],
-
+                                language: {
+                                    processing: "Memproses...",
+                                    search: "Cari:",
+                                    lengthMenu: "Tampilkan _MENU_ entri",
+                                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                                    infoEmpty: "Tidak ada data",
+                                    infoFiltered: "(difilter dari _MAX_ total entri)",
+                                    loadingRecords: "Memuat...",
+                                    zeroRecords: "Tidak ditemukan data yang cocok",
+                                    emptyTable: "Tidak ada data di tabel"
+                                },
                                 responsive: true,
                                 scrollX: false,
                                 destroy: true,
-                                pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
-                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
-                        }); 
-
-                        $('#detailModal').modal('show');
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data:", error);
-                        Swal.fire({
-                          title: 'Error!',
-                          text: 'Gagal mengambil data pengeluaran barang.',
-                          icon: 'error',
-                          confirmButtonText: 'OK'
-                      });
-                    }
-                });
+                                pageLength: 5,
+                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                            }); 
+                            
+                            $('#detailModal').modal('show');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error fetching data:", error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Gagal mengambil data pengeluaran.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
 
             }
             // Tambahkan event listener ke tombol "Cari"
@@ -593,20 +577,22 @@
         });
 
         function fetchDetailKendaraan(nomor) {
+            
             $('.modal').modal('hide');
-            document.getElementById('nomorSuratCard').innerText = nomor;
+               document.getElementById('nomorSuratCard').innerText = nomor;
             $.ajax({
                 url: "/pengajuan/detailSuratNonAuth",
                 method: "POST",
                 data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
                 success: function (data) {
                     const detailTable = $('#detaildataTableModal').DataTable();
+                    const modalHeader = document.getElementById('modalHeaderKendaraan');
+                    const statusIcon = document.getElementById('statusIconKendaraan');
 
                     const jenisKendraan = {
                         1: "Mengeluarkan"
                     };
 
-                    let statusBadgeHTML = '';
                     const informasiTambahan = data.informasi_tambahan ?? [];
 
                     // Cek apakah ada yang menolak
@@ -615,9 +601,32 @@
                     // Cek level tertinggi yang menyetujui
                     const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
 
-                    const tombolCetak = document.getElementById('cetakBukti');
+                    // Set header color and status icon
+                    if (adaYangMenolak) {
+                        // Status DITOLAK
+                        modalHeader.style.backgroundColor = '#dc3545';
+                        modalHeader.style.color = 'white';
+                        statusIcon.className = 'fas fa-times-circle';
+                        statusIcon.style.color = 'white';
+                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    } else if (maxLevel >= 3) {
+                        // Status LENGKAP
+                        modalHeader.style.backgroundColor = '#28a745';
+                        modalHeader.style.color = 'white';
+                        statusIcon.className = 'fas fa-clipboard-check';
+                        statusIcon.style.color = 'white';
+                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    } else {
+                        // Status BELUM LENGKAP
+                        modalHeader.style.backgroundColor = '#ffc107';
+                        modalHeader.style.color = 'black';
+                        statusIcon.className = 'fas fa-exclamation-circle';
+                        statusIcon.style.color = 'black';
+                        statusIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                    }
 
                     // Logika tampil/sembunyikan tombol
+                    const tombolCetak = document.getElementById('cetakBukti');
                     if (tombolCetak) {
                         if (adaYangMenolak || maxLevel < 3) {
                             tombolCetak.style.display = "none";
@@ -625,28 +634,6 @@
                             tombolCetak.style.display = "inline-block";
                         }
                     }
-
-                    if (adaYangMenolak) {
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
-                            </span>
-                        `;
-                    } else if (maxLevel >= 3) {
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
-                            </span>
-                        `;
-                    } else {
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                            </span>
-                        `;
-                    }
-
-                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
                     // Kosongkan data lama kendaraan
                     document.getElementById('kendaraanInfoBody').innerHTML = "";
@@ -790,7 +777,6 @@
         function printSuratDinas() {
             // Ambil data dari modal
             const nomorSurat = document.getElementById('nomorSuratCard').innerText;
-            const statusBadge = document.getElementById('approvalStatusBadgeDinas').innerHTML;
 
             // Ambil data kendaraan
             let kendaraanRows = '';

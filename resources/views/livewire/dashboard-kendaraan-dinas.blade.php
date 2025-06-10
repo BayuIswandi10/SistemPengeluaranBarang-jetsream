@@ -308,18 +308,16 @@
                         <div class="modal fade" id="detailModalPenggunaan" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                   <div class="modal-header" id="modalHeader" style="position: relative;">
                                         <div class="d-flex justify-content-between align-items-center w-100">
                                             <h5 class="modal-title" id="detailModalLabel">Detail Surat Dinas</h5>
-                                            <!-- Badge Status di Header -->
-                                            <div id="approvalStatusBadgeDinas"></div>
                                         </div>
+                                        <i id="statusIcon" style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"></i>
                                         <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
+                                            <span aria-hidden="true">×</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-
 
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <p><strong>Nomor Surat:</strong> <span id="nomorSuratCard"></span></p>    
@@ -698,23 +696,23 @@
 
 
                     $(document).ready(function () {
-                        $('#detailModalPenggunaan').on('show.bs.modal', function (event) {
+                       $('#detailModalPenggunaan').on('show.bs.modal', function (event) {
                             const button = $(event.relatedTarget); // Tombol yang diklik
                             const nomor = button.data('nomor'); 
-                            document.getElementById('nomorSuratCard').innerText = nomor;
 
                             $.ajax({
                                 url: "/pengajuan/detailSurat",
                                 method: "POST",
                                 data: { surat_kendaraan_dinas_id: nomor, "_token": "{{ csrf_token() }}" },
-                                    success: function (data) {
+                                success: function (data) {
                                     const detailTable = $('#detaildataTableModal').DataTable();
+                                    const modalHeader = document.getElementById('modalHeader');
+                                    const statusIcon = document.getElementById('statusIcon');
 
                                     const jenisKendraan = {
                                         1: "Mengeluarkan"
                                     };
 
-                                    let statusBadgeHTML = '';
                                     const informasiTambahan = data.informasi_tambahan ?? [];
 
                                     // Cek apakah ada yang menolak
@@ -723,38 +721,30 @@
                                     // Cek level tertinggi yang menyetujui
                                     const maxLevel = Math.max(...informasiTambahan.map(x => parseInt(x.status?.replace('Level ', '')) || 0));
 
-                                    const tombolCetak = document.getElementById('cetakBukti');
-
-                                    // Logika tampil/sembunyikan tombol
-                                    if (tombolCetak) {
-                                        if (adaYangMenolak || maxLevel < 3) {
-                                            tombolCetak.style.display = "none";
-                                        } else {
-                                            tombolCetak.style.display = "inline-block";
-                                        }
-                                    }
-
+                                    // Set header color and status icon
                                     if (adaYangMenolak) {
-                                        statusBadgeHTML = `
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 4px;"></i> Ditolak
-                                            </span>
-                                        `;
+                                        // Status DITOLAK
+                                        modalHeader.style.backgroundColor = '#dc3545';
+                                        modalHeader.style.color = 'white';
+                                        statusIcon.className = 'fas fa-times-circle';
+                                        statusIcon.style.color = 'white';
+                                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                                     } else if (maxLevel >= 3) {
-                                        statusBadgeHTML = `
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 4px;"></i> Lengkap
-                                            </span>
-                                        `;
+                                        // Status LENGKAP
+                                        modalHeader.style.backgroundColor = '#28a745';
+                                        modalHeader.style.color = 'white';
+                                        statusIcon.className = 'fas fa-clipboard-check';
+                                        statusIcon.style.color = 'white';
+                                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255,  provisial';
                                     } else {
-                                        statusBadgeHTML = `
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                                            </span>
-                                        `;
+                                        // Status BELUM LENGKAP
+                                        modalHeader.style.backgroundColor = '#ffc107';
+                                        modalHeader.style.color = 'black';
+                                        statusIcon.className = 'fas fa-exclamation-circle';
+                                        statusIcon.style.color = 'black';
+                                        statusIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                                     }
 
-                                    document.getElementById('approvalStatusBadgeDinas').innerHTML = statusBadgeHTML;
 
                                     // Kosongkan data lama kendaraan
                                     document.getElementById('kendaraanInfoBody').innerHTML = "";
@@ -785,17 +775,6 @@
                                             document.getElementById('kendaraanInfoBody').innerHTML += row;
                                         });
 
-                                        // Simpan kilometer data untuk print
-                                        let kilometerElement = document.getElementById('kilometerData');
-                                        if (!kilometerElement) {
-                                            kilometerElement = document.createElement('div');
-                                            kilometerElement.id = 'kilometerData';
-                                            kilometerElement.style.display = 'none';
-                                            document.body.appendChild(kilometerElement);
-                                        }
-                                        kilometerElement.setAttribute('data-kilometer-awal', kilometerAwal);
-                                        kilometerElement.setAttribute('data-kilometer-akhir', kilometerAkhir);
-                                        kilometerElement.setAttribute('data-has-private-vehicle', hasPrivateVehicle);
                                     } else {
                                         document.getElementById('kendaraanInfoBody').innerHTML = `
                                             <tr><td colspan="7" class="text-center">Tidak ada data kendaraan</td></tr>
@@ -873,7 +852,6 @@
                                             {className: 'dt-head-center', targets: 1},
                                             {className: 'dt-head-center', targets: 2},
                                             {className: 'dt-head-center', targets: 3},
-
                                             {className: 'dt-body-center', targets: 0},
                                             {className: 'dt-body-left', targets: 1},
                                         ],
@@ -896,7 +874,7 @@
                                     });
 
                                     // Pastikan modal terbuka setelah data dimuat
-                                    $('#suratDinasModal').modal('show');
+                                    $('#detailModalPenggunaan').modal('show');
                                 },
                                 error: function (xhr, status, error) {
                                     console.error("Error fetching data:", error);

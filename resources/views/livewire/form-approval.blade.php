@@ -270,26 +270,18 @@
      <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" id="modalHeader" style="position: relative;">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title" id="detailModalLabel">Detail Barang Keluar</h5>
-                        
-                        <div class="d-flex align-items-center gap-3">
-                            <div id="approvalStatusBadge" style="padding-right: 1rem; border-right: 1px solid #ccc;"></div>
-                            <div id="kategoriBarangCard" style="padding-left: 1rem;"></div>
-                        </div>
+                    </div>
+                    <div style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px;">
+                        <i id="statusIcon" style="font-size: 1.8rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"></i>
                     </div>
                     <button type="button" class="close ml-2" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
-
-                    <!-- Info Nomor Pengeluaran dan Kategori -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p><strong>Nomor Pengeluaran:</strong> <span id="nomorPengeluaranCard"></span></p>
-                        <div id="kategoriBarangCard"></div>
-                    </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
@@ -562,57 +554,47 @@
         $('#detailModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget); // Button yang diklik
             const nomor = button.data('nomor'); // Nomor pengeluaran barang
-            document.getElementById('nomorPengeluaranCard').innerText = nomor;
-
-            $.ajax({
+             $.ajax({
                 url: "/pengeluaran/detail",
                 method: "POST",
                 data: { pengeluaran_barang_id: nomor, "_token": "{{ csrf_token() }}" },
                 success: function (data) {
-                    // Tampilkan badge kategori
-                    document.getElementById('kategoriBarangCard').innerHTML = 
-                        data.kategori_pengeluaran === 1 
-                        ? `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                Scrap
-                            </span>`
-                        : `<span style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #17a2b8; color: white;">
-                                Non Scrap
-                            </span>`;
+                    // Set judul modal berdasarkan kategori
+                    const kategoriText = data.kategori_pengeluaran === 1 ? 'Scrap' : 'Non Scrap';
+                    document.getElementById('detailModalLabel').innerText = `Detail Barang Keluar Kategori ${kategoriText}`;
 
-                    // Badge besar status persetujuan
+                    // Warna header dan ikon berdasarkan status persetujuan
+                    const modalHeader = document.getElementById('modalHeader');
+                    const statusIcon = document.getElementById('statusIcon');
                     const maxLevel = Math.max(...(data.informasi_tambahan ?? []).map(x => parseInt(x.status?.replace('Level ', '')) || 0));
                     const adaYangMenolak = (data.informasi_tambahan ?? []).some(x => x.status === 'Level 0');
-
-                    let statusBadgeHTML = '';
-
+                    
                     if (adaYangMenolak) {
                         // Status DITOLAK
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #dc3545; color: white;">
-                                <i class="fas fa-times-circle" style="font-size: 1rem; margin-right: 6px;"></i> Ditolak
-                            </span>
-                        `;
+                        modalHeader.style.backgroundColor = '#dc3545';
+                        modalHeader.style.color = 'white';
+                        statusIcon.className = 'fas fa-times-circle';
+                        statusIcon.style.color = 'white';
+                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                     } else if (
                         (data.kategori_pengeluaran === 1 && maxLevel >= 5) || 
                         (data.kategori_pengeluaran === 0 && maxLevel >= 4)
                     ) {
                         // Status LENGKAP
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 130px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #28a745; color: white;">
-                                <i class="fas fa-clipboard-check" style="font-size: 1rem; margin-right: 6px;"></i> Lengkap
-                            </span>
-                        `;
+                        modalHeader.style.backgroundColor = '#28a745';
+                        modalHeader.style.color = 'white';
+                        statusIcon.className = 'fas fa-clipboard-check';
+                        statusIcon.style.color = 'white';
+                        statusIcon.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                     } else {
                         // Status BELUM LENGKAP
-                        statusBadgeHTML = `
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 40px; font-size: 0.85rem; padding: 0.25rem; border-radius: 0.5rem; background-color: #ffc107; color: black;">
-                                <i class="fas fa-exclamation-circle" style="font-size: 1rem; margin-right: 6px;"></i> Belum Lengkap
-                            </span>
-                        `;
+                        modalHeader.style.backgroundColor = '#ffe107';
+                        modalHeader.style.color = 'black';
+                        statusIcon.className = 'fas fa-exclamation-circle';
+                        statusIcon.style.color = 'black';
+                        statusIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                     }
 
-                    document.getElementById('approvalStatusBadge').innerHTML = statusBadgeHTML;
-            
                     document.getElementById('nomorPolisiCard').innerText = data.no_polisi || '-';
                     const tbody = document.getElementById('detailBody');
                     const additionalInfoBody = document.getElementById('additionalInfoBody');
@@ -625,9 +607,8 @@
                         $('#detaildataTableModal').DataTable().clear().destroy();
                     }
 
-                    let statusPengeluaran = data.status; // Pastikan API mengembalikan status
+                    let statusPengeluaran = data.status;
                     let kategoriPengeluaran = data.kategori_pengeluaran;
-
                     let nomorPolisi = data.no_polisi;
                     
                     // Menambahkan data ke tabel barang keluar
@@ -670,8 +651,7 @@
                         data.informasi_tambahan.forEach((info, index) => {
                             let alasanPenolakan = (index === data.informasi_tambahan.length - 1) 
                                 ? info.alasan_penolakan 
-                                : '-'; // hanya isi di baris terakhir
-
+                                : '-';
                             let row = `
                                 <tr>
                                     <td>${index + 1}</td>
@@ -691,32 +671,31 @@
                     
                     // Aktifkan DataTable setelah data ditambahkan
                     $('#detaildataTableModal').DataTable({
-                            columnDefs: [
-                                { className: 'dt-head-center', targets: 0 },
-                                { className: 'dt-head-center', targets: 1 },
-                                { className: 'dt-head-center', targets: 2 },
-                                { className: 'dt-head-center', targets: 3 },
-                                { className: 'dt-head-center', targets: 4 },
-                                { className: 'dt-head-center', targets: 5 },
-
-                                { className: 'dt-body-center', targets: 0 }
-                            ],
-                            language: {
-                                processing: "Memproses...",
-                                search: "Cari:",
-                                lengthMenu: "Tampilkan _MENU_ entri",
-                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                                infoEmpty: "Tidak ada data",
-                                infoFiltered: "(difilter dari _MAX_ total entri)",
-                                loadingRecords: "Memuat...",
-                                zeroRecords: "Tidak ditemukan data yang cocok",
-                                emptyTable: "Tidak ada data di tabel"
-                            },
-                            responsive: true,
-                            scrollX: false,
-                            destroy: true,
-                            pageLength: 5, // Menentukan jumlah default entries per page menjadi 5
-                            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]] 
+                        columnDefs: [
+                            { className: 'dt-head-center', targets: 0 },
+                            { className: 'dt-head-center', targets: 1 },
+                            { className: 'dt-head-center', targets: 2 },
+                            { className: 'dt-head-center', targets: 3 },
+                            { className: 'dt-head-center', targets: 4 },
+                            { className: 'dt-head-center', targets: 5 },
+                            { className: 'dt-body-center', targets: 0 }
+                        ],
+                        language: {
+                            processing: "Memproses...",
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ entri",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            infoEmpty: "Tidak ada data",
+                            infoFiltered: "(difilter dari _MAX_ total entri)",
+                            loadingRecords: "Memuat...",
+                            zeroRecords: "Tidak ditemukan data yang cocok",
+                            emptyTable: "Tidak ada data di tabel"
+                        },
+                        responsive: true,
+                        scrollX: false,
+                        destroy: true,
+                        pageLength: 5,
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
                     }); 
                     
                     $('#detailModal').modal('show');
