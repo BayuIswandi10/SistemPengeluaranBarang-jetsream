@@ -691,7 +691,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group" id="waktu_pergi">
+                                <div class="form-group" id="waktu_pergi" hidden>
                                     <label for="waktu_pergi_input">Jam Keberangkatan <span class="text-danger">*</span></label>
                                     <input type="time" class="custom-input" id="waktu_pergi" name="waktu_pergi" placeholder="Pilih jam keberangkatan" autocomplete="off">
                                 </div>

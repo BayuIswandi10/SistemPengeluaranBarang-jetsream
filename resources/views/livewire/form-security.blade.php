@@ -114,8 +114,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     <button type="button" class="btn btn-primary" id="approveButton" data-id="">
-                        <i class="fa-solid fa-check-circle mr-1"></i>
+                        <i class="fa-solid fa-check-circle ml-2"></i>
                         Setujui
                     </button>
                 </div>
@@ -205,8 +206,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     <button type="button" class="btn btn-primary" id="approveButtonDinas" data-id="">
-                        <i class="fa-solid fa-check-circle mr-1"></i>
+                        <i class="fa-solid fa-check-circle ml-2"></i>
                         Setujui
                     </button>
                 </div>
