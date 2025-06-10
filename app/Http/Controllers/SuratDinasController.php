@@ -53,8 +53,14 @@ class SuratDinasController extends Controller
         $start = $request->query('start');
         $end = $request->query('end');
 
-        return Excel::download(new KendaraanDinasExport($start, $end), 'data_kendaraan_dinas.xlsx');
+        $startFormatted = date('Y-m-d', strtotime($start));
+        $endFormatted = date('Y-m-d', strtotime($end));
+
+        $fileName = "SuratKendaraanDinas({$startFormatted}_sd_{$endFormatted}).xlsx";
+
+        return Excel::download(new KendaraanDinasExport($start, $end), $fileName);
     }
+
 
     public function getSuratDinasData(Request $request){
         $start = $request->query('start');

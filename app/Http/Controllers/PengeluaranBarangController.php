@@ -36,8 +36,14 @@ class PengeluaranBarangController extends Controller
         $start = $request->query('start');
         $end = $request->query('end');
 
-        return Excel::download(new BarangKeluarExport($start, $end), 'data_barang_keluar.xlsx');
+        $startFormatted = date('Y-m-d', strtotime($start));
+        $endFormatted = date('Y-m-d', strtotime($end));
+
+        $fileName = "SuratBarangKeluar({$startFormatted}_sd_{$endFormatted}).xlsx";
+
+        return Excel::download(new BarangKeluarExport($start, $end), $fileName);
     }
+
 
     public function getDataRange(Request $request){
         $start = $request->query('start');
