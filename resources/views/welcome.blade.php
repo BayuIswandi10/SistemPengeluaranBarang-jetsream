@@ -1990,7 +1990,9 @@
                             // Tanggal yang sudah lewat - warna abu-abu
                             cell.style.backgroundColor = '#f8f9fa';
                             cell.style.color = '#6c757d';
-                            cell.style.opacity = '0.6';
+                            cell.style.opacity = '0.8'; // tetap
+                            cell.style.filter = 'brightness(95%)'; 
+
                         } else if (cellDate.getTime() === today.getTime()) {
                             // Tanggal hari ini - warna biru
                             cell.style.backgroundColor = '#e3f2fd';
