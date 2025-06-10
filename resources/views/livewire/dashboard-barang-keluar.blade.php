@@ -716,34 +716,31 @@
                         return `${year}-${month}-${day}`; // Format YYYY-MM-DD
                     }
 
-                    // Fungsi untuk memformat tanggal ke awal hari
-                    function formatDateToStartOfDay(dateString) {
-                        return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                    function formatDateToStartOfDay(date) {
+                        const d = new Date(date);
+                        d.setHours(0, 0, 0, 0);
+                        return formatLocalDate(d, 'start');
                     }
 
-                    // Fungsi untuk memformat tanggal ke akhir hari
-                    function formatDateToEndOfDay(dateString) {
-                        return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                    function formatDateToEndOfDay(date) {
+                        const d = new Date(date);
+                        d.setHours(23, 59, 59, 999);
+                        return formatLocalDate(d, 'end');
                     }
 
                     // Fungsi utama untuk memformat waktu lokal dengan opsi jam kustom
                     function formatLocalDate(date, type = 'default') {
-                        if (type === 'start') {
-                            date.setHours(0, 0, 0, 0); // Awal hari
-                        } else if (type === 'end') {
-                            date.setHours(23, 59, 59, 999); // Akhir hari
-                        }
-                        
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                        const localDate = new Date(date); // aman karena ini sudah Date, bukan string
+
+                        const year = localDate.getFullYear();
+                        const month = String(localDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(localDate.getDate()).padStart(2, '0');
+                        const hours = String(localDate.getHours()).padStart(2, '0');
+                        const minutes = String(localDate.getMinutes()).padStart(2, '0');
+                        const seconds = String(localDate.getSeconds()).padStart(2, '0');
 
                         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
                     }
-
 
                     // Fungsi untuk memuat jumlah data
                     function loadCounts(startDate, endDate) {
@@ -810,7 +807,7 @@
                     }
 
                    // Inisialisasi Flatpickr dengan event onChange untuk memuat count data
-                   flatpickr("#date-range-picker", {
+                    flatpickr("#date-range-picker", {
                         mode: "range",
                         dateFormat: "Y-m-d",
                         locale: "id",
@@ -938,37 +935,36 @@
 
                         if (!statusFilter) {
                             console.warn('Data status tidak ditemukan. Pastikan elemen yang di-klik memiliki atribut data-status.');
-                            return; // Jika tidak ada status, hentikan
+                            return;
                         }
 
-                        // Ambil instance Flatpickr yang sudah ada
+                        // Ambil instance Flatpickr
                         const dateRangeInstance = document.getElementById("date-range-picker")._flatpickr;
 
                         if (!dateRangeInstance) {
                             console.error('Flatpickr tidak ditemukan pada elemen #date-range-picker.');
-                            return; // Jika Flatpickr belum diinisialisasi, hentikan
+                            return;
                         }
 
                         let startDate, endDate;
-                        const selectedDates = dateRangeInstance.selectedDates; // Ambil tanggal yang dipilih
+                        const selectedDates = dateRangeInstance.selectedDates;
 
                         if (selectedDates.length === 2) {
-                            // Format tanggal menjadi YYYY-MM-DD jika ada yang dipilih
-                            startDate = selectedDates[0].toISOString().split('T')[0];
-                            endDate = selectedDates[1].toISOString().split('T')[0];
+                            startDate = formatLocalDate(selectedDates[0], 'start');
+                            endDate = formatLocalDate(selectedDates[1], 'end');
                         } else {
-                            // Default ke hari ini jika tidak ada tanggal yang dipilih
                             const today = new Date();
-                            startDate = today.toISOString().split('T')[0];
-                            endDate = today.toISOString().split('T')[0];
+                            startDate = formatLocalDate(today, 'start');
+                            endDate = formatLocalDate(today, 'end');
                         }
 
-                        console.log('Start Date:', startDate); // Debug tanggal mulai
-                        console.log('End Date:', endDate); // Debug tanggal akhir
+                        console.log('Start Date:', startDate);
+                        console.log('End Date:', endDate);
 
                         // Panggil fungsi untuk memuat data tabel
                         loadTableData(statusFilter, startDate, endDate);
                     });
+
 
                 });
             });
@@ -994,14 +990,18 @@
                     },
                 });
 
-                function formatDateToStartOfDay(dateString) {
-                    return `${dateString} 00:00:00`; // Format YYYY-MM-DD 00:00:00
+                function formatDateToStartOfDay(date) {
+                    const d = new Date(date);
+                    d.setHours(0, 0, 0, 0);
+                    return formatLocalDate(d, 'start');
                 }
 
-                // Fungsi untuk memformat tanggal ke akhir hari
-                function formatDateToEndOfDay(dateString) {
-                    return `${dateString} 23:59:59`; // Format YYYY-MM-DD 23:59:59
+                function formatDateToEndOfDay(date) {
+                    const d = new Date(date);
+                    d.setHours(23, 59, 59, 999);
+                    return formatLocalDate(d, 'end');
                 }
+
 
                 function fetchData() {
                     const startDate = startDateInput.val();

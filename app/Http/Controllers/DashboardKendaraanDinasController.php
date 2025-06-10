@@ -39,7 +39,7 @@ class DashboardKendaraanDinasController extends Controller
                     'pencatatanKendaraanDinas', 
                     'suratDetail'
                 ])
-                ->whereBetween('created_date', [$startDate, $endDate])
+                ->whereBetween('tanggal_penggunaan', [$startDate, $endDate])
                 ->where('status', '!=', 'Expired');
 
             // Filter data berdasarkan level user
@@ -96,7 +96,8 @@ class DashboardKendaraanDinasController extends Controller
             })->values();
 
             // 1. Ambil semua surat kendaraan dinas dalam rentang tanggal
-            $suratIds = SuratKendaraanDinas::whereBetween('created_date', [$startDate, $endDate])
+            $suratIds = SuratKendaraanDinas::whereBetween('tanggal_penggunaan', [$startDate, $endDate])
+            ->where('status', '!=', 'Expired')
             ->pluck('surat_kendaraan_dinas_id');
 
             // 2. Ambil detail surat berdasarkan ID surat
