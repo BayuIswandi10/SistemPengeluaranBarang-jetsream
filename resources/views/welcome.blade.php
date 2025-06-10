@@ -231,45 +231,46 @@
     <style>
         /* Semua tombol di FullCalendar */
         .fc .fc-button {
-        background-color: #0d6efd !important;
-        border-color: #0d6efd !important;
-        color: #ffffff !important;
-        font-weight: bold;
-        border-radius: 0.375rem;
+            background-color: #084298 !important; /* Lebih gelap */
+            border-color: #084298 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 0.375rem;
         }
 
         /* Hover */
         .fc .fc-button:hover,
         .fc .fc-button:focus {
-        background-color: #0b5ed7 !important;
-        border-color: #0a58ca !important;
-        color: #ffffff !important;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            background-color: #0b5ed7 !important; /* Hover lebih terang */
+            border-color: #0a58ca !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
         }
 
         /* Saat tombol aktif (diklik) */
         .fc .fc-button:active,
         .fc .fc-button.fc-button-active {
-        background-color: #084298 !important;
-        border-color: #084298 !important;
-        color: #ffffff !important;
+            background-color: #0d6efd !important; /* Lebih terang dari default */
+            border-color: #0d6efd !important;
+            color: #ffffff !important;
         }
 
-        /* Tombol "today" (sama warnanya juga) */
+        /* Tombol "today" (default gelap, aktif terang) */
         .fc .fc-today-button {
-        background-color: #0d6efd !important;
-        border-color: #0d6efd !important;
-        color: #ffffff !important;
+            background-color: #084298 !important;
+            border-color: #084298 !important;
+            color: #ffffff !important;
         }
 
-        /* Hover & klik untuk today juga */
+        /* Hover & klik untuk today */
         .fc .fc-today-button:hover,
         .fc .fc-today-button:focus,
         .fc .fc-today-button:active {
-        background-color: #4b5ac1 !important;
-        border-color: #4b5ac1 !important;
-        color: #ffffff !important;
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: #ffffff !important;
         }
+
 
 
     </style>
