@@ -126,71 +126,9 @@
                         });
                     });
                 });
-
-                // Konfigurasi untuk modal backdrop - hanya 1 backdrop
-                $(document).ready(function() {
-                    let modalCount = 0;
-                    
-                    // Event handler saat modal akan ditampilkan
-                    $(document).on('show.bs.modal', '.modal', function (e) {
-                        modalCount++;
-                        var zIndex = 1040 + (10 * modalCount);
-                        $(this).css('z-index', zIndex);
-                        
-                        // Hanya modal pertama yang menggunakan backdrop
-                        if (modalCount === 1) {
-                            // Modal pertama menggunakan backdrop normal
-                            $(this).data('bs.modal')._config.backdrop = true;
-                        } else {
-                            // Modal kedua dan seterusnya tidak menggunakan backdrop
-                            $(this).data('bs.modal')._config.backdrop = false;
-                            
-                            // Hapus backdrop yang mungkin sudah dibuat
-                            setTimeout(() => {
-                                $('.modal-backdrop:not(:first)').remove();
-                            }, 0);
-                        }
-                    });
-                    
-                    // Event handler saat modal disembunyikan
-                    $(document).on('hidden.bs.modal', '.modal', function () {
-                        modalCount--;
-                        
-                        // Jika masih ada modal yang terbuka, pastikan body tetap memiliki class modal-open
-                        if (modalCount > 0) {
-                            setTimeout(function() {
-                                $('body').addClass('modal-open');
-                            }, 0);
-                        }
-                        
-                        // Hapus backdrop berlebihan
-                        if ($('.modal-backdrop').length > 1) {
-                            $('.modal-backdrop:not(:first)').remove();
-                        }
-                    });
-                    
-                    // Fungsi helper untuk membuka modal
-                    window.openModal = function(modalId) {
-                        $('#' + modalId).modal('show');
-                    };
-                    
-                    // Override default bootstrap modal untuk mengontrol backdrop
-                    const originalModal = $.fn.modal.Constructor;
-                    $.fn.modal.Constructor = function(element, config) {
-                        // Jika sudah ada modal terbuka, set backdrop false
-                        if ($('.modal.show').length > 0) {
-                            config = config || {};
-                            config.backdrop = false;
-                        }
-                        return originalModal.call(this, element, config);
-                    };
-                    
-                    // Copy semua properti dan method dari constructor asli
-                    Object.setPrototypeOf($.fn.modal.Constructor, originalModal);
-                    Object.assign($.fn.modal.Constructor, originalModal);
-                });
             });
         </script>
+
 
         @livewireScripts
 
