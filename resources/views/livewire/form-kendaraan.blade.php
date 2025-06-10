@@ -567,8 +567,8 @@
                     icon: 'info',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Ya, nonaktifkan!',
                     cancelButtonText: 'Batal'
                 }).then((result) => {
