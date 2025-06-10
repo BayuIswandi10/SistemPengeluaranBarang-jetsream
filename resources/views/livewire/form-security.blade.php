@@ -505,8 +505,8 @@
               icon: 'info',
               showCancelButton: true,
               reverseButtons: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
+              confirmButtonColor: '#0d6efd',
+              cancelButtonColor: '#6c757d',
               confirmButtonText: 'Ya, setuju!',
               cancelButtonText: 'Batal'
           }).then((result) => {
@@ -597,8 +597,8 @@
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
             confirmButtonText: 'Ya, setuju!',
             cancelButtonText: 'Batal'
         }).then((result) => {
