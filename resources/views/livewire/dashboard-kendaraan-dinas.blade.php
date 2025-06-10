@@ -104,6 +104,10 @@
             line-height: 1 !important;
             display: table-cell !important;
         }
+        #dataTableKendaraan td {
+            vertical-align: middle !important;
+            display: table-cell !important;
+        }
 
 </style>
     <div class="container-fluid">
@@ -1091,15 +1095,12 @@
                                         if (item.surat_details && item.surat_details.length > 0) {
                                             tanggalDigunakan = item.surat_details.map(surat => {
                                                 const tgl = surat.tanggal_penggunaan || '-';
-                                                const badgeClass = getBadgeColor(tgl);
-                                                return `<span class="badge badge-${badgeClass}">${tgl}</span>`;
+                                                return `<span>${tgl}</span>`;
                                             }).join(' ');
 
                                             suratKendaraanDinas = item.surat_details.map(surat => {
                                                 const no = surat.no_surat || '-';
-                                                const tgl = surat.tanggal_penggunaan || '-';
-                                                const badgeClass = getBadgeColor(tgl); // warna mengikuti tanggal
-                                                return `<span class="badge badge-${badgeClass}">${no}</span>`;
+                                                return `<span>${no}</span>`;
                                             }).join(' ');
                                         }
 

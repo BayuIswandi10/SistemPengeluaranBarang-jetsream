@@ -90,12 +90,12 @@
                                     <thead>
                                         <tr>
                                             <th style="text-align: center">No</th>
-                                            <th style="text-align: center">Nama</th>
-                                            <th style="text-align: center">Tingkatan</th>
-                                            <th style="text-align: center">Departemen</th>
-                                            <th style="text-align: center">Status Persetujuan</th>
-                                            <th style="text-align: center">Tanggal Persetujuan</th>
-                                            <th style="text-align: center">Alasan Penolakan</th>
+                                            <th>Nama</th>
+                                            <th>Tingkatan</th>
+                                            <th>Departemen</th>
+                                            <th>Status Persetujuan</th>
+                                            <th>Tanggal Persetujuan</th>
+                                            <th>Alasan Penolakan</th>
                                         </tr>
                                     </thead>
                                     <tbody id="additionalInfoBody">
@@ -108,7 +108,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" id="approveButton" data-id="">
+                    <button type="button" class="btn btn-success" id="approveButton" data-id="">
                         <i class="fa-solid fa-check-circle ml-2"></i>
                         Setujui
                     </button>
@@ -145,12 +145,12 @@
                                 <thead>
                                     <tr>
                                         <th style="text-align: center">No</th>
-                                        <th style="text-align: center">No Kendaraan</th>
-                                        <th style="text-align: center">Keterangan</th>
-                                        <th style="text-align: center">Tanggal Penggunaan</th>
-                                        <th style="text-align: center">Rute 1</th>
-                                        <th style="text-align: center">Rute 2</th>
-                                        <th style="text-align: center">Rute 3</th>
+                                        <th>No Kendaraan</th>
+                                        <th>Keterangan</th>
+                                        <th>Tanggal Penggunaan</th>
+                                        <th>Rute 1</th>
+                                        <th>Rute 2</th>
+                                        <th>Rute 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -201,7 +201,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" id="approveButtonDinas" data-id="">
+                    <button type="button" class="btn btn-success" id="approveButtonDinas" data-id="">
                         <i class="fa-solid fa-check-circle ml-2"></i>
                         Setujui
                     </button>
@@ -327,7 +327,7 @@
                             <td>${item.nama_barang}</td>
                             <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                             <td>${item.satuan_barang}</td>
-                            <td>${item.keterangan_barang ?? ''}</td>
+                            <td>${item.keterangan_barang ?? '-'}</td>
                         </tr>
                     `).join('');
                 } else {
@@ -380,11 +380,6 @@
                 $('#dataTable').DataTable({
                     columnDefs: [
                         { className: 'dt-head-center', targets: 0 },
-                        { className: 'dt-head-center', targets: 1 },
-                        { className: 'dt-head-center', targets: 2 },
-                        { className: 'dt-head-center', targets: 3 },
-                        { className: 'dt-head-center', targets: 4 },
-                        { className: 'dt-head-center', targets: 5 },
                         { className: 'dt-body-center', targets: 0 }
                     ],
                     language: {
@@ -845,7 +840,7 @@
                 // Inisialisasi ulang DataTable
                 $('#detaildataTableModal').DataTable({
                     columnDefs: [
-                        { className: 'dt-head-center', targets: [0, 1, 2, 3, 4] },
+                        { className: 'dt-head-center', targets: [0] },
                         { className: 'dt-body-center', targets: [0] },
                         { className: 'dt-body-left', targets: [1, 2, 3, 4] }
                     ],

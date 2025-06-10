@@ -588,7 +588,7 @@
                                         <td>${item.nama_barang}</td>
                                         <td>${Number(item.jumlah_barang).toLocaleString('id-ID')}</td>
                                         <td>${item.satuan_barang}</td>
-                                        <td>${item.keterangan_barang ?? ''}</td>
+                                        <td>${item.keterangan_barang ?? '-'}</td>
                                     </tr>
                                 `).join('');
                             } else {
