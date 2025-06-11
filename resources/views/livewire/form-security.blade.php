@@ -52,7 +52,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p><strong>Nomor Polisi:</strong> <span id="nomorPolisiCard"></span></p>
                     </div>
-                    
                     <!-- Card untuk Tabel Barang Keluar -->
                     <div class="card">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3">
@@ -482,7 +481,7 @@
               icon: 'info',
               showCancelButton: true,
               reverseButtons: true,
-              confirmButtonColor: '#0d6efd',
+              confirmButtonColor: '#28a745',
               cancelButtonColor: '#6c757d',
               confirmButtonText: 'Ya, setuju!',
               cancelButtonText: 'Batal'
@@ -574,7 +573,7 @@
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonColor: '#0d6efd',
+            confirmButtonColor: '#28a745',
             cancelButtonColor: '#6c757d',
             confirmButtonText: 'Ya, setuju!',
             cancelButtonText: 'Batal'

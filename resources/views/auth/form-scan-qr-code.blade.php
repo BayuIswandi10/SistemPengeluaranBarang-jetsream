@@ -177,7 +177,7 @@
                     <!-- Card untuk Tabel Barang Keluar -->
                     <div class="card">
                         <div class="card-header bg-primary text-white">
-                            <h6 class="mb-0">Detail Barang Keluar</h6>
+                            <h6 class="mb-0">Informasi Barang Keluar</h6>
                         </div>
                         <div class="card-body">
                             <table id="dataTable" class="table table-striped table-bordered">
