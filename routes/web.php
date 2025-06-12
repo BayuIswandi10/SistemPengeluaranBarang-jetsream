@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', function () {
     return Auth::guard()->check()
         ? redirect('/dashboard-barang-keluar')
-        : view('welcome');
+        : view('landing.welcome');
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
