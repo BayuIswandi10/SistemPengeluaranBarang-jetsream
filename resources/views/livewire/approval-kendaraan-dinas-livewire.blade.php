@@ -1022,6 +1022,7 @@
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                                    <td>${item.alasan_penggunaan || '-'}</td>
                                 </tr>
                             `;
                             document.getElementById('kendaraanInfoBody').innerHTML += row;
