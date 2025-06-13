@@ -11,18 +11,22 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
+
 class DashboardKendaraanDinasLiveWire extends Component
 {
     public function render()
     {
         $user = Auth::user();
         $user->level = trim($user->level);
-         $startOfDay = Carbon::today()->startOfDay(); 
-        $endOfDay = Carbon::today()->endOfDay(); 
+        $isSecurityOrSuperAdmin = false;
 
+        date_default_timezone_set('Asia/Jakarta'); // Untuk memastikan script CLI ikut WIB
+
+        $startOfDay = Carbon::today('Asia/Jakarta')->startOfDay()->format('Y-m-d H:i:s');
+        $endOfDay = Carbon::today('Asia/Jakarta')->endOfDay()->format('Y-m-d H:i:s');
 
         $query = SuratKendaraanDinas::with(['user', 'approval'])
-            ->whereBetween('created_date', [$startOfDay, $endOfDay])
+            ->whereBetween('tanggal_penggunaan', [$startOfDay, $endOfDay])
             ->where('status', '!=', 'Expired');
 
         // Filter data berdasarkan level user
@@ -31,8 +35,9 @@ class DashboardKendaraanDinasLiveWire extends Component
                 $query->where('departemen', $user->departemen);
             })->get();
         }elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
-            // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
-            $suratKendaraanDinasList = $query->get();
+            $suratKendaraanDinasList = $query->whereHas('user', function ($query) use ($user) {
+                $query->where('departemen', $user->departemen);
+            })->get();
         } elseif (
             in_array($user->level, ['Security', 'Super Admin']) ||
             ($user->level === 'Ka.Sie' && $user->seksi === 'GENERAL SERVICES')
@@ -50,8 +55,9 @@ class DashboardKendaraanDinasLiveWire extends Component
             $userLevel = 3;
         }elseif ($user->level === 'Ka.Dept') {
             $userLevel = 2;
-        } elseif ($user->level === 'Security') {
+        } elseif ($user->level === 'Security' || 'Super Admin') {
             $userLevel = 4;
+            $isSecurityOrSuperAdmin = true;
         }
 
         $approvedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
@@ -69,10 +75,18 @@ class DashboardKendaraanDinasLiveWire extends Component
         )->count();
 
 
-        $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+        if ($isSecurityOrSuperAdmin) {
+            // Ambil SEMUA data yang ditolak
+            $rejectedIdsByUser = ApprovalKendaraanDinas::where('status_approval', 'Level 0')
+                ->pluck('surat_kendaraan_dinas_id')
+                ->toArray();
+        } else {
+            // Ambil yang ditolak oleh user yang login (jika memang perlu dibatasi begitu)
+            $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
             ->where('status_approval', 'Level 0')
             ->pluck('surat_kendaraan_dinas_id')
             ->toArray();
+        }
         $suratDitolak = $suratKendaraanDinasList->filter(function ($item) use ($rejectedIdsByUser) {
             return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
         })->count();

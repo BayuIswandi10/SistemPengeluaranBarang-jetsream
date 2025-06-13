@@ -1939,7 +1939,7 @@
 
                         return {
                             id: item.kendaraan_dinas_id,
-                            title: `<strong>${item.nomor_kendaraan}</strong><br>${item.merk_kendaraan} (${item.kapasitas_tersedia > 0 ? 'Sisa: ' + item.kapasitas_tersedia : 'Penuh'})`,
+                            title: `<strong>${item.nomor_kendaraan}</strong><br>${item.merk_kendaraan}<br>${item.kapasitas_tersedia > 0 ? 'Sisa: ' + item.kapasitas_tersedia : 'Penuh'}`,
                             start: item.tanggal_penggunaan,
                             allDay: true,
                             backgroundColor: color,

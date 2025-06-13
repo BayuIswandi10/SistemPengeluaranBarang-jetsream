@@ -21,6 +21,7 @@ class DashboardBarangKeluarController extends Controller
             $user = Auth::user();
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date');
+            $isSecurityOrSuperAdmin = false;
 
             if (!$startDate || !$endDate) {
                 return response()->json([
@@ -59,32 +60,55 @@ class DashboardBarangKeluarController extends Controller
             } elseif ($user->level === 'Ka.Dept') {
                 $userLevel = 3;
             } elseif ($user->level === 'Security') {
-                $userLevel = 5;
+                $userLevel = 6;
+                $isSecurityOrSuperAdmin = true;
             } elseif ($user->level === 'Super Admin') {
-                $userLevel = 5;
+                $userLevel = 6;
+                $isSecurityOrSuperAdmin = true;
             } else {
                 $userLevel = 1; // default fallback jika tidak dikenali
+                 $isSecurityOrSuperAdmin = false;
             }
 
             //Mengambil NRP yang login dan untuk mengambil persetujuan
-           $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', '=', 'Level ' . $userLevel)
-            ->pluck('pengeluaran_barang_id')
-            ->toArray();
+            if ($isSecurityOrSuperAdmin) {
+                $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                    ->whereIn('status_approval', ['Level 5', 'Level 6'])
+                    ->pluck('pengeluaran_barang_id')
+                    ->toArray();
+            } else {
+                $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                    ->where('status_approval', '=', 'Level ' . $userLevel)
+                    ->pluck('pengeluaran_barang_id')
+                    ->toArray();
+            }
 
             $pengeluaranBarangsDisetujui = $pengeluaranBarangs->filter(function ($item) use ($approvedIdsByUser) {
                 return in_array($item->pengeluaran_barang_id, $approvedIdsByUser);
             })->values();
 
-            $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
-                (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
-            )->values();
+            $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(function ($item) use ($userLevel, $isSecurityOrSuperAdmin) {
+                $itemLevel = (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT);
 
-            //Mengambil NRP yang login dan untuk mengambil penolakan
-            $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-            ->where('status_approval', 'Level 0')
-            ->pluck('pengeluaran_barang_id')
-            ->toArray();
+                if ($isSecurityOrSuperAdmin ?? false) {
+                    return in_array($itemLevel, [4, 5]); // lihat level 4 dan 5
+                }
+
+                return $itemLevel === ($userLevel - 1);
+            })->values();
+
+           if ($isSecurityOrSuperAdmin) {
+                // Ambil SEMUA data yang ditolak
+                $rejectedIdsByUser = ApprovalBarangKeluar::where('status_approval', 'Level 0')
+                    ->pluck('pengeluaran_barang_id')
+                    ->toArray();
+            } else {
+                // Ambil yang ditolak oleh user yang login (jika memang perlu dibatasi begitu)
+                $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                    ->where('status_approval', 'Level 0')
+                    ->pluck('pengeluaran_barang_id')
+                    ->toArray();
+            }
             $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(function ($item) use ($rejectedIdsByUser) {
                 return in_array($item->pengeluaran_barang_id, $rejectedIdsByUser);
             })->values();

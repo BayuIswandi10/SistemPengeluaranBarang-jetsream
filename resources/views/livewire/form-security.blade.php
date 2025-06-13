@@ -601,7 +601,11 @@
                             title: 'Berhasil!',
                             text: response.message,
                             icon: 'success',
-                            confirmButtonText: 'OK'
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            },
+                            buttonsStyling: false
                         }).then(() => {
                             $('#suratDinasModal').modal('hide');
                             location.reload();
@@ -612,7 +616,11 @@
                             title: 'Gagal!',
                             text: xhr.responseJSON?.message || 'Terjadi kesalahan.',
                             icon: 'error',
-                            confirmButtonText: 'OK'
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            },
+                            buttonsStyling: false
                         });
                     }
                 });

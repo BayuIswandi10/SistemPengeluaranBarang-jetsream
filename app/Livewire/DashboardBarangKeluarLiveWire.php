@@ -17,6 +17,7 @@ class DashboardBarangKeluarLiveWire extends Component
         $user->level = trim($user->level);
         $startOfDay = Carbon::today()->startOfDay(); 
         $endOfDay = Carbon::today()->endOfDay(); 
+        $isSecurityOrSuperAdmin = false;
 
         $query = PengeluaranBarang::with(['user', 'approval', 'barangKeluar'])
             ->whereBetween('created_date', [$startOfDay, $endOfDay]);
@@ -47,19 +48,29 @@ class DashboardBarangKeluarLiveWire extends Component
         } elseif ($user->level === 'Ka.Dept') {
             $userLevel = 3;
         } elseif ($user->level === 'Security') {
-            $userLevel = 5;
+            $userLevel = 6;
+            $isSecurityOrSuperAdmin = true;
         } elseif ($user->level === 'Super Admin') {
-            $userLevel = 5;
+            $userLevel = 6;
+            $isSecurityOrSuperAdmin = true;
         } else {
-            $userLevel = 1; // default fallback jika tidak dikenali
+            $userLevel = 1;
+            $isSecurityOrSuperAdmin = false;
         }
 
         
         // Mengambil data status yang disetujui (hanya dari data hari ini)
-        $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-        ->where('status_approval', '=', 'Level ' . $userLevel)
-        ->pluck('pengeluaran_barang_id')
-        ->toArray();
+        if ($isSecurityOrSuperAdmin) {
+            $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                ->whereIn('status_approval', ['Level 5', 'Level 6'])
+                ->pluck('pengeluaran_barang_id')
+                ->toArray();
+        } else {
+            $approvedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                ->where('status_approval', '=', 'Level ' . $userLevel)
+                ->pluck('pengeluaran_barang_id')
+                ->toArray();
+        }
 
         $pengeluaranBarangsDisetujui = $pengeluaranBarangs
             ->filter(fn ($item) =>
@@ -68,21 +79,32 @@ class DashboardBarangKeluarLiveWire extends Component
             ->count();
 
         // Mengambil data status yang menunggu (hanya dari data hari ini)
-        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(fn ($item) =>
-            (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
-        )->count();
+        $pengeluaranBarangsMenunggu = $pengeluaranBarangs->filter(function ($item) use ($userLevel, $isSecurityOrSuperAdmin) {
+            $itemLevel = (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT);
 
-        // Mengambil data status yang ditolak (hanya dari data hari ini)
-        $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
-        ->where('status_approval', 'Level 0')
-        ->pluck('pengeluaran_barang_id')
-        ->toArray();
+            if ($isSecurityOrSuperAdmin ?? false) {
+                return in_array($itemLevel, [4, 5]); // lihat level 4 dan 5
+            }
 
-        $pengeluaranBarangsDitolak = $pengeluaranBarangs
-            ->filter(fn ($item) =>
-                in_array($item->pengeluaran_barang_id, $rejectedIdsByUser)
-            )
-            ->count();
+            return $itemLevel === ($userLevel - 1);
+        })->count();
+
+        //Mengambil NRP yang login dan untuk mengambil penolakan
+        if ($isSecurityOrSuperAdmin) {
+            // Ambil SEMUA data yang ditolak
+            $rejectedIdsByUser = ApprovalBarangKeluar::where('status_approval', 'Level 0')
+                ->pluck('pengeluaran_barang_id')
+                ->toArray();
+        } else {
+            // Ambil yang ditolak oleh user yang login (jika memang perlu dibatasi begitu)
+            $rejectedIdsByUser = ApprovalBarangKeluar::where('created_by', $user->nrp_karyawan)
+                ->where('status_approval', 'Level 0')
+                ->pluck('pengeluaran_barang_id')
+                ->toArray();
+        }
+        $pengeluaranBarangsDitolak = $pengeluaranBarangs->filter(function ($item) use ($rejectedIdsByUser) {
+            return in_array($item->pengeluaran_barang_id, $rejectedIdsByUser);
+        })->count();
 
         // 📊 Data Harian (7 hari terakhir)
         $startDate = now()->subDays(6)->startOfDay();

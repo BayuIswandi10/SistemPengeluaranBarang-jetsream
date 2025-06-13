@@ -34,8 +34,17 @@
         /* FIXED: Ensure all body cells are vertically centered */
         #dataTable td {
             vertical-align: middle !important;
-            line-height: 1 !important;
-            display: table-cell !important;
+            line-height: 1.4 !important; /* Ganti dari 1 ke 1.4 agar lebih proporsional */
+            word-break: break-word !important; /* Supaya teks panjang bisa pindah baris */
+            white-space: normal !important; /* Izinkan teks pindah baris */
+        }
+
+        
+        /* Khusus kolom terakhir (Detail), center juga */
+        #dataTable th:last-child,
+        #dataTable td:last-child {
+            text-align: center !important;
+            vertical-align: middle !important;
         }
 
         /* Additional fix for form-check wrapper if it exists */
@@ -47,8 +56,11 @@
             align-items: center !important;
         }
 
-        .button-group.d-flex {
-            justify-content: center;
+        #dataTable td:nth-child(4),
+        #dataTable th:nth-child(4) {
+            min-width: 150px !important;
+            width: 150px !important;
+            white-space: nowrap !important;
         }
 
 
@@ -287,7 +299,7 @@
                                         <!-- Button Detail -->
                                         <button 
                                             type="button" 
-                                            class="btn btn-primary btn-sm mr-2" 
+                                            class="btn btn-primary btn-sm ml-4" 
                                             data-toggle="modal" 
                                             data-target="#detailModal" 
                                             data-nomor="{{ $dataKD->surat_kendaraan_dinas_id }}">

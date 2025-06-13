@@ -24,6 +24,7 @@ class DashboardKendaraanDinasController extends Controller
             $user = Auth::user();
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date');
+            $isSecurityOrSuperAdmin = false;
 
             if (!$startDate || !$endDate) {
                 return response()->json([
@@ -49,8 +50,9 @@ class DashboardKendaraanDinasController extends Controller
                 })->get();
             }
             elseif (in_array($user->level, ['Ka.Sie', 'Ka.Dept']) && $user->seksi !== 'GENERAL SERVICES') {
-                // Ka.Sie dan Ka.Dept biasa → hanya data dari departemen yang sama
-                $suratKendaraan = $query->get();
+                 $suratKendaraan = $query->whereHas('user', function ($query) use ($user) {
+                    $query->where('departemen', $user->departemen);
+                })->get();
             }
             elseif (
                 in_array($user->level, ['Security', 'Super Admin']) ||
@@ -62,16 +64,15 @@ class DashboardKendaraanDinasController extends Controller
                 // Selain itu, kosong
                 $suratKendaraan = collect();
             }
-
-            $userLevel = null; 
              // Ekstrak angka dari level user
             $userLevel = null;
             if ($user->departemen === 'GENERAL AFFAIRS' && $user->seksi === 'GENERAL SERVICES') {
                 $userLevel = 3;
             }elseif ($user->level === 'Ka.Dept') {
                 $userLevel = 2;
-            } elseif ($user->level === 'Security') {
+            } elseif ($user->level === 'Security' || 'Super Admin') {
                 $userLevel = 4;
+                $isSecurityOrSuperAdmin = true;
             }
 
             // Mengambil data berdasarkan status
@@ -84,13 +85,22 @@ class DashboardKendaraanDinasController extends Controller
             })->values();
 
             $kendaraanMenunggu = $suratKendaraan->filter(fn ($item) =>
+                $item->status !== 'Level 0' &&
                 (int) filter_var($item->status, FILTER_SANITIZE_NUMBER_INT) === ($userLevel - 1)
             )->values();
 
-            $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
+            if ($isSecurityOrSuperAdmin) {
+                // Ambil SEMUA data yang ditolak
+                $rejectedIdsByUser = ApprovalKendaraanDinas::where('status_approval', 'Level 0')
+                    ->pluck('surat_kendaraan_dinas_id')
+                    ->toArray();
+            } else {
+                // Ambil yang ditolak oleh user yang login (jika memang perlu dibatasi begitu)
+                $rejectedIdsByUser = ApprovalKendaraanDinas::where('created_by', $user->nrp_karyawan)
                 ->where('status_approval', 'Level 0')
                 ->pluck('surat_kendaraan_dinas_id')
                 ->toArray();
+            }
             $kendaraanDitolak = $suratKendaraan->filter(function ($item) use ($rejectedIdsByUser) {
                 return in_array($item->surat_kendaraan_dinas_id, $rejectedIdsByUser);
             })->values();
