@@ -457,7 +457,7 @@
                                 "Level 1": "Mengajukan",
                                 "Level 2": "Menyetujui",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Mengetahui",
+                                "Level 4": "Menyetuhui",
                                 "Level 5": "Menyetujui",
                                 "Level 6": "Menyetujui"
                             };
