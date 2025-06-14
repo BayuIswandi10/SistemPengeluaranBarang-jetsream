@@ -961,6 +961,9 @@
                     const modalHeader = document.getElementById('modalHeader');
                     const statusIcon = document.getElementById('statusIcon');
 
+                    
+                    document.getElementById('nomorSuratCard').textContent = data.nomor_surat || nomor || '-';
+
                     const jenisKendraan = {
                         1: "Mengeluarkan"
                     };
