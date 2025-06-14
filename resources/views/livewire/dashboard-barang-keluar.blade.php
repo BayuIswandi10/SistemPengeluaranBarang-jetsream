@@ -606,12 +606,12 @@
                             };
                             const approvMapping = {
                                 "Level 0": "Menolak",
-                                "Level 1": "Mengeluarkan",
-                                "Level 2": "Membawa",
+                                "Level 1": "Mengajukan",
+                                "Level 2": "Menyetujui",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Mengetahui",
-                                "Level 5": "Menerima",
-                                "Level 6": "Memeriksa"
+                                "Level 4": "Menyetujui",
+                                "Level 5": "Menyetujui",
+                                "Level 6": "Menyetujui"
                             };
                             
                             // Menambahkan data ke tabel informasi tambahan
