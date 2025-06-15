@@ -776,7 +776,6 @@
                                             <th style="text-align: center">No</th>
                                             <th style="text-align: center">No Polisi</th>
                                             <th style="text-align: center">Jenis Mobil</th>
-                                            <th style="text-align: center">Jam Keberangkatan</th>
                                             <th style="text-align: center">Tanggal Penggunaan</th>
                                             <th style="text-align: center">Rute 1</th>
                                             <th style="text-align: center">Rute 2</th>
@@ -787,7 +786,6 @@
                                     </thead>
                                     <tbody id="bookingTableBody">
                                         <tr>
-                                            <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
@@ -853,7 +851,7 @@
                                 <input type="hidden" name="tujuan_penggunaan_1" id="ikut_tujuan_penggunaan_1">
                                 <input type="hidden" name="tujuan_penggunaan_2" id="ikut_tujuan_penggunaan_2">
                                 <input type="hidden" name="tujuan_penggunaan_3" id="ikut_tujuan_penggunaan_3">
-                                <input type="hidden" name="waktu_pergi" id="ikut_waktu_pergi">
+                                {{-- <input type="hidden" name="waktu_pergi" id="ikut_waktu_pergi"> --}}
                                 <input type="hidden" name="tanggal_penggunaan" id="ikut_tanggal_penggunaan">
                                 <input type="hidden" name="jenis_kendaraan" id="ikut_jenis_kendaraan">
                                 <input type="hidden" name="kendaraan_dinas_id" id="ikut_kendaraan_dinas_id">
@@ -2081,7 +2079,6 @@
                                     const bookingTableBody = $('#bookingTableBody');
                                     bookingTableBody.empty();
                                     const uniqueBookings = filteredBookings.reduce((acc, booking) => {
-                                        acc.waktuPergi = booking.waktu_pergi || acc.waktuPergi || '-';
                                         acc.tanggal = booking.tanggal_penggunaan || acc.tanggal || '-';
                                         acc.jenis = jenisMapping[booking.jenis_kendaraan] || acc.jenis || 'TIDAK DIKETAHUI';
                                         acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
@@ -2095,7 +2092,6 @@
                                             <td style="text-align: center">1</td>
                                             <td>${noPolisi || '-'}</td>
                                             <td>${uniqueBookings.jenis}</td>
-                                            <td style="text-align: right">${uniqueBookings.waktuPergi}</td>
                                             <td style="text-align: right">${uniqueBookings.tanggal}</td>
                                             <td>${uniqueBookings.tujuan1}</td>
                                             <td>${uniqueBookings.tujuan2}</td>
@@ -2530,12 +2526,11 @@
             const $bookingRow = $('#bookingTableBody tr').first();
             const noPolisi = $bookingRow.find('td').eq(1).text();
             const jenisKendaraan = $bookingRow.find('td').eq(2).text();
-            const waktuPergi = $bookingRow.find('td').eq(3).text();
-            const tanggalPenggunaan = $bookingRow.find('td').eq(4).text();
-            const tujuan1 = $bookingRow.find('td').eq(5).text();
-            const tujuan2 = $bookingRow.find('td').eq(6).text();
-            const tujuan3 = $bookingRow.find('td').eq(7).text();
-            const alsanPenggunaan = $bookingRow.find('td').eq(8).text();
+            const tanggalPenggunaan = $bookingRow.find('td').eq(3).text();
+            const tujuan1 = $bookingRow.find('td').eq(4).text();
+            const tujuan2 = $bookingRow.find('td').eq(5).text();
+            const tujuan3 = $bookingRow.find('td').eq(6).text();
+            const alsanPenggunaan = $bookingRow.find('td').eq(7).text();
 
             const event = globalCalendar.getEventById(globalCalendar.currentEventId);
             const kendaraanDinasId = event?.extendedProps.kendaraan_dinas_id ?? null;
@@ -2560,7 +2555,6 @@
             $('#ikut_tujuan_penggunaan_1').val(tujuan1 !== '-' ? tujuan1 : '');
             $('#ikut_tujuan_penggunaan_2').val(tujuan2 !== '-' ? tujuan2 : '');
             $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
-            $("#ikut_waktu_pergi").val(waktuPergi !== '-' ? waktuPergi : '');
             $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
             $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
             $('#ikut_alasan_penggunaan').val(alsanPenggunaan !== '-' ? alsanPenggunaan : '');

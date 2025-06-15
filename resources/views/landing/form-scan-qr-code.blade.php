@@ -271,6 +271,7 @@
                                         <th>Rute 1</th>
                                         <th>Rute 2</th>
                                         <th>Rute 3</th>
+                                        <th>Keperluan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kendaraanInfoBody">
@@ -457,7 +458,7 @@
                                 "Level 1": "Mengajukan",
                                 "Level 2": "Menyetujui",
                                 "Level 3": "Menyetujui",
-                                "Level 4": "Menyetuhui",
+                                "Level 4": "Menyetujui",
                                 "Level 5": "Menyetujui",
                                 "Level 6": "Menyetujui"
                             };
@@ -654,6 +655,7 @@
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                                    <td>${item.alasan_penggunaan || '-'}</td>
                                 </tr>
                             `;
                             document.getElementById('kendaraanInfoBody').innerHTML += row;

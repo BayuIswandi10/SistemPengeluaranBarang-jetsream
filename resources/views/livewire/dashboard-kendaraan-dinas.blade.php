@@ -351,6 +351,7 @@
                                                             <th>Rute 1</th>
                                                             <th>Rute 2</th>
                                                             <th>Rute 3</th>
+                                                            <th>Keperluan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="kendaraanInfoBody">
@@ -717,6 +718,8 @@
                                         1: "Mengeluarkan"
                                     };
 
+                                    document.getElementById('nomorSuratCard').textContent = data.nomor_surat || nomor || '-';
+
                                     const informasiTambahan = data.informasi_tambahan ?? [];
 
                                     // Cek apakah ada yang menolak
@@ -774,6 +777,7 @@
                                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
                                                     <td>${item.tujuan_penggunaan_3 || '-'}</td>
+                                                    <td>${item.alasan_penggunaan || '-'}</td>
                                                 </tr>
                                             `;
                                             document.getElementById('kendaraanInfoBody').innerHTML += row;
