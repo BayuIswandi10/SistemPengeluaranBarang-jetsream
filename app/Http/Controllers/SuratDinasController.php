@@ -772,7 +772,7 @@ class SuratDinasController extends Controller
                     'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
                     'tujuan_penggunaan_3' => $suratDinas->tujuan_penggunaan_3 ?? '-',
                     'kilometer_awal' => $kilometerAwal, // Tambahkan kilometer_awal ke response
-                    'alasan_penggunaan' => $suratDinas->alasan_penggunaan ?? '-',
+                    'alasan_penggunaan' => $suratDinas->alasan_penggunaan ?? '-'
                 ];
             });
 
@@ -790,6 +790,8 @@ class SuratDinasController extends Controller
                 'has_private_vehicle' => $hasPrivateVehicle,
                 'kilometer_awal' => $hasPrivateVehicle ? ($suratDinas->kilometer_awal ?? '-') : null,
                 'kilometer_akhir' => $hasPrivateVehicle ? ($suratDinas->kilometer_akhir ?? '-') : null, // Tambahkan kilometer_akhir
+                'estimasi_waktu_kembali' => $suratDinas->estimasi_waktu_kembali ?? '-',
+                'waktu_pergi'=> $suratDinas->waktu_pergi ?? '-',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

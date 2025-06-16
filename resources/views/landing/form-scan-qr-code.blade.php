@@ -642,6 +642,8 @@
                     let kilometerAwal = data.kilometer_awal || '-';
                     let kilometerAkhir = data.kilometer_akhir || '-';
                     let hasPrivateVehicle = data.has_private_vehicle || false;
+                    let waktuPergi = data.waktu_pergi || '-';
+                    let waktuPulang = data.estimasi_waktu_kembali || '-';
 
                     // Validasi dan tampilkan data kendaraan
                     if (data.data_kendaraan && data.data_kendaraan.length > 0) {
@@ -672,6 +674,9 @@
                         kilometerElement.setAttribute('data-kilometer-awal', kilometerAwal);
                         kilometerElement.setAttribute('data-kilometer-akhir', kilometerAkhir);
                         kilometerElement.setAttribute('data-has-private-vehicle', hasPrivateVehicle);
+                        kilometerElement.setAttribute('data-waktu-pergi', waktuPergi);
+                        kilometerElement.setAttribute('data-waktu-pulang', waktuPulang);
+
                     } else {
                         document.getElementById('kendaraanInfoBody').innerHTML = `
                             <tr><td colspan="7" class="text-center">Tidak ada data kendaraan</td></tr>
@@ -781,6 +786,9 @@
             const hasPrivateVehicle = kilometerElement ? kilometerElement.getAttribute('data-has-private-vehicle') === 'true' : false;
             const kilometerAwal = kilometerElement ? kilometerElement.getAttribute('data-kilometer-awal') || '-' : '-';
             const kilometerAkhir = kilometerElement ? kilometerElement.getAttribute('data-kilometer-akhir') || '-' : '-';
+            const waktuPergi = kilometerElement ? kilometerElement.getAttribute('data-waktu-pergi') || '-' : '-';
+            const waktuPulang = kilometerElement ? kilometerElement.getAttribute('data-waktu-pulang') || '-' : '-';
+
 
             const kendaraanTable = document.getElementById('kendaraanInfoBody');
             if (kendaraanTable) {
@@ -863,10 +871,89 @@
                 });
             }
 
-            // Buat section kilometer untuk kendaraan pribadi
-            const kilometerSection = hasPrivateVehicle ? `
-                <div style="margin-top: 5px;"><strong>Kilometer Awal:</strong> ${kilometerAwal} KM</div>
-                <div style="margin-top: 5px;"><strong>Kilometer Akhir:</strong> ${kilometerAkhir === '-' ? '.........................' : kilometerAkhir + ' KM'}</div>
+            // Buat section kilometer untuk kendaraan pribadi dengan Digit Box Writing
+            const renderDigitBoxes = (value, maxDigits = 5) => {
+                // Hapus semua karakter non-digit (misal: titik ribuan)
+                const cleanValue = value.toString().replace(/\D/g, '');
+                const digits = cleanValue.padStart(maxDigits, '0').split('');
+                return digits.map(d => `<span style="
+                    display: inline-block;
+                    width: 20px;
+                    height: 25px;
+                    border: 1px solid #000;
+                    text-align: center;
+                    line-height: 25px;
+                    margin-right: 2px;
+                    font-family: monospace;
+                ">${d}</span>`).join('');
+            };
+
+            const emptyDigitBoxes = (num = 5) => {
+                return Array(num).fill('').map(() => `<span style="
+                    display: inline-block;
+                    width: 20px;
+                    height: 25px;
+                    border: 1px solid #000;
+                    margin-right: 2px;
+                ">&nbsp;</span>`).join('');
+            };
+
+            const renderTimeBoxes = (time = '--:--') => {
+                const cleanTime = time.replace(/[^0-9]/g, '').padStart(4, '0'); // Ambil hanya digit
+                const digits = cleanTime.split('');
+                // Format: HH:MM → kotak HH - kotak MM
+                return `
+                    ${digits.slice(0, 2).map(d => `
+                        <span style="
+                            display: inline-block;
+                            width: 20px;
+                            height: 25px;
+                            border: 1px solid #000;
+                            text-align: center;
+                            line-height: 25px;
+                            margin-right: 2px;
+                            font-family: monospace;
+                        ">${d}</span>`).join('')}
+                    <span style="margin: 0 4px;">:</span>
+                    ${digits.slice(2, 4).map(d => `
+                        <span style="
+                            display: inline-block;
+                            width: 20px;
+                            height: 25px;
+                            border: 1px solid #000;
+                            text-align: center;
+                            line-height: 25px;
+                            margin-right: 2px;
+                            font-family: monospace;
+                        ">${d}</span>`).join('')}
+                `;
+            };
+
+           const kilometerSection = hasPrivateVehicle ? `
+                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                    <strong>Kilometer Awal:</strong>
+                    <div>${renderDigitBoxes(kilometerAwal || '0')}</div>
+                </div>
+                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                    <strong>Waktu Pergi:</strong>
+                    <div>${renderTimeBoxes(waktuPergi || '--:--')}</div>
+                </div>
+                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                    <strong>Kilometer Akhir:</strong>
+                    <div>${kilometerAkhir === '-' ? emptyDigitBoxes(5) : renderDigitBoxes(kilometerAkhir)}</div>
+                </div>
+                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                    <strong>Estimasi Waktu Kembali:</strong>
+                    <div>${renderTimeBoxes(waktuPulang || '--:--')}</div>
+                </div>
+                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                    <strong>Waktu Kembali Aktual:</strong>
+                    <div>${emptyDigitBoxes(2)}<span style="margin: 0 4px;">:</span>${emptyDigitBoxes(2)}</div>
+                </div>
+                <div style="margin-top: 10px; display: flex; align-items: center;">
+                    <strong style="margin-right: 10px;">Alasan Tidak Sesuai Estimasi:</strong>
+                    <div style="flex-grow: 1; border-bottom: 1px solid #000; height: 20px;"></div>
+                </div>
             ` : '';
 
             // Buat window baru untuk print
