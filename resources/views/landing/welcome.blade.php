@@ -692,9 +692,13 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group" id="waktu_pergi" hidden>
+                                <div class="form-group" id="waktu_pergi">
                                     <label for="waktu_pergi_input">Jam Keberangkatan <span class="text-danger">*</span></label>
                                     <input type="time" class="custom-input" id="waktu_pergi" name="waktu_pergi" placeholder="Pilih jam keberangkatan" autocomplete="off">
+                                </div>
+                                <div class="form-group" id="estimasi_waktu_kembali">
+                                    <label for="estimasi_waktu_kembali_input">Estimasi Kepulangan <span class="text-danger">*</span></label>
+                                    <input type="time" class="custom-input" id="estimasi_waktu_kembali" name="estimasi_waktu_kembali" placeholder="Pilih jam estimasi Kepulangan" autocomplete="off">
                                 </div>
 
 
@@ -773,14 +777,16 @@
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th style="text-align: center">No</th>
-                                            <th style="text-align: center">No Polisi</th>
-                                            <th style="text-align: center">Jenis Mobil</th>
-                                            <th style="text-align: center">Tanggal Penggunaan</th>
-                                            <th style="text-align: center">Rute 1</th>
-                                            <th style="text-align: center">Rute 2</th>
-                                            <th style="text-align: center">Rute 3</th>
-                                            <th style="text-align: center">Keperluan</th>
+                                            <th style="text-align: center;">No</th>
+                                            <th>No Polisi</th>
+                                            <th>Jenis Mobil</th>
+                                            <th>Keberangkatan</th>
+                                            <th>Estimasi Kepulangan</th>
+                                            <th>Tanggal Penggunaan</th>
+                                            <th>Rute 1</th>
+                                            <th>Rute 2</th>
+                                            <th>Rute 3</th>
+                                            <th>Keperluan</th>
                                         </tr>
                                         
                                     </thead>
@@ -806,10 +812,10 @@
                                     <thead>
                                         <tr>
                                             <th style="text-align: center">No</th>
-                                            <th style="text-align: center">No Surat Dinas</th>
-                                            <th style="text-align: center">NRP</th>
-                                            <th style="text-align: center">Nama</th>
-                                            <th style="text-align: center">Departemen</th>
+                                            <th>No Surat Dinas</th>
+                                            <th>NRP</th>
+                                            <th>Nama</th>
+                                            <th>Departemen</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pesertaTableBody">
@@ -851,7 +857,8 @@
                                 <input type="hidden" name="tujuan_penggunaan_1" id="ikut_tujuan_penggunaan_1">
                                 <input type="hidden" name="tujuan_penggunaan_2" id="ikut_tujuan_penggunaan_2">
                                 <input type="hidden" name="tujuan_penggunaan_3" id="ikut_tujuan_penggunaan_3">
-                                {{-- <input type="hidden" name="waktu_pergi" id="ikut_waktu_pergi"> --}}
+                                <input type="hidden" name="waktu_pergi" id="ikut_waktu_pergi">
+                                <input type="hidden" name="estimasi_waktu_kembali" id="ikut_estimasi_waktu_kembali">
                                 <input type="hidden" name="tanggal_penggunaan" id="ikut_tanggal_penggunaan">
                                 <input type="hidden" name="jenis_kendaraan" id="ikut_jenis_kendaraan">
                                 <input type="hidden" name="kendaraan_dinas_id" id="ikut_kendaraan_dinas_id">
@@ -2079,6 +2086,8 @@
                                     const bookingTableBody = $('#bookingTableBody');
                                     bookingTableBody.empty();
                                     const uniqueBookings = filteredBookings.reduce((acc, booking) => {
+                                        acc.waktu_pergi = booking.waktu_pergi || acc.waktu_pergi || '-';
+                                        acc.estimasi_waktu_kembali = booking.estimasi_waktu_kembali || acc.estimasi_waktu_kembali || '-';
                                         acc.tanggal = booking.tanggal_penggunaan || acc.tanggal || '-';
                                         acc.jenis = jenisMapping[booking.jenis_kendaraan] || acc.jenis || 'TIDAK DIKETAHUI';
                                         acc.tujuan1 = acc.tujuan1 || booking.tujuan_penggunaan_1 || '-';
@@ -2092,6 +2101,8 @@
                                             <td style="text-align: center">1</td>
                                             <td>${noPolisi || '-'}</td>
                                             <td>${uniqueBookings.jenis}</td>
+                                            <td>${uniqueBookings.waktu_pergi}</td>
+                                            <td>${uniqueBookings.estimasi_waktu_kembali}</td>
                                             <td style="text-align: right">${uniqueBookings.tanggal}</td>
                                             <td>${uniqueBookings.tujuan1}</td>
                                             <td>${uniqueBookings.tujuan2}</td>
@@ -2526,11 +2537,13 @@
             const $bookingRow = $('#bookingTableBody tr').first();
             const noPolisi = $bookingRow.find('td').eq(1).text();
             const jenisKendaraan = $bookingRow.find('td').eq(2).text();
-            const tanggalPenggunaan = $bookingRow.find('td').eq(3).text();
-            const tujuan1 = $bookingRow.find('td').eq(4).text();
-            const tujuan2 = $bookingRow.find('td').eq(5).text();
-            const tujuan3 = $bookingRow.find('td').eq(6).text();
-            const alsanPenggunaan = $bookingRow.find('td').eq(7).text();
+            const waktu_pergi = $bookingRow.find('td').eq(3).text();
+            const estimasi_waktu_kembali = $bookingRow.find('td').eq(4).text();
+            const tanggalPenggunaan = $bookingRow.find('td').eq(5).text();
+            const tujuan1 = $bookingRow.find('td').eq(6).text();
+            const tujuan2 = $bookingRow.find('td').eq(7).text();
+            const tujuan3 = $bookingRow.find('td').eq(8).text();
+            const alsanPenggunaan = $bookingRow.find('td').eq(9).text();
 
             const event = globalCalendar.getEventById(globalCalendar.currentEventId);
             const kendaraanDinasId = event?.extendedProps.kendaraan_dinas_id ?? null;
@@ -2555,6 +2568,8 @@
             $('#ikut_tujuan_penggunaan_1').val(tujuan1 !== '-' ? tujuan1 : '');
             $('#ikut_tujuan_penggunaan_2').val(tujuan2 !== '-' ? tujuan2 : '');
             $('#ikut_tujuan_penggunaan_3').val(tujuan3 !== '-' ? tujuan3 : '');
+            $('#ikut_waktu_pergi').val(waktu_pergi !== '-' ? waktu_pergi : '');
+            $('#ikut_estimasi_waktu_kembali').val(estimasi_waktu_kembali !== '-' ? estimasi_waktu_kembali : '');
             $('#ikut_tanggal_penggunaan').val(tanggalPenggunaan !== '-' ? tanggalPenggunaan : '');
             $('#ikut_jenis_kendaraan').val(jenisKendaraanId);
             $('#ikut_alasan_penggunaan').val(alsanPenggunaan !== '-' ? alsanPenggunaan : '');
