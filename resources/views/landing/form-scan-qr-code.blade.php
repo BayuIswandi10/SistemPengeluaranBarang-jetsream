@@ -873,10 +873,35 @@
 
             // Buat section kilometer untuk kendaraan pribadi dengan Digit Box Writing
             const renderDigitBoxes = (value, maxDigits = 5) => {
-                // Hapus semua karakter non-digit (misal: titik ribuan)
+                if (
+                    value == null || 
+                    value === '' || 
+                    value === '-' || 
+                    parseInt(value.toString().replace(/\D/g, '')) === 0
+                ) {
+                    return '-';
+                }
+
                 const cleanValue = value.toString().replace(/\D/g, '');
                 const digits = cleanValue.padStart(maxDigits, '0').split('');
-                return digits.map(d => `<span style="
+                return digits.map(d => `
+                    <span style="
+                        display: inline-block;
+                        width: 20px;
+                        height: 25px;
+                        border: 1px solid #000;
+                        text-align: center;
+                        line-height: 25px;
+                        margin-right: 2px;
+                        font-family: monospace;
+                    ">${d}</span>
+                `).join('');
+            };
+
+
+           const emptyDigitBoxes = (num = 2) => {
+                return Array(num).fill('').map(() => `
+                    <span style="
                     display: inline-block;
                     width: 20px;
                     height: 25px;
@@ -885,18 +910,10 @@
                     line-height: 25px;
                     margin-right: 2px;
                     font-family: monospace;
-                ">${d}</span>`).join('');
+                    ">&nbsp;</span>
+                `).join('');
             };
 
-            const emptyDigitBoxes = (num = 5) => {
-                return Array(num).fill('').map(() => `<span style="
-                    display: inline-block;
-                    width: 20px;
-                    height: 25px;
-                    border: 1px solid #000;
-                    margin-right: 2px;
-                ">&nbsp;</span>`).join('');
-            };
 
             const renderTimeBoxes = (time = '--:--') => {
                 const cleanTime = time.replace(/[^0-9]/g, '').padStart(4, '0'); // Ambil hanya digit
@@ -929,32 +946,61 @@
                 `;
             };
 
-           const kilometerSection = hasPrivateVehicle ? `
-                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
-                    <strong>Kilometer Awal:</strong>
-                    <div>${renderDigitBoxes(kilometerAwal || '0')}</div>
-                </div>
-                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
-                    <strong>Waktu Pergi:</strong>
-                    <div>${renderTimeBoxes(waktuPergi || '--:--')}</div>
-                </div>
-                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
-                    <strong>Kilometer Akhir:</strong>
-                    <div>${kilometerAkhir === '-' ? emptyDigitBoxes(5) : renderDigitBoxes(kilometerAkhir)}</div>
-                </div>
-                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
-                    <strong>Estimasi Waktu Kembali:</strong>
-                    <div>${renderTimeBoxes(waktuPulang || '--:--')}</div>
-                </div>
-                <div style="margin-top: 5px; display: flex; justify-content: space-between;">
-                    <strong>Waktu Kembali Aktual:</strong>
-                    <div>${emptyDigitBoxes(2)}<span style="margin: 0 4px;">:</span>${emptyDigitBoxes(2)}</div>
-                </div>
-                <div style="margin-top: 10px; display: flex; align-items: center;">
-                    <strong style="margin-right: 10px;">Alasan Tidak Sesuai Estimasi:</strong>
-                    <div style="flex-grow: 1; border-bottom: 1px solid #000; height: 20px;"></div>
-                </div>
+            const kilometerSection = hasPrivateVehicle ? `
+                <table style="width: 100%; border:none; border-collapse: collapse; margin-top: 10px; table-layout: fixed;">
+                    <tr>
+                        <!-- Kolom Kiri -->
+                        <td style="width: 50%; vertical-align: top; padding-right: 10px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Waktu Pergi:</strong></td>
+                                    <td>
+                                        ${renderTimeBoxes(waktuPergi || '--:--')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Kilometer Awal:</strong></td>
+                                    <td>
+                                        ${kilometerAwal ? renderDigitBoxes(kilometerAwal) : '-'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Kilometer Akhir:</strong></td>
+                                    <td>
+                                       ${kilometerAwal === '-' ? '-' : emptyDigitBoxes(5)}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+
+                        <!-- Kolom Kanan -->
+                        <td style="width: 50%; vertical-align: top; padding-left: 10px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Estimasi Waktu Kembali:</strong></td>
+                                    <td>
+                                        ${renderTimeBoxes(waktuPulang || '--:--')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Waktu Kembali Aktual:</strong></td>
+                                    <td>
+                                        ${emptyDigitBoxes(2)}<span style="margin: 0 4px;">:</span>${emptyDigitBoxes(2)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <strong>Alasan Tidak Sesuai Estimasi:</strong>
+                                        <div style="margin-top: 6px; height: 24px;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             ` : '';
+
+
 
             // Buat window baru untuk print
             const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -1115,6 +1161,7 @@
                             ${pesertaRows || '<tr><td colspan="4" style="text-align: center; font-style: italic;">Tidak ada data peserta</td></tr>'}
                         </tbody>
                     </table>
+                    <div style="page-break-before: always;"></div>
                     <div class="section-title">III. HISTORIS PERSETUJUAN</div>
                     <table>
                         <thead>
@@ -1128,7 +1175,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${historyRows || '<tr><td colspan="5" style="text-align: center; font-style: italic;">Tidak ada data historis</td></tr>'}
+                            ${historyRows || '<tr><td colspan="6" style="text-align: center; font-style: italic;">Tidak ada data historis</td></tr>'}
                         </tbody>
                     </table>
                     <div class="signature-section">
