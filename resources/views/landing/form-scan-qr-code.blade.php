@@ -754,6 +754,17 @@
                             { className: 'dt-head-center', targets: 1 },
                             { className: 'dt-body-left', targets: 1 }
                         ],
+                        language: {
+                            processing: "Memproses...",
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ entri",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                            infoEmpty: "Tidak ada data",
+                            infoFiltered: "(difilter dari _MAX_ total entri)",
+                            loadingRecords: "Memuat...",
+                            zeroRecords: "Tidak ditemukan data yang cocok",
+                            emptyTable: "Tidak ada data di tabel"
+                        },
                         responsive: true,
                         scrollX: false,
                         destroy: true,
@@ -967,7 +978,7 @@
                                 <tr>
                                     <td style="white-space: nowrap;"><strong>Kilometer Akhir:</strong></td>
                                     <td>
-                                       ${kilometerAwal === '-' ? '-' : emptyDigitBoxes(5)}
+                                    ${kilometerAwal === '-' ? '-' : emptyDigitBoxes(5)}
                                     </td>
                                 </tr>
                             </table>
@@ -998,7 +1009,41 @@
                         </td>
                     </tr>
                 </table>
-            ` : '';
+            ` : `
+                <table style="width: 100%; border:none; border-collapse: collapse; margin-top: 10px;">
+                    <tr>
+                        <td style="vertical-align: top;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Waktu Pergi:</strong></td>
+                                    <td>
+                                        ${renderTimeBoxes(waktuPergi || '--:--')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Estimasi Waktu Kembali:</strong></td>
+                                    <td>
+                                        ${renderTimeBoxes(waktuPulang || '--:--')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="white-space: nowrap;"><strong>Waktu Kembali Aktual:</strong></td>
+                                    <td>
+                                        ${emptyDigitBoxes(2)}<span style="margin: 0 4px;">:</span>${emptyDigitBoxes(2)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <strong>Alasan Tidak Sesuai Estimasi:</strong>
+                                        <div style="margin-top: 6px; height: 24px;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            `;
+
 
 
 
