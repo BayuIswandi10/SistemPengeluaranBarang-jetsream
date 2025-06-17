@@ -769,6 +769,8 @@ class SuratDinasController extends Controller
                     'id_kendaraan' => $detail->kendaraan->kendaraan_dinas_id ?? 'N/A',
                     'nomor_kendaraan' => $detail->kendaraan->nomor_kendaraan ?? 'Tidak Diketahui',
                     'keterangan' => ($detail->kendaraan->merk_kendaraan ?? 'Tidak Diketahui') . ' - ' . $jenisKendaraanText,
+                    'waktu_pergi' => $suratDinas->waktu_pergi ?? '-',
+                    'estimasi_waktu_kembali' => $suratDinas->estimasi_waktu_kembali ?? '-',
                     'tanggal_penggunaan' => $suratDinas->tanggal_penggunaan ?? '-',
                     'tujuan_penggunaan_1' => $suratDinas->tujuan_penggunaan_1 ?? '-',
                     'tujuan_penggunaan_2' => $suratDinas->tujuan_penggunaan_2 ?? '-',
