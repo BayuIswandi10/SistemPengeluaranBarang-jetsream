@@ -579,18 +579,17 @@
 <script>
     let dataTableInstance;
 
-   Livewire.on('dataUpdated', () => {
+    Livewire.on('dataUpdated', () => {
         console.log('dataUpdated event received!');
         setTimeout(() => {
             initDataTable();
         }, 100); // delay 100ms, bisa disesuaikan
     });
 
-
     function initDataTable() {
         const table = $('#dataTable');
 
-        // sembunyikan dulu
+        // Sembunyikan dulu
         table.removeClass('visible');
 
         if (dataTableInstance) {
@@ -610,16 +609,14 @@
                 emptyTable: "Tidak ada data di tabel"
             },
             columnDefs: [
-            {
-                
-                className: 'dt-body-center dt-head-center', 
-                targets: 0, // Kolom pertama (checkbox)
-                orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
-                width: '50px'
-            },
+                {
+                    className: 'dt-body-center dt-head-center',
+                    targets: 0, // Kolom pertama (checkbox)
+                    orderable: false, // Opsional: Matikan sorting untuk kolom checkbox
+                    width: '50px'
+                },
                 { className: 'dt-head-center', targets: 1 },
                 { className: 'dt-head-center', targets: 6 },
-
                 { className: 'dt-body-center', targets: 1 },
                 { className: 'dt-body-center', targets: 6 }
             ],
@@ -629,14 +626,65 @@
             responsive: true,
             order: [[1, 'asc']],
             initComplete: function() {
-                // tampilkan setelah selesai inisialisasi
+                // Tampilkan setelah selesai inisialisasi
                 table.addClass('visible');
+
+                // Update button states after table initialization
+                updateBulkActionButtons();
+
+                // Reattach select all checkbox event
+                const selectAllCheckbox = document.getElementById('selectAll');
+                selectAllCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    updateBulkActionButtons();
+                });
             }
+        });
+
+        // Use event delegation for checkbox changes
+        table.on('change', '.item-checkbox', function() {
+            updateSelectAllState();
+            updateBulkActionButtons();
         });
     }
 
+    // Update Select All state based on individual checkboxes
+    function updateSelectAllState() {
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        const totalCheckboxes = itemCheckboxes.length;
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
 
-     function formatDate(date) {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        if (checkedCheckboxes === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+        } else {
+            selectAllCheckbox.indeterminate = true;
+            selectAllCheckbox.checked = false;
+        }
+    }
+
+    // Update bulk action buttons state
+    function updateBulkActionButtons() {
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+        const selectedCountElement = document.getElementById('selected-count');
+        const bulkApproveBtn = document.getElementById('bulk-approve-btn');
+        const bulkRejectBtn = document.getElementById('bulk-reject-btn');
+
+        selectedCountElement.textContent = checkedCheckboxes;
+        const hasSelection = checkedCheckboxes > 0;
+        bulkApproveBtn.disabled = !hasSelection;
+        bulkRejectBtn.disabled = !hasSelection;
+    }
+
+    // Format date function
+    function formatDate(date) {
         const wibOffset = 7 * 60; // offset WIB dalam menit
         const localTime = new Date(date.getTime() + (wibOffset - date.getTimezoneOffset()) * 60000);
 
@@ -647,21 +695,11 @@
         return `${year}-${month}-${day}`;
     }
 
-   const today = new Date();
-    // Awal bulan sebelumnya
+    // Initialize flatpickr
+    const today = new Date();
     const defaultStartDate = new Date(today.getFullYear(), today.getMonth() - 1, 1, 0, 0, 0);
-    // Akhir bulan ini
     const defaultEndDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
 
-    // Format tanggal (YYYY-MM-DD)
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // Inisialisasi flatpickr
     const fp = flatpickr("#date-range-picker", {
         mode: "range",
         dateFormat: "Y-m-d",
@@ -686,18 +724,16 @@
     });
 
     // Atur nilai awal saat load
-    startDate = formatDate(defaultStartDate);
-    endDate = formatDate(defaultEndDate);
+    let startDate = formatDate(defaultStartDate);
+    let endDate = formatDate(defaultEndDate);
     document.querySelector("#date-range-picker").value = `${startDate} s/d ${endDate}`;
 
     // Handler tombol download
     $('#downloadExcel').on('click', function (e) {
         e.preventDefault();
-
         const url = `/data-kendaraan-dinas/export?start=${startDate}&end=${endDate}`;
         window.open(url, '_blank');
     });
-
 
     initDataTable();
 </script>
@@ -1175,33 +1211,6 @@
                 updateBulkActionButtons();
             });
         });
-
-        // Update Select All state based on individual checkboxes
-        function updateSelectAllState() {
-            const totalCheckboxes = itemCheckboxes.length;
-            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
-            
-            if (checkedCheckboxes === 0) {
-                selectAllCheckbox.indeterminate = false;
-                selectAllCheckbox.checked = false;
-            } else if (checkedCheckboxes === totalCheckboxes) {
-                selectAllCheckbox.indeterminate = false;
-                selectAllCheckbox.checked = true;
-            } else {
-                selectAllCheckbox.indeterminate = true;
-                selectAllCheckbox.checked = false;
-            }
-        }
-
-        // Update bulk action buttons state
-        function updateBulkActionButtons() {
-            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
-            selectedCountElement.textContent = checkedCheckboxes;
-            
-            const hasSelection = checkedCheckboxes > 0;
-            bulkApproveBtn.disabled = !hasSelection;
-            bulkRejectBtn.disabled = !hasSelection;
-        }
 
         // Bulk Approve Handler
         bulkApproveBtn.addEventListener('click', function() {

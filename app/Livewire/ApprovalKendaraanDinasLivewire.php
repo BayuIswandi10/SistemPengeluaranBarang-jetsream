@@ -32,41 +32,6 @@ class ApprovalKendaraanDinasLivewire extends Component
         $this->kendaraanDinas = $this->fetchKendaraanDinas();
         $this->dispatch('dataUpdated');
     }
-
-    // private function fetchKendaraanDinas()
-    // {
-    //     $user = Auth::user();
-    //     $query = SuratKendaraanDinas::with(['user', 'approval', 'pencatatanKendaraanDinas']);
-
-    //     $start = Carbon::parse($this->startDate)->setTimezone('Asia/Jakarta')->startOfDay();
-    //     $end = Carbon::parse($this->endDate)->setTimezone('Asia/Jakarta')->endOfDay();
-
-    //     if (in_array($user->level, ['Ka.Sie']) && $user->seksi !== 'GENERAL SERVICES') {
-    //         return (clone $query)->whereHas('user', function ($query) use ($user) {
-    //                 $query->where('departemen', $user->departemen);
-    //             })
-    //             ->whereBetween('created_date', [$start, $end])
-    //             ->get();
-    //     } elseif ($user->level === 'Ka.Dept' && $user->departemen !== 'GENERAL AFFAIRS') {
-    //         return (clone $query)->whereHas('user', function ($query) use ($user) {
-    //                 $query->where('departemen', $user->departemen);
-    //             })
-    //             ->whereBetween('created_date', [$start, $end])
-    //             ->orderByRaw("FIELD(status, 'Level 1') DESC")
-    //             ->orderBy('status', 'asc')
-    //             ->get();
-    //     } elseif (
-    //         in_array($user->level, ['Ka.Dept', 'Security', 'Super Admin']) ||
-    //         ($user->level === 'Ka.Sie' && $user->seksi === 'GENERAL SERVICES')
-    //     ) {
-    //         return (clone $query)
-    //             ->whereBetween('created_date', [$start, $end])
-    //             ->orderByRaw("FIELD(status, 'Level 2') DESC")
-    //             ->get();
-    //     } else {
-    //         return collect();
-    //     }
-    // }
     private function fetchKendaraanDinas()
     {
         $user = Auth::user();

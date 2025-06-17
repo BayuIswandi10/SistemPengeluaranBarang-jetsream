@@ -482,8 +482,58 @@
             initComplete: function() {
                 // tampilkan setelah selesai inisialisasi
                 table.addClass('visible');
+
+                // Update button states after table initialization
+                updateBulkActionButtons();
+
+                // Reattach select all checkbox event
+                const selectAllCheckbox = document.getElementById('selectAll');
+                selectAllCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    updateBulkActionButtons();
+                });
             }
         });
+        // Use event delegation for checkbox changes
+        table.on('change', '.item-checkbox', function() {
+            updateSelectAllState();
+            updateBulkActionButtons();
+        });
+    }
+
+    // Update Select All state based on individual checkboxes
+    function updateSelectAllState() {
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        const totalCheckboxes = itemCheckboxes.length;
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+
+        const selectAllCheckbox = document.getElementById('selectAll');
+        if (checkedCheckboxes === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+        } else {
+            selectAllCheckbox.indeterminate = true;
+            selectAllCheckbox.checked = false;
+        }
+    }
+
+    // Update bulk action buttons state
+    function updateBulkActionButtons() {
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+        const selectedCountElement = document.getElementById('selected-count');
+        const bulkApproveBtn = document.getElementById('bulk-approve-btn');
+        const bulkRejectBtn = document.getElementById('bulk-reject-btn');
+
+        selectedCountElement.textContent = checkedCheckboxes;
+        const hasSelection = checkedCheckboxes > 0;
+        bulkApproveBtn.disabled = !hasSelection;
+        bulkRejectBtn.disabled = !hasSelection;
     }
 
     function formatDate(date) {
@@ -814,30 +864,30 @@
             });
         });
 
-        function updateSelectAllState() {
-            const totalCheckboxes = itemCheckboxes.length;
-            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+        // function updateSelectAllState() {
+        //     const totalCheckboxes = itemCheckboxes.length;
+        //     const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
             
-            if (checkedCheckboxes === 0) {
-                selectAllCheckbox.indeterminate = false;
-                selectAllCheckbox.checked = false;
-            } else if (checkedCheckboxes === totalCheckboxes) {
-                selectAllCheckbox.indeterminate = false;
-                selectAllCheckbox.checked = true;
-            } else {
-                selectAllCheckbox.indeterminate = true;
-                selectAllCheckbox.checked = false;
-            }
-        }
+        //     if (checkedCheckboxes === 0) {
+        //         selectAllCheckbox.indeterminate = false;
+        //         selectAllCheckbox.checked = false;
+        //     } else if (checkedCheckboxes === totalCheckboxes) {
+        //         selectAllCheckbox.indeterminate = false;
+        //         selectAllCheckbox.checked = true;
+        //     } else {
+        //         selectAllCheckbox.indeterminate = true;
+        //         selectAllCheckbox.checked = false;
+        //     }
+        // }
 
-        function updateBulkActionButtons() {
-            const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
-            selectedCountElement.textContent = checkedCheckboxes;
+        // function updateBulkActionButtons() {
+        //     const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked').length;
+        //     selectedCountElement.textContent = checkedCheckboxes;
             
-            const hasSelection = checkedCheckboxes > 0;
-            bulkApproveBtn.disabled = !hasSelection;
-            bulkRejectBtn.disabled = !hasSelection;
-        }
+        //     const hasSelection = checkedCheckboxes > 0;
+        //     bulkApproveBtn.disabled = !hasSelection;
+        //     bulkRejectBtn.disabled = !hasSelection;
+        // }
 
         bulkApproveBtn.addEventListener('click', function () {
             const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
