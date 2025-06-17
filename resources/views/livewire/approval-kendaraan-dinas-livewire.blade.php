@@ -377,6 +377,8 @@
                                         <th style="text-align: center">No</th>
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
+                                        <th>Keberangkatan</th>
+                                        <th>Estimasi Kepulangan</th>
                                         <th>Tanggal Penggunaan</th>
                                         <th>Rute 1</th>
                                         <th>Rute 2</th>
@@ -1057,6 +1059,8 @@
                                     <td style="text-align: center">${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
+                                    <td>${item.waktu_pergi || '-'}</td>
+                                    <td>${item.estimasi_waktu_kembali || '-'}</td>
                                     <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
