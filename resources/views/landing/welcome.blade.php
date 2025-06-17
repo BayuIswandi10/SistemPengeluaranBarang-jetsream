@@ -1140,9 +1140,7 @@
         </div>
     </body>
     <script>
-        // Local storage keys for separation
         const STORAGE_KEY_TAMBAH = 'nrp_karyawan_list_tambah';
-        const STORAGE_KEY_IKUTSERTA = 'nrp_karyawan_list_ikutserta';
 
         let counterPeserta = 1;
         let counterIkutserta = 1;
@@ -1243,42 +1241,30 @@
                 row.find('.departemen').val('');
             }
             
-            // Save to localStorage
-            const tableId = row.closest('table').attr('id');
-            const storageKey = getStorageKeyByTableId(tableId);
-            saveToLocalStoragePeserta(tableId, storageKey);
-        }
-
-        // Get storage key based on table ID
-        function getStorageKeyByTableId(tableId) {
-            switch(tableId) {
-                case 'pesertaTableTambah':
-                    return STORAGE_KEY_TAMBAH;
-                case 'pesertaTableTambahPeserta':
-                    return STORAGE_KEY_IKUTSERTA;
-                default:
-                    return STORAGE_KEY_TAMBAH;
+            // Save to localStorage for tambahDinasModal
+            if (row.closest('table').attr('id') === 'pesertaTableTambah') {
+                saveToLocalStoragePeserta();
             }
         }
 
-        // Save to local storage for specific table
-        function saveToLocalStoragePeserta(tableId, storageKey) {
-            const nrpInputs = $(`#${tableId} .nrp_karyawan`);
+        // Save to local storage for tambahDinasModal
+        function saveToLocalStoragePeserta() {
+            const nrpInputs = $('#pesertaTableTambah .nrp_karyawan');
             const nrpList = Array.from(nrpInputs).map(input => $(input).val()).filter(val => val);
             try {
-                localStorage.setItem(storageKey, JSON.stringify(nrpList));
+                localStorage.setItem(STORAGE_KEY_TAMBAH, JSON.stringify(nrpList));
             } catch (e) {
                 console.error('Failed to save to localStorage:', e);
             }
         }
 
-        // Load from local storage for specific table
-        function loadFromLocalStoragePeserta(tableId, storageKey, addRowFn) {
+        // Load from local storage for tambahDinasModal
+        function loadFromLocalStoragePeserta(addRowFn) {
             try {
-                const storedList = localStorage.getItem(storageKey);
+                const storedList = localStorage.getItem(STORAGE_KEY_TAMBAH);
                 if (storedList) {
                     const nrpList = JSON.parse(storedList);
-                    const currentRows = $(`#${tableId} .nrp_karyawan`).length;
+                    const currentRows = $('#pesertaTableTambah .nrp_karyawan').length;
 
                     // Add rows if needed
                     while (currentRows < nrpList.length) {
@@ -1287,23 +1273,19 @@
 
                     // Populate inputs with delay to ensure DOM is ready
                     setTimeout(() => {
-                        $(`#${tableId} .nrp_karyawan`).each(function(idx) {
+                        $('#pesertaTableTambah .nrp_karyawan').each(function(idx) {
                             if (nrpList[idx] && this.selectize) {
                                 this.selectize.setValue(nrpList[idx], true);
                                 const row = $(this).closest('tr');
                                 setParticipantData(row, nrpList[idx]);
                                 if (idx === 0) {
-                                    // Set nilai di hidden input untuk baris pertama
-                                    const hiddenInputId = tableId === 'pesertaTableTambahPeserta' 
-                                        ? '#hidden_nrp_peserta_0_ikutserta' 
-                                        : '#hidden_nrp_peserta_0_regular';
-                                    $(hiddenInputId).val(nrpList[idx]);
+                                    $('#hidden_nrp_peserta_0_regular').val(nrpList[idx]);
                                     this.selectize.disable();
                                 }
                             }
                         });
-                        // Nonaktifkan tombol hapus untuk baris pertama
-                        $(`#${tableId} tbody tr:first .btn-hapus-peserta`).prop('disabled', true);
+                        // Disable delete button for first row
+                        $('#pesertaTableTambah tbody tr:first .btn-hapus-peserta').prop('disabled', true);
                     }, 100);
                 }
             } catch (e) {
@@ -1311,10 +1293,10 @@
             }
         }
 
-        // Clear local storage for specific key
-        function clearLocalStorage(storageKey) {
+        // Clear local storage for tambahDinasModal
+        function clearLocalStorage() {
             try {
-                localStorage.removeItem(storageKey);
+                localStorage.removeItem(STORAGE_KEY_TAMBAH);
             } catch (e) {
                 console.error('Failed to clear localStorage:', e);
             }
@@ -1402,7 +1384,7 @@
             }
             
             updateNomorPeserta('pesertaTableTambah');
-            saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+            saveToLocalStoragePeserta();
         }
 
         // Enhanced tambahPesertaIkutSerta with Selectize
@@ -1439,7 +1421,7 @@
                 <td class="nomor">${++counterIkutserta}</td>
                 <td>
                     <select ${isFirstRow ? '' : `name="peserta[${counterIkutserta - 1}][nrp_karyawan]"`} 
-                            class=" nrp_karyawan selectize-nrp" 
+                            class="nrp_karyawan selectize-nrp" 
                             required ${isFirstRow ? 'readonly' : ''}>
                         <option value="">Pilih NRP Karyawan</option>
                         ${nrpValue ? `<option value="${nrpValue}" selected>${nrpValue}</option>` : ''}
@@ -1472,13 +1454,12 @@
             }
             
             updateNomorPeserta('pesertaTableTambahPeserta');
-            saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
         }
 
-        //Web Scrapper Validation
+        // Web Scraper Validation
         function formatDateLocal(date) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // bulan 0-based
+            const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
@@ -1501,7 +1482,6 @@
                 });
             }
         });
-
 
         // Remove participant row for tambahDinasModal
         function hapusComboBoxPeserta(button) {
@@ -1531,7 +1511,7 @@
                         row.remove();
                         counterPeserta--;
                         updateNomorPeserta('pesertaTableTambah');
-                        saveToLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH);
+                        saveToLocalStoragePeserta();
                     }
                 });
             } else {
@@ -1573,7 +1553,6 @@
                         row.remove();
                         counterIkutserta--;
                         updateNomorPeserta('pesertaTableTambahPeserta');
-                        saveToLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA);
                     }
                 });
             } else {
@@ -1604,9 +1583,8 @@
                     });
                 });
                 
-                // Load stored data from localStorage
-                loadFromLocalStoragePeserta('pesertaTableTambah', STORAGE_KEY_TAMBAH, tambahComboBoxPeserta);
-                loadFromLocalStoragePeserta('pesertaTableTambahPeserta', STORAGE_KEY_IKUTSERTA, tambahPesertaIkutSerta);
+                // Load stored data from localStorage for tambahDinasModal
+                loadFromLocalStoragePeserta(tambahComboBoxPeserta);
                 
             }).catch(function(error) {
                 console.error('Failed to load user data:', error);
@@ -1750,13 +1728,9 @@
                 }, 100);
             });
 
-            // Clear local storage on form submission
+            // Clear local storage on form submission for tambahDinasModal
             $('#tambah_penggunaan_kendaraan_dinas').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_TAMBAH);
-            });
-
-            $('#formTambahikutserta').on('submit', function() {
-                clearLocalStorage(STORAGE_KEY_IKUTSERTA);
+                clearLocalStorage();
             });
 
             // Legacy support for created_by sync
