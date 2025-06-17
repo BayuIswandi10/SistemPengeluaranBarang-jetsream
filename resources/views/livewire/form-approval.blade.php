@@ -1094,7 +1094,7 @@
                     if (failCount === 0) {
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: `Semua ${successCount} pengajuan berhasil disetujui.`,
+                            text: `${successCount} pengajuan berhasil disetujui.`,
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000

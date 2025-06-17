@@ -1378,7 +1378,7 @@
                         Swal.fire({
                             title: 'Berhasil!',
                             text: isMassal
-                                ? `Semua ${successCount} pengajuan berhasil disetujui.`
+                                ? `${successCount} pengajuan berhasil disetujui.`
                                 : `Pengajuan berhasil disetujui.`,
                             icon: 'success',
                             showConfirmButton: false,
@@ -1447,7 +1447,7 @@
                         Swal.fire({
                             title: 'Berhasil!',
                             text: isMassal 
-                                ? `Semua ${successCount} pengajuan berhasil ditolak.` 
+                                ? `${successCount} pengajuan berhasil ditolak.` 
                                 : `Pengajuan berhasil ditolak.`,
                             icon: 'success',
                             showConfirmButton: false,

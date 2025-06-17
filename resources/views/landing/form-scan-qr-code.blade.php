@@ -965,10 +965,10 @@
             };
 
             const kilometerSection = hasPrivateVehicle ? `
-                <table style="width: 100%; border:none; border-collapse: collapse; margin-top: 10px; table-layout: fixed;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed;">
                     <tr>
                         <!-- Kolom Kiri -->
-                        <td style="width: 50%; vertical-align: top; padding-right: 10px;">
+                        <td style="width: 50%; vertical-align: top; padding-right: 10px; border:none;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="white-space: nowrap;"><strong>Waktu Pergi:</strong></td>
@@ -992,7 +992,7 @@
                         </td>
 
                         <!-- Kolom Kanan -->
-                        <td style="width: 50%; vertical-align: top; padding-left: 10px;">
+                        <td style="width: 50%; vertical-align: top; padding-left: 10px; border:none;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="white-space: nowrap;"><strong>Estimasi Waktu Kembali:</strong></td>
@@ -1017,9 +1017,9 @@
                     </tr>
                 </table>
             ` : `
-                <table style="width: 100%; border:none; border-collapse: collapse; margin-top: 10px;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <tr>
-                        <td style="vertical-align: top;">
+                        <td style="vertical-align: top; border:none;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="white-space: nowrap;"><strong>Waktu Pergi:</strong></td>

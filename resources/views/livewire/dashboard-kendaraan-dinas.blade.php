@@ -1097,15 +1097,33 @@
                                         let suratKendaraanDinas = '-';
 
                                         if (item.surat_details && item.surat_details.length > 0) {
-                                            tanggalDigunakan = item.surat_details.map(surat => {
-                                                const tgl = surat.tanggal_penggunaan || '-';
-                                                return `<span>${tgl}</span>`;
-                                            }).join(' ');
+                                            // Badge untuk tanggal penggunaan
+                                            tanggalDigunakan = `
+                                                <div class="tujuan-container-minimal">
+                                                    <div class="tujuan-list-minimal">
+                                                        ${item.surat_details.map((surat, i) => `
+                                                            <span class="tujuan-item-minimal">
+                                                                <span class="tujuan-number-minimal">${i + 1}</span>
+                                                                ${surat.tanggal_penggunaan || '-'}
+                                                            </span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `;
 
-                                            suratKendaraanDinas = item.surat_details.map(surat => {
-                                                const no = surat.no_surat || '-';
-                                                return `<span>${no}</span>`;
-                                            }).join(' ');
+                                            // Badge untuk nomor surat
+                                            suratKendaraanDinas = `
+                                                <div class="tujuan-container-minimal">
+                                                    <div class="tujuan-list-minimal">
+                                                        ${item.surat_details.map((surat, i) => `
+                                                            <span class="tujuan-item-minimal">
+                                                                <span class="tujuan-number-minimal">${i + 1}</span>
+                                                                ${surat.no_surat || '-'}
+                                                            </span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `;
                                         }
 
                                         table.row.add([
@@ -1117,6 +1135,7 @@
                                             suratKendaraanDinas
                                         ]);
                                     });
+
 
                                     table.draw();
                                     setTimeout(() => {
