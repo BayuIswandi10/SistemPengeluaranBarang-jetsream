@@ -267,6 +267,8 @@
                                         <th style="text-align: center">No</th>
                                         <th>No Kendaraan</th>
                                         <th>Keterangan</th>
+                                        <th>Keberangkatan</th>
+                                        <th>Estimasi Kepulangan</th>
                                         <th>Tanggal Penggunaan</th>
                                         <th>Rute 1</th>
                                         <th>Rute 2</th>
@@ -653,6 +655,8 @@
                                     <td style="text-align: center">${index + 1}</td>
                                     <td>${item.nomor_kendaraan}</td>
                                     <td>${item.keterangan}</td>
+                                    <td>${item.waktu_pergi || '-'}</td>
+                                    <td>${item.estimasi_waktu_kembali || '-'}</td>
                                     <td style="text-align: right">${item.tanggal_penggunaan || '-'}</td>
                                     <td>${item.tujuan_penggunaan_1 || '-'}</td>
                                     <td>${item.tujuan_penggunaan_2 || '-'}</td>
@@ -812,10 +816,13 @@
                                 <td style="border: 1px solid #000; padding: 8px; text-align: center;">${cells[0].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[1].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[2].innerText}</td>
-                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${cells[3].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[3].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[4].innerText}</td>
-                                <td style="border: 1px solid #000; padding: 8px;">${cells[5].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${cells[5].innerText}</td>
                                 <td style="border: 1px solid #000; padding: 8px;">${cells[6].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[7].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[8].innerText}</td>
+                                <td style="border: 1px solid #000; padding: 8px;">${cells[9].innerText}</td>
                             </tr>
                         `;
                     }
@@ -1179,13 +1186,16 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 5%;">No</th>
-                                <th style="width: 15%;">No Kendaraan</th>
-                                <th style="width: 20%;">Keterangan</th>
-                                <th style="width: 15%;">Tanggal Penggunaan</th>
-                                <th style="width: 15%;">Rute 1</th>
-                                <th style="width: 15%;">Rute 2</th>
-                                <th style="width: 15%;">Rute 3</th>
+                                <th>No</th>
+                                <th>No Kendaraan</th>
+                                <th>Keterangan</th>
+                                <th>Keberangkatan</th>
+                                <th>estimasi kepulangan</th>
+                                <th>Tanggal Penggunaan</th>
+                                <th>Rute 1</th>
+                                <th>Rute 2</th>
+                                <th>Rute 3</th>
+                                <th>Keperluan</th>
                             </tr>
                         </thead>
                         <tbody>
