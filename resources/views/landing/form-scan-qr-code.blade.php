@@ -214,9 +214,9 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status Persetujuan</th>
-                                        <th>Tanggal Persetujuan</th>
-                                        <th>Alasan</th>
+                                        <th>Status Pengajuan</th>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">
@@ -322,9 +322,9 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status Persetujuan</th>
-                                        <th>Tanggal Persetujuan</th>
-                                        <th>Alasan</th>
+                                        <th>Status Pengajuan</th>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="addhistory">

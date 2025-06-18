@@ -129,7 +129,7 @@
                             <th>Nomor Pengeluaran Barang</th>
                             <th>Tujuan</th>
                             <th>Jenis Kendaraan</th>
-                            <th>Status</th>
+                            <th>Status Pengajuan</th>
                             <th>Detail</th>
                         </tr>
                     </thead>
@@ -327,7 +327,7 @@
                     <!-- Card untuk Tabel Informasi Tambahan -->
                     <div class="card mt-4">
                     <div class="card-header bg-primary text-white">
-                            <h6 class="mb-0">Informasi Tambahan</h6>
+                            <h6 class="mb-0">Informasi Historis Persetujuan</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -338,9 +338,9 @@
                                         <th>Nama</th>
                                         <th>Tingkatan</th>
                                         <th>Departemen</th>
-                                        <th>Status Persetujuan</th>
-                                        <th>Tanggal Persetujuan</th>
-                                        <th>Alasan Penolakan</th>
+                                        <th>Status Pengajuan</th>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="additionalInfoBody">

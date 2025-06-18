@@ -232,7 +232,7 @@
                                                     <th>Nomor Surat Kendaraan Dinas</th>
                                                     <th>Rute</th>
                                                     <th>Jenis Kendaraan</th>
-                                                    <th>Status</th>
+                                                    <th>Status Pengajuan</th>
                                                     <th>Detail</th>
                                                 </tr>
                                             </thead>
@@ -402,9 +402,9 @@
                                                             <th>Nama</th>
                                                             <th>Tingkatan</th>
                                                             <th>Departemen</th>
-                                                            <th>Status Persetujuan</th>
-                                                            <th>Tanggal Persetujuan</th>
-                                                            <th>Alasan</th>
+                                                            <th>Status Pengajuan</th>
+                                                            <th>Tanggal</th>
+                                                            <th>Keterangan</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="addhistory">
