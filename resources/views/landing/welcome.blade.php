@@ -1011,6 +1011,7 @@
                                 <tr>
                                     <th>NO</th>
                                     <th>Nomor Pengeluaran Barang</th>
+                                    <th>Kategori Barang Keluar</th>
                                     <th>Diajukan Oleh</th>
                                     <th>Tanggal Pengajuan</th>
                                     <th>Asal Barang Keluar</th>
@@ -2580,11 +2581,17 @@
                         const tbody = document.getElementById('detailBody');
                         tbody.innerHTML = '';
 
+                        const kategoriPengeluaranMaping = {
+                            0: 'NON SCRAP',
+                            1: 'SCRAP'
+                        };
+
                         tbody.innerHTML = data_barang.map((item, index) => {
                             return `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${item.pengeluaran_barang_id}</td>
+                                    <td>${kategoriPengeluaranMaping[item.kategori_pengeluaran]}</td>
                                     <td>${item.created_by}</td>
                                     <td>${item.created_date}</td>
                                     <td>${item.lokasi_barang_keluar}</td>
