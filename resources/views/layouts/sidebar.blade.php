@@ -21,9 +21,9 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                     with font-awesome or any other icon font library -->
-                <li class="nav-header">MENU</li>
-                    <li class="nav-item {{ request()->routeIs('dashboard-barang-keluar') ? 'menu-open' : '' }}">
-                        <a href="{{ route('dashboard-barang-keluar') }}" class="nav-link {{ request()->routeIs('dashboard-barang-keluar') ? 'active' : '' }}">
+                    <li class="nav-header">MENU</li>
+                    <li class="nav-item {{ request()->routeIs(['dashboard-barang-keluar', 'dashboard-kendaraan-dinas']) ? 'menu-open' : '' }}">
+                        <a href="{{ route('dashboard-barang-keluar') }}" class="nav-link {{ request()->routeIs(['dashboard-barang-keluar', 'dashboard-kendaraan-dinas']) ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
                                 Beranda
@@ -31,6 +31,7 @@
                             </p>
                         </a>
                     </li>
+
 
                     @if(Auth::check() && (Auth::user()->level === 'Super Admin' || Auth::user()->seksi === 'GENERAL SERVICES'))
                         <li class="nav-item {{ request()->routeIs('kendaraan', 'approval', 'approval-dinas') ? 'menu-open' : '' }}">
