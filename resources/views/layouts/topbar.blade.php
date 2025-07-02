@@ -1,4 +1,14 @@
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <style>
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .navbar-nav.d-none.d-md-flex {
+                display: none !important;
+            }
+            .navbar-nav.ml-auto .d-md-none {
+                display: block !important;
+            }
+        }
+    </style>
     <div class="container-fluid d-flex justify-content-between">
         <!-- Left navbar links -->
         <ul class="navbar-nav d-none d-md-flex"> 
