@@ -915,7 +915,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </nav>
 
        <!-- Grafis Section -->
         <div class="hero-section">
